@@ -166,6 +166,15 @@ export function BreakEven({ runId, catalogue }) {
               moving into work, microsimulated.
             </p>
           )}
+          {entrySaving !== null && fullSaving !== null && (
+            <p data-entry-run-comparison="">
+              The microsimulated scenario adds {formatBn(entrySaving - fullSaving)} to the Exchequer, far less than the
+              slider below gives at 25%. The slider applies one case (a single Universal Credit claimant adding £4,027 a year to the
+              Exchequer) to every young person in a losing household. In the survey data many of them
+              are not on Universal Credit because they live with their parents, some already work, and the count includes
+              siblings and partners. Treat the slider as an upper bound and the microsimulated figure as the better guide.
+            </p>
+          )}
         </>
       );
     }
