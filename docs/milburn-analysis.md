@@ -42,6 +42,12 @@ FILLED FROM `public/data/milburn_summary.json` BY `scripts/milburn_summary.py`.
   phased variant (existing claimants reached as reassessed, about 36% in
   2027-28) and the central variant (severe cases keep the element; PIP at
   half rate standing in for the cost allowance) bracket the briefed design.
+- **Variants (2027-28).** Phased: £2.01bn, rising to £4.74bn by 2031-32
+  (full abolition £4.89bn); absolute AHC poverty +0.21pp rising to +0.53pp.
+  Central (severe cases keep the element on 24+ PIP daily living points;
+  PIP at half rate): £2.54bn; the same 578k young people in losing
+  households but an average household loss of about £7,000 rather than
+  £12,600; absolute AHC poverty +0.45pp (~314k) against +0.59pp (~410k).
 - **Overlap.** In the data, limited capability for work among under-25s
   mostly coincides with PIP receipt (about nine in ten young LCWRA claimants
   also get PIP). The package therefore stacks both losses on largely the
@@ -91,6 +97,16 @@ numbers:
   570k at 16 hours (450k at 25 hours), against ~233k young LCWRA awards and
   the review's claim of 440,000 "opportunities" by 2036 (placements and
   education, not additional jobs).
+- Microsimulated scenario (`milburn_package_entry_25pct`): if a random
+  quarter of affected young people who do not work (aged 18–24, with PIP or
+  LCWRA) moved into 16 hours a week at their minimum wage, the 2027-28
+  saving rises only from £4.49bn to £4.61bn, because many young PIP
+  recipients are not on UC (they live with parents), so the Exchequer gains
+  little beyond employer NICs. The rise in absolute poverty after housing
+  costs falls by about a third (+0.39pp, ~272k people, against +0.59pp,
+  ~410k) and the average loss in losing households from about £12.6k to
+  £11.3k. The fiscal second-round effect is small; the distributional one
+  is not.
 - Unverified figures heard in conversation (450,000 more in work; 45% of
   about 1m affected; an average loss over £3,000) were not found in any
   published source as of 15 November.
