@@ -90,6 +90,8 @@ export async function loadGeographyFile(
   const { file, level } = FILES[name];
   // Not in this build: not published, and not requested
   if (published && !published.includes(file)) return failure("unavailable", null);
+  // The local build route has no results by area (a different build)
+  if (catalogue?.localBuild) return failure("unavailable", null);
   try {
     const { text, aliases } = await loadVerifiedFlat(file, catalogue, { fetchImpl, basePath: base });
     const parsed = parseGeographyTable(text, { level });

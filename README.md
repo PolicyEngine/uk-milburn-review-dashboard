@@ -93,7 +93,7 @@ HOUSEHOLD_WORKERS=2 PORT=8010 uv run uk-budget-api
 bun run dev
 ```
 
-The page is at <http://localhost:3000/uk/autumn-budget-2026>.
+The page is at <http://localhost:3000/uk/milburn-review>.
 
 | Variable | Used by | Purpose |
 |---|---|---|

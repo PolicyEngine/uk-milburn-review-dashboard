@@ -19,6 +19,7 @@
 import { readFile } from 'node:fs/promises';
 import { join, resolve, sep } from 'node:path';
 import { loadDashboardParts } from '@/utils/publication/parts';
+import { isLocalBuildRoute } from '@/utils/milburn/localBuild';
 
 const DATA = join(process.cwd(), 'public', 'data');
 const PREFIX = '/data/';
@@ -52,6 +53,9 @@ let boot: Promise<PublicationBoot | null> | null = null;
 /** The build-verified publication, or null for none (the page then loads it). */
 export function publicationBoot(): Promise<PublicationBoot | null> {
   if (process.env.AB26_NO_BOOT === '1') return Promise.resolve(null);
+  // The local build route (utils/milburn/localBuild.js) bakes in nothing:
+  // the page reads its flat results itself, never the verified manifest
+  if (isLocalBuildRoute()) return Promise.resolve(null);
   boot ??= loadDashboardParts('', { fetchImpl: readPublished as typeof fetch }).then(
     (parts) => (parts.status === 'ready' ? (plain(parts) as PublicationBoot) : null),
     (error) => {

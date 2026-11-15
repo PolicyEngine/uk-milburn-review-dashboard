@@ -4,6 +4,7 @@ import { loadDashboardParts } from "./publication/parts";
 export { loadDashboardParts, sameParts } from "./publication/parts";
 import { parseCsv } from "./publication/csv";
 import { buildMeasureCatalogue, isCatalogueRowDisplayable } from "./measureCatalogue";
+import { finishLocalCatalogue, isLocalBuildRoute, loadLocalBuildParts, localTableRows } from "./milburn/localBuild";
 
 export function parseDashboardCsv(text) {
   const [headers, ...rows] = parseCsv(text);
@@ -13,6 +14,9 @@ export function parseDashboardCsv(text) {
 
 /** Every national figure is read from a receipt-verified artifact snapshot. */
 export async function loadDashboard(basePath = "", options = {}) {
+  // The Milburn review's local build route (utils/milburn/localBuild.js):
+  // flat results on a build no receipt covers, labelled as such
+  if (isLocalBuildRoute()) return dashboardFromParts(await loadLocalBuildParts(basePath, options));
   return dashboardFromParts(await loadDashboardParts(basePath, options));
 }
 
@@ -26,6 +30,7 @@ export function dashboardFromParts(parts) {
   const names = { budgetary: "budgetary_impact", distributional: "distributional_impact", winnersLosers: "winners_losers", metrics: "metrics" };
   for (const [name, table] of Object.entries(names)) data[name] = Object.values(tablesByKey).flatMap((tables) => tables[table] ?? []);
   const catalogue = buildMeasureCatalogue({ manifest, ...data, tablesByKey, failures });
+  if (parts.localBuild) finishLocalCatalogue(catalogue, parts);
   for (const name of Object.keys(names)) data[name] = data[name].filter((row) => isCatalogueRowDisplayable(catalogue, row.reform_id, row.year));
   return { status: "ready", catalogue, ...data };
 }
@@ -81,6 +86,8 @@ export function peekVerifiedTables(catalogue, table) {
 export async function loadVerifiedTables(catalogue, table, { basePath = process.env.NEXT_PUBLIC_BASE_PATH || "", fetchImpl = fetch, signal } = {}) {
   const manifest = catalogue?.manifest;
   if (!manifest || !catalogue.tablesByKey) throw new Error("No Budget results are published yet");
+  // The local build route loaded every run's tables with the catalogue
+  if (catalogue.localBuild) return localTableRows(catalogue, table, isCatalogueRowDisplayable);
   const failures = [];
   const loaded = await Promise.all(Object.keys(catalogue.tablesByKey).map(async (key) => {
     const entry = Object.hasOwn(manifest.measures, key) ? manifest.measures[key] : Object.hasOwn(manifest.combined, key) ? manifest.combined[key] : undefined;

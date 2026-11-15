@@ -136,14 +136,25 @@ local-area cut is a different build.
 
 ```bash
 HOUSEHOLD_WORKERS=2 PORT=8010 uv run uk-budget-api     # household calculations on 2.177.7
-bun run dev                                            # http://localhost:3000/uk/autumn-budget-2026
+bun run dev                                            # http://localhost:3000/uk/milburn-review
 ```
 
+The page reads the flat files above through its local build route
+(`src/utils/milburn/localBuild.js`), not the verified route. `next.config.ts`
+sets `NEXT_PUBLIC_DATA_ROUTE=local-build` when
+`public/data/milburn_measures.json` exists (set `NEXT_PUBLIC_DATA_ROUTE=verified`
+to use the verified route instead). The catalogue comes from
+`milburn_measures.json`; each of the six measures and `milburn_package` is a
+single run, selected one at a time and never summed on the page. A run shows
+once its folder has a `model_build.json` (written after the tables); until
+then it is listed as "Not yet run", with no figure. Every view carries the
+label from `model_build.json` ("not certified"). Results by area and the
+household scatter are not on the flat route and show as unavailable.
+
 The household API answers on the installed engine, but the page's Household
-impact tab only offers measures the manifest approves, and refuses answers
-whose engine differs from the receipts' (none exist on this build). Until
-the frontend reads the flat files above, the page will show no Milburn
-figures.
+calculator checks every answer against a receipt's engine and approved
+definitions, and none exist on this build, so on the local route the tab
+shows that it is unavailable.
 
 ## The release id
 

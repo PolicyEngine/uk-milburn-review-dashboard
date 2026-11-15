@@ -1,18 +1,75 @@
 import SectionHeading from "../SectionHeading";
 import { PolicyCard } from "../PolicyCards";
 import { NOT_COMPUTABLE_MEASURES } from "../../utils/milburn/notComputable";
+import { useMeasureCatalogue } from "../../utils/measureCatalogue";
+import { NOT_YET_RUN } from "../../utils/milburn/localBuild";
+import "./milburn.css";
 
 export const NOT_COMPUTABLE_TITLE = "Candidate measures we cannot compute";
+export const NOT_YET_RUN_TITLE = "Candidate measures not yet run";
+
+/**
+ * The not-computable measures as the local build route lists them
+ * (milburn_measures.json), in the cards' shape; the static list's
+ * audience and category where it has the measure.
+ */
+export function notComputableFromFile(listed) {
+  return listed.map((measure) => {
+    const known = NOT_COMPUTABLE_MEASURES.find((item) => item.id === measure.id);
+    return {
+      id: measure.id,
+      name: measure.name,
+      summary: measure.description || known?.summary || "",
+      affects: known?.affects ?? "",
+      category: known?.category ?? { label: "Benefits", icon: "piggy" },
+      notModelled: measure.reason || known?.notModelled || "",
+    };
+  });
+}
+
+/**
+ * On the local build route, the computable measures whose national run has
+ * not finished (no folder under public/data/milburn/) or could not be read:
+ * named with the reason, no figure.
+ */
+function PendingMeasures() {
+  const catalogue = useMeasureCatalogue();
+  if (!catalogue.localBuild) return null;
+  const pending = catalogue.measures.filter((measure) => !measure.displayable);
+  if (!pending.length) return null;
+  return (
+    <section id="measures-not-yet-run" aria-label={NOT_YET_RUN_TITLE}>
+      <SectionHeading
+        icon="list"
+        title={NOT_YET_RUN_TITLE}
+        subtitle="Computable, but their national results are not on this build yet; no figure is shown for them until they are."
+      />
+      <ul className="milburn-pending report-section">
+        {pending.map((measure) => (
+          <li key={measure.id}>
+            <strong>{measure.name}</strong>{" "}
+            <span className="milburn-pending-status">({measure.availability?.reason || NOT_YET_RUN})</span>
+            {measure.description && <p>{measure.description}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 /**
  * The candidate measures the dashboard lists but cannot compute, as cards
  * of the modelled cards' kind, each with the reason. No figure is shown
  * for any of them.
  */
-export default function NotComputableMeasures({ measures = NOT_COMPUTABLE_MEASURES }) {
-  if (!measures.length) return null;
+export default function NotComputableMeasures({ measures: given }) {
+  const catalogue = useMeasureCatalogue();
+  // The local build route's list (milburn_measures.json), else the static one
+  const measures = given ?? (catalogue.localBuild ? notComputableFromFile(catalogue.localBuild.notComputable) : NOT_COMPUTABLE_MEASURES);
   return (
-    <section id="measures-not-computable" aria-label={NOT_COMPUTABLE_TITLE}>
+    <>
+    <PendingMeasures />
+    {measures.length > 0 && <section id="measures-not-computable" aria-label={NOT_COMPUTABLE_TITLE}>
       <SectionHeading
         icon="list"
         title={NOT_COMPUTABLE_TITLE}
@@ -39,6 +96,7 @@ export default function NotComputableMeasures({ measures = NOT_COMPUTABLE_MEASUR
           ))}
         </ul>
       </div>
-    </section>
+    </section>}
+    </>
   );
 }

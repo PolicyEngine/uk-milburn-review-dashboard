@@ -13,6 +13,24 @@ import "./PersonalImpactTab.css";
 function PersonalImpactTab({ selectedPolicies = [], policies = [], year, onRemoveUnavailable, active = true }) {
   const catalogue = useMeasureCatalogue();
   const confirmPublication = usePublicationCheck();
+  // The local build route (utils/milburn/localBuild.js) has no receipts:
+  // the calculator checks every live answer against a receipt's engine and
+  // approved definition, so it cannot answer on this build
+  if (catalogue.localBuild) {
+    return (
+      <UnavailableNotice reason="Household calculator is not available on the local build">
+        <p>
+          The calculator checks each answer against the model version and measure definitions that the published
+          figures&rsquo; receipts record. The local build ({catalogue.localBuild.label}) has no receipts, so there is
+          nothing to check a household&rsquo;s answer against.
+        </p>
+        <p>
+          The household API runs on this engine (<code>HOUSEHOLD_WORKERS=2 PORT=8010 uv run uk-budget-api</code>) and
+          can be asked directly for the six computable measures.
+        </p>
+      </UnavailableNotice>
+    );
+  }
   const unavailable = selectedPolicies.filter((id) => !isCatalogueRowDisplayable(catalogue, id, year));
   if (!catalogue.manifest || unavailable.length) {
     const names = unavailable.map((id) => catalogue.byId.get(id)?.name ?? id);

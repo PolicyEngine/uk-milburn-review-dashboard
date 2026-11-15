@@ -32,6 +32,8 @@ import { bootView } from "./utils/bootView";
 import { POVERTY_FIGURES_SHOWN } from "./utils/povertyFigures";
 import UpdateToast from "./components/publication/UpdateToast";
 import { provisionalNotice } from "./utils/publication/manifest";
+import { isLocalBuildRoute, localBuildNotice } from "./utils/milburn/localBuild";
+import LocalBuildLabel from "./components/milburn/LocalBuildLabel";
 import { DownloadContext, policiesLabel } from "./utils/downloadContext";
 import { OPEN_VIEW_EVENT } from "./utils/methodLink";
 import { lazyView, preloadViewCode } from "./utils/lazyView";
@@ -333,7 +335,8 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         done.add("map");
         prefetchGeography(catalogue);
       }
-      if (!done.has("presets") && target.closest("#tab-household")) {
+      // The local build route has no household calculator (PersonalImpactTab)
+      if (!done.has("presets") && !catalogue.localBuild && target.closest("#tab-household")) {
         done.add("presets");
         loadPresetChanges().catch(() => {});
       }
@@ -967,7 +970,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   const provisional = catalogueProvisional(catalogue);
   // The notice shown for it: the candidate label before the Budget, none
   // for Budget-day statement figures
-  const notice = provisional ? provisionalNotice(catalogue.manifest) : "";
+  const notice = catalogue.localBuild ? localBuildNotice(catalogue.localBuild) : provisional ? provisionalNotice(catalogue.manifest) : "";
 
   // What a downloaded chart says it shows (ChartDownloadMenu's frame): the
   // band's policies on the views it drives, the provisional label while
@@ -1253,6 +1256,9 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           hidden={landing || value !== activeTab}
         >
         <DownloadContext.Provider value={downloadContext(value)}>
+        {/* The local build's label, near every view's figures (Population
+            impact carries it under its sub-tabs) */}
+        {value !== "dashboard" && <LocalBuildLabel />}
         <Suspense fallback={viewFallback(value)}>
         {BUDGET_VIEWS.has(value) && unavailable?.loading ? (
           // Placeholders at once while the verified figures load; the
@@ -1307,7 +1313,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         ) : (
           // Population impact and its sub-tabs (populationPanel)
           // Hidden under the landing page, it leaves the address alone
-          <PopulationImpactView note={showingLine} active={activeTab === value && !landing}>
+          <PopulationImpactView note={<>{showingLine}<LocalBuildLabel /></>} active={activeTab === value && !landing}>
             {populationPanel}
           </PopulationImpactView>
         )}
@@ -1377,13 +1383,15 @@ function App({ boot = null }) {
   useEffect(() => {
     const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
     const controller = new AbortController();
+    // The Milburn review's local build route (utils/milburn/localBuild.js)
+    const localRoute = isLocalBuildRoute();
     const show = (result) => {
       current.current = result;
       setPublished(result);
       setError(null);
     };
     let initialComplete = false;
-    const initial = (fromBuild
+    const initial = (fromBuild && !localRoute
       ? reverifyBoot(base, boot, controller.signal).then((parts) => {
         if (controller.signal.aborted) return;
         // The page's check found exactly the build's figures: they stay
@@ -1414,9 +1422,21 @@ function App({ boot = null }) {
     // Each check resolves to the live snapshot it found, or null for none.
     const run = async () => {
       try {
-        const live = await loadManifest(base, { signal: controller.signal });
         const catalogue = current.current?.catalogue;
         const shown = catalogue?.manifest?.snapshotSha256 ?? null;
+        // The local build route has no manifest to check: its runs are read
+        // again, so a run that has finished since appears
+        if (localRoute) {
+          const next = await loadDashboard(base, { signal: controller.signal });
+          if (controller.signal.aborted) return null;
+          const found = next.catalogue.manifest?.snapshotSha256 ?? null;
+          if (found !== shown) {
+            show(next);
+            if (shown !== null) setUpdated(true);
+          }
+          return found;
+        }
+        const live = await loadManifest(base, { signal: controller.signal });
         const failed = Object.keys(catalogue?.failures ?? {}).length > 0;
         if (current.current !== null && (live?.snapshotSha256 ?? null) === shown && !failed) return shown;
         const next = await loadDashboard(base, { signal: controller.signal });

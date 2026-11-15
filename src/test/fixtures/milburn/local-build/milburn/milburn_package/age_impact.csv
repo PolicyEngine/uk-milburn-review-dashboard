@@ -1,0 +1,7 @@
+reform_id,reform_name,year,age_band,people,sample_size,mean_change,mean_equivalised_change,pct_better_off,pct_worse_off,pct_unchanged,people_directly_affected
+milburn_package,Milburn package (combined),2027,0-15,12000000.0,1000,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_package,Milburn package (combined),2027,16-24,6000000.0,1000,-50.0,-30.0,0.0,5.0,95.0,300000.0
+milburn_package,Milburn package (combined),2027,25-34,8000000.0,1000,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_package,Milburn package (combined),2028,0-15,12000000.0,1000,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_package,Milburn package (combined),2028,16-24,6000000.0,1000,-50.0,-30.0,0.0,5.0,95.0,300000.0
+milburn_package,Milburn package (combined),2028,25-34,8000000.0,1000,0.0,0.0,0.0,0.0,100.0,0.0

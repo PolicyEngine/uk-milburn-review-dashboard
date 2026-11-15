@@ -20,6 +20,12 @@ import { isSupported } from "../publication/select";
  * null (none, or several to choose between).
  */
 export function packageKeyOf(catalogue) {
+  // The local build route: the package is a run of its own, shown only once
+  // its folder has been read (utils/milburn/localBuild.js)
+  if (catalogue?.localBuild) {
+    const key = catalogue.localBuild.packageId;
+    return key && catalogue.byId?.get(key)?.displayable ? key : null;
+  }
   if (catalogue?.combinedId) return catalogue.combinedId;
   const combined = catalogue?.manifest?.combined;
   if (!combined || !catalogue.tablesByKey) return null;
@@ -31,6 +37,10 @@ export function packageKeyOf(catalogue) {
 
 /** Whether a package row's year is published for the run and every member. */
 export function packageYearShown(catalogue, key, year) {
+  if (catalogue?.localBuild) {
+    const run = catalogue.manifest?.measures?.[key];
+    return Boolean(run) && isDisplayable(run) && isSupported(run, Number(year));
+  }
   const entry = catalogue?.manifest?.combined?.[key];
   if (!entry || !isDisplayable(entry) || !isSupported(entry, Number(year))) return false;
   return (entry.measures ?? []).every((member) => {
@@ -48,6 +58,11 @@ export function loadPackageTable(catalogue, key, table, { basePath = process.env
   let cache = loads.get(catalogue);
   if (!cache) loads.set(catalogue, (cache = new Map()));
   const id = `${key}\u0000${table}`;
+  if (!cache.has(id) && catalogue.localBuild) {
+    // Loaded with the catalogue: the run's own rows, its years only
+    const rows = catalogue.tablesByKey?.[key]?.[table] ?? [];
+    cache.set(id, Promise.resolve(rows.filter((row) => row.reform_id === key && packageYearShown(catalogue, key, row.year))));
+  }
   if (!cache.has(id)) {
     const entry = catalogue.manifest?.combined?.[key] ?? catalogue.manifest?.measures?.[key];
     const promise = loadArtifact(basePath, key, entry, { tables: [table] })

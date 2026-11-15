@@ -32,6 +32,18 @@ function publishedGeography(): string {
     .join(',');
 }
 
+/**
+ * Where the page's figures come from. "local-build" (the Milburn review's
+ * flat results on a build no receipt covers, utils/milburn/localBuild.js)
+ * when public/data/milburn_measures.json exists, else "verified" (the
+ * receipted publication route); NEXT_PUBLIC_DATA_ROUTE overrides either.
+ */
+function dataRoute(): string {
+  const given = process.env.NEXT_PUBLIC_DATA_ROUTE;
+  if (given) return given;
+  return existsSync(join(process.cwd(), 'public', 'data', 'milburn_measures.json')) ? 'local-build' : 'verified';
+}
+
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH !== undefined
   ? process.env.NEXT_PUBLIC_BASE_PATH
   : '/uk/milburn-review';
@@ -48,6 +60,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BASE_PATH: basePath,
     NEXT_PUBLIC_POLICYENGINE_VERSION: lockedVersion('policyengine'),
     NEXT_PUBLIC_PUBLISHED_GEOGRAPHY: publishedGeography(),
+    NEXT_PUBLIC_DATA_ROUTE: dataRoute(),
   },
   // recharts and d3 ship CJS interop and rely on browser globals; transpiling
   // them through Next's pipeline avoids ESM/CJS mismatch errors during build.

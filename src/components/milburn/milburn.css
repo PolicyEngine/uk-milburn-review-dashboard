@@ -177,3 +177,37 @@
   color: var(--c-axis-title);
   font-size: 0.75rem;
 }
+
+/* The local build's label (LocalBuildLabel.jsx), under the view tabs */
+.milburn-build-label {
+  display: block;
+  margin: 16px 0;
+  line-height: 1.5;
+}
+
+/* Policies: the computable measures whose run has not finished */
+.milburn-pending {
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 16px;
+}
+
+.milburn-pending li {
+  padding: 16px 20px;
+  border: 1px dashed var(--c-axis);
+  border-radius: 8px;
+  background: var(--c-muted-fill);
+  color: var(--c-text);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.milburn-pending li p {
+  margin: 4px 0 0;
+}
+
+.milburn-pending-status {
+  font-weight: 500;
+}
