@@ -38,13 +38,13 @@
     },
     {
       "id": "uc_lcwra_16_24",
-      "figure": "People aged 16 to 24 on Universal Credit with limited capability for work and work-related activity (LCWRA)",
+      "figure": "Young people aged 16 to 24 in a Universal Credit LCWRA subgroup, as reported",
       "value": "62,570",
-      "basis": "DWP administrative statistics, May 2026",
+      "basis": "DWP statistics as reported by Benefits and Work; the report describes a subgroup at substantial risk if required to prepare for work, so this is not the full LCWRA caseload",
       "source": "DWP, via Benefits and Work",
       "url": "https://benefitsandwork.co.uk/news/milburn-proposes-abolition-of-%20pip-and-uc-health-for-under-25s",
       "date": "May 2026",
-      "press_report": false,
+      "press_report": true,
       "policyengine_estimate": null
     },
     {
@@ -83,6 +83,61 @@
         "metric": "young_people_worse_off",
         "label": "People aged 16 to 24 in households made worse off by the combined package"
       }
+    },
+    {
+      "id": "young_benefits_spend",
+      "figure": "Spending on PIP and Universal Credit health for young people",
+      "value": "About £8bn a year; PIP for young people projected at £6.5bn by 2031-32",
+      "basis": "Interim report estimates, as reported",
+      "source": "Benefits and Work, reporting the interim report",
+      "url": "https://benefitsandwork.co.uk/news/milburn-proposes-abolition-of-%20pip-and-uc-health-for-under-25s",
+      "date": "1 June 2026",
+      "press_report": true,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "pip_young_2025_26",
+      "figure": "Young people on PIP",
+      "value": "465,000 in 2025-26 (230,000 in 2019-20)",
+      "basis": "Caseload as reported; age band and coverage not stated",
+      "source": "Press report (GB News)",
+      "url": "",
+      "date": "November 2026",
+      "press_report": true,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "pip_no_extra_costs",
+      "figure": "Young PIP claimants reporting no extra costs",
+      "value": "About 1 in 5",
+      "basis": "Resolution Foundation research",
+      "source": "Resolution Foundation",
+      "url": "https://www.resolutionfoundation.org/comment/can-milburn-rise-to-the-scale-of-britains-neets-challenge/",
+      "date": "11 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "employer_nics_under_25",
+      "figure": "Cost of a zero employer National Insurance rate for under-25s",
+      "value": "£5.1bn a year; about £132,000 per extra job",
+      "basis": "Resolution Foundation estimate; not a recommendation of the review",
+      "source": "Resolution Foundation",
+      "url": "https://www.resolutionfoundation.org/comment/can-milburn-rise-to-the-scale-of-britains-neets-challenge/",
+      "date": "11 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "opportunities_claim",
+      "figure": "Employment and education opportunities from the review's proposals",
+      "value": "440,000 by 2036",
+      "basis": "Claim by the review's author; counts placements and education, not additional employment",
+      "source": "Press report (Guardian)",
+      "url": "https://www.aol.co.uk/articles/local-fund-replace-pip-most-171434000.html",
+      "date": "12 November 2026",
+      "press_report": true,
+      "policyengine_estimate": null
     }
   ]
 }

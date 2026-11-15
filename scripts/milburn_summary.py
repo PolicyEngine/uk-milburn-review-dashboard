@@ -59,12 +59,18 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
         "everyone_in_losing_households_pct": round(
             float(ages["all"]["pct_worse_off"]), 2
         ),
-        "poverty_bhc_change_pp": round(float(metrics["poverty_change_pp"]), 3),
-        "poverty_ahc_change_pp": round(
-            float(metrics.get("poverty_abs_ahc_change_pp") or "nan"), 3
-        )
-        if metrics.get("poverty_abs_ahc_change_pp")
-        else None,
+        "poverty_change_pp": {
+            k: round(float(metrics[f"poverty_{k}_change_pp"]), 3)
+            for k in ("rel_bhc", "rel_ahc", "abs_bhc", "abs_ahc")
+        },
+        "people_into_poverty_rel_ahc": round(
+            float(metrics["poverty_rel_ahc_change_pp"])
+            / 100
+            * float(ages["all"]["people"])
+        ),
+        "child_poverty_change_pp_rel_ahc": round(
+            float(metrics["child_poverty_rel_ahc_change_pp"]), 3
+        ),
     }
     # Illustrative break-even: the share of young people in losing
     # households who would need to move into work (16 or 25 hours at the
@@ -73,9 +79,25 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     # 22-year-old renter with LCWRA); a household with PIP or a partner
     # gains differently, so this is an order of magnitude, not an estimate.
     if loss_affected and scenarios:
+        cases = scenarios.get("entry_cases", [])
+        # s = L / g: the share of young people in losing households who
+        # would need to move into work for the group's average income to
+        # recover. Above 100% means no entry rate at these hours restores
+        # it. Arithmetic, not an incentive the reform creates: the gain
+        # from work is the same under current law and the package.
         out["break_even_share_in_work_pct"] = {
             c["id"]: round(100 * loss_affected / c["net_income_gain_package"], 1)
-            for c in scenarios.get("entry_cases", [])
+            for c in cases
+        }
+        # Entrants whose gains from work would match the total static
+        # income loss (approximated by the Exchequer saving).
+        saving = budget.get(YEAR, 0) * 1e9
+        out["entrants_to_match_income_loss"] = {
+            c["id"]: round(saving / c["net_income_gain_package"])
+            for c in cases
+        }
+        out["exchequer_gain_per_entrant"] = {
+            c["id"]: c["exchequer_gain_package"] for c in cases
         }
     return out
 
@@ -94,7 +116,7 @@ def main():
     w = sys.stdout.write
     w(
         "| Measure | Saving 2027-28 | 16-24s in losing households |"
-        " Avg loss (losing hh) | Poverty BHC | Break-even 16h / 25h |\n"
+        " Avg loss (losing hh) | Relative AHC poverty | Break-even 16h / 25h |\n"
     )
     w("|---|---|---|---|---|---|\n")
     for r in results:
@@ -104,7 +126,8 @@ def main():
             f" {r['young_people_in_losing_households']/1000:.0f}k"
             f" ({r['share_of_16_24_in_losing_households_pct']:.1f}%) |"
             f" £{r['average_loss_young_person_in_losing_household'] or 0:,} |"
-            f" {r['poverty_bhc_change_pp']:+.2f}pp |"
+            f" {r['poverty_change_pp']['rel_ahc']:+.2f}pp"
+            f" ({r['people_into_poverty_rel_ahc']/1000:.0f}k) |"
             f" {be.get('h16', '–')}% / {be.get('h25', '–')}% |\n"
         )
 
