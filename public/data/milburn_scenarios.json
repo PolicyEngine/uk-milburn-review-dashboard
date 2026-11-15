@@ -1,0 +1,33 @@
+{
+  "year": 2027,
+  "basis": "Household calculation for 2027-28 (build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release), on the OBR October 2026 forecast. A single person aged 22, renting privately in the North West for \u00a36,000 a year, with limited capability for work and work-related activity, no PIP and no other income, on Universal Credit; moving from no work to 16 or 25 hours a week at the National Living Wage for 2027-28, all year. Gains are annual, in work minus out of work. The Exchequer gain is income tax plus employee and employer National Insurance plus the fall in benefits; employer National Insurance is counted. Package: milburn_package (health element removed for under-25s and PIP removed for 18 to 24-year-olds).",
+  "entry_cases": [
+    {
+      "id": "h16",
+      "hours": 16,
+      "hourly_wage": 13.21,
+      "annual_earnings": 10990.72,
+      "net_income_gain_current_law": 7862.66,
+      "net_income_gain_package": 7862.66,
+      "exchequer_gain_current_law": 4026.67,
+      "exchequer_gain_package": 4026.67
+    },
+    {
+      "id": "h25",
+      "hours": 25,
+      "hourly_wage": 13.21,
+      "annual_earnings": 17173.0,
+      "net_income_gain_current_law": 10064.7,
+      "net_income_gain_package": 10064.7,
+      "exchequer_gain_current_law": 8934.25,
+      "exchequer_gain_package": 8934.25
+    }
+  ],
+  "notes": [
+    "Out of work under current law the person receives the protected LCWRA element (a pre-2026 claimant); the package removes it, in work and out.",
+    "The LCWRA status still gives the Universal Credit work allowance under the package, so earnings up to it reduce the award by nothing.",
+    "The person has no PIP, so the package's PIP removal does not change these cases.",
+    "The element is a fixed amount: while Universal Credit stays in payment after the move into work, removing it lowers income by the same amount in and out of work, so the gains from work are the same under the package as under current law.",
+    "Wages, hours and housing costs are held fixed; no behavioural response is modelled."
+  ]
+}

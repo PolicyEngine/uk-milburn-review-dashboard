@@ -1,0 +1,128 @@
+{
+  "build": "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release",
+  "measures": [
+    {
+      "id": "milburn_package",
+      "name": "Milburn package (combined)",
+      "description": "The health element removal for under-25s (all claimants) and the PIP removal for 18 to 24-year-olds simulated together, with their interactions.",
+      "status": "computable",
+      "first_year": 2027,
+      "measures": [
+        "uc_health_element_removed_under_25",
+        "pip_removed_under_25"
+      ]
+    },
+    {
+      "id": "milburn_package_central",
+      "name": "Milburn package, central variant (combined)",
+      "description": "The health element removal for under-25s with severe cases kept, and PIP at half rate for 18 to 24-year-olds in place of a new additional cost allowance, simulated together with their interactions.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "uc_health_element_removed_under_25",
+      "name": "UC health element removed for under-25s",
+      "description": "From April 2027 Universal Credit awards no longer include the health (LCWRA) element where the claimant with limited capability for work and work-related activity is under 25, for existing and new claimants alike; an award keeps it where a joint claimant aged 25 or over has that capability. The assessment itself is unchanged, so the work allowance still applies, but an award without the element loses the benefit cap exception that rests on it.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "uc_health_element_removed_under_25_new_claims",
+      "name": "UC health element removed for under-25 new claims",
+      "description": "From April 2027 Universal Credit awards paid the health element at the new-claimant rate (claims from April 2026) no longer include it where the claimant with limited capability for work and work-related activity is under 25; protected claimants keep it. The data hold no claim dates: the model assigns the new-claimant rate by a random draw at the expected share of claims, regardless of age, so the figure rests on that assumption.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "pip_removed_under_25",
+      "name": "PIP removed for 18 to 24-year-olds",
+      "description": "From April 2027 people aged 18 to 24 receive neither component of Personal Independence Payment; 16 and 17-year-olds keep it and Disability Living Allowance for children is unchanged. Entitlements that depend on receiving PIP go with it. Scottish recipients of Adult Disability Payment, which the data record as PIP, are included.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "youth_allowance_at_25_plus_rate",
+      "name": "Under-25 UC standard allowance at the 25-and-over rate",
+      "description": "From April 2027 single Universal Credit claimants under 25 receive the standard allowance for those aged 25 and over, and couples in which both are under 25 receive the couple rate for those aged 25 and over. The protected health element is held at its current-law amount, which the law otherwise links to the under-25 allowances. Briefings before the report point to a youth allowance at the under-25 rate, which would leave awards unchanged; this variant shows the higher rate.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "employer_nics_zero_under_25",
+      "name": "Employer NICs zero rate extended to under-25s",
+      "description": "From April 2027 employers pay no Class 1 National Insurance on earnings up to the upper secondary threshold (\u00a350,270 a year) for employees under 25, extending the zero rate for under-21s. The model passes employers' National Insurance through to wages, so the saving shows as higher pay for these employees. Recommended by the Work and Pensions Committee; briefings do not attribute it to the review.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "uc_health_element_removed_under_22",
+      "name": "UC health element removed for under-22s",
+      "description": "From April 2027 Universal Credit awards no longer include the health (LCWRA) element where the claimant with limited capability for work and work-related activity is under 22, for existing and new claimants alike: the age limit proposed in the 2025 Pathways to Work green paper.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "uc_health_element_removed_under_25_severe_kept",
+      "name": "UC health element removed for under-25s, severe cases kept",
+      "description": "As the removal for under-25s, except that a young claimant with limited capability for work and work-related activity who scores 24 or more PIP daily living points (about a fifth of young PIP recipients) keeps the element. The points stand in for the trailed higher-rate benefit for people with the most severe conditions, whose eligibility rules are not yet known.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "pip_halved_under_25",
+      "name": "PIP at half rate for 18 to 24-year-olds",
+      "description": "From April 2027 people aged 18 to 24 receive half their current Personal Independence Payment. This is an illustrative stand-in for a smaller, non-means-tested additional cost allowance in place of PIP, whose rules are not yet known; Scottish Adult Disability Payment, recorded as PIP, is included. Half an award can fall below the amounts that qualify a carer for Carer's Allowance or a household for disability premia, so those can be lost too; a new allowance could carry its own qualifying rules.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "pip_removed_16_to_24",
+      "name": "PIP removed for 16 to 24-year-olds",
+      "description": "As the PIP removal for 18 to 24-year-olds, but from age 16: 'under 25' read literally. Disability Living Allowance for children under 16 is unchanged.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "milburn_package_phased",
+      "name": "Milburn package, phased as claimants are reassessed",
+      "description": "The health element and PIP removals for young people, reaching new entrants (people turning 18 from April 2026) at once and existing claimants as they are reassessed, at an assumed 25% of the remaining caseload a year: about 36% reached in 2027-28, 60% in 2028-29 and 93% by 2031-32. Who is reached is a random draw, as the data hold no reassessment dates.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "milburn_package_entry_25pct",
+      "name": "Milburn package with an illustrative move into work",
+      "description": "The full package, with a randomly chosen quarter of affected young people who do not work (aged 18 to 24, with PIP or limited capability for work and work-related activity) moving into 16 hours a week at their minimum wage. An illustrative scenario, not an estimate of how people would respond.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "severe_conditions_higher_rate",
+      "name": "Higher health element for severe conditions",
+      "description": "A higher Universal Credit health element for claimants who meet the severe conditions criteria.",
+      "reason": "The data hold no severe conditions flag, so the claimants it would reach cannot be identified.",
+      "status": "not_computable"
+    },
+    {
+      "id": "additional_cost_allowance",
+      "name": "Additional cost allowance",
+      "description": "A new allowance towards the extra costs of disability, replacing PIP for young people.",
+      "reason": "Its rules (eligibility, rates) have not been set out.",
+      "status": "not_computable"
+    },
+    {
+      "id": "youth_conditionality",
+      "name": "Conditionality for young people",
+      "description": "Work-related requirements and sanctions for young Universal Credit claimants.",
+      "reason": "Its effect works through behaviour (job search, sanctions), which a static model does not capture.",
+      "status": "not_computable"
+    },
+    {
+      "id": "youth_guarantee_expansion",
+      "name": "Youth Guarantee expansion",
+      "description": "More training, job and work experience places for young people under the Youth Guarantee.",
+      "reason": "It is a spending programme, not a tax or benefit rule the model applies to households.",
+      "status": "not_computable"
+    }
+  ]
+}
