@@ -1554,7 +1554,10 @@ def _create_pip_halved_under_25() -> Reform:
             "Personal Independence Payment. This is an illustrative stand-in "
             "for a smaller, non-means-tested additional cost allowance in "
             "place of PIP, whose rules are not yet known; Scottish Adult "
-            "Disability Payment, recorded as PIP, is included."
+            "Disability Payment, recorded as PIP, is included. Half an award "
+            "can fall below the amounts that qualify a carer for Carer's "
+            "Allowance or a household for disability premia, so those can be "
+            "lost too; a new allowance could carry its own qualifying rules."
         ),
         simulation_modifier=pip_halved_ages_18_to_24,
     )

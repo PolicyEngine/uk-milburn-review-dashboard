@@ -47,7 +47,14 @@ FILLED FROM `public/data/milburn_summary.json` BY `scripts/milburn_summary.py`.
   Central (severe cases keep the element on 24+ PIP daily living points;
   PIP at half rate): £2.54bn; the same 578k young people in losing
   households but an average household loss of about £7,000 rather than
-  £12,600; absolute AHC poverty +0.45pp (~314k) against +0.59pp (~410k).
+  £12,600; absolute AHC poverty +0.45pp (~314k) against +0.59pp (~410k). PIP at half
+  rate alone saves £1.72bn, more than half of direct PIP (£1.46bn): half an
+  award can fall below the amounts that qualify carers for Carer's
+  Allowance and households for disability premia, so the proxy may
+  overstate losses relative to a new allowance with its own passports.
+  Severe cases kept: the health element removal saves £0.83bn rather than
+  £1.15bn. PIP from 16: £4.42bn rather than £3.44bn (87k recipients aged
+  16–17 and their carers).
 - **Overlap.** In the data, limited capability for work among under-25s
   mostly coincides with PIP receipt (about nine in ten young LCWRA claimants
   also get PIP). The package therefore stacks both losses on largely the
