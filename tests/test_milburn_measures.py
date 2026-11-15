@@ -280,6 +280,9 @@ def test_the_registry_holds_the_milburn_measures_only():
         "uc_health_element_removed_under_22",
         "uc_health_element_removed_under_25_severe_kept",
         "pip_halved_under_25",
+        "pip_removed_16_to_24",
+        "milburn_package_phased",
+        "milburn_package_entry_25pct",
     ]
     assert MILBURN_PACKAGE_COMPONENTS == (
         UC_HEALTH_UNDER_25_ID,
@@ -379,9 +382,19 @@ def _with_dl(situation, category):
     return situation
 
 
-def test_severe_cases_kept_spares_an_enhanced_daily_living_award():
+def _with_points(situation, points):
+    situation = _with_dl(situation, "ENHANCED")
+    situation["people"]["p"]["pip_dl_points"] = {YEAR: points}
+    return situation
+
+
+def test_severe_cases_kept_spares_24_or_more_daily_living_points():
     rid = "uc_health_element_removed_under_25_severe_kept"
-    kept = change(rid, _with_dl(single(22, lcwra=True), "ENHANCED"), "uc_LCWRA_element")
+    kept = change(rid, _with_points(single(22, lcwra=True), 26), "uc_LCWRA_element")
+    assert kept[1] == pytest.approx(kept[0], abs=0.01) and kept[0] > 0
+    lost12 = change(rid, _with_points(single(22, lcwra=True), 12), "uc_LCWRA_element")
+    assert lost12[1] == 0 and lost12[0] > 0
+    kept = change(rid, _with_points(single(22, lcwra=True), 24), "uc_LCWRA_element")
     assert kept[1] == pytest.approx(kept[0], abs=0.01) and kept[0] > 0
     lost = change(rid, _with_dl(single(22, lcwra=True), "STANDARD"), "uc_LCWRA_element")
     assert lost[1] == 0 and lost[0] > 0
@@ -394,3 +407,22 @@ def test_pip_at_half_rate_halves_a_20_year_olds_award():
 
 def test_the_central_package_is_registered():
     assert "milburn_package_central" in list_reform_ids()
+
+
+def test_pip_from_16_removes_a_17_year_olds_award():
+    before, after = change("pip_removed_16_to_24", single(17, rent=0, pip=True))
+    assert before - after == pytest.approx(8_433.58, abs=0.05)
+
+
+def test_a_new_entrant_is_reached_at_once_by_the_phased_package():
+    # Aged 18 in 2027-28: turned 18 after April 2026, so reached whatever
+    # the reassessment draw.
+    before, after = change("milburn_package_phased", single(18, rent=0, pip=True))
+    assert before - after == pytest.approx(8_433.58, abs=0.05)
+
+
+def test_the_entry_scenario_runs_on_a_household():
+    before, after = change("milburn_package_entry_25pct", single(20, rent=0, pip=True))
+    # Either the person stays out of work (loses PIP) or moves into work;
+    # both are finite and the PIP is gone.
+    assert change("milburn_package_entry_25pct", single(20, rent=0, pip=True), "pip")[1] == 0

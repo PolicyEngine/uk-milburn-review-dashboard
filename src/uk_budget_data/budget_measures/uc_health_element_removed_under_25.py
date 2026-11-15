@@ -13,6 +13,9 @@ from policyengine_uk.utils.uc_work_related_requirements import (
 )
 
 
+SEVERE_DL_POINTS = 24
+
+
 def uc_health_element_removed_under_25(
     sim,
     start_year=2027,
@@ -56,19 +59,15 @@ def uc_health_element_removed_under_25(
             & (person("age", period) >= age_limit)
         )
         if keep_enhanced_pip_daily_living:
-            # Severity proxy: a young claimant with LCWRA whose PIP daily
-            # living category is enhanced keeps the element. The category,
-            # not the payment, is read, so a PIP change in the same run
-            # does not move it.
-            category = person("pip_dl_category", period)
-            if hasattr(category, "possible_values"):
-                enhanced = category == category.possible_values.ENHANCED
-            else:
-                enhanced = np.asarray(category).astype(str) == "ENHANCED"
+            # Severity proxy: a young claimant with LCWRA scoring 24 or more
+            # PIP daily living points (about a fifth of young recipients)
+            # keeps the element. Points, not payments, are read, so a PIP
+            # change in the same run does not move it.
+            severe = person("pip_dl_points", period) >= SEVERE_DL_POINTS
             qualifying = qualifying | (
                 claimant
                 & person("uc_limited_capability_for_WRA", period)
-                & enhanced
+                & severe
             )
         keep = benunit.any(qualifying)
         set_model_value(
@@ -84,8 +83,8 @@ def uc_health_element_removed_under_22(sim):
 
 
 def uc_health_element_removed_under_25_severe_kept(sim):
-    """As above, but young claimants with LCWRA and an enhanced PIP daily
-    living award keep the element: a proxy for the trailed higher-rate
+    """As above, but young claimants with LCWRA and 24 or more PIP daily
+    living points keep the element: a proxy for the trailed higher-rate
     benefit for people with the most severe conditions."""
     return uc_health_element_removed_under_25(
         sim, keep_enhanced_pip_daily_living=True

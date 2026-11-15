@@ -57,8 +57,13 @@ from uk_budget_data.budget_measures.household_energy_payment_2026 import (
 from uk_budget_data.budget_measures.pension_tax_allowance import (
     pension_tax_allowance,
 )
+from uk_budget_data.budget_measures.milburn_variants import (
+    milburn_package_phased,
+    milburn_package_with_entry_25pct,
+)
 from uk_budget_data.budget_measures.pip_removed_ages_18_to_24 import (
     pip_halved_ages_18_to_24,
+    pip_removed_ages_16_to_24,
     pip_removed_ages_18_to_24,
 )
 from uk_budget_data.budget_measures.planned_cash_isa_limit import (
@@ -1530,8 +1535,9 @@ def _create_uc_health_element_removed_under_25_severe_kept() -> Reform:
         description=(
             "As the removal for under-25s, except that a young claimant "
             "with limited capability for work and work-related activity "
-            "who has an enhanced PIP daily living award keeps the element. "
-            "The enhanced award stands in for the trailed higher-rate "
+            "who scores 24 or more PIP daily living points (about a fifth "
+            "of young PIP recipients) keeps the element. The points stand "
+            "in for the trailed higher-rate "
             "benefit for people with the most severe conditions, whose "
             "eligibility rules are not yet known."
         ),
@@ -1552,6 +1558,55 @@ def _create_pip_halved_under_25() -> Reform:
         ),
         simulation_modifier=pip_halved_ages_18_to_24,
     )
+PIP_16_TO_24_ID = "pip_removed_16_to_24"
+MILBURN_PHASED_ID = "milburn_package_phased"
+MILBURN_ENTRY_ID = "milburn_package_entry_25pct"
+
+
+def _create_pip_removed_16_to_24() -> Reform:
+    return Reform(
+        id=PIP_16_TO_24_ID,
+        name="PIP removed for 16 to 24-year-olds",
+        description=(
+            "As the PIP removal for 18 to 24-year-olds, but from age 16: "
+            "'under 25' read literally. Disability Living Allowance for "
+            "children under 16 is unchanged."
+        ),
+        simulation_modifier=pip_removed_ages_16_to_24,
+    )
+
+
+def _create_milburn_package_phased() -> Reform:
+    return Reform(
+        id=MILBURN_PHASED_ID,
+        name="Milburn package, phased as claimants are reassessed",
+        description=(
+            "The health element and PIP removals for young people, reaching "
+            "new entrants (people turning 18 from April 2026) at once and "
+            "existing claimants as they are reassessed, at an assumed 25% "
+            "of the remaining caseload a year: about 36% reached in "
+            "2027-28, 60% in 2028-29 and 93% by 2031-32. Who is reached is "
+            "a random draw, as the data hold no reassessment dates."
+        ),
+        simulation_modifier=milburn_package_phased,
+    )
+
+
+def _create_milburn_package_entry_25pct() -> Reform:
+    return Reform(
+        id=MILBURN_ENTRY_ID,
+        name="Milburn package with an illustrative move into work",
+        description=(
+            "The full package, with a randomly chosen quarter of affected "
+            "young people who do not work (aged 18 to 24, with PIP or "
+            "limited capability for work and work-related activity) moving "
+            "into 16 hours a week at their minimum wage. An illustrative "
+            "scenario, not an estimate of how people would respond."
+        ),
+        simulation_modifier=milburn_package_with_entry_25pct,
+    )
+
+
 # The registry's combined run and its parts, under the names the rest of the
 # package imports (geography's PACKAGES, the household calculation).
 COMBINED_ID = MILBURN_PACKAGE_ID
@@ -1570,6 +1625,9 @@ _MEASURE_FACTORIES = (
     _create_uc_health_element_removed_under_22,
     _create_uc_health_element_removed_under_25_severe_kept,
     _create_pip_halved_under_25,
+    _create_pip_removed_16_to_24,
+    _create_milburn_package_phased,
+    _create_milburn_package_entry_25pct,
 )
 
 

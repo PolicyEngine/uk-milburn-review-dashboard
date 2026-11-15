@@ -61,3 +61,8 @@ def pip_halved_ages_18_to_24(sim):
     illustrative stand-in for a smaller, non-means-tested additional cost
     allowance whose rules are not yet known."""
     return pip_removed_ages_18_to_24(sim, share_kept=0.5)
+
+
+def pip_removed_ages_16_to_24(sim):
+    """PIP removal from age 16 (\"under 25\" read literally)."""
+    return pip_removed_ages_18_to_24(sim, lowest_age=16)
