@@ -33,7 +33,23 @@ income falls, siblings and partners included. Poverty: absolute after housing
 costs (fixed real line) and relative after housing costs (60% of a median
 that the measures themselves move).
 
-FILLED FROM `public/data/milburn_summary.json` BY `scripts/milburn_summary.py`.
+| Measure | Saving 2027-28 | 16-24s in losing households | Avg loss (losing hh) | Absolute AHC poverty | Break-even 16h / 25h |
+|---|---|---|---|---|---|
+| employer_nics_zero_under_25 | £-4.43bn | 2843k (38.1%) | £-2,706 | -0.12pp (-83k) | –% / –% |
+| milburn_package | £4.49bn | 578k (7.8%) | £12,622 | +0.59pp (410k) | 160.5% / 125.4% |
+| milburn_package_central | £2.54bn | 578k (7.8%) | £6,994 | +0.45pp (314k) | 89.0% / 69.5% |
+| milburn_package_entry_25pct | £4.61bn | 560k (7.5%) | £11,305 | +0.39pp (272k) | 143.8% / 112.3% |
+| milburn_package_phased | £2.01bn | 239k (3.2%) | £12,462 | +0.21pp (143k) | 158.5% / 123.8% |
+| pip_halved_under_25 | £1.72bn | 555k (7.5%) | £4,718 | +0.29pp (200k) | 60.0% / 46.9% |
+| pip_removed_16_to_24 | £4.42bn | 647k (8.7%) | £10,728 | +0.72pp (499k) | 136.4% / 106.6% |
+| pip_removed_under_25 | £3.44bn | 555k (7.5%) | £9,954 | +0.44pp (306k) | 126.6% / 98.9% |
+| uc_health_element_removed_under_22 | £0.60bn | 235k (3.2%) | £4,983 | +0.05pp (38k) | 63.4% / 49.5% |
+| uc_health_element_removed_under_25 | £1.15bn | 406k (5.4%) | £5,011 | +0.12pp (85k) | 63.7% / 49.8% |
+| uc_health_element_removed_under_25_new_claims | £0.06bn | 30k (0.4%) | £2,720 | +0.00pp (3k) | 34.6% / 27.0% |
+| uc_health_element_removed_under_25_severe_kept | £0.83bn | 286k (3.8%) | £4,975 | +0.10pp (70k) | 63.3% / 49.4% |
+| youth_allowance_at_25_plus_rate | £-0.80bn | 1157k (15.5%) | £-1,116 | -0.16pp (-114k) | –% / –% |
+
+Negative saving = a cost; for gain measures the loss columns are gains (negative loss). Break-even only applies to loss measures. Table from `scripts/milburn_summary.py`.
 
 ## Reading the numbers
 

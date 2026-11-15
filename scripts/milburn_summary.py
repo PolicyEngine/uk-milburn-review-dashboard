@@ -126,7 +126,7 @@ def main():
     w = sys.stdout.write
     w(
         "| Measure | Saving 2027-28 | 16-24s in losing households |"
-        " Avg loss (losing hh) | Relative AHC poverty | Break-even 16h / 25h |\n"
+        " Avg loss (losing hh) | Absolute AHC poverty | Break-even 16h / 25h |\n"
     )
     w("|---|---|---|---|---|---|\n")
     for r in results:
@@ -136,8 +136,8 @@ def main():
             f" {r['young_people_in_losing_households']/1000:.0f}k"
             f" ({r['share_of_16_24_in_losing_households_pct']:.1f}%) |"
             f" £{r['average_loss_young_person_in_losing_household'] or 0:,} |"
-            f" {r['poverty_change_pp']['rel_ahc']:+.2f}pp"
-            f" ({r['people_into_poverty_rel_ahc']/1000:.0f}k) |"
+            f" {r['poverty_change_pp']['abs_ahc']:+.2f}pp"
+            f" ({r['people_into_poverty_abs_ahc']/1000:.0f}k) |"
             f" {be.get('h16', '–')}% / {be.get('h25', '–')}% |\n"
         )
 
