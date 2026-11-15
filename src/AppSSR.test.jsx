@@ -8,9 +8,10 @@ it("prerenders the shell without a browser or any Budget figures", () => {
   const html = renderToString(<App />);
   expect(html).toContain("Milburn review: young people and work");
   expect(html).toContain("Candidate measures modelled before the review is published. These are not announced policy.");
-  for (const label of ["Population impact", "Household calculator", "Policies", "Methodology"]) {
+  for (const label of [">Impact<", ">Measures<", ">Methodology<"]) {
     expect(html).toContain(label);
   }
+  expect(html).not.toContain("Household calculator");
   // The landing page, whole, with no view mounted under it
   expect(html).toContain("Young people and work: candidate measures modelled");
   expect(html).not.toContain("Pre-measures forecast");

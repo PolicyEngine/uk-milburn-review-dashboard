@@ -13,7 +13,69 @@ import {
   summaryRun,
   useMilburnSummary,
 } from "../../utils/milburn/summary";
+import { PACKAGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGroups";
 import "./milburn.css";
+
+/** The replacement support briefed for the review, which no run models. */
+export const REPLACEMENT_NOT_MODELLED_NOTE =
+  "The replacement support briefed for the review is not modelled: a discretionary local fund, an allowance for the extra costs of the most disabled, a higher payment for those who can never work, and conditionality. The full package is therefore an upper bound on losses.";
+
+/** The range strip's short names for the packages, by position in PACKAGE_IDS. */
+const RANGE_NAMES = ["Upper bound", "Central", "Phased"];
+
+/**
+ * The packages' range, whatever run is selected: each package's saving and
+ * the people moved into absolute poverty after housing costs, from
+ * milburn_summary.json. A package the file does not list is left out.
+ */
+export function packageRange(summary) {
+  return PACKAGE_IDS.map((id, index) => {
+    const run = summaryRun(summary, id);
+    if (!run) return null;
+    return {
+      id,
+      name: RANGE_NAMES[index] ?? milburnDisplayName(id, id),
+      saving: formatBn(savingInYear(run, summary.year)),
+      poverty: run.peopleIntoPovertyAbsAhc === null ? "" : `about ${formatPeople(run.peopleIntoPovertyAbsAhc)}`,
+    };
+  }).filter(Boolean);
+}
+
+function RangeStrip({ summary }) {
+  const rows = packageRange(summary);
+  if (!rows.length) return null;
+  return (
+    <div className="milburn-table-wrap milburn-range">
+      <table className="milburn-table">
+        <caption>The packages&rsquo; range, {fiscalYearTick(summary.year)}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Package</th>
+            <th scope="col">Exchequer saving</th>
+            <th scope="col">People moved into absolute poverty after housing costs</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id} data-run={row.id}>
+              <th scope="row">{row.name}</th>
+              <td>{row.saving || "Not in the summary"}</td>
+              <td>{row.poverty || "Not in the summary"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** The relative poverty figure as one footnote sentence, or null when the run carries none. */
+export function relativePovertySentence(run) {
+  const count = run?.peopleIntoPovertyRelAhc;
+  if (count === null || count === undefined) return null;
+  const pp = run.povertyPp.rel_ahc;
+  return `On the relative line (60% of median income after housing costs), ${formatPeople(count)} people move ${count >= 0 ? "into" : "out of"} poverty${pp !== null ? ` (${formatSignedPp(pp)})` : ""}.`;
+}
 
 /**
  * The tiles for one run of milburn_summary.json, in its year: each a
@@ -73,21 +135,6 @@ export function keyFigureTiles(run, year) {
     "absolute",
     "The change in the number of people of all ages in households below the absolute poverty line after housing costs, which is fixed in real terms.",
   );
-  povertyTile(
-    "poverty",
-    run.peopleIntoPovertyRelAhc,
-    run.povertyPp.rel_ahc,
-    "relative",
-    "The change in the number of people of all ages in households below 60% of median income after housing costs, in the same year.",
-  );
-  if (run.childPovertyPpRelAhc !== null) {
-    tiles.push({
-      key: "child",
-      value: formatSignedPp(run.childPovertyPpRelAhc),
-      label: "Change in child poverty, relative, after housing costs",
-      definition: "Change in the share of children in households below 60% of median income after housing costs, in percentage points.",
-    });
-  }
   return tiles;
 }
 
@@ -149,11 +196,15 @@ export default function KeyFigures({ runId }) {
     <section className="report-section milburn-key card" aria-label="Key figures">
       {heading}
       {body}
-      {status === "ready" && summaryRun(summary, id) && (
+      {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
         <p className="milburn-key-foot" data-poverty-note="">
-          {RELATIVE_LINE_NOTE}
+          {relativePovertySentence(summaryRun(summary, id))} {RELATIVE_LINE_NOTE}
         </p>
       )}
+      {status === "ready" && <RangeStrip summary={summary} />}
+      <p className="milburn-key-foot" data-replacement-note="">
+        {REPLACEMENT_NOT_MODELLED_NOTE}
+      </p>
       <p className="milburn-key-foot">
         Static estimates for {fiscalYearTick(summary?.year ?? 2027)}, against current law. Counts are rounded to the nearest thousand.
       </p>

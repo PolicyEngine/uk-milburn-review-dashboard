@@ -18,14 +18,16 @@ import {
   formatSignedPp,
   parseSummary,
   savingInYear,
+  summaryPovertyCount,
   summaryRun,
 } from "./summary";
-import { groupMilburnMeasures, milburnDisplayName, milburnGroupOf } from "./measureGroups";
+import { povertyWaterfall } from "../../components/MeasuresPovertyCard";
+import { groupMilburnMeasures, milburnDefaultMeasure, milburnDisplayName, milburnGroupOf } from "./measureGroups";
 import { loadLocalBuildParts } from "./localBuild";
 import { dashboardFromParts } from "../loadDashboard";
 import { MeasureCatalogueProvider } from "../measureCatalogue";
-import KeyFigures, { keyFigureTiles } from "../../components/milburn/KeyFigures";
-import { BreakEven, SAME_GAIN_SENTENCE } from "../../components/milburn/BehaviouralScenarios";
+import KeyFigures, { REPLACEMENT_NOT_MODELLED_NOTE, keyFigureTiles, packageRange } from "../../components/milburn/KeyFigures";
+import { BreakEven, EntryComparison, SAME_GAIN_SENTENCE, SMALL_FISCAL_EFFECT_SENTENCE } from "../../components/milburn/BehaviouralScenarios";
 
 const FIXTURES = join(__dirname, "..", "..", "test", "fixtures", "milburn");
 const SUMMARY_TEXT = readFileSync(join(FIXTURES, "summary", "milburn_summary.json"), "utf8");
@@ -115,12 +117,11 @@ describe("key figure tiles", () => {
     expect(byKey.young.label).toContain("households that lose");
     expect(byKey.young.definition).toContain("including siblings and partners, not only claimants");
     expect(byKey.loss.label).toBe("Their average household loss");
-    // Absolute poverty after housing costs first, relative beside it
-    expect(tiles.map((tile) => tile.key).slice(3, 5)).toEqual(["poverty-abs", "poverty"]);
+    // Absolute poverty after housing costs only: relative poverty is a
+    // footnote, and there is no child poverty tile
+    expect(tiles.map((tile) => tile.key)).toEqual(["saving", "young", "loss", "poverty-abs"]);
     expect(byKey["poverty-abs"].label).toBe("People moved into absolute poverty after housing costs");
     expect(byKey["poverty-abs"].value).toBe("300,000");
-    expect(byKey.poverty.label).toBe("People moved into relative poverty after housing costs");
-    expect(byKey.child.label).toContain("relative, after housing costs");
   });
 
   it("label a gain run's figures as gains and a cost", () => {
@@ -131,7 +132,6 @@ describe("key figure tiles", () => {
     expect(byKey.young.label).toContain("households that gain");
     expect(byKey.loss.label).toBe("Their average household gain");
     expect(byKey.loss.value).toBe("£1,100");
-    expect(byKey.poverty.label).toBe("People moved out of relative poverty after housing costs");
     expect(byKey["poverty-abs"].label).toBe("People moved out of absolute poverty after housing costs");
     expect(byKey["poverty-abs"].extra).toBe("−0.16pp");
   });
@@ -152,6 +152,24 @@ describe("KeyFigures", () => {
     const region = screen.getByRole("region", { name: "Key figures" });
     expect(region.textContent).toContain("Full abolition, no replacement (upper bound)");
     expect(region.textContent).toContain(RELATIVE_LINE_NOTE);
+    expect(region.textContent).toContain("On the relative line (60% of median income after housing costs), 150,000 people move into poverty (+0.20pp).");
+    expect(region.textContent).toContain(REPLACEMENT_NOT_MODELLED_NOTE);
+  });
+
+  it("shows the packages' range strip whatever run is selected", async () => {
+    vi.stubGlobal("fetch", fixtureFetch());
+    const catalogue = await localCatalogue();
+    render(
+      <MeasureCatalogueProvider catalogue={catalogue}>
+        <KeyFigures runId="youth_allowance_at_25_plus_rate" />
+      </MeasureCatalogueProvider>,
+    );
+    const strip = await screen.findByRole("table");
+    const rows = within(strip).getAllByRole("row");
+    // The fixture lists only the full package: the others are left out
+    expect(rows).toHaveLength(2);
+    expect(rows[1].textContent).toBe("Upper bound£4.00bnabout 300,000");
+    expect(packageRange(summary).map((row) => row.id)).toEqual(["milburn_package"]);
   });
 
   it("says a run missing from the summary has not yet run", async () => {
@@ -178,7 +196,7 @@ describe("KeyFigures", () => {
 });
 
 describe("BreakEven", () => {
-  it("gives the arithmetic, the >100% wording, and the 25% entry run's saving beside the full package's", async () => {
+  it("gives the arithmetic and the >100% wording", async () => {
     vi.stubGlobal("fetch", fixtureFetch());
     const catalogue = await localCatalogue();
     render(<BreakEven runId="milburn_package" catalogue={catalogue} />);
@@ -190,7 +208,6 @@ describe("BreakEven", () => {
     expect(rows[2].textContent).toContain("95.5%");
     const section = screen.getByRole("region", { name: "Break-even arithmetic" });
     expect(section.textContent).toContain(SAME_GAIN_SENTENCE);
-    expect(section.textContent).toContain("£4.00bn for Full abolition, no replacement (upper bound); £3.00bn with 25% moving into work, microsimulated");
   });
 
   it("omits the arithmetic for a gain run, and says when a run has not yet run", async () => {
@@ -205,19 +222,102 @@ describe("BreakEven", () => {
   });
 });
 
+describe("the published summary", () => {
+  const published = parseSummary(JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8")));
+
+  it("gives the packages' range: upper bound, central and phased", () => {
+    expect(packageRange(published).map(({ name, saving, poverty }) => [name, saving, poverty])).toEqual([
+      ["Upper bound", "£4.49bn", "about 410,000"],
+      ["Central", "£2.54bn", "about 314,000"],
+      ["Phased", "£2.01bn", "about 143,000"],
+    ]);
+  });
+
+  it("leads Return to work with the 25% entry run against the static package", () => {
+    render(<EntryComparison summary={published} catalogue={null} />);
+    const rows = within(screen.getByRole("table")).getAllByRole("row");
+    expect(rows[1].textContent).toContain("£4.49bn");
+    expect(rows[1].textContent).toContain("£4.61bn");
+    expect(rows[2].textContent).toContain("+0.59pp (about 410,000 people)");
+    expect(rows[2].textContent).toContain("+0.39pp (about 272,000 people)");
+    expect(rows[3].textContent).toContain("£12,622");
+    expect(rows[3].textContent).toContain("£11,305");
+  });
+});
+
+describe("the poverty card's direct count", () => {
+  const published = parseSummary(JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8")));
+  const count = summaryPovertyCount(published);
+
+  it("reads the summary's count for absolute poverty after housing costs in its year only", () => {
+    expect(count("milburn_package", 2027, "poverty_abs_ahc_change_pp")).toBe(409743);
+    expect(count("milburn_package", 2028, "poverty_abs_ahc_change_pp")).toBeNull();
+    expect(count("milburn_package", 2027, "poverty_rel_ahc_change_pp")).toBeNull();
+    expect(count("not_a_run", 2027, "poverty_abs_ahc_change_pp")).toBeNull();
+    expect(summaryPovertyCount(null)).toBeNull();
+  });
+
+  it("replaces pp × population in the card's bars, so it reads 410,000 as Key figures do", () => {
+    // +0.589pp of about 70m people would be about 412,000
+    const measures = [{ id: "milburn_package", name: "Package", value: 0.589, colour: "" }];
+    const scaled = povertyWaterfall(measures, null, 70);
+    expect(Math.round(-scaled.steps[0].x / 1000)).toBe(412);
+    const direct = povertyWaterfall(measures, null, 70, [], (id) => count(id, 2027, "poverty_abs_ahc_change_pp"));
+    expect(direct.steps[0].x).toBe(-409743);
+    expect(formatPeople(-direct.steps[0].x)).toBe("410,000");
+  });
+});
+
+describe("EntryComparison", () => {
+  it("leads with the 25% entry run beside the static package, from the summary", async () => {
+    const catalogue = await localCatalogue();
+    render(<EntryComparison summary={summary} catalogue={catalogue} />);
+    const section = screen.getByRole("region", { name: "With a quarter moving into work" });
+    const rows = within(within(section).getByRole("table")).getAllByRole("row");
+    expect(rows[1].textContent).toContain("£4.00bn");
+    expect(rows[1].textContent).toContain("£3.00bn");
+    // The entry run carries no absolute poverty figure: said, never zero
+    expect(rows[2].textContent).toContain("+0.50pp (about 300,000 people)");
+    expect(rows[2].textContent).toContain("Not in the summary");
+    expect(rows[3].textContent).toContain("£12,000");
+    expect(rows[3].textContent).toContain("£9,000");
+    expect(section.textContent).toContain(`The move into work takes £1.00bn from the Exchequer. ${SMALL_FISCAL_EFFECT_SENTENCE}`);
+  });
+
+  it("says when either run has not yet run", () => {
+    const partial = parseSummary({ year: 2027, runs: [{ id: "milburn_package", saving_bn: { 2027: 4 } }] });
+    render(<EntryComparison summary={partial} catalogue={null} />);
+    expect(screen.getByText(/Not yet run: the comparison/)).toBeTruthy();
+  });
+});
+
 describe("measure groups", () => {
-  it("names the packages and groups packages, single measures and comparators", () => {
+  it("names the packages and groups packages, single measures, variants and comparators", () => {
     expect(milburnDisplayName("milburn_package", "Milburn package (combined)")).toBe("Full abolition, no replacement (upper bound)");
     expect(milburnDisplayName("pip_halved_under_25", "PIP at half rate")).toBe("PIP at half rate");
     expect(milburnGroupOf({ id: "employer_nics_zero_under_25" })).toBe("comparators");
-    expect(milburnGroupOf({ id: "uc_health_element_removed_under_22" })).toBe("single");
+    expect(milburnGroupOf({ id: "uc_health_element_removed_under_25" })).toBe("single");
+    expect(milburnGroupOf({ id: "uc_health_element_removed_under_22" })).toBe("variants");
     const groups = groupMilburnMeasures([
       { id: "youth_allowance_at_25_plus_rate" },
       { id: "pip_removed_16_to_24" },
+      { id: "milburn_package_entry_25pct" },
+      { id: "uc_health_element_removed_under_25_new_claims" },
+      { id: "pip_removed_under_25" },
       { id: "milburn_package_phased" },
       { id: "milburn_package" },
     ]);
-    expect(groups.map((group) => group.label)).toEqual(["Packages", "Single measures", "Comparators, not review proposals"]);
+    expect(groups.map((group) => group.label)).toEqual(["Packages", "Single measures", "Variants", "Comparators, not review proposals"]);
     expect(groups[0].measures.map((measure) => measure.id)).toEqual(["milburn_package", "milburn_package_phased"]);
+    // The 25% entry run and the new-claims run stay loadable but are not offered
+    expect(groups.flatMap((group) => group.measures.map((measure) => measure.id))).not.toContain("milburn_package_entry_25pct");
+    expect(groups.flatMap((group) => group.measures.map((measure) => measure.id))).not.toContain("uc_health_element_removed_under_25_new_claims");
+  });
+
+  it("defaults to the full abolition package, though the catalogue puts the 25% entry run (the largest saving) first", () => {
+    const catalogueOrder = [{ id: "milburn_package_entry_25pct" }, { id: "milburn_package" }, { id: "pip_removed_under_25" }];
+    expect(milburnDefaultMeasure(catalogueOrder).id).toBe("milburn_package");
+    expect(milburnDefaultMeasure([{ id: "milburn_package_entry_25pct" }, { id: "pip_removed_under_25" }]).id).toBe("pip_removed_under_25");
+    expect(milburnDefaultMeasure([])).toBeNull();
   });
 });

@@ -5,12 +5,10 @@ import TrendCard from "./youngPeople/TrendCard";
 import MeasuresCard from "./youngPeople/MeasuresCard";
 import AgeChangeCard from "./age/AgeChangeCard";
 import { SharesCard, YOUNG_PEOPLE_ANCHOR, useAgeImpactRows } from "./YoungPeopleSection";
-import { PENSIONERS_ANCHOR, PensionerSharesCard } from "./PensionersSection";
 import { useNarrowViewport } from "../utils/chartTheme";
 import { isCatalogueRowDisplayable, useMeasureCatalogue } from "../utils/measureCatalogue";
-import { AGE_GROUP_OPTIONS, PENSIONERS, ageGroupFrom, groupSubject } from "../utils/ageGroups";
+import { AGE_GROUP_OPTIONS, ageGroupFrom, groupSubject } from "../utils/ageGroups";
 import "./YoungPeopleSection.css";
-import "./PensionersSection.css";
 import { scrollBelowBars } from "../utils/pageScroll";
 import { POVERTY_FIGURES_SHOWN } from "../utils/povertyFigures";
 
@@ -29,8 +27,8 @@ function writeGroup(group) {
 }
 
 /**
- * Population impact's By age sub-tab (?sub=age), in place of the Young
- * people and Pensioners sub-tabs: one Age group control at the top (in the
+ * Impact's Young people sub-tab (?sub=age): one Age group control (16 to
+ * 24, 25 to 34 or all ages) at the top (in the
  * address as ?age=) drives every card, its focus, comparisons and
  * sentences. The cards: average change by age group, change by year,
  * change by single year of age, the effect of each policy on the group
@@ -53,14 +51,14 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
     writeGroup(next);
   };
 
-  // A link to #young-people or #pensioners: the section renders after the
-  // page's data loads, too late for the browser's own jump
+  // A link to #young-people: the section renders after the page's data
+  // loads, too late for the browser's own jump
   const scrolled = useRef(false);
   useEffect(() => {
     if (status !== "ready" || scrolled.current || typeof window === "undefined") return;
     scrolled.current = true;
     const hash = window.location.hash.slice(1);
-    if (hash === YOUNG_PEOPLE_ANCHOR || hash === PENSIONERS_ANCHOR) scrollBelowBars(document.getElementById(hash));
+    if (hash === YOUNG_PEOPLE_ANCHOR) scrollBelowBars(document.getElementById(hash));
   }, [status]);
 
   if (status !== "ready") {
@@ -79,7 +77,7 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
     options: AGE_GROUP_OPTIONS.map((option) => ({
       value: option.key,
       label: option.label,
-      summary: option.key === PENSIONERS ? "Pensioners" : option.label,
+      summary: option.label,
     })),
   };
   const props = { rows, policies, selectedPolicies, selectedYear, narrow, combinedId, catalogue, group, extraOptions: [groupOption] };
@@ -88,16 +86,11 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
     <>
       {/* The old sub-tabs' anchors, so their links still land here */}
       <span id={YOUNG_PEOPLE_ANCHOR} aria-hidden="true" />
-      <span id={PENSIONERS_ANCHOR} aria-hidden="true" />
       <MeasureKeyProvider>
         <SectionHeading
           icon="usersRound"
           title="How each age group's income changes"
-          subtitle={
-            group === PENSIONERS
-              ? "The average change for pensioners, people at State Pension age or over, this year and over time; choose the group in any card's Options."
-              : "The average change for each age group, this year and over time; choose the group in any card's Options."
-          }
+          subtitle="The average change for each age group, this year and over time; choose the group in any card's Options."
         />
         <section className="report-section young-people-section" aria-label="How each age group's income changes">
           {/* The shared key is in Average change by age's legend row
@@ -120,11 +113,7 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
             <div className="charts-grid">
               {/* 16 to 24 (the default group) against 25 to 34 at first */}
               <MeasuresCard {...props} defaultCompare="25-34" height={narrow ? 460 : 400} />
-              {group === PENSIONERS ? (
-                <PensionerSharesCard {...props} height={narrow ? 260 : 400} />
-              ) : (
-                <SharesCard {...props} height={narrow ? 340 : 400} />
-              )}
+              <SharesCard {...props} height={narrow ? 340 : 400} />
             </div>
           </section>
         </>

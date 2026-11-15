@@ -12,23 +12,29 @@ import { join } from "node:path";
 // Every view's code is in before a test renders it (App.jsx lazyView)
 beforeAll(preloadAllViews, 60_000);
 
+// The fixture's figures are for a year past the dashboard's window: it is
+// added to the years shown, as in tabsSmoke.test.jsx, so the probe below
+// carries their values
+vi.mock("./utils/displayYears", async (original) => {
+  const actual = await original();
+  const { IN_DATA } = await import("./test/publicationFixture");
+  const withFixtureYear = (years) => [...new Set([...years, IN_DATA])];
+  return {
+    ...actual,
+    DEFAULT_DISPLAY_YEAR: IN_DATA,
+    DISPLAY_YEARS: withFixtureYear(actual.DISPLAY_YEARS),
+    yearsForSelection: (rows, selected) => withFixtureYear(actual.yearsForSelection(rows, selected)),
+  };
+});
+
+// Public finances' chart is the probe: the selection's budgetary series,
+// one per selected measure (budgetChartData), and the selection itself
 vi.mock("./components/BudgetaryImpactChart", () => ({
-  default: ({ data }) => <div data-testid="budget-figures" data-rows={JSON.stringify(data)} />,
+  default: ({ data, selectedPolicies }) => <div data-testid="budget-figures" data-rows={JSON.stringify(data)} data-selected={JSON.stringify(selectedPolicies)} />,
 }));
-vi.mock("./components/DistributionalChart", () => ({
-  default: ({ rawData, selectedPolicies }) => <div data-testid="distributional-figures" data-rows={JSON.stringify(rawData)} data-selected={JSON.stringify(selectedPolicies)} />,
-}));
-vi.mock("./components/WaterfallChart", () => ({ default: () => null }));
-// The decile card shows £ by default; these tests read the % view's rows
-vi.mock("./components/DecileImpactCard", () => ({
-  default: ({ distributional, selectedPolicies }) => <div data-testid="distributional-figures" data-rows={JSON.stringify(distributional)} data-selected={JSON.stringify(selectedPolicies)} />,
-}));
-vi.mock("./components/ConstituencyMap", () => ({ default: () => null }));
-vi.mock("./components/HouseholdScatter", () => ({ default: () => null }));
-vi.mock("./components/PersonalImpactTab", () => ({ default: () => null }));
 vi.mock("./components/OBRComparisonTable", () => ({ default: () => null, ObrComparisonCard: () => null }));
 vi.mock("./components/YoungPeopleSection", () => ({ default: () => null, YOUNG_PEOPLE_ANCHOR: "young-people" }));
-vi.mock("./components/MethodologyTab", () => ({ default: () => <div data-testid="methodology-view" />, METHOD_SECTIONS: { geography: "geography" } }));
+vi.mock("./components/MethodologyTab", () => ({ default: () => <div data-testid="methodology-view" />, METHOD_SECTIONS: {} }));
 vi.mock("./components/livingStandards/LivingStandardsTab", () => ({
   default: () => <div data-testid="living-view" />,
 }));
@@ -38,9 +44,16 @@ vi.mock("./components/livingStandards/CurrentLawSection", () => ({
   default: () => <div data-testid="current-law" />,
 }));
 
-// The decile charts are under All households, By income (Public finances
-// is the default sub-tab)
-beforeEach(() => { window.history.replaceState({}, "", "/?sub=all"); });
+// The budgetary chart is on Public finances (Young people is the default sub-tab)
+beforeEach(() => { window.history.replaceState({}, "", "/?sub=finances"); });
+
+/** The measures the probe draws figures for: a series with a value in some year (an unselected one is 0). */
+const figureIds = (node) =>
+  new Set(
+    JSON.parse(node.dataset.rows).flatMap((point) =>
+      Object.entries(point).filter(([key, value]) => key.startsWith("measure:") && value !== 0).map(([key]) => key.slice("measure:".length)),
+    ),
+  );
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 describe("the page's verified publication catalogue", () => {
@@ -49,11 +62,10 @@ describe("the page's verified publication catalogue", () => {
     manifest.measures = Object.fromEntries(["alpha", "beta", "epsilon"].map((id) => [id, manifest.measures[id]]));
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(manifest) } }));
     const { container } = render(<App />);
-    const figures = await screen.findByTestId("distributional-figures");
+    const figures = await screen.findByTestId("budget-figures");
     expect(new Set(JSON.parse(figures.dataset.selected))).toEqual(new Set(["alpha", "beta"]));
-    const rows = JSON.parse(figures.dataset.rows);
-    expect(new Set(rows.map((row) => row.reform_id))).toEqual(new Set(["alpha", "beta"]));
-    expect(rows.every((row) => row.year === IN_DATA)).toBe(true);
+    expect(figureIds(figures)).toEqual(new Set(["alpha", "beta"]));
+    expect(JSON.parse(figures.dataset.rows).some((point) => point.year === IN_DATA)).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: /^Policies / }));
     const selector = within(container.querySelector(".policy-selector-dropdown"));
     expect(selector.getAllByRole("checkbox")).toHaveLength(2);
@@ -81,7 +93,6 @@ describe("the page's verified publication catalogue", () => {
     render(<App />);
     expect(await screen.findByText("No results are published yet")).toBeInTheDocument();
     expect(screen.queryByTestId("budget-figures")).toBeNull();
-    expect(screen.queryByTestId("distributional-figures")).toBeNull();
   });
 
   it("never displays a stale flat figure when an approved output digest differs", async () => {
@@ -90,21 +101,19 @@ describe("the page's verified publication catalogue", () => {
     manifest.combined = {};
     const artifact = manifest.measures.alpha.artifact;
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(manifest), "budgetary_impact.csv": fixtureText(`${artifact}/budgetary_impact.csv`) } }));
-    window.history.replaceState({}, "", "/?sub=all&policies=alpha");
+    window.history.replaceState({}, "", "/?sub=finances&policies=alpha");
     render(<App />);
     expect(await screen.findByText(/Alpha \(Results unavailable/)).toBeInTheDocument();
-    expect(screen.queryByTestId("distributional-figures")).toBeNull();
     expect(screen.queryByTestId("budget-figures")).toBeNull();
   });
 
   it.each(["epsilon", "never_published"])("does not replace the requested unavailable selection %s with zeros", async (id) => {
-    window.history.replaceState({}, "", `/?sub=all&policies=${id}`);
+    window.history.replaceState({}, "", `/?sub=finances&policies=${id}`);
     vi.stubGlobal("fetch", dashboardFixtureFetch());
     render(<App />);
     expect(await screen.findByText("Some selected policies are unavailable")).toBeInTheDocument();
     expect(new URLSearchParams(window.location.search).get("policies")).toBe(id);
     expect(screen.queryByTestId("budget-figures")).toBeNull();
-    expect(screen.queryByTestId("distributional-figures")).toBeNull();
     expect(document.body).not.toHaveTextContent("£0");
   });
 
@@ -115,11 +124,11 @@ describe("the page's verified publication catalogue", () => {
     render(<App />);
     const view = "methodology-view";
     expect(await screen.findByTestId(view)).toBeInTheDocument();
-    expect(within(screen.getByRole("tablist", { name: "Views" })).getAllByRole("tab")).toHaveLength(4);
+    expect(within(screen.getByRole("tablist", { name: "Views" })).getAllByRole("tab")).toHaveLength(3);
     // The default view is mounted from the first render and kept, hidden,
     // since #128; the open view says nothing about Budget results
     expect(within(screen.getByRole("tabpanel")).queryByText("No results are published yet")).toBeNull();
-    fireEvent.click(screen.getByRole("tab", { name: "Population impact" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Impact" }));
     expect(await screen.findByText("No results are published yet")).toBeInTheDocument();
     expect(screen.queryByTestId("budget-figures")).toBeNull();
   });
@@ -131,13 +140,13 @@ describe("an open page follows the publication", () => {
     manifest.measures = { alpha: { ...manifest.measures.alpha }, beta: { ...manifest.measures.beta, status } };
     return manifest;
   };
-  const rowIds = () => new Set(JSON.parse(screen.getByTestId("distributional-figures").dataset.rows).map((row) => row.reform_id));
+  const rowIds = () => figureIds(screen.getByTestId("budget-figures"));
 
   it("takes a chosen selection's figures away when one of its measures goes stale", async () => {
-    window.history.replaceState({}, "", "/?sub=all&policies=alpha,beta");
+    window.history.replaceState({}, "", "/?sub=finances&policies=alpha,beta");
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures()) } }));
     render(<App />);
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     expect(rowIds()).toEqual(new Set(["alpha", "beta"]));
     // A correction marks beta stale while the page is open
     const next = twoMeasures("stale");
@@ -145,7 +154,6 @@ describe("an open page follows the publication", () => {
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(next) } }));
     await act(async () => { window.dispatchEvent(new Event("focus")); });
     expect(await screen.findByText("Some selected policies are unavailable")).toBeInTheDocument();
-    expect(screen.queryByTestId("distributional-figures")).toBeNull();
     expect(screen.queryByTestId("budget-figures")).toBeNull();
     expect(new Set(new URLSearchParams(window.location.search).get("policies").split(","))).toEqual(new Set(["alpha", "beta"]));
     expect(screen.getByText(/Updated with the latest published results/)).toBeInTheDocument();
@@ -154,17 +162,17 @@ describe("an open page follows the publication", () => {
   it("lets the reader remove an unavailable measure and keep the rest", async () => {
     // Review of 62febdd, finding 4: the selector cannot offer an unavailable
     // measure, so the notice must, or a chosen selection never recovers
-    window.history.replaceState({}, "", "/?sub=all&policies=alpha,beta");
+    window.history.replaceState({}, "", "/?sub=finances&policies=alpha,beta");
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures()) } }));
     render(<App />);
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     const next = twoMeasures("stale");
     next.revision += 1;
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(next) } }));
     await act(async () => { window.dispatchEvent(new Event("focus")); });
     const notice = (await screen.findByText("Some selected policies are unavailable")).closest(".publication-unavailable");
     fireEvent.click(within(notice).getByRole("button", { name: /^Remove .* from the selection$/ }));
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     expect(rowIds()).toEqual(new Set(["alpha"]));
     expect(new URLSearchParams(window.location.search).get("policies")).toBe("alpha");
     expect(screen.queryByText("Some selected policies are unavailable")).toBeNull();
@@ -175,7 +183,7 @@ describe("an open page follows the publication", () => {
     // measure, so a withdrawal leaves it rather than blocking the figures
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures()) } }));
     render(<App />);
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     expect(rowIds()).toEqual(new Set(["alpha", "beta"]));
     const next = twoMeasures("withdrawn");
     next.revision += 1;
@@ -190,10 +198,10 @@ describe("an open page follows the publication", () => {
 
   // A withdrawn entry (taken out by decision) does not exist for the reader
   it("drops a withdrawn measure in the link silently and rewrites the address", async () => {
-    window.history.replaceState({}, "", "/?sub=all&policies=alpha,beta");
+    window.history.replaceState({}, "", "/?sub=finances&policies=alpha,beta");
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures("withdrawn")) } }));
     render(<App />);
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     expect(rowIds()).toEqual(new Set(["alpha"]));
     await waitFor(() => expect(new URLSearchParams(window.location.search).get("policies")).toBe("alpha"));
     expect(screen.queryByText("Some selected policies are unavailable")).toBeNull();
@@ -202,10 +210,10 @@ describe("an open page follows the publication", () => {
   });
 
   it("leaves a withdrawn measure out of the picker and the counts", async () => {
-    window.history.replaceState({}, "", "/?sub=all");
+    window.history.replaceState({}, "", "/?sub=finances");
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures("withdrawn")) } }));
     render(<App />);
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     expect(Number(document.querySelector(".band-policy .policy-selector-count")?.textContent)).toBe(1);
     expect(document.querySelector(".band-policy").textContent).toMatch(/All\s*1/);
     fireEvent.click(document.querySelector(".band-policy button"));
@@ -215,7 +223,7 @@ describe("an open page follows the publication", () => {
   });
 
   it("names a selected unavailable measure and its reason in one line inside the view, not a box above the tabs", async () => {
-    window.history.replaceState({}, "", "/?sub=all&policies=alpha,beta");
+    window.history.replaceState({}, "", "/?sub=finances&policies=alpha,beta");
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures("stale")) } }));
     render(<App />);
     const notice = (await screen.findByText("Some selected policies are unavailable")).closest(".publication-unavailable");
@@ -228,7 +236,7 @@ describe("an open page follows the publication", () => {
   it("replaces an approved measure's figures with its newly verified artifact", async () => {
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures()) } }));
     render(<App />);
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
 
     const next = twoMeasures();
     next.revision += 1;
@@ -237,8 +245,8 @@ describe("an open page follows the publication", () => {
     const receipt = fixtureJson(`${previousArtifact}/receipt.json`);
     // A synthetic corrected output, bound through the production digest
     // functions, not injected into the chart or publication loader.
-    const corrected = fixtureText(`${previousArtifact}/distributional_impact.csv`).replace(/,-?\d+(?:\.\d+)?(?=\r?\n|$)/g, ",42.25");
-    receipt.dashboard.files["distributional_impact.csv"] = await sha256Hex(corrected);
+    const corrected = fixtureText(`${previousArtifact}/budgetary_impact.csv`).replace(/,-?\d+(?:\.\d+)?(?=\r?\n|$)/g, ",42.25");
+    receipt.dashboard.files["budgetary_impact.csv"] = await sha256Hex(corrected);
     entry.outputs_sha256 = receipt.dashboard.digests.outputs_sha256 = await jcsSha256(receipt.dashboard.files);
     entry.artifact_sha256 = await artifactSha256(receipt);
     entry.artifact = `artifacts/alpha/${entry.artifact_sha256.slice(0, 16)}`;
@@ -250,13 +258,14 @@ describe("an open page follows the publication", () => {
     }
     const overrides = { "manifest.json": JSON.stringify(next), [`${entry.artifact}/receipt.json`]: JSON.stringify(receipt) };
     for (const file of Object.keys(receipt.dashboard.files)) {
-      overrides[`${entry.artifact}/${file}`] = file === "distributional_impact.csv" ? corrected : fixtureText(`${previousArtifact}/${file}`);
+      overrides[`${entry.artifact}/${file}`] = file === "budgetary_impact.csv" ? corrected : fixtureText(`${previousArtifact}/${file}`);
     }
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides }));
     await act(async () => { window.dispatchEvent(new Event("focus")); });
     await waitFor(() => {
-      const rows = JSON.parse(screen.getByTestId("distributional-figures").dataset.rows);
-      expect(rows.filter((row) => row.reform_id === "alpha").map((row) => row.value)).toEqual(Array(10).fill(42.25));
+      const values = JSON.parse(screen.getByTestId("budget-figures").dataset.rows).map((point) => point["measure:alpha"]).filter((value) => value !== null);
+      expect(values.length).toBeGreaterThan(0);
+      expect(values.every((value) => value === 42.25)).toBe(true);
     });
     expect(rowIds()).toEqual(new Set(["alpha", "beta"]));
     expect(screen.getByText(/Updated with the latest published results/)).toBeInTheDocument();
@@ -265,11 +274,11 @@ describe("an open page follows the publication", () => {
   it("takes the figures away when the manifest is withdrawn or invalid", async () => {
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures()) } }));
     render(<App />);
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": 404 } }));
     await act(async () => { window.dispatchEvent(new Event("focus")); });
     expect(await screen.findByText("No results are published yet")).toBeInTheDocument();
-    expect(screen.queryByTestId("distributional-figures")).toBeNull();
+    expect(screen.queryByTestId("budget-figures")).toBeNull();
   });
 
   it("suppresses figures on every revalidation failure and recovers on the next focus", async () => {
@@ -277,20 +286,20 @@ describe("an open page follows the publication", () => {
       const approved = () => dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures()) } });
       vi.stubGlobal("fetch", approved());
       render(<App />);
-      await screen.findByTestId("distributional-figures");
+      await screen.findByTestId("budget-figures");
       expect(rowIds()).toEqual(new Set(["alpha", "beta"]));
       vi.stubGlobal("fetch", failure === "unreachable"
         ? async () => { throw new TypeError("Failed to fetch"); }
         : dashboardFixtureFetch({ overrides: { "manifest.json": failure === "invalid" ? "{}" : Number(failure) } }));
       await act(async () => { window.dispatchEvent(new Event("focus")); });
       expect(await screen.findByText(failure === "404" ? "No results are published yet" : "Published results are unavailable")).toBeInTheDocument();
-      expect(screen.queryByTestId("distributional-figures")).toBeNull();
+      expect(screen.queryByTestId("budget-figures")).toBeNull();
       expect(screen.queryByTestId("budget-figures")).toBeNull();
 
       // No reload is needed after an initial or subsequent failed request.
       vi.stubGlobal("fetch", approved());
       await act(async () => { window.dispatchEvent(new Event("focus")); });
-      await screen.findByTestId("distributional-figures");
+      await screen.findByTestId("budget-figures");
       expect(rowIds()).toEqual(new Set(["alpha", "beta"]));
       cleanup();
     }), { numRuns: 15 });
@@ -300,10 +309,10 @@ describe("an open page follows the publication", () => {
     // Review of 62febdd, finding 3: an artifact failure stayed until a
     // reload, since an unchanged manifest skipped every recheck.
     await fc.assert(fc.asyncProperty(
-      fc.constantFrom("receipt.json", "distributional_impact.csv"),
+      fc.constantFrom("receipt.json", "budgetary_impact.csv"),
       fc.constantFrom(500, 503, 404),
       async (file, status) => {
-        window.history.replaceState({}, "", "/?sub=all&policies=alpha,beta");
+        window.history.replaceState({}, "", "/?sub=finances&policies=alpha,beta");
         const manifest = twoMeasures();
         const unchanged = { "manifest.json": JSON.stringify(manifest) };
         const failing = `${manifest.measures.beta.artifact}/${file}`;
@@ -318,21 +327,21 @@ describe("an open page follows the publication", () => {
         const tries = () => requested.filter((url) => url.endsWith(`/data/${failing}`)).length;
         render(<App />);
         expect(await screen.findByText("Some selected policies are unavailable")).toBeInTheDocument();
-        expect(screen.queryByTestId("distributional-figures")).toBeNull();
+        expect(screen.queryByTestId("budget-figures")).toBeNull();
 
         // A focus tries the failed file again; while it fails, no figure
         const before = tries();
         await act(async () => { window.dispatchEvent(new Event("focus")); });
         await waitFor(() => expect(tries()).toBeGreaterThan(before), { timeout: 10000 });
         expect(screen.getByText("Some selected policies are unavailable")).toBeInTheDocument();
-        expect(screen.queryByTestId("distributional-figures")).toBeNull();
+        expect(screen.queryByTestId("budget-figures")).toBeNull();
 
         // The file serves its verified bytes again: a later check recovers.
         // A focus during a check in flight is skipped, so keep focusing.
         failingNow = false;
         await waitFor(async () => {
           await act(async () => { window.dispatchEvent(new Event("focus")); });
-          expect(screen.getByTestId("distributional-figures")).toBeInTheDocument();
+          expect(screen.getByTestId("budget-figures")).toBeInTheDocument();
         }, { timeout: 10000 });
         expect(rowIds()).toEqual(new Set(["alpha", "beta"]));
         expect(new Set(new URLSearchParams(window.location.search).get("policies").split(","))).toEqual(new Set(["alpha", "beta"]));
@@ -354,7 +363,7 @@ describe("an open page follows the publication", () => {
     let failingNow = true;
     vi.stubGlobal("fetch", (url, init) => (failingNow ? broken : healthy)(url, init));
     render(<App />);
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     expect(rowIds()).toEqual(new Set(["alpha"]));
 
     failingNow = false;
@@ -362,7 +371,7 @@ describe("an open page follows the publication", () => {
       await act(async () => { window.dispatchEvent(new Event("focus")); });
       expect(rowIds()).toEqual(new Set(["alpha", "beta"]));
     }, { timeout: 10000 });
-    const selected = JSON.parse(screen.getByTestId("distributional-figures").dataset.selected);
+    const selected = JSON.parse(screen.getByTestId("budget-figures").dataset.selected);
     expect(new Set(selected)).toEqual(new Set(["alpha", "beta"]));
     expect(new URLSearchParams(window.location.search).has("policies")).toBe(false);
     expect(screen.queryByText(/Updated with the latest published results/)).toBeNull();
@@ -370,7 +379,7 @@ describe("an open page follows the publication", () => {
     // The same publication loaded afresh selects the same measures
     cleanup();
     render(<App />);
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     expect(rowIds()).toEqual(new Set(["alpha", "beta"]));
   }, 30000);
 
@@ -380,7 +389,7 @@ describe("an open page follows the publication", () => {
     await screen.findByText("Published results are unavailable");
     vi.stubGlobal("fetch", dashboardFixtureFetch({ overrides: { "manifest.json": JSON.stringify(twoMeasures()) } }));
     await act(async () => { window.dispatchEvent(new Event("focus")); });
-    await screen.findByTestId("distributional-figures");
+    await screen.findByTestId("budget-figures");
     expect(rowIds()).toEqual(new Set(["alpha", "beta"]));
   });
 });

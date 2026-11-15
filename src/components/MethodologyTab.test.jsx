@@ -22,9 +22,8 @@ const renderTab = (onShowTab = vi.fn()) => render(<MeasureCatalogueProvider cata
 
 describe("MethodologyTab", () => {
   it("keeps the anchors other views link to", () => {
-    // Other views (e.g. the map and Household calculator) link to these
-    expect(METHOD_SECTIONS.geography).toBe("method-area");
-    expect(METHOD_SECTIONS.singleYear).toBe("method-single-year");
+    // The age cards link to these
+    expect(METHOD_SECTIONS.young).toBe("method-young");
     const { container } = renderTab();
     for (const id of Object.values(METHOD_SECTIONS)) {
       expect(container.querySelector(`#${id}`)).not.toBeNull();
@@ -53,11 +52,11 @@ describe("MethodologyTab", () => {
   it("marks the chosen section current, puts it in the address and focuses its title", () => {
     renderTab();
     const nav = screen.getByRole("navigation", { name: "Methodology contents" });
-    const link = within(nav).getByRole("link", { name: "Population impact" });
+    const link = within(nav).getByRole("link", { name: "Impact" });
     fireEvent.click(link);
     expect(link).toHaveAttribute("aria-current", "location");
     expect(window.location.hash).toBe("#method-population");
-    expect(screen.getByRole("heading", { level: 2, name: "Population impact" })).toHaveFocus();
+    expect(screen.getByRole("heading", { level: 2, name: "Impact" })).toHaveFocus();
 
     fireEvent.change(within(nav).getByRole("combobox"), {
       target: { value: METHOD_SECTIONS.limitations },
@@ -92,28 +91,24 @@ describe("MethodologyTab", () => {
     expect(emptyCard.querySelector(".mm-reasons")).toBeNull();
   });
 
-  it("points to the household calculation from its slot", () => {
-    renderTab();
-    const slot = document.getElementById(METHOD_SECTIONS.singleYear);
-    // One line: the tab it is about; the calculation is said once, folded below
-    expect(within(slot).getByRole("link", { name: "Household calculator tab" })).toBeInTheDocument();
-    expect(slot).not.toHaveTextContent("OBR's average earnings forecast");
-    const calc = document.getElementById(METHOD_ANCHORS.householdCalc);
-    expect(within(calc).getByRole("button", { name: "How the household calculation works" })).toBeInTheDocument();
-    const terms = [...calc.querySelectorAll(".method-fact dt")].map((term) => term.textContent);
-    expect(terms).toEqual(expect.arrayContaining(["Engine and policies", "Salary", "Marginal tax rate", "Who counts as a child", "Council Tax"]));
+  it("has no Household calculator section, and no topics for the removed All households sub-tab", () => {
+    const { container } = renderTab();
+    expect(METHOD_CONTENTS.map((section) => section.title)).not.toContain("Household calculator");
+    for (const title of ["By income decile", "Household scatter", "Figures by area"]) {
+      expect(screen.queryByRole("button", { name: new RegExp(`^${title}`) })).toBeNull();
+    }
+    expect(container.querySelector(`#${METHOD_ANCHORS.householdCalc}`)).toBeNull();
+  });
+
+  it("says young LCWRA claimants mostly also get PIP, and how the caseloads compare with DWP's", () => {
+    const { container } = renderTab();
+    expect(container.textContent).toContain("About nine in ten young claimants with limited capability for work and work-related activity (LCWRA) in the data also get PIP");
+    expect(container.textContent).toContain("about 23% above DWP's figure");
   });
 
   it("switches views from its links, in place", () => {
     const onShowTab = vi.fn();
     renderTab(onShowTab);
-    // Household calculator is the "household" view (it was linked as "personal",
-    // a view that does not exist)
-    const household = document.getElementById(METHOD_SECTIONS.singleYear);
-    const tabLink = within(household).getByRole("link", { name: "Household calculator tab" });
-    expect(tabLink).toHaveAttribute("href", "?tab=household");
-    fireEvent.click(tabLink);
-    expect(onShowTab).toHaveBeenLastCalledWith("household");
     // Young people, with 16 to 24 chosen
     const young = screen.getAllByRole("link", { name: "Young people", hidden: true }).find((a) => a.getAttribute("href").startsWith("?tab="));
     expect(young).toHaveAttribute("href", "?tab=dashboard&sub=age&age=16-24#young-people");

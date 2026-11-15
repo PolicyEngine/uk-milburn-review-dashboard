@@ -3,51 +3,25 @@ import { OPEN_POPULATION_SUB } from "../utils/populationSub";
 import { POVERTY_FIGURES_SHOWN } from "../utils/povertyFigures";
 import SubTabs, { SubTabPanel, subTabId, useSubTabParam } from "./SubTabs";
 import { YOUNG_PEOPLE_ANCHOR } from "../utils/viewAnchors";
-import { scrollBelowBars, settleHeadings } from "../utils/pageScroll";
 
 /**
- * Population impact's sub-tabs; the first, Young people (?sub=age, the
- * age-group view opened on 16 to 24), is the default. Poverty is left out
- * while the poverty figures are withheld (povertyFigures.js), so
- * ?sub=poverty opens the default. Behavioural scenarios and Benchmarks are
- * illustrative and reference material, beside the static results.
+ * Impact's sub-tabs; the first, Young people (?sub=age, the age-group view
+ * opened on 16 to 24), is the default. Poverty is left out while the
+ * poverty figures are withheld (povertyFigures.js), so ?sub=poverty opens
+ * the default. Return to work (?sub=scenarios) and Benchmarks set the
+ * static results beside a move into work and published figures.
  */
 export const POPULATION_SUB_TABS = [
   { value: "age", label: "Young people", icon: "usersRound" },
-  { value: "all", label: "All households", icon: "users" },
   { value: "poverty", label: "Poverty", icon: "percent" },
   { value: "finances", label: "Public finances", icon: "landmark" },
-  { value: "scenarios", label: "Behavioural scenarios", icon: "sliders" },
+  { value: "scenarios", label: "Return to work", icon: "sliders" },
   { value: "benchmarks", label: "Benchmarks", icon: "scale" },
 ].filter((tab) => POVERTY_FIGURES_SHOWN || tab.value !== "poverty");
 
 const SUB_TAB_VALUES = POPULATION_SUB_TABS.map((tab) => tab.value);
 
 const ID_PREFIX = "population";
-
-// The income decile pair, on All households (App.jsx's DECILES_ANCHOR)
-const DECILES_HASH = "#deciles";
-
-/**
- * Once the sub-tab holding an anchor shows it, bring it into view: the
- * cards wait for their data, so the browser's own jump on load misses it.
- * Gives up after a few seconds.
- */
-function scrollToHashWhenShown(hash) {
-  const started = Date.now();
-  const step = () => {
-    if (window.location.hash !== hash) return;
-    const element = document.getElementById(hash.slice(1));
-    if (element && element.offsetParent !== null) {
-      scrollBelowBars(element);
-      // Charts above it can still be loading: check its heading once more
-      setTimeout(settleHeadings, 2000);
-      return;
-    }
-    if (Date.now() - started < 8000) setTimeout(step, 150);
-  };
-  step();
-}
 
 /** Take #young-people out of the address, keeping the rest. */
 function dropYoungHash() {
@@ -65,21 +39,10 @@ function PopulationSubTabs({ note, active = true, children }) {
   useEffect(() => {
     const onHashChange = () => {
       if (window.location.hash === `#${YOUNG_PEOPLE_ANCHOR}`) setSub("age");
-      if (window.location.hash === DECILES_HASH) {
-        setSub("all");
-        scrollToHashWhenShown(DECILES_HASH);
-      }
     };
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, [setSub]);
-
-  // Opened from a link to the decile pair: show it once it has loaded
-  useEffect(() => {
-    if (sub === "all" && window.location.hash === DECILES_HASH) scrollToHashWhenShown(DECILES_HASH);
-    // Only on the first render: later visits come through hashchange
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // A link elsewhere on the page that opens a sub-tab (openPopulationSub)
   useEffect(() => {
@@ -106,7 +69,7 @@ function PopulationSubTabs({ note, active = true, children }) {
         tabs={POPULATION_SUB_TABS}
         value={sub}
         onChange={onChange}
-        ariaLabel="Population impact sections"
+        ariaLabel="Impact sections"
         idPrefix={ID_PREFIX}
       />
       {note}
@@ -120,15 +83,10 @@ function PopulationSubTabs({ note, active = true, children }) {
 }
 
 /**
- * The Population impact view: Public finances first, then All households
- * (places, how changes vary, example households), By age (every age group,
- * pensioners and all ages, one chosen at a time), Living standards
- * (income changes by decile, inequality) and Poverty, as pill sub-tabs
- * under the view tabs. The open sub-tab is ?sub= (useSubTabParam): Public
- * finances has no parameter, the others are ?sub=all, age, living and
- * poverty. App.jsx turns the old links (?tab=young, #young-people,
- * ?sub=young, ?sub=pensioners) into ?sub=age (with ?age=) before this view
- * first reads the address.
+ * The Impact view: its sub-tabs (POPULATION_SUB_TABS) as pills under the
+ * view tabs. The open sub-tab is ?sub= (useSubTabParam). App.jsx turns the
+ * old links (?tab=young, #young-people, ?sub=young, ?sub=pensioners) into
+ * ?sub=age (with ?age=) before this view first reads the address.
  *
  * The sub-tab is read from the address, which the server does not have, so
  * the view renders from the first client effect on: the server's page and

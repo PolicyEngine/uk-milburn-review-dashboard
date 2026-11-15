@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { packageStaticBn, parseScenarios, scenarioFigures } from "./scenarios";
+import { packageStaticBn, parseScenarios } from "./scenarios";
 import { youngPeopleWorseOff } from "./youngPeople";
 import { packageKeyOf, packageYearShown } from "./packageRun";
 import { estimateFor, parseBenchmarks } from "./benchmarks";
@@ -29,22 +29,7 @@ describe("the scenarios file", () => {
   });
 });
 
-describe("a scenario's figures", () => {
-  const entryCase = parseScenarios(fixture).entryCases[0];
-
-  it("multiplies the movers by the package's gain to the Exchequer, in £m", () => {
-    const figures = scenarioFigures({ entryCase, sharePct: 20, affected: 100000, staticBn: 1.5 });
-    expect(figures.movers).toBe(20000);
-    expect(figures.offsetM).toBeCloseTo(80);
-    expect(figures.staticM).toBeCloseTo(1500);
-    expect(figures.afterM).toBeCloseTo(1580);
-  });
-
-  it("is null when the count or the static figure is missing", () => {
-    expect(scenarioFigures({ entryCase, sharePct: 20, affected: null, staticBn: 1 })).toBeNull();
-    expect(scenarioFigures({ entryCase, sharePct: 20, affected: 1, staticBn: null })).toBeNull();
-  });
-
+describe("the package's static figure", () => {
   it("reads the package's static figure for the year, or null", () => {
     const rows = [{ reform_id: "milburn_package", year: "2027", value: "-0.5" }];
     expect(packageStaticBn(rows, "milburn_package", 2027)).toBe(-0.5);
@@ -102,12 +87,25 @@ describe("the benchmarks file", () => {
       expect(row.figure, row.id).toBeTruthy();
       if (row.url) expect(row.url, row.id).toMatch(/^https:\/\//);
     }
-    expect(parsed.rows.find((row) => row.id === "pip_16_24").pressReport).toBe(true);
+    // Rows without a usable source (including the unsourced ~430k PIP 16-24 caseload) are gone, and no URL carries a stray %20
+    for (const id of ["pip_young_2025_26", "pip_16_24", "pip_16_24_caseload", "opportunities_claim"]) expect(parsed.rows.find((row) => row.id === id), id).toBeUndefined();
+    for (const row of parsed.rows) if (row.url) expect(row.url, row.id).not.toContain("%20");
   });
 
   it("fills a PolicyEngine estimate only where the verified results have one", () => {
-    // Only the package's figure is comparable; every other row is blank
-    expect(parsed.rows.filter((row) => row.estimate).map((row) => row.id)).toEqual(["package_young_people_affected"]);
+    // The package's figure is worked out from the results; two rows carry a
+    // fixed figure from the named build; every other row is blank
+    expect(parsed.rows.filter((row) => row.estimate).map((row) => row.id)).toEqual([
+      "uc_health_no_work_requirements",
+      "package_young_people_affected",
+      "employer_nics_under_25",
+    ]);
+    for (const row of parsed.rows.filter((each) => each.estimate?.fixed)) {
+      expect(row.estimate.label, row.id).toBe("PolicyEngine, build 6f918b81, 2027-28");
+      expect(estimateFor(row, { ageRows: [], packageRows: [], packageKey: null, year: 2027 })).toBeNull();
+    }
+    expect(parsed.rows.find((row) => row.id === "uc_health_no_work_requirements").estimate.fixed).toBe("232,000");
+    expect(parsed.rows.find((row) => row.id === "employer_nics_under_25").estimate.fixed).toBe("£4.43bn a year");
     const ucRow = { id: "x", estimate: { package: false, reformId: "uc_health_element_removed_under_25", metric: "young_people_worse_off" } };
     const neetRow = parsed.rows.find((row) => row.id === "neet_16_24");
     const packageRow = parsed.rows.find((row) => row.id === "package_young_people_affected");

@@ -61,7 +61,7 @@ export function describePovertyFigures(shown, { files, catalogueRef, ageRowsRef 
       const { SKELETON_SUB_TABS } = await import("../components/publication/ViewSkeleton");
       for (const values of [POPULATION_SUB_TABS.map((t) => t.value), BOOT_SUBS.dashboard, SKELETON_SUB_TABS.dashboard.map((t) => t.value)]) {
         expect(values.includes("poverty")).toBe(shown);
-        expect(values).toEqual(["age", "all", ...(shown ? ["poverty"] : []), "finances", "scenarios", "benchmarks"]);
+        expect(values).toEqual(["age", ...(shown ? ["poverty"] : []), "finances", "scenarios", "benchmarks"]);
       }
       expect(BOOT_SUBS.outlook).toBeUndefined();
     });
@@ -125,7 +125,6 @@ export function describePovertyFigures(shown, { files, catalogueRef, ageRowsRef 
     it.each([
       ["16-24", ".young-people-shares"],
       ["all", ".young-people-shares"],
-      ["pensioners", ".pensioners-shares"],
     ])(`By age (?age=%s) ${either("shows", "leaves out")} Winners and losers in its age-group fallback, and keeps Effect of each policy`, async (age, selector) => {
       const { default: AgeSection } = await import("../components/AgeSection");
       const { fixture, rows } = packageWithoutSingleAges();

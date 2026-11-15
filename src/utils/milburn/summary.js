@@ -153,9 +153,10 @@ export function breakEvenText(sharePct) {
  * Fetched afresh whenever `refresh` changes (the catalogue's fingerprint,
  * which changes as runs are added), so a run that finishes appears.
  */
-export function useMilburnSummary(refresh, { basePath = process.env.NEXT_PUBLIC_BASE_PATH || "" } = {}) {
+export function useMilburnSummary(refresh, { basePath = process.env.NEXT_PUBLIC_BASE_PATH || "", enabled = true } = {}) {
   const [state, setState] = useState({ status: "loading", summary: null });
   useEffect(() => {
+    if (!enabled) return undefined;
     let cancelled = false;
     fetch(`${basePath}/data/${SUMMARY_FILE}`, { cache: "no-cache" })
       .then((response) => (response.ok ? response.json() : null))
@@ -169,8 +170,27 @@ export function useMilburnSummary(refresh, { basePath = process.env.NEXT_PUBLIC_
     return () => {
       cancelled = true;
     };
-  }, [refresh, basePath]);
-  return state;
+  }, [refresh, basePath, enabled]);
+  return enabled ? state : { status: "unavailable", summary: null };
+}
+
+/** The poverty measure the summary counts directly: absolute, after housing costs, all people. */
+export const DIRECT_COUNT_METRIC = "poverty_abs_ahc_change_pp";
+
+/**
+ * The summary's direct count of people moved into poverty, as
+ * count(runId, year, metricKey): the run's people_into_poverty_abs_ahc
+ * (negative: out of poverty) for absolute poverty after housing costs in
+ * the summary's year, else null. So a poverty card that would otherwise
+ * multiply the rate's change by the population reads the same count as
+ * Key figures. Null without a summary.
+ */
+export function summaryPovertyCount(summary) {
+  if (!summary?.runs) return null;
+  return (runId, year, metricKey) => {
+    if (metricKey !== DIRECT_COUNT_METRIC || Number(year) !== summary.year) return null;
+    return finite(summary.runs.get(runId)?.peopleIntoPovertyAbsAhc);
+  };
 }
 
 /** Said beside the two poverty measures: why they can point different ways. */

@@ -1,6 +1,6 @@
 /**
- * Behavioural scenarios: illustrative second-round effects of the package,
- * read from public/data/milburn_scenarios.json, which the pipeline writes.
+ * Return to work's entry cases, read from public/data/milburn_scenarios.json,
+ * which the pipeline writes.
  * Its shape:
  *
  *   { year, basis, entry_cases: [{ id, hours, hourly_wage,
@@ -10,26 +10,16 @@
  * Each entry case is one young person moving into work for `hours` a week
  * at `hourly_wage`: their household's net income gain (£ a year) and the
  * gain to the Exchequer (£ a year), under current law and under the
- * package. The scenario multiplies the package's gain to the Exchequer by
- * the number of young people who move into work, an assumed share of the
- * young people the package leaves worse off. Not a PolicyEngine estimate:
- * the main figures are static.
+ * package.
  */
 
 export const SCENARIOS_FILE = "milburn_scenarios.json";
-
-/** The share presets offered (per cent), and the slider's range. */
-export const SHARE_PRESETS = Object.freeze([0, 20, 45]);
-export const SHARE_MIN = 0;
-export const SHARE_MAX = 50;
-export const DEFAULT_SHARE = 20;
 
 /** The hours cases offered, by entry case id. */
 export const HOURS_CASES = Object.freeze([
   { id: "h16", label: "16 hours a week" },
   { id: "h25", label: "25 hours a week" },
 ]);
-export const DEFAULT_CASE = "h16";
 
 const NUMBER_FIELDS = [
   "hours",
@@ -61,24 +51,6 @@ export function parseScenarios(json) {
     entryCases: cases,
     notes: Array.isArray(json.notes) ? json.notes.filter((note) => typeof note === "string") : [],
   };
-}
-
-/**
- * One scenario's figures, or null when any input is missing.
- *
- * @param {Object} args
- * @param {Object} args.entryCase - One parsed entry case
- * @param {number} args.sharePct - Share of the affected young people who move into work (0-100)
- * @param {number|null} args.affected - Young people the package leaves worse off
- * @param {number|null} args.staticBn - The package's static effect on the public finances, £bn (positive: a gain to the Exchequer)
- * @returns {{ movers: number, offsetM: number, staticM: number, afterM: number } | null}
- */
-export function scenarioFigures({ entryCase, sharePct, affected, staticBn }) {
-  if (!entryCase || !isNumber(sharePct) || !isNumber(affected) || !isNumber(staticBn)) return null;
-  const movers = (affected * sharePct) / 100;
-  const offsetM = (movers * entryCase.exchequer_gain_package) / 1e6;
-  const staticM = staticBn * 1000;
-  return { movers, offsetM, staticM, afterM: staticM + offsetM };
 }
 
 /** The package's static budgetary effect (£bn) in `year`, or null. */

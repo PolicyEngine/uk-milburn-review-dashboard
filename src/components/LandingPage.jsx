@@ -39,7 +39,7 @@ function LandingBox({ tab, sub, icon, title, description, onOpen }) {
  */
 const boxes = () => [
   ["dashboard", "age", "usersRound", "Young people", "Who gains or loses, and the cost"],
-  ["household", undefined, "house", "Your household", "See how your income changes"],
+  ["dashboard", "scenarios", "sliders", "Return to work", "The package if some young people move into work"],
   ["policies", undefined, "list", "The measures modelled", "Every candidate measure, and how we model it"],
 ];
 
@@ -56,7 +56,7 @@ export function LandingIntro({ headingId, provisional, note = null, className = 
         Estimates from <SourceLink source="policyengine_uk_model" />{" "}of how
         candidate measures for the independent review of young people and
         work would affect the public finances and household incomes, by
-        age, income and area. The review&rsquo;s final report is expected on
+        age. The review&rsquo;s final report is expected on
         17 November 2026; the measures here are modelled before it is
         published and are not announced policy. The main figures are static:
         they assume no change in behaviour.
@@ -103,7 +103,7 @@ export function LandingBoxes({ onOpen, list = false, labelledBy, provisional = f
     return (
       <ul className="landing-rows" aria-labelledby={labelledBy}>
         {BOXES.map(([tab, sub, icon, title, description]) => (
-          <LandingRow key={tab} tab={tab} sub={sub} icon={icon} title={title} description={description} onOpen={onOpen} />
+          <LandingRow key={`${tab}:${sub ?? ""}`} tab={tab} sub={sub} icon={icon} title={title} description={description} onOpen={onOpen} />
         ))}
       </ul>
     );
@@ -111,7 +111,7 @@ export function LandingBoxes({ onOpen, list = false, labelledBy, provisional = f
   return (
     <ul className="landing-boxes">
       {BOXES.map(([tab, sub, icon, title, description]) => (
-        <LandingBox key={tab} tab={tab} sub={sub} icon={icon} title={title} description={description} onOpen={onOpen} />
+        <LandingBox key={`${tab}:${sub ?? ""}`} tab={tab} sub={sub} icon={icon} title={title} description={description} onOpen={onOpen} />
       ))}
     </ul>
   );

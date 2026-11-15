@@ -12,10 +12,12 @@ import { groupMeasureSeries } from "../components/youngPeople/youngPeopleData";
 export const PENSIONERS = "pensioners";
 export const DEFAULT_AGE_GROUP = YOUNG_BAND;
 
-/** Every group a reader can choose, in order. */
+/** The bands a reader can choose on this dashboard: young people and the band above. */
+const OFFERED_BANDS = [YOUNG_BAND, "25-34"];
+
+/** Every group a reader can choose, in order: 16 to 24, 25 to 34 and all ages. */
 export const AGE_GROUP_OPTIONS = [
-  ...AGE_BANDS.map((band) => ({ key: band.key, label: band.label, short: band.short })),
-  { key: PENSIONERS, label: "Pensioners (State Pension age)", short: "Pensioners" },
+  ...AGE_BANDS.filter((band) => OFFERED_BANDS.includes(band.key)).map((band) => ({ key: band.key, label: band.label, short: band.short })),
   { key: ALL_BAND, label: "All ages", short: "All" },
 ];
 
@@ -29,7 +31,7 @@ export function ageGroupFrom(value) {
 /** The group's name on a chart or chip: "16 to 24", "Pensioners", "All ages". */
 export function groupLabel(key) {
   if (key === PENSIONERS) return "Pensioners";
-  return AGE_GROUP_OPTIONS.find((group) => group.key === key)?.label ?? key;
+  return AGE_GROUP_OPTIONS.find((group) => group.key === key)?.label ?? AGE_BANDS.find((band) => band.key === key)?.label ?? key;
 }
 
 /** Who the group is, as a sentence's subject: "16 to 24-year-olds", "Pensioners". */

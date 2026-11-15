@@ -7,12 +7,12 @@ import LandingPage from "./components/LandingPage";
 import LandingBackdrop from "./components/landing/LandingBackdrop";
 import useScrollReveal from "./hooks/useScrollReveal";
 import ViewTabs from "./components/ViewTabs";
-import { SUB_TAB_PARAM, subTabId } from "./components/SubTabs";
+import { SUB_TAB_PARAM } from "./components/SubTabs";
 import SectionHeading from "./components/SectionHeading";
 import { YOUNG_PEOPLE_ANCHOR } from "./utils/viewAnchors";
 import PopulationImpactView from "./components/PopulationImpactView";
 import MilburnBanner from "./components/MilburnBanner";
-import { DEFAULT_DISPLAY_YEAR, DisplayYearsContext, EARLY_YEAR, SELECTABLE_YEARS, selectableYearOr, yearsForSelection } from "./utils/displayYears";
+import { DEFAULT_DISPLAY_YEAR, DisplayYearsContext, EARLY_YEAR, selectableYearOr, yearsForSelection } from "./utils/displayYears";
 import { opensLanding } from "./utils/landing";
 import { useNarrowViewport } from "./utils/chartTheme";
 import TitleMark, { EdgeAboutTab } from "./components/HomeButton";
@@ -20,10 +20,8 @@ import OverviewDrawer from "./components/OverviewDrawer";
 import { buildMeasureCatalogue, catalogueProvisional, MeasureCatalogueProvider, useMeasureCatalogue } from "./utils/measureCatalogue";
 import { dashboardFromParts, loadDashboard, loadDashboardParts, loadVerifiedTablesOnce, budgetChartData, sameParts } from "./utils/loadDashboard";
 import { pruneVerifiedCache } from "./utils/publication/cache";
-import { prefetchGeography } from "./hooks/useGeographyData";
 import { selectionPackageKey } from "./utils/geography/selection";
 
-import { loadPresetChanges } from "./utils/householdPresets";
 import { loadManifest } from "./utils/publication/load";
 import { PublicationCheckContext, serialisedChecks } from "./utils/publication/check";
 import UnavailableNotice, { RemoveUnavailable } from "./components/publication/UnavailableNotice";
@@ -34,25 +32,21 @@ import UpdateToast from "./components/publication/UpdateToast";
 import { provisionalNotice } from "./utils/publication/manifest";
 import { isLocalBuildRoute, localBuildNotice } from "./utils/milburn/localBuild";
 import LocalBuildLabel from "./components/milburn/LocalBuildLabel";
+import { milburnDefaultMeasure } from "./utils/milburn/measureGroups";
 import { DownloadContext, policiesLabel } from "./utils/downloadContext";
 import { OPEN_VIEW_EVENT } from "./utils/methodLink";
 import { lazyView, preloadViewCode } from "./utils/lazyView";
 import { trackEngagement, trackEvent, trackLinkClicks } from "./utils/analytics";
 import { createBandIntent, createSiteNavIntent, isProgrammaticScroll, LANDSCAPE_PHONE_QUERY, isTouchOnly, pointerWantsSiteNav, SITE_NAV_DWELL_MS, landAt, scrollBelowBars, scrollTopFor, settleHeadings } from "./utils/pageScroll";
 
-// Each view's code (the chart library, the map's and the household
-// calculator's) loads when a view first opens, or while the page is idle,
+// Each view's code (the chart library) loads when a view first opens, or while the page is idle,
 // not with the page: the landing page, the band and the placeholders need
 // none of it. The chart views share one chunk (components/chartViews.js);
 // the text views have their own. A view whose code has loaded renders at once.
 const chartViews = () => import("./components/chartViews");
 const BudgetaryImpactChart = lazyView(chartViews, (m) => m.BudgetaryImpactChart);
-const ConstituencyMap = lazyView(chartViews, (m) => m.ConstituencyMap);
-const DecileImpactCard = lazyView(chartViews, (m) => m.DecileImpactCard);
-const HouseholdScatter = lazyView(chartViews, (m) => m.HouseholdScatter);
 const AgeSection = lazyView(chartViews, (m) => m.AgeSection);
 const PovertyMeasuresRow = lazyView(chartViews, (m) => m.PovertyMeasuresRow);
-const PersonalImpactTab = lazyView(chartViews, (m) => m.PersonalImpactTab);
 const PolicyCards = lazyView(() => import("./components/PolicyCards"));
 const NotComputableMeasures = lazyView(() => import("./components/milburn/NotComputableMeasures"));
 const MethodologyTab = lazyView(() => import("./components/MethodologyTab"));
@@ -63,11 +57,9 @@ const KeyFigures = lazyView(() => import("./components/milburn/KeyFigures"));
 // The code each view ("tab" or "tab:sub", as bootView names them) needs
 const VIEW_CODE = {
   "dashboard:finances": [BudgetaryImpactChart],
-  "dashboard:all": [ConstituencyMap, DecileImpactCard, HouseholdScatter],
   "dashboard:age": [AgeSection],
   // Withheld for now (povertyFigures.js): no sub-tab, so no code to load
   ...(POVERTY_FIGURES_SHOWN ? { "dashboard:poverty": [PovertyMeasuresRow] } : {}),
-  household: [PersonalImpactTab],
   "dashboard:scenarios": [BehaviouralScenarios],
   "dashboard:benchmarks": [BenchmarksTable],
   policies: [PolicyCards, NotComputableMeasures],
@@ -100,13 +92,12 @@ function viewFallback(value) {
 // the band's pills apply to a view; the others stay in the band, faded and
 // inactive, their reason in their accessible names. Policies describes
 // every measure and Methodology is text: no pill applies to them.
-// Population impact's sub-tabs (Young people, All households, Poverty,
-// Public finances, Behavioural scenarios, Benchmarks) are in
-// PopulationImpactView.
+// Impact's sub-tabs (Young people, Poverty, Public finances, Return to
+// work, Benchmarks) are in PopulationImpactView. The URL values stay as
+// they were ("dashboard", "policies"); only the labels changed.
 export const VIEWS = [
-  { value: "dashboard", label: "Population impact", year: true, policies: true },
-  { value: "household", label: "Household calculator", year: true, policies: true },
-  { value: "policies", label: "Policies", year: false, policies: false },
+  { value: "dashboard", label: "Impact", year: true, policies: true },
+  { value: "policies", label: "Measures", year: false, policies: false },
   { value: "methodology", label: "Methodology", year: false, policies: false },
 ];
 
@@ -117,13 +108,10 @@ const VIEW_BY_KEY = Object.fromEntries(VIEWS.map((view) => [view.value, view]));
 export const YEAR_INACTIVE = "The year doesn't change this tab";
 export const POLICIES_INACTIVE = "Policy choices don't change this tab";
 
-// Under the decile chart on the local build route (Methodology, Limitations)
-export const DECILE_SAMPLE_NOTE =
-  "These results rest on roughly 500 to 650 survey records of young claimants, so the pattern across individual deciles is noisy.";
-
 // Old ?tab= values still opened by shared links, and the view each is now;
-// the address is rewritten to the new value
-const VIEW_ALIASES = { personal: "household" };
+// the address is rewritten to the new value. The Household calculator tab
+// was removed: its links open Impact.
+const VIEW_ALIASES = { personal: "dashboard", household: "dashboard" };
 const viewKey = (tab) => VIEW_ALIASES[tab] ?? tab;
 
 // The view under the landing page, and the one an address with no ?tab=
@@ -142,23 +130,13 @@ export function yearPillShown(view) {
 
 /**
  * Whether a page address is an old link to the Young people view
- * (#young-people or ?tab=young), now Population impact's Young people
+ * (#young-people or ?tab=young), now Impact's Young people
  * sub-tab.
  */
 export function opensYoungPeople({ search, hash }) {
   return (
     hash === `#${YOUNG_PEOPLE_ANCHOR}` || new URLSearchParams(search).get("tab") === "young"
   );
-}
-
-/**
- * Whether a page address links to the income decile pair (#deciles), which
- * is on Population impact's All households sub-tab (it was on Living
- * standards before).
- */
-export const DECILES_ANCHOR = "deciles";
-export function opensDeciles({ hash }) {
-  return hash === `#${DECILES_ANCHOR}`;
 }
 
 /**
@@ -176,7 +154,6 @@ export function oldAgeSubGroup({ search }) {
 /** The view a page address opens: an old Young people link, else ?tab=, else the default. */
 export function viewFromLocation({ search, hash }) {
   if (opensYoungPeople({ search, hash })) return DEFAULT_VIEW;
-  if (opensDeciles({ hash })) return DEFAULT_VIEW;
   const tab = viewKey(new URLSearchParams(search).get("tab"));
   return VIEW_BY_KEY[tab] ? tab : DEFAULT_VIEW;
 }
@@ -214,10 +191,10 @@ const NOTHING_PUBLISHED = Object.freeze({
 });
 
 // The views whose figures come from the publication
-const BUDGET_VIEWS = new Set(["dashboard", "household"]);
+const BUDGET_VIEWS = new Set(["dashboard"]);
 
 // The placeholder for a Budget view while its results load: the linked
-// sub-tab's on Population impact (bootView), as the server's HTML drew it
+// sub-tab's on Impact (bootView), as the server's HTML drew it
 function loadingView(value) {
   if (value !== "dashboard") return value;
   const linked = typeof window === "undefined" ? "dashboard:finances" : bootView(window.location);
@@ -225,7 +202,7 @@ function loadingView(value) {
 }
 
 // The tables no first view waits for, loaded when the page is idle
-const IDLE_TABLES = ["age_impact", "household_scatter_binned"];
+const IDLE_TABLES = ["age_impact"];
 
 function whenIdle(run) {
   if (typeof window === "undefined") return undefined;
@@ -255,20 +232,18 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   // population tabs only: the picker is single-select there, the default
   // the first measure in the catalogue's order, and a link naming several
   // opens on the first of them. Once a combined run is published it is
-  // multi-select again, by itself. The Household calculator keeps its own
-  // selection, every policy by default.
+  // multi-select again, by itself.
   const singleSelect = Boolean(catalogue.manifest) && catalogue.displayable.length > 1 && !catalogue.combinedId;
   // A link's ?policies= is the open tab's own choice while single-select:
-  // on Population impact (or the landing page) the one policy, and the
-  // household keeps every policy; on the Household calculator the
-  // household's; on a tab the policies do not change, both
-  const linkTab = () => (typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("tab"));
+  // on Impact (or the landing page) the one policy; on a tab the policies
+  // do not change, both. An old ?tab= value counts as the view it opens.
+  const linkTab = () => (typeof window === "undefined" ? null : viewKey(new URLSearchParams(window.location.search).get("tab")));
   const linkSetsHousehold = (link) => link !== null && (!singleSelect || (linkTab() !== null && linkTab() !== "dashboard"));
-  const linkSetsOne = (link) => link !== null && singleSelect && linkTab() !== "household";
+  const linkSetsOne = (link) => link !== null && singleSelect;
   const [chosenPolicies, setChosenPolicies] = useState(() => (linkSetsHousehold(requested) ? requestedPolicies(requested) : []));
   const [selectionChosen, setSelectionChosen] = useState(() => linkSetsHousehold(requested));
   // The population tabs' one policy while single-select (below): its own
-  // choice, so the Household calculator's selection is kept beside it
+  // choice, so the multi-policy selection is kept beside it
   const [chosenOne, setChosenOne] = useState(() => (linkSetsOne(requested) ? requestedPolicies(requested) : []));
   // The default is derived, never stored: an artifact that verifies later
   // under the same manifest joins it, as on a fresh load (review of
@@ -279,9 +254,8 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   const allPolicyIds = defaultPolicies;
   // A withdrawn measure in a link or a kept selection drops out silently;
   // the address writer below then rewrites ?policies= without it.
-  // The Household calculator's selection: every policy by default, any
-  // several (the household API runs them together, no combined run needed)
-  const householdPolicies = useMemo(() => {
+  // The multi-policy selection: every policy by default, any several
+  const multiPolicies = useMemo(() => {
     const chosen = selectionChosen ? chosenPolicies : defaultPolicies;
     return catalogue.withdrawn?.size ? chosen.filter((id) => !catalogue.withdrawn.has(id)) : chosen;
   }, [selectionChosen, chosenPolicies, defaultPolicies, catalogue]);
@@ -289,15 +263,18 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   // policy, its own choice (the first a link names, in the catalogue's
   // order), else the first in the catalogue's order
   const selectedPolicies = useMemo(() => {
-    if (!singleSelect) return householdPolicies;
+    if (!singleSelect) return multiPolicies;
     const kept = catalogue.withdrawn?.size ? chosenOne.filter((id) => !catalogue.withdrawn.has(id)) : chosenOne;
     const first = catalogue.displayable.find((measure) => kept.includes(measure.id));
     if (first) return [first.id];
     // A link naming only an unavailable policy keeps it, so the page says
     // it is unavailable rather than swapping in another
     if (kept.length) return [kept[0]];
-    return catalogue.displayable.length ? [catalogue.displayable[0].id] : [];
-  }, [singleSelect, householdPolicies, chosenOne, catalogue]);
+    // On the local build route, the first run the selector offers (the full
+    // abolition package), not the catalogue's first (the largest saving)
+    const fallback = catalogue.localBuild ? milburnDefaultMeasure(catalogue.displayable) : catalogue.displayable[0];
+    return fallback ? [fallback.id] : [];
+  }, [singleSelect, multiPolicies, chosenOne, catalogue]);
   // Once the first view has painted, every other view's tables load and
   // verify while the page is idle, so a tab switch need not wait
   useEffect(() => {
@@ -324,33 +301,6 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     return () => {
       steps.length = 0;
       cancel?.();
-    };
-  }, [catalogue]);
-  // The two big files (the map's boundaries and results by area; the
-  // example households' answers) load only for the views that show them:
-  // when one opens (its cards ask), or a little before, as the pointer or
-  // focus reaches its tab, through the same checks
-  useEffect(() => {
-    if (!catalogue.manifest) return undefined;
-    const done = new Set();
-    const onIntent = (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      if (!target) return;
-      if (!done.has("map") && target.closest(`#${subTabId("population", "all")}`)) {
-        done.add("map");
-        prefetchGeography(catalogue);
-      }
-      // The local build route has no household calculator (PersonalImpactTab)
-      if (!done.has("presets") && !catalogue.localBuild && target.closest("#tab-household")) {
-        done.add("presets");
-        loadPresetChanges().catch(() => {});
-      }
-    };
-    document.addEventListener("pointerover", onIntent, { passive: true });
-    document.addEventListener("focusin", onIntent);
-    return () => {
-      document.removeEventListener("pointerover", onIntent);
-      document.removeEventListener("focusin", onIntent);
     };
   }, [catalogue]);
   const [distributionalYear, setDistributionalYear] = useState(DEFAULT_DISPLAY_YEAR);
@@ -389,8 +339,6 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     const oldGroup = oldAgeSubGroup(window.location);
     if (opensYoungPeople(window.location)) dropSubTab("age", { age: "16-24" });
     else if (oldGroup) dropSubTab("age", { age: oldGroup });
-    // A link to the decile pair opens All households, where it now is
-    else if (opensDeciles(window.location)) dropSubTab("all");
     setLanding(opensLanding(window.location));
     setActiveTab(view);
     // A shared link's ?year= opens that year; one not offered opens the
@@ -428,14 +376,12 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
       // selection comes back to the address with the next view)
       // The open tab's own selection. One policy at a time on the population
       // tabs: the address always names it, so a shared link opens on it
-      const onHousehold = activeTab === "household";
-      // Single-select: Population impact always names its one policy; the
-      // Household calculator its chosen selection; another tab the
-      // household's chosen selection, else a chosen one policy
+      // Single-select: Impact always names its one policy; another tab the
+      // chosen selection, else a chosen one policy
       if (landing) params.delete("policies");
       else if (singleSelect && activeTab === "dashboard") params.set("policies", selectedPolicies.join(","));
-      else if (selectionChosen) params.set("policies", householdPolicies.join(","));
-      else if (singleSelect && !onHousehold && chosenOne.length > 0) params.set("policies", selectedPolicies.join(","));
+      else if (selectionChosen) params.set("policies", multiPolicies.join(","));
+      else if (singleSelect && chosenOne.length > 0) params.set("policies", selectedPolicies.join(","));
       else params.delete("policies");
     }
     // The year chosen in the header, so a shared link opens on it; the
@@ -443,7 +389,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     if (!landing && distributionalYear !== DEFAULT_DISPLAY_YEAR) params.set("year", String(distributionalYear));
     else params.delete("year");
     window.history.replaceState({}, "", `${window.location.pathname}${params.size ? `?${params}` : ""}${window.location.hash}`);
-  }, [selectedPolicies, householdPolicies, selectionChosen, singleSelect, chosenOne, activeTab, landing, locationReady, unavailable, distributionalYear]);
+  }, [selectedPolicies, multiPolicies, selectionChosen, singleSelect, chosenOne, activeTab, landing, locationReady, unavailable, distributionalYear]);
 
   // The years shown: 2026-27 first only while a selected policy has an
   // effect in it (yearsForSelection)
@@ -456,8 +402,6 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     // The net line from the selected policies' combined run when one is
     // published, else the bars' sum
     budgetData: budgetChartData(published.budgetary, catalogue.displayable, selectedPolicies, shownYears, selectionPackageKey(catalogue.manifest, selectedPolicies)),
-    rawDistributional: published.distributional.filter((row) => selectedPolicies.includes(row.reform_id)),
-    rawWinnersLosers: published.winnersLosers.filter((row) => selectedPolicies.includes(row.reform_id)),
     // Every verified run's rows: the summary statistics read one run, not a
     // sum; an artifact's poverty_inequality table is merged into its rows
     rawMetrics: published.metrics,
@@ -466,11 +410,11 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   const handlePolicyToggle = (policyId) => {
     if (!catalogue.byId.get(policyId)?.displayable) return;
     // One at a time on the population tabs: picking a policy selects only it
-    if (singleSelect && activeTab !== "household") {
+    if (singleSelect) {
       setChosenOne([policyId]);
       return;
     }
-    setChosenPolicies(householdPolicies.includes(policyId) ? householdPolicies.filter((id) => id !== policyId) : [...householdPolicies, policyId]);
+    setChosenPolicies(multiPolicies.includes(policyId) ? multiPolicies.filter((id) => id !== policyId) : [...multiPolicies, policyId]);
     setSelectionChosen(true);
   };
   // Select all and Clear: the whole selection in one update (a run of
@@ -486,7 +430,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   };
   // Only on the reader's request: an unavailable measure leaves the selection
   const removeFromSelection = (ids) => {
-    setChosenPolicies(householdPolicies.filter((id) => !ids.includes(id)));
+    setChosenPolicies(multiPolicies.filter((id) => !ids.includes(id)));
     setSelectionChosen(true);
   };
 
@@ -739,7 +683,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     }
   }, []);
 
-  // A link to #young-people from elsewhere on the page opens Population
+  // A link to #young-people from elsewhere on the page opens Impact
   // impact's Young people sub-tab (PopulationImpactView shows it if open)
   useEffect(() => {
     const onHashChange = () => {
@@ -843,7 +787,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   const handleTabChange = (requested, sub, extra) => {
     const tab = viewKey(requested);
     // Leaving the landing page opens the view even when it is the one
-    // behind it (a box, or the Population impact tab)
+    // behind it (a box, or the Impact tab)
     const changing = tab !== activeTab || landing;
     // A sub-tab (?sub=, SubTabs.jsx) belongs to the view that wrote it, so
     // it goes before another view opens and reads the address
@@ -901,10 +845,10 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     window.addEventListener(OPEN_VIEW_EVENT, onOpenView);
     return () => window.removeEventListener(OPEN_VIEW_EVENT, onOpenView);
   }, []);
-  // A Policies card's "See its effect": Population impact with only that
+  // A Policies card's "See its effect": Impact with only that
   // measure selected (the address then carries ?policies=<id>)
   const handleShowEffect = (policyId) => {
-    // One at a time: the population tabs' own choice, the household's kept
+    // One at a time: the population tabs' own choice, the selection kept
     if (singleSelect) setChosenOne([policyId]);
     else {
       setChosenPolicies([policyId]);
@@ -940,8 +884,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   }, [activeTab, landing]);
 
   // An explicit URL selection is never silently narrowed into another
-  // selection. Household calculator applies its own year-aware gate; Population
-  // impact with an unavailable member has no complete set of Budget figures.
+  // selection. Impact with an unavailable member has no complete set of Budget figures.
   // Each opened view stays mounted, so the check is per view, not for the
   // open one only.
   const unavailableIds = selectedPolicies.filter((id) => !catalogue.byId.get(id)?.displayable);
@@ -956,7 +899,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   } : null;
   const viewUnavailable = (value) => unavailable ?? (value === "dashboard" ? selectionUnavailable : null);
   // The views with sub-tabs open into their band (SubTabs); not while
-  // Population impact shows its unavailable notice instead, nor on the
+  // Impact shows its unavailable notice instead, nor on the
   // landing page, where no view tab is chosen
   const hasSubTabs = !landing && activeTab === "dashboard" && !viewUnavailable("dashboard");
 
@@ -964,10 +907,6 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   // Both pills show on the landing page: the band stays the same from the
   // start, and they drive the view behind it
   const yearShown = landing || yearPillShown(activeTab);
-  // Household calculator's examples are published from 2027-28 only, so its
-  // year pill offers those years and a band year of 2026-27 shows 2027-28
-  const householdView = !landing && activeTab === "household";
-  const householdYear = SELECTABLE_YEARS.includes(distributionalYear) ? distributionalYear : DEFAULT_DISPLAY_YEAR;
   const policiesShown = landing || view.policies;
 
   // A caveat on the results while any shown measure is provisional: one
@@ -983,12 +922,12 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   const downloadContext = (value) =>
     VIEW_BY_KEY[value]?.policies
       ? {
-          policies: policiesLabel(value === "household" ? householdPolicies : selectedPolicies, POLICIES),
+          policies: policiesLabel(selectedPolicies, POLICIES),
           provisional: notice || null,
         }
       : { policies: null, provisional: null };
 
-  // Which policies the charts show, when not all (under Population
+  // Which policies the charts show, when not all (under Impact
   // impact's sub-tabs)
   const showingLine = selectedPolicies.length > 0 &&
     selectedPolicies.length < POLICIES.length && (
@@ -1023,7 +962,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   );
 
 
-  // A Population impact sub-tab's content. With no policies chosen, each
+  // A Impact sub-tab's content. With no policies chosen, each
   // offers the full Budget; the charts wait for the CSVs.
   // Each sub-tab's code loads when it first opens (lazyView), its
   // placeholder showing meanwhile
@@ -1096,78 +1035,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         </div>
       );
     }
-    // All households: places, and how changes vary between households
-    return (
-      <div className="results-container">
-        {/* Two sections: by area (the constituency map) and by income (the
-            decile card beside the scatter of binned groups; the
-            per-household scatter stays withdrawn, as it showed survey
-            households one by one). No key above the sections: the
-            header shows the selection and each chart draws its own key.
-            Results by region are hidden for now (RegionView is
-            kept, not rendered). */}
-          <SectionHeading
-            id="by-area"
-            icon="compass"
-            title="By area"
-            subtitle="Average change in household income in each parliamentary constituency."
-          />
-          <section id="constituencies" className="report-section charts-stack">
-            <ConstituencyMap
-              selectedPolicies={selectedPolicies}
-              selectedYear={distributionalYear}
-              policies={POLICIES}
-              showRegionLink={false}
-            />
-          </section>
-          <SectionHeading
-            id="by-income"
-            icon="wallet"
-            title="By income"
-            subtitle="How the change differs between lower- and higher-income households: on average in each income decile, and across households with similar incomes and changes."
-          />
-          {/* The decile card (£ or % in its Options) beside the household
-              scatter: two columns on a wide screen, stacked on a narrow one */}
-          <section id={DECILES_ANCHOR} className="report-section distributional-section">
-            <div className="charts-grid">
-              <div className="decile-with-note">
-                <DecileImpactCard
-                  winnersLosers={results.rawWinnersLosers}
-                  distributional={results.rawDistributional}
-                  selectedPolicies={selectedPolicies}
-                  selectedYear={distributionalYear}
-                />
-                {catalogue.localBuild && (
-                  <p className="milburn-chart-note" role="note">
-                    {DECILE_SAMPLE_NOTE}
-                  </p>
-                )}
-              </div>
-              <HouseholdScatter
-                selectedPolicies={selectedPolicies}
-                policies={POLICIES}
-                selectedYear={distributionalYear}
-                onPoliciesSet={handlePoliciesSet}
-                descriptionLink={
-                  <>
-                    Where would yours be?{" "}
-                    <a
-                      className="twin-link"
-                      href={`?${new URLSearchParams({ tab: "household", ...(selectionChosen ? { policies: householdPolicies.join(",") } : {}) })}`}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        handleTabChange("household");
-                      }}
-                    >
-                      Work it out on Household calculator →
-                    </a>
-                  </>
-                }
-              />
-            </div>
-          </section>
-      </div>
-    );
+    return null;
   };
 
   return (
@@ -1196,17 +1064,15 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
             <h1>Milburn review: young people and work</h1>
           </div>
 
-          {/* The year applies to every chart on Population impact (both
-              sub-tabs) and to Household calculator, and
-              the revenue chart highlights it; it lives in the band so it can
-              be changed from anywhere. The policy pill
-              applies to those views and Household calculator. A pill that does
+          {/* The year applies to every chart on Impact, and the revenue
+              chart highlights it; it lives in the band so it can be changed
+              from anywhere. The policy pill applies to Impact. A pill that does
               not apply stays in its place, faded, and does not open; its
               reason is in its accessible name only. Both are on every view, so the band never moves. */}
           <div className={`band-year${yearShown ? "" : " is-inactive"}`}>
             <YearSlider
-              years={householdView ? SELECTABLE_YEARS : shownYears}
-              selectedYear={householdView ? householdYear : distributionalYear}
+              years={shownYears}
+              selectedYear={distributionalYear}
               onYearChange={setDistributionalYear}
               inactiveReason={yearShown ? undefined : YEAR_INACTIVE}
             />
@@ -1214,10 +1080,10 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           <div className={`band-policy${policiesShown ? "" : " is-inactive"}`}>
             <PolicySelector
               policies={POLICIES}
-              selectedPolicies={householdView ? householdPolicies : selectedPolicies}
+              selectedPolicies={selectedPolicies}
               onPolicyToggle={handlePolicyToggle}
               onPoliciesSet={handlePoliciesSet}
-              single={singleSelect && !householdView}
+              single={singleSelect}
               loading={Boolean(unavailable?.loading)}
               noneReason={unavailable?.reason}
               inactiveReason={policiesShown ? undefined : POLICIES_INACTIVE}
@@ -1277,7 +1143,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           hidden={landing || value !== activeTab}
         >
         <DownloadContext.Provider value={downloadContext(value)}>
-        {/* The local build's label, near every view's figures (Population
+        {/* The local build's label, near every view's figures (Impact
             impact carries it under its sub-tabs) */}
         {value !== "dashboard" && <LocalBuildLabel />}
         <Suspense fallback={viewFallback(value)}>
@@ -1323,16 +1189,8 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           </div>
         ) : value === "methodology" ? (
           <MethodologyTab onShowTab={handleTabChange} />
-        ) : value === "household" ? (
-          <PersonalImpactTab
-            selectedPolicies={householdPolicies}
-            policies={POLICIES}
-            year={householdYear}
-            onRemoveUnavailable={removeFromSelection}
-            active={activeTab === value}
-          />
         ) : (
-          // Population impact and its sub-tabs (populationPanel)
+          // Impact and its sub-tabs (populationPanel)
           // Hidden under the landing page, it leaves the address alone
           <PopulationImpactView note={<>{showingLine}<LocalBuildLabel /></>} active={activeTab === value && !landing}>
             {populationPanel}

@@ -1,7 +1,7 @@
 /**
  * When the page opens on its landing page: only at the bare address. A link
  * that names a view or a selection (?tab=, ?sub=, ?policies=, ?year=) or a
- * section (#young-people, #deciles) opens that instead, as it always has.
+ * section (#young-people) opens that instead, as it always has.
  *
  * Kept free of React so the root layout's inline script (DEEP_LINK_SCRIPT)
  * and App.jsx read the same rule.
@@ -12,10 +12,10 @@ export const DEEP_LINK_PARAMS = Object.freeze(["tab", "sub", "policies", "year"]
 
 /**
  * The hashes that make an address a link to a section: Young people
- * (YoungPeopleSection's YOUNG_PEOPLE_ANCHOR) and the income decile pair
- * (App.jsx's DECILES_ANCHOR). landing.test.js keeps them in step.
+ * (YoungPeopleSection's YOUNG_PEOPLE_ANCHOR). landing.test.js keeps them
+ * in step.
  */
-export const DEEP_LINK_HASHES = Object.freeze(["#young-people", "#deciles"]);
+export const DEEP_LINK_HASHES = Object.freeze(["#young-people"]);
 
 /** Whether a page address opens the landing page. */
 export function opensLanding({ search, hash }) {

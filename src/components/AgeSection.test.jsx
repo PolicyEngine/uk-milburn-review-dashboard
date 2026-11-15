@@ -3,9 +3,11 @@ import { ageGroupFrom, ageWindow, groupAges, groupSubject, AGE_GROUP_OPTIONS } f
 import { oldAgeSubGroup } from "../App";
 
 describe("By age's age groups", () => {
-  it("offers every band, pensioners and all ages, and reads ?age= with 16 to 24 as the default", () => {
-    expect(AGE_GROUP_OPTIONS.map((group) => group.key)).toEqual(["0-15", "16-24", "25-34", "35-49", "50-64", "65+", "pensioners", "all"]);
-    expect(ageGroupFrom("pensioners")).toBe("pensioners");
+  it("offers 16 to 24, 25 to 34 and all ages, and reads ?age= with 16 to 24 as the default", () => {
+    expect(AGE_GROUP_OPTIONS.map((group) => group.key)).toEqual(["16-24", "25-34", "all"]);
+    // Pensioners and the other bands are no longer offered: their links open the default
+    expect(ageGroupFrom("pensioners")).toBe("16-24");
+    expect(ageGroupFrom("50-64")).toBe("16-24");
     expect(ageGroupFrom("nonsense")).toBe("16-24");
     expect(ageGroupFrom(null)).toBe("16-24");
   });
@@ -55,13 +57,14 @@ describe("By age's cards share one age group", async () => {
     // Three while the winners and losers shares are withheld (povertyFigures.js)
     expect(pills()).toHaveLength(POVERTY_FIGURES_SHOWN ? 4 : 3);
     for (const pill of pills()) expect(pill.getAttribute("aria-label")).toMatch(/^Options: 16 to 24/);
-    // Choose 50 to 64 in the second card (Change by year)
+    // Choose 25 to 34 in the second card (Change by year)
     fireEvent.click(pills()[1]);
     const dialog = screen.getByRole("dialog");
     const group = within(dialog).getAllByRole("radiogroup")[0];
-    fireEvent.click(within(group).getByRole("radio", { name: /50 to 64/ }));
-    for (const pill of pills()) expect(pill.getAttribute("aria-label")).toMatch(/^Options: 50 to 64/);
-    expect(new URLSearchParams(window.location.search).get("age")).toBe("50-64");
+    expect(within(group).queryByRole("radio", { name: /50 to 64|Pensioners/ })).toBeNull();
+    fireEvent.click(within(group).getByRole("radio", { name: /25 to 34/ }));
+    for (const pill of pills()) expect(pill.getAttribute("aria-label")).toMatch(/^Options: 25 to 34/);
+    expect(new URLSearchParams(window.location.search).get("age")).toBe("25-34");
   });
 
   it("with All ages against All ages, Effect of each policy's pill reads All ages once", async () => {

@@ -1,6 +1,6 @@
 import { beforeAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import App, { DECILES_ANCHOR, preloadAllViews } from "./App";
+import App, { preloadAllViews } from "./App";
 import { YOUNG_PEOPLE_ANCHOR } from "./components/YoungPeopleSection";
 import { resetPresetResults } from "./utils/householdPresets";
 import { DEEP_LINK_HASHES, DEEP_LINK_SCRIPT, opensLanding } from "./utils/landing";
@@ -11,11 +11,11 @@ import { BASE_PATH, fixtureFetch, fixtureJson } from "./test/publicationFixture"
 beforeAll(preloadAllViews, 60_000);
 
 const INTRO =
-  /^Estimates from PolicyEngine UK( \(opens in a new tab\))? of how candidate measures for the independent review of young people and work would affect the public finances and household incomes, by age, income and area\. The review’s final report is expected on 17 November 2026; the measures here are modelled before it is published and are not announced policy\. The main figures are static: they assume no change in behaviour\.$/;
+  /^Estimates from PolicyEngine UK( \(opens in a new tab\))? of how candidate measures for the independent review of young people and work would affect the public finances and household incomes, by age\. The review’s final report is expected on 17 November 2026; the measures here are modelled before it is published and are not announced policy\. The main figures are static: they assume no change in behaviour\.$/;
 
 const BOXES = {
   society: /^Young people/,
-  household: /^Your household/,
+  scenarios: /^Return to work/,
   policies: /^The measures modelled/,
 };
 
@@ -61,7 +61,7 @@ describe("the landing page", () => {
     // Each box: a title, one short line and "Explore", and no figure
     expect(within(page).getAllByRole("link", { name: /Explore$/ }).map((link) => [link.getAttribute("href"), link.textContent])).toEqual([
       ["?tab=dashboard&sub=age", "Young peopleWho gains or loses, and the costExplore→"],
-      ["?tab=household", "Your householdSee how your income changesExplore→"],
+      ["?tab=dashboard&sub=scenarios", "Return to workThe package if some young people move into workExplore→"],
       ["?tab=policies", "The measures modelledEvery candidate measure, and how we model itExplore→"],
     ]);
     expect(page.querySelector(".landing-box-figure")).toBeNull();
@@ -77,7 +77,7 @@ describe("the landing page", () => {
       // A source link says it opens in a new tab, to a screen reader
       "PolicyEngine UK (opens in a new tab)",
       expect.stringMatching(BOXES.society),
-      expect.stringMatching(BOXES.household),
+      expect.stringMatching(BOXES.scenarios),
       expect.stringMatching(BOXES.policies),
     ]);
     // The band keeps both pills
@@ -133,50 +133,50 @@ describe("the landing page", () => {
     fireEvent.click(box("society"));
     expect(container.querySelector(".landing-backdrop")).toBeNull();
     expect(container.querySelector(".view-stage")).not.toHaveClass("is-landing");
-    expect(screen.getByRole("tabpanel", { name: "Population impact" })).toBeInTheDocument();
+    expect(screen.getByRole("tabpanel", { name: "Impact" })).toBeInTheDocument();
   });
 
-  it("opens Population impact at Young people from the first box, and brings the tab bar", async () => {
+  it("opens Impact at Young people from the first box, and brings the tab bar", async () => {
     const { container } = await renderApp();
     fireEvent.click(box("society"));
     expect(landing()).toBeNull();
     expect(container.querySelector(".view-tabs-bar")).not.toHaveAttribute("hidden");
-    expect(selectedViewTabs().map((tab) => tab.textContent)).toEqual(["Population impact"]);
+    expect(selectedViewTabs().map((tab) => tab.textContent)).toEqual(["Impact"]);
     expect(screen.getByRole("tab", { name: "Young people" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tabpanel", { name: "Young people" })).toBeInTheDocument();
     // Young people is the default sub-tab, so ?sub= is left out
     expect([search().get("tab"), search().get("sub")]).toEqual(["dashboard", null]);
   });
 
-  it("opens Household calculator from the second box", async () => {
+  it("opens Impact at Return to work from the second box", async () => {
     await renderApp();
-    fireEvent.click(box("household"));
+    fireEvent.click(box("scenarios"));
     expect(landing()).toBeNull();
-    expect(selectedViewTabs().map((tab) => tab.textContent)).toEqual(["Household calculator"]);
-    expect(screen.getByRole("tabpanel", { name: "Household calculator" })).toBeInTheDocument();
-    expect([search().get("tab"), search().get("sub")]).toEqual(["household", null]);
+    expect(selectedViewTabs().map((tab) => tab.textContent)).toEqual(["Impact"]);
+    expect(screen.getByRole("tab", { name: "Return to work" })).toHaveAttribute("aria-selected", "true");
+    expect([search().get("tab"), search().get("sub")]).toEqual(["dashboard", "scenarios"]);
   });
 
-  it("opens Policies from the third box, and any view from the tab bar after", async () => {
+  it("opens Measures from the third box, and any view from the tab bar after", async () => {
     await renderApp();
     fireEvent.click(box("policies"));
     expect(landing()).toBeNull();
-    expect(selectedViewTabs().map((tab) => tab.textContent)).toEqual(["Policies"]);
-    expect(screen.getByRole("tabpanel", { name: "Policies" })).toBeInTheDocument();
+    expect(selectedViewTabs().map((tab) => tab.textContent)).toEqual(["Measures"]);
+    expect(screen.getByRole("tabpanel", { name: "Measures" })).toBeInTheDocument();
     expect(search().get("tab")).toBe("policies");
     fireEvent.click(viewTab("Methodology"));
     expect(search().get("tab")).toBe("methodology");
   });
 
   it.each([
-    ["/?tab=dashboard", "Population impact"],
-    ["/?tab=household", "Household calculator"],
-    ["/?tab=policies", "Policies"],
-    ["/?sub=all", "Population impact"],
-    ["/?policies=alpha", "Population impact"],
-    ["/?year=2028", "Population impact"],
-    [`/#${DECILES_ANCHOR}`, "Population impact"],
-    [`/#${YOUNG_PEOPLE_ANCHOR}`, "Population impact"],
+    ["/?tab=dashboard", "Impact"],
+    // The removed Household calculator's links open Impact
+    ["/?tab=household", "Impact"],
+    ["/?tab=policies", "Measures"],
+    ["/?sub=all", "Impact"],
+    ["/?policies=alpha", "Impact"],
+    ["/?year=2028", "Impact"],
+    [`/#${YOUNG_PEOPLE_ANCHOR}`, "Impact"],
   ])("does not show for a link to a view: %s", async (url, view) => {
     window.history.replaceState({}, "", url);
     const { container } = await renderApp();
@@ -310,7 +310,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
     const rows = within(within(nav).getByRole("list", { name: "In this dashboard" })).getAllByRole("link");
     expect(rows.map((row) => row.textContent)).toEqual([
       "Young peopleWho gains or loses, and the cost",
-      "Your householdSee how your income changes",
+      "Return to workThe package if some young people move into work",
       "The measures modelledEvery candidate measure, and how we model it",
     ]);
     const site = within(within(nav).getByRole("region", { name: "More from PolicyEngine" })).getByRole("link");
@@ -374,9 +374,9 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
   });
 
   it.each([
-    [/^Young people/, "Population impact", "dashboard"],
-    [/^Your household/, "Household calculator", "household"],
-    [/^The measures modelled/, "Policies", "policies"],
+    [/^Young people/, "Impact", "dashboard"],
+    [/^Return to work/, "Impact", "dashboard"],
+    [/^The measures modelled/, "Measures", "policies"],
   ])("opens a view from a box and closes: %s", async (name, view, tab) => {
     await openDrawer();
     fireEvent.click(within(drawer()).getByRole("link", { name }));
@@ -393,10 +393,11 @@ describe("the landing page's rules", () => {
     for (const search of ["?tab=outlook", "?sub=all", "?policies=", "?year=2028"]) {
       expect(opensLanding({ search, hash: "" })).toBe(false);
     }
-    expect(opensLanding({ search: "", hash: "#deciles" })).toBe(false);
+    // The decile pair was removed with All households: its old link opens the landing page
+    expect(opensLanding({ search: "", hash: "#deciles" })).toBe(true);
     expect(opensLanding({ search: "", hash: "#young-people" })).toBe(false);
     // The hashes are the sections' own anchors
-    expect(DEEP_LINK_HASHES).toEqual([`#${YOUNG_PEOPLE_ANCHOR}`, `#${DECILES_ANCHOR}`]);
+    expect(DEEP_LINK_HASHES).toEqual([`#${YOUNG_PEOPLE_ANCHOR}`]);
   });
 
   it("marks a link to a view before the first paint, with the same rule", () => {

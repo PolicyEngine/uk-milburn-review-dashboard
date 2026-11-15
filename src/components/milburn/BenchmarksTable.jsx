@@ -73,7 +73,7 @@ export default function BenchmarksTable() {
                 <th scope="col">Basis</th>
                 <th scope="col">Source</th>
                 <th scope="col">Date</th>
-                <th scope="col">PolicyEngine estimate{yearLabel && `, ${yearLabel}`}</th>
+                <th scope="col">PolicyEngine estimate</th>
               </tr>
             </thead>
             <tbody>
@@ -97,12 +97,19 @@ export default function BenchmarksTable() {
                     </td>
                     <td>{row.date}</td>
                     <td>
-                      {estimate === null ? (
+                      {row.estimate?.fixed ? (
+                        <>
+                          <span className="milburn-estimate">{row.estimate.fixed}</span>
+                          {row.estimate.basis && <span className="milburn-estimate-label">{row.estimate.basis}</span>}
+                          {row.estimate.label && <span className="milburn-estimate-label">{row.estimate.label}</span>}
+                        </>
+                      ) : estimate === null ? (
                         ""
                       ) : (
                         <>
                           <span className="milburn-estimate">{thousands(estimate)}</span>
                           {row.estimate.label && <span className="milburn-estimate-label">{row.estimate.label}</span>}
+                          {yearLabel && <span className="milburn-estimate-label">{yearLabel}</span>}
                         </>
                       )}
                     </td>
@@ -113,9 +120,10 @@ export default function BenchmarksTable() {
           </table>
         </div>
         <p className="milburn-control-note">
-          The PolicyEngine estimate is static: people aged 16 to 24 in households whose net income falls under the
-          modelled package, from its {catalogue.localBuild ? "local build" : "verified"} run. It counts a different group from the published figures, so it is
-          context, not a check on them; other rows have no comparable estimate and are left blank.
+          PolicyEngine estimates are static, and each names its build and year. They can count a different group or
+          area from the published figure beside them, so they are context, not a check on it. The package row counts
+          people aged 16 to 24 in households whose net income falls under the modelled package, from its{" "}
+          {catalogue.localBuild ? "local build" : "verified"} run. Rows with no comparable estimate are left blank.
         </p>
       </section>
     );

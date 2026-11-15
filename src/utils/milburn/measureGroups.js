@@ -1,7 +1,7 @@
 /**
  * How the Milburn runs are named and grouped on the page (the policy
- * selector and the Policies tab): packages, single measures, and
- * comparators that are not review proposals. Descriptions stay as
+ * selector and the Measures tab): packages, single measures, variants,
+ * and comparators that are not review proposals. Descriptions stay as
  * milburn_measures.json publishes them; only the packages' names are
  * replaced, with a plain statement of what each package assumes.
  */
@@ -16,22 +16,38 @@ export const MILBURN_DISPLAY_NAMES = Object.freeze({
 
 export const PACKAGES_GROUP = "packages";
 export const SINGLE_GROUP = "single";
+export const VARIANTS_GROUP = "variants";
 export const COMPARATORS_GROUP = "comparators";
+export const HIDDEN_GROUP = "hidden";
 
-/** The groups in the order shown. A run named in none is a single measure. */
+/**
+ * The groups in the order shown. A run named in none is a single measure.
+ * The hidden group's runs stay loadable (a link naming one still opens it)
+ * but are left out of the selector and the Measures tab: the 25% entry run
+ * feeds Return to work only.
+ */
 export const MILBURN_GROUPS = Object.freeze([
   {
     id: PACKAGES_GROUP,
     label: "Packages",
-    ids: ["milburn_package", "milburn_package_central", "milburn_package_phased", "milburn_package_entry_25pct"],
+    ids: ["milburn_package", "milburn_package_central", "milburn_package_phased"],
   },
-  { id: SINGLE_GROUP, label: "Single measures", ids: [] },
+  { id: SINGLE_GROUP, label: "Single measures", ids: ["uc_health_element_removed_under_25", "pip_removed_under_25"] },
+  {
+    id: VARIANTS_GROUP,
+    label: "Variants",
+    ids: ["uc_health_element_removed_under_22", "uc_health_element_removed_under_25_severe_kept", "pip_halved_under_25", "pip_removed_16_to_24"],
+  },
   {
     id: COMPARATORS_GROUP,
     label: "Comparators, not review proposals",
     ids: ["youth_allowance_at_25_plus_rate", "employer_nics_zero_under_25"],
   },
+  { id: HIDDEN_GROUP, label: null, hidden: true, ids: ["milburn_package_entry_25pct", "uc_health_element_removed_under_25_new_claims"] },
 ]);
+
+/** The packages' run ids, in the order shown (Key figures' range strip). */
+export const PACKAGE_IDS = MILBURN_GROUPS.find((group) => group.id === PACKAGES_GROUP).ids;
 
 /** A run's display name: the package's own, else the name given. */
 export function milburnDisplayName(id, name) {
@@ -48,14 +64,23 @@ export function milburnGroupOf(measure) {
 }
 
 /**
- * The measures in their groups, in the groups' order: within Packages and
- * Comparators in the order listed above, then any others in the order
- * given; single measures in the order given. Empty groups are left out.
+ * The run shown when none is chosen: the first offered in the groups'
+ * order (the full abolition package), never a hidden run, though the
+ * catalogue's own order puts the largest saving first.
+ */
+export function milburnDefaultMeasure(measures) {
+  return groupMilburnMeasures(measures)[0]?.measures[0] ?? measures?.[0] ?? null;
+}
+
+/**
+ * The measures in their groups, in the groups' order: within each group in
+ * the order listed above, then any others in the order given. Empty groups
+ * and the hidden group are left out.
  *
  * @returns {Array<{id: string, label: string, measures: Array<Object>}>}
  */
 export function groupMilburnMeasures(measures) {
-  return MILBURN_GROUPS.map((group) => {
+  return MILBURN_GROUPS.filter((group) => !group.hidden).map((group) => {
     const members = (measures ?? []).filter((measure) => milburnGroupOf(measure) === group.id);
     const rank = (measure) => {
       const at = group.ids.indexOf(measure.id);

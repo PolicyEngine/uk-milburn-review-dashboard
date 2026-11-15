@@ -295,7 +295,8 @@
   color: var(--c-axis-title);
 }
 
-/* Break-even arithmetic (BehaviouralScenarios.jsx) */
+/* Return to work's lead comparison and break-even arithmetic (BehaviouralScenarios.jsx) */
+.milburn-entry,
 .milburn-breakeven {
   padding: var(--card-padding, 20px);
   border: 1px solid var(--c-grid);
@@ -303,21 +304,28 @@
   background: var(--c-surface);
 }
 
+.milburn-entry h3,
 .milburn-breakeven h3 {
   margin: 0 0 8px;
   font-size: 1rem;
 }
 
+.milburn-entry p,
 .milburn-breakeven p {
   margin: 0 0 12px;
   font-size: 0.95rem;
   line-height: 1.55;
 }
 
+.milburn-entry .milburn-table-wrap,
+.milburn-notes .milburn-table-wrap,
 .milburn-breakeven .milburn-table-wrap {
   margin-bottom: 12px;
 }
 
+.milburn-entry td,
+.milburn-notes td,
+.milburn-range td,
 .milburn-breakeven td {
   font-variant-numeric: tabular-nums;
 }
@@ -338,4 +346,21 @@
   font-size: var(--fs-small);
   line-height: 1.5;
   color: var(--c-axis-title);
+}
+
+/* Key figures' range strip: the three packages side by side (KeyFigures.jsx) */
+.milburn-range {
+  margin-top: 16px;
+}
+
+.milburn-range caption {
+  padding: 10px 12px 0;
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+}
+
+.milburn-range .milburn-table tbody th {
+  min-width: 0;
 }

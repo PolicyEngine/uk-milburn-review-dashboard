@@ -1,7 +1,9 @@
 /**
  * Benchmarks: published reference figures (public/data/milburn_benchmarks.json,
  * static, written by hand), each with its source, beside a PolicyEngine
- * estimate where the verified results hold a comparable figure.
+ * estimate where there is a comparable figure: either worked out from the
+ * results (`run`/`reform_id` with a `metric`) or a fixed figure from a named
+ * build (`value`, with its `basis` and `label`).
  */
 import { youngPeopleWorseOff } from "./youngPeople";
 
@@ -24,7 +26,13 @@ export function parseBenchmarks(json) {
       date: text(row.date),
       pressReport: row.press_report === true,
       estimate:
-        row.policyengine_estimate && (row.policyengine_estimate.run === "package" || typeof row.policyengine_estimate.reform_id === "string")
+        row.policyengine_estimate && typeof row.policyengine_estimate.value === "string" && row.policyengine_estimate.value.trim()
+          ? {
+              fixed: row.policyengine_estimate.value.trim(),
+              basis: text(row.policyengine_estimate.basis),
+              label: text(row.policyengine_estimate.label),
+            }
+          : row.policyengine_estimate && (row.policyengine_estimate.run === "package" || typeof row.policyengine_estimate.reform_id === "string")
           ? {
               package: row.policyengine_estimate.run === "package",
               reformId: typeof row.policyengine_estimate.reform_id === "string" ? row.policyengine_estimate.reform_id : null,
@@ -47,7 +55,7 @@ export function parseBenchmarks(json) {
  * "package"`, its rows and key from usePackageTable) or one measure's.
  */
 export function estimateFor(row, { ageRows, packageRows, packageKey, year }) {
-  if (!row.estimate || year === null) return null;
+  if (!row.estimate || row.estimate.fixed || year === null) return null;
   if (row.estimate.metric !== "young_people_worse_off") return null;
   if (row.estimate.package) return youngPeopleWorseOff(packageRows, packageKey, year);
   return youngPeopleWorseOff(ageRows, row.estimate.reformId, year);

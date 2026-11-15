@@ -29,7 +29,7 @@ async function renderApp() {
 
 const viewList = () => screen.getByRole("tablist", { name: "Views" });
 const tabs = () => within(viewList()).getAllByRole("tab");
-const subList = () => screen.getByRole("tablist", { name: "Population impact sections" });
+const subList = () => screen.getByRole("tablist", { name: "Impact sections" });
 const subTabs = () => within(subList()).getAllByRole("tab");
 const band = (container) => container.querySelector(".title-row");
 // A pill is always in the band (never hidden or inert); "shown" is whether
@@ -38,14 +38,13 @@ const visible = (pill) => !pill.classList.contains("is-hidden") && !pill.hasAttr
 const shown = (pill) => visible(pill) && !pill.classList.contains("is-inactive") && !pill.querySelector('.band-control[aria-disabled="true"]');
 
 describe("the view tabs", () => {
-  it("are four tabs under the band, in order, with no view pill in the band", async () => {
+  it("are three tabs under the band, in order, with no view pill in the band", async () => {
     // The bare address is the landing page (landing.test.jsx)
     window.history.replaceState({}, "", "/?tab=dashboard");
     const { container } = await renderApp();
     expect(tabs().map((tab) => tab.textContent)).toEqual([
-      "Population impact",
-      "Household calculator",
-      "Policies",
+      "Impact",
+      "Measures",
       "Methodology",
     ]);
     expect(tabs()[0]).toHaveAttribute("aria-selected", "true");
@@ -57,7 +56,7 @@ describe("the view tabs", () => {
     expect(container.querySelector(".dashboard-intro")).toBeNull();
     expect(container.querySelector(".landing")).toBeNull();
     expect(container).not.toHaveTextContent("This dashboard uses");
-    expect(screen.getByRole("tabpanel", { name: "Population impact" })).toBeInTheDocument();
+    expect(screen.getByRole("tabpanel", { name: "Impact" })).toBeInTheDocument();
   });
 
   it("shows the candidate banner on every view, once", async () => {
@@ -74,8 +73,6 @@ describe("the view tabs", () => {
     const { container } = await renderApp();
     const expected = {
       dashboard: [true, true],
-      // The year drives Household calculator's household calculation
-      household: [true, true],
       outlook: [false, false],
       policies: [false, false],
       methodology: [false, false],
@@ -115,18 +112,11 @@ describe("the view tabs", () => {
     });
   });
 
-  it("show the year pill on Household calculator, whatever an old ?sub= link says", async () => {
-    window.history.replaceState({}, "", "/?tab=personal&sub=multi");
-    const { container } = await renderApp();
-    expect(shown(band(container).querySelector(".band-year"))).toBe(true);
-    expect(container.querySelector(".app")).not.toHaveAttribute("data-band");
-  });
-
   it("keep ?tab= in step, the default selection out of the address and a chosen one on every view", async () => {
     // Review of 15439f4, finding 2: the default follows the publication,
     // and a chosen selection survives a view without the policy pill
     const search = () => new URLSearchParams(window.location.search);
-    const tabParam = { dashboard: "dashboard", household: "household", outlook: "outlook", policies: "policies", methodology: "methodology" };
+    const tabParam = { dashboard: "dashboard", outlook: "outlook", policies: "policies", methodology: "methodology" };
     const { unmount } = await renderApp();
     VIEWS.forEach((view, index) => {
       fireEvent.click(tabs()[index]);
@@ -143,23 +133,24 @@ describe("the view tabs", () => {
 
   it("open the view an old or new link names", async () => {
     for (const [url, label] of [
-      ["/?tab=household", "Household calculator"],
-      // An old link: the view it named, at its new address
-      ["/?tab=personal", "Household calculator"],
+      // The Household calculator was removed: its old links open Impact
+      ["/?tab=household", "Impact"],
+      ["/?tab=personal", "Impact"],
       // The Autumn Budget's Pre-measures forecast is not in this dashboard
-      ["/?tab=outlook", "Population impact"],
-      ["/?tab=living", "Population impact"],
-      ["/?tab=policies", "Policies"],
-      ["/?tab=dashboard", "Population impact"],
+      ["/?tab=outlook", "Impact"],
+      ["/?tab=living", "Impact"],
+      ["/?tab=policies", "Measures"],
+      ["/?tab=dashboard", "Impact"],
       ["/?tab=methodology", "Methodology"],
-      ["/?tab=nonsense", "Population impact"],
+      ["/?tab=nonsense", "Impact"],
     ]) {
       window.history.replaceState({}, "", url);
       const { unmount } = await renderApp();
       expect(screen.getByRole("tab", { name: label })).toHaveAttribute("aria-selected", "true");
       unmount();
     }
-    expect(viewFromLocation({ search: "?tab=personal", hash: "" })).toBe("household");
+    expect(viewFromLocation({ search: "?tab=personal", hash: "" })).toBe("dashboard");
+    expect(viewFromLocation({ search: "?tab=household", hash: "" })).toBe("dashboard");
     expect(viewFromLocation({ search: "?tab=living", hash: "#young-people" })).toBe("dashboard");
     expect(viewFromLocation({ search: "?tab=young", hash: "" })).toBe("dashboard");
     expect(viewFromLocation({ search: "?tab=outlook&sub=baseline", hash: "" })).toBe("dashboard");
@@ -167,14 +158,14 @@ describe("the view tabs", () => {
     expect(opensYoungPeople({ search: "?tab=living", hash: "" })).toBe(false);
   });
 
-  it("describe every published measure on Policies, whatever the selection", async () => {
-    window.history.replaceState({}, "", "/?sub=all&policies=alpha");
+  it("describe every published measure on Measures, whatever the selection", async () => {
+    window.history.replaceState({}, "", "/?sub=finances&policies=alpha");
     await renderApp();
-    // Population impact neither repeats the cards nor points to them
+    // Impact neither repeats the cards nor points to them
     expect(screen.queryByText("About selected policies")).toBeNull();
     expect(screen.queryByText(/What each policy does is on/)).toBeNull();
-    fireEvent.click(screen.getByRole("tab", { name: "Policies" }));
-    const panel = screen.getByRole("tabpanel", { name: "Policies" });
+    fireEvent.click(screen.getByRole("tab", { name: "Measures" }));
+    const panel = screen.getByRole("tabpanel", { name: "Measures" });
     // The fixture publishes one measure (beforeEach); the candidate
     // measures the dashboard cannot compute follow, each with its reason
     const modelled = panel.querySelector("#policy-details");
@@ -190,12 +181,12 @@ describe("the view tabs", () => {
     expect(new URLSearchParams(window.location.search).get("tab")).toBe("policies");
   });
 
-  it("open Population impact with only one measure from its card's \"See its effect\"", async () => {
+  it("open Impact with only one measure from its card's \"See its effect\"", async () => {
     window.history.replaceState({}, "", "/?tab=policies");
     await renderApp();
-    const panel = screen.getByRole("tabpanel", { name: "Policies" });
+    const panel = screen.getByRole("tabpanel", { name: "Measures" });
     fireEvent.click(within(panel).getByRole("button", { name: /effect: Alpha,/ }));
-    expect(screen.getByRole("tab", { name: "Population impact" })).toHaveAttribute(
+    expect(screen.getByRole("tab", { name: "Impact" })).toHaveAttribute(
       "aria-selected",
       "true",
     );
@@ -213,7 +204,7 @@ describe("the view tabs", () => {
     expect(tabs()[1]).toHaveFocus();
     fireEvent.keyDown(list, { key: "ArrowLeft" });
     fireEvent.keyDown(list, { key: "ArrowLeft" });
-    expect(tabs()[3]).toHaveAttribute("aria-selected", "true");
+    expect(tabs()[2]).toHaveAttribute("aria-selected", "true");
     fireEvent.keyDown(list, { key: "Home" });
     expect(tabs()[0]).toHaveAttribute("aria-selected", "true");
     fireEvent.keyDown(list, { key: "End" });
@@ -230,7 +221,7 @@ describe("the view tabs", () => {
     expect(indicator).toHaveLength(1);
     expect(indicator[0]).toHaveAttribute("aria-hidden", "true");
     expect(tabs()).toHaveLength(VIEWS.length);
-    for (const name of ["Policies", "Methodology"]) {
+    for (const name of ["Measures", "Methodology"]) {
       fireEvent.click(within(viewList()).getByRole("tab", { name }));
       const panel = screen.getByRole("tabpanel", { name });
       expect(panel.querySelector(".sub-tabs-band")).toBeNull();
@@ -244,10 +235,10 @@ describe("the view tabs", () => {
     expect(bar).toHaveClass("has-notch");
   });
 
-  it("split Population impact into its sub-tabs, Young people first", async () => {
+  it("split Impact into its sub-tabs, Young people first", async () => {
     window.history.replaceState({}, "", "/?tab=dashboard");
     await renderApp();
-    const panel = screen.getByRole("tabpanel", { name: "Population impact" });
+    const panel = screen.getByRole("tabpanel", { name: "Impact" });
     // The band sits directly under the view tabs, first in the view's
     // panel (after its zero-height sentinel), and holds the sub-tabs
     expect(panel.firstElementChild).toHaveClass("sub-tabs-sentinel");
@@ -257,21 +248,21 @@ describe("the view tabs", () => {
     expect(document.querySelector(".view-tabs-bar")).toHaveClass("has-notch");
     expect(subTabs().map((tab) => tab.textContent)).toEqual([
       "Young people",
-      "All households",
       // Only while the poverty figures are shown (povertyFigures.js)
       ...(POVERTY_FIGURES_SHOWN ? ["Poverty"] : []),
       "Public finances",
-      "Behavioural scenarios",
+      "Return to work",
       "Benchmarks",
     ]);
     expect(subTabs()[0]).toHaveAttribute("aria-selected", "true");
     // The default sub-tab has no ?sub=
     expect(window.location.search).not.toContain("sub=");
 
-    fireEvent.click(subTabs()[1]);
-    expect(subTabs()[1]).toHaveAttribute("aria-selected", "true");
-    expect(await screen.findByRole("tabpanel", { name: "All households" })).toBeInTheDocument();
-    expect(new URLSearchParams(window.location.search).get("sub")).toBe("all");
+    const finances = () => within(subList()).getByRole("tab", { name: "Public finances" });
+    fireEvent.click(finances());
+    expect(finances()).toHaveAttribute("aria-selected", "true");
+    expect(await screen.findByRole("tabpanel", { name: "Public finances" })).toBeInTheDocument();
+    expect(new URLSearchParams(window.location.search).get("sub")).toBe("finances");
     // The year and policy pills drive both sub-tabs
     expect(shown(band(document.body).querySelector(".band-year"))).toBe(true);
     expect(shown(band(document.body).querySelector(".band-policy"))).toBe(true);
@@ -282,9 +273,9 @@ describe("the view tabs", () => {
     // shows the sub-tab left open, and its ?sub= again
     fireEvent.click(screen.getByRole("tab", { name: "Methodology" }));
     expect(window.location.search).not.toContain("sub=");
-    fireEvent.click(screen.getByRole("tab", { name: "Population impact" }));
-    expect(subTabs()[1]).toHaveAttribute("aria-selected", "true");
-    expect(new URLSearchParams(window.location.search).get("sub")).toBe("all");
+    fireEvent.click(screen.getByRole("tab", { name: "Impact" }));
+    expect(finances()).toHaveAttribute("aria-selected", "true");
+    expect(new URLSearchParams(window.location.search).get("sub")).toBe("finances");
   });
 
   it("open By age with pensioners chosen from an old ?sub=pensioners link", async () => {
@@ -305,7 +296,7 @@ describe("the view tabs", () => {
     ]) {
       window.history.replaceState({}, "", url);
       const { unmount } = await renderApp();
-      expect(screen.getByRole("tab", { name: "Population impact" })).toHaveAttribute(
+      expect(screen.getByRole("tab", { name: "Impact" })).toHaveAttribute(
         "aria-selected",
         "true",
       );
@@ -329,7 +320,7 @@ describe("the view tabs", () => {
     await renderApp();
     window.history.replaceState({}, "", "/?tab=methodology#young-people");
     fireEvent(window, new HashChangeEvent("hashchange"));
-    expect(screen.getByRole("tab", { name: "Population impact" })).toHaveAttribute(
+    expect(screen.getByRole("tab", { name: "Impact" })).toHaveAttribute(
       "aria-selected",
       "true",
     );
@@ -369,20 +360,18 @@ describe("the view tabs", () => {
       "At a glance",
       "Data",
       "Model and measures",
-      "Population impact",
-      "Scenarios and benchmarks",
-      "Household calculator",
+      "Impact",
+      "Return to work and benchmarks",
       "Limitations",
     ]) {
       expect(within(panel).getByRole("heading", { level: 2, name })).toBeInTheDocument();
     }
-    // Figures by area and results by age are folded topics of Population
-    // impact; the household calculation is one of Household calculator
-    const population = within(panel).getByRole("heading", { level: 2, name: "Population impact" }).closest(".method-section");
-    for (const name of ["Figures by area", "Results by age"]) {
-      expect(within(population).getByRole("button", { name })).toBeInTheDocument();
-    }
-    expect(within(panel).getByRole("button", { name: "How the household calculation works" })).toBeInTheDocument();
+    expect(within(panel).queryByRole("heading", { level: 2, name: "Household calculator" })).toBeNull();
+    // Results by age is a folded topic of Impact
+    const population = within(panel).getByRole("heading", { level: 2, name: "Impact" }).closest(".method-section");
+    expect(within(population).getByRole("button", { name: "Results by age" })).toBeInTheDocument();
+    expect(within(population).queryByRole("button", { name: "Figures by area" })).toBeNull();
+    expect(within(panel).queryByRole("button", { name: "How the household calculation works" })).toBeNull();
     expect(panel).not.toHaveTextContent("Pre-measures forecast");
     expect(panel.querySelector('a[href*="policyengine.org/uk/research"]')).toBeNull();
   });

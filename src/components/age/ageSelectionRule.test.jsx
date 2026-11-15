@@ -316,8 +316,8 @@ describe("Average change by age's opening view", () => {
     // 16 to 24, already the section's group: this card moves to it
     fireEvent.click(optionRadio(ageCard(container), "16 to 24"));
     expect(optionRadio(ageCard(container), "16 to 24")).toHaveAttribute("aria-checked", "true");
-    fireEvent.click(optionRadio(container.querySelector(".young-people-trend"), "35 to 49"));
-    expect(optionRadio(ageCard(container), "35 to 49")).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(optionRadio(container.querySelector(".young-people-trend"), "25 to 34"));
+    expect(optionRadio(ageCard(container), "25 to 34")).toHaveAttribute("aria-checked", "true");
   });
 
   it("opens on the group in the address (?age=)", async () => {

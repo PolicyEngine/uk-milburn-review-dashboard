@@ -38,36 +38,37 @@ afterEach(() => {
 
 const youngRow = { reform_id: "combined--pkg", year: "2027", age_band: "16-24", people: "1000000", pct_worse_off: "10" };
 
-describe("Behavioural scenarios", () => {
-  it("shows an unavailable state, never zeros, when the file is missing", async () => {
-    vi.stubGlobal("fetch", respond(null));
+const summaryText = readFileSync(join(__dirname, "..", "..", "test", "fixtures", "milburn", "summary", "milburn_summary.json"), "utf8");
+
+/** Serves the scenarios and summary files, either missing when null. */
+const serve = ({ scenarios = fixture, summary = summaryText } = {}) =>
+  vi.fn(async (url) => {
+    const body = String(url).endsWith("milburn_summary.json") ? summary : scenarios;
+    return body === null ? { ok: false, status: 404, json: async () => null } : { ok: true, status: 200, json: async () => JSON.parse(body) };
+  });
+
+describe("Return to work", () => {
+  it("leads with the microsimulated entry run, then the entry cases and the break-even arithmetic, with no slider", async () => {
+    vi.stubGlobal("fetch", serve());
     const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");
     render(<BehaviouralScenarios />);
-    expect(await screen.findByText(/data file has not been published/)).toBeInTheDocument();
-    expect(screen.getByText("Illustrative scenarios, not a PolicyEngine estimate. The main figures are static.")).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: "With a quarter moving into work" })).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: "One young person moving into work" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Break-even arithmetic" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Return to work" })).toBeInTheDocument();
+    expect(screen.queryByRole("slider")).toBeNull();
+    // The entry cases from the file: 16 hours at £10 an hour
+    const cases = screen.getByRole("region", { name: "One young person moving into work" });
+    expect(within(cases).getAllByRole("row")[1].textContent).toBe("16 hours£10.00£1,000; £2,000£3,000; £4,000");
+  });
+
+  it("shows unavailable states, never zeros, when the files are missing", async () => {
+    vi.stubGlobal("fetch", serve({ scenarios: null, summary: null }));
+    const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");
+    render(<BehaviouralScenarios />);
+    expect(await screen.findByText(/entry cases are not available/)).toBeInTheDocument();
+    expect(await screen.findByText(/comparison is not available/)).toBeInTheDocument();
     expect(screen.queryByText(/£0/)).toBeNull();
-  });
-
-  it("shows an unavailable state when the verified results give no count of young people", async () => {
-    vi.stubGlobal("fetch", respond(fixture));
-    state.budgetRows = [{ reform_id: "combined--pkg", year: "2027", value: "1.2" }];
-    const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");
-    render(<BehaviouralScenarios />);
-    expect(await screen.findByText(/give no count of young people affected/)).toBeInTheDocument();
-  });
-
-  it("works out the movers and the offset from the file and the verified results", async () => {
-    vi.stubGlobal("fetch", respond(fixture));
-    state.ageRows = [youngRow];
-    state.budgetRows = [{ reform_id: "combined--pkg", year: "2027", value: "1.2" }];
-    const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");
-    render(<BehaviouralScenarios />);
-    // 20% of 100,000 young people worse off, each £4,000 to the Exchequer
-    expect(await screen.findByText("20,000")).toBeInTheDocument();
-    expect(screen.getAllByText("+£80.0m").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("+£1,280.0m").length).toBeGreaterThan(0);
-    expect(screen.getByRole("slider")).toHaveAttribute("max", "50");
-    for (const preset of ["0%", "20%", "45%"]) expect(screen.getByRole("button", { name: preset })).toBeInTheDocument();
   });
 });
 
@@ -85,9 +86,23 @@ describe("Benchmarks", () => {
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");
     }
-    // The package's estimate from its own run; no other row has a comparable figure
+    // The package's estimate from its own run
     expect(screen.getByText("100,000")).toBeInTheDocument();
     expect(screen.queryByText("30,000")).toBeNull();
+    // Fixed PolicyEngine figures beside the published ones, each labelled with its build and year
+    for (const [published, estimate] of [["260,000", "232,000"]]) {
+      const row = screen.getByText(published).closest("tr");
+      expect(row.textContent).toContain(estimate);
+      expect(row.textContent).toContain("PolicyEngine, build 6f918b81, 2027-28");
+    }
+    expect(screen.getByText("£4.43bn a year").closest("tr").textContent).toContain("£5.1bn a year");
+    // Rows without a source are gone, and no link carries a stray %20 or points elsewhere than its label
+    expect(screen.queryByText(/465,000/)).toBeNull();
+    expect(screen.queryByText(/440,000 by 2036/)).toBeNull();
+    for (const link of within(screen.getByRole("table")).getAllByRole("link")) {
+      expect(link.getAttribute("href")).not.toContain("%20");
+      expect(link.getAttribute("href")).not.toContain("aol.");
+    }
   });
 
   it("shows an unavailable state when its file is missing", async () => {

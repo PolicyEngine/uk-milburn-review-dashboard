@@ -455,7 +455,7 @@ export function metricByYear(rows, run, metric, years = DISPLAY_YEARS) {
  * matches), one bar per measure and year, each measure's own run: these
  * statistics are never added up across measures.
  */
-function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, selectedYear, population, choiceAbove = false }) {
+function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, selectedYear, population, directCount = null, choiceAbove = false }) {
   const shownYears = useDisplayYears();
   const chartRef = useRef(null);
   // The whole selection's run: one measure's own, or the package's combined
@@ -468,8 +468,17 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
   const [effectView, setEffectView] = useState("year");
   // People behind a poverty change (pp × the population), where the
   // population is known for the year (population(year, group) in millions)
-  const peopleText = (year, value) =>
-    metric.group && population ? peopleInPovertyText(value, population(year, metric.group), metric.group) : null;
+  // A run's direct count where one is given (directCount), in place of pp × people
+  const direct = (year) => (run && directCount ? directCount(run, year, metric.key) : null);
+  const peopleText = (year, value) => {
+    const count = direct(year);
+    if (count !== null && metric.group && population) {
+      const n = Math.abs(count);
+      const way = count < 0 ? "fewer" : "more";
+      return n < 1000 ? `under 1,000 ${way} people in poverty` : `about ${roundPeople(n)} ${way} people in poverty`;
+    }
+    return metric.group && population ? peopleInPovertyText(value, population(year, metric.group), metric.group) : null;
+  };
   const narrow = useNarrowViewport();
   // No run for the whole selection: each selected measure's own, side by side
   const byMeasure = !run && selectedPolicies.length > 1
@@ -517,7 +526,8 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
   const selectedCount = (() => {
     const millions = selected?.value != null && metric.group && population ? population(selectedYear, metric.group) : null;
     if (!millions) return null;
-    const people = Math.abs((selected.value / 100) * millions * 1e6);
+    const count = direct(selectedYear);
+    const people = count !== null ? Math.abs(count) : Math.abs((selected.value / 100) * millions * 1e6);
     const who = metric.group === "children" ? "children" : "people";
     return people < 1000 ? `under 1,000 ${who}` : `about ${roundPeople(people)} ${who}`;
   })();

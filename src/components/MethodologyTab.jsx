@@ -1,11 +1,8 @@
 import { useEffect } from "react";
-import GeographyMethodology from "./GeographyMethodology";
 import FactList from "./methodology/FactList";
 import MethodGlossary from "./methodology/MethodGlossary";
 import SectionHeading from "./SectionHeading";
-import { HIGHEST_PERCENTILE, LOWEST_PERCENTILE, ordinal } from "../utils/incomePosition";
 import { METHOD_ANCHORS } from "./methodology/anchors";
-import { SINGLE_YEAR_METHOD } from "../utils/singleYear";
 import MethodContents, { revealAnchor } from "./methodology/MethodContents";
 import { unavailableMeasures } from "./methodology/measures";
 import { AGE_BANDS, MIN_SAMPLE_SIZE } from "../utils/ageImpact";
@@ -13,7 +10,7 @@ import { useMeasureCatalogue } from "../utils/measureCatalogue";
 import { OPEN_VIEW_EVENT } from "../utils/methodLink";
 import { AnchorLink, ExternalLink, ReasonList, SourceLink, Topic } from "./methodology/MethodUi";
 import { glossaryAnchor } from "./methodology/glossary";
-import { Calculator, ChartColumn, Compass, Database, House, Info, SlidersHorizontal } from "lucide-react";
+import { Calculator, ChartColumn, Compass, Database, Info, SlidersHorizontal } from "lucide-react";
 import "./methodology/Methodology.css";
 import { scrollBelowBars, smoothUnlessReduced } from "../utils/pageScroll";
 import { POVERTY_FIGURES_SHOWN, WITHHELD_SENTENCE } from "../utils/povertyFigures";
@@ -27,7 +24,7 @@ export const MICROCOSM_BUILD_NAME = `uk-frs-calibration-attempt-20261112T133744Z
 
 /**
  * The ids of the Methodology view's sections and of the topics other
- * views link to (the map to `geography`, the age cards to `young`), so a
+ * views link to (the age cards to `young`), so a
  * key's id must not change.
  */
 export const METHOD_SECTIONS = {
@@ -35,11 +32,8 @@ export const METHOD_SECTIONS = {
   data: "method-data",
   model: "method-model",
   population: "method-population",
-  geography: "method-area",
   young: "method-young",
   scenarios: "method-scenarios",
-  personal: "method-personal",
-  singleYear: "method-single-year",
   limitations: "method-limitations",
 };
 
@@ -51,9 +45,8 @@ export const METHOD_CONTENTS = [
   { id: METHOD_SECTIONS.overview, title: "At a glance", icon: Compass, titleIcon: "compass" },
   { id: METHOD_SECTIONS.data, title: "Data", icon: Database, titleIcon: "database" },
   { id: METHOD_SECTIONS.model, title: "Model and measures", icon: Calculator, titleIcon: "calculator" },
-  { id: METHOD_SECTIONS.population, title: "Population impact", icon: ChartColumn, titleIcon: "bars" },
-  { id: METHOD_SECTIONS.scenarios, title: "Scenarios and benchmarks", icon: SlidersHorizontal, titleIcon: "sliders" },
-  { id: METHOD_SECTIONS.personal, title: "Household calculator", icon: House, titleIcon: "house" },
+  { id: METHOD_SECTIONS.population, title: "Impact", icon: ChartColumn, titleIcon: "bars" },
+  { id: METHOD_SECTIONS.scenarios, title: "Return to work and benchmarks", icon: SlidersHorizontal, titleIcon: "sliders" },
   { id: METHOD_SECTIONS.limitations, title: "Limitations", icon: Info, titleIcon: "book" },
 ];
 
@@ -64,12 +57,13 @@ const SECTION_ICONS = Object.fromEntries(METHOD_CONTENTS.map(({ id, titleIcon })
  * have gaps that bear on young people.
  */
 export const MILBURN_LIMITATIONS = [
-  ["Static", "The main figures hold behaviour fixed: nobody changes their work, hours, claims or education because of a measure. The Behavioural scenarios tab shows illustrative second-round effects separately."],
+  ["Static", "The main figures hold behaviour fixed: nobody changes their work, hours, claims or education because of a measure. The Return to work sub-tab shows the package with a move into work separately."],
   ["No NEET variable", "The data have no variable for being not in education, employment or training (NEET), so no figure here is for NEETs as such."],
   ["PIP in Scotland", "Adult Disability Payment records in Scotland are held as PIP in the data, so PIP figures for Scotland use ADP records."],
   ["New-claimant health element rate", "Which Universal Credit health element rate a new claimant receives is assigned by a random draw that does not depend on age. New claimants since April 2026 receive the lower health element (£217.26 a month, £2,607 a year) rather than £442.10 a month, so removing it takes less from them."],
   ["Few young claimant records", "The results rest on roughly 500 to 650 survey records of young claimants, so the pattern across individual income deciles and single years of age is noisy; national totals are steadier than any one decile or age."],
-  ["Overlapping losses", "In the data, limited capability for work among under-25s mostly coincides with PIP receipt, so the package stacks both losses on largely the same people. Per-person losses are an upper bound and headcounts a lower bound."],
+  ["Overlapping losses", "About nine in ten young claimants with limited capability for work and work-related activity (LCWRA) in the data also get PIP, so the package stacks both losses on largely the same people. Per-person losses are an upper bound and headcounts a lower bound."],
+  ["Caseloads against DWP", "The all-age LCWRA stock in the data is about 23% above DWP's figure. The PIP caseload aged 18 to 24 is low but its award mix is high (more enhanced awards), which roughly offsets in cost."],
   ["No replacement in the upper bound", "The full abolition package (upper bound) includes no replacement fund, cost allowance or insurance payment. The central variant stands in for a smaller allowance with PIP at half rate."],
   ["Small samples at 16 and 17", "Few survey households include people aged 16 or 17, so figures for those ages rest on small samples."],
   ["Not computable", "Some candidate measures cannot be computed with these data and this model; they are listed with the reason, and never shown as £0."],
@@ -296,21 +290,14 @@ function MethodologyTab({ onShowTab }) {
 
         <MethodSection
           id={METHOD_SECTIONS.population}
-          title="Population impact"
-          summary="How the national results are calculated: the public finances, incomes, poverty, area and age."
+          title="Impact"
+          summary="How the national results are calculated: the public finances, poverty and age."
         >
           <Topic id={METHOD_ANCHORS.publicFinances} title="Public finances" preview="Net effect on revenue and spending, by year">
             <p className="method-more">
               The change in government revenue less the change in spending on benefits, from the static model, by
               fiscal year. A positive figure is a gain to the Exchequer. There is no official costing to compare
               with.
-            </p>
-          </Topic>
-          <Topic id={METHOD_ANCHORS.byIncome} title="By income decile" preview="Deciles · Average change">
-            <p className="method-more">
-              Households are ranked by baseline <Term id="equivalised">equivalised</Term> household net income{" "}
-              <Term id="housingCosts">before housing costs</Term> (the <SourceLink id="dwp_hbai">HBAI</SourceLink>{" "}
-              measure) and split into ten groups of equal population.
             </p>
           </Topic>
           <Topic id={METHOD_ANCHORS.poverty} title="Poverty and inequality" preview="Absolute and relative poverty · Gini">
@@ -326,18 +313,6 @@ function MethodologyTab({ onShowTab }) {
             ) : (
               <p className="method-more">{WITHHELD_SENTENCE}</p>
             )}
-          </Topic>
-          <Topic id={METHOD_ANCHORS.scatter} title="Household scatter" preview="Groups of households by income and change">
-            <p className="method-more">
-              Each dot is a group of survey households with similar incomes and changes, never a single household.
-            </p>
-          </Topic>
-          <Topic id={METHOD_SECTIONS.geography} title="Figures by area" preview="Disclosure checks · 90% intervals · Map colours">
-            <p className="method-more">
-              Constituency figures come from the same survey as the national ones. We publish each only after
-              disclosure checks, with a 90% interval.
-            </p>
-            <GeographyMethodology />
           </Topic>
           <Topic id={METHOD_SECTIONS.young} title="Results by age" preview="Age bands · Who counts · Young people">
             <p className="method-more">
@@ -375,24 +350,23 @@ function MethodologyTab({ onShowTab }) {
 
         <MethodSection
           id={METHOD_SECTIONS.scenarios}
-          title="Scenarios and benchmarks"
-          summary="Illustrative second-round effects, and published figures to set the results beside. Neither is a PolicyEngine estimate."
+          title="Return to work and benchmarks"
+          summary="The package with a move into work, microsimulated, and published figures to set the results beside."
         >
-          <Topic id="method-behavioural-scenarios" title="Behavioural scenarios" preview="Illustrative · Share moving into work · Entry cases">
+          <Topic id="method-behavioural-scenarios" title="Return to work" preview="Microsimulated move into work · Entry cases · Break-even">
             <FactList
               items={[
-                ["Illustrative", "Illustrative scenarios, not a PolicyEngine estimate. The main figures are static."],
                 [
-                  "Young people affected",
-                  "People aged 16 to 24 in households whose net income falls under the package, from the verified static results for the scenarios' year.",
+                  "Microsimulated",
+                  "The full abolition package is run again with a quarter of the young people it leaves worse off moving into work, and set beside the static package: the saving, poverty and average loss.",
                 ],
                 [
-                  "Moving into work",
-                  "An assumed share of them, from 0% to 50%, moves into work, each like one entry case: 16 or 25 hours a week at a given wage.",
+                  "Entry cases",
+                  "One young person moving into work for 16 or 25 hours a week at a given wage: their household's gain and the gain to the Exchequer, from household calculations.",
                 ],
                 [
-                  "Exchequer offset",
-                  "Their number times the entry case's gain to the Exchequer under the package, from household calculations; it is added to the static figure.",
+                  "Break-even",
+                  "How many of the young people in losing households would need to move into work for their gains to make up the loss. The gain from work is the same under current law and under the package.",
                 ],
               ]}
             />
@@ -400,52 +374,9 @@ function MethodologyTab({ onShowTab }) {
           <Topic id="method-benchmarks" title="Benchmarks" preview="Published figures · Sources · PolicyEngine estimates beside them">
             <p className="method-more">
               Published figures from the ONS, DWP, the Resolution Foundation and the IFS, each with its basis, source
-              and date. Where the verified results hold a comparable figure, a PolicyEngine estimate sits beside it;
-              the two count different groups, so the estimate is context, not a check.
+              and date. Where PolicyEngine has a comparable figure, it sits beside it, labelled with its build and
+              year; the two can count different groups or areas, so the estimate is context, not a check.
             </p>
-          </Topic>
-        </MethodSection>
-
-        <MethodSection
-          id={METHOD_SECTIONS.personal}
-          title="Household calculator"
-          summary={
-            <span id={METHOD_SECTIONS.singleYear} className="method-anchor">
-              We apply the same model and measures to one household&apos;s answers on the{" "}
-              <ViewLink tab="household" onShowTab={onShowTab}>
-                Household calculator tab
-              </ViewLink>
-              .
-            </span>
-          }
-        >
-          <Topic id={METHOD_ANCHORS.householdPolicies} title="Measures in the calculator" preview={`${modelled.length} measures`}>
-            <ul className="method-list">
-              {modelled.map((measure) => (
-                <li key={measure.id}>{measure.name}</li>
-              ))}
-            </ul>
-          </Topic>
-          <Topic
-            id={METHOD_ANCHORS.householdCalc}
-            title="How the household calculation works"
-            preview={SINGLE_YEAR_METHOD.map(([term]) => term).join(" · ")}
-          >
-            <FactList items={SINGLE_YEAR_METHOD.map(([term, text]) => [term, text])} />
-          </Topic>
-          <Topic id={METHOD_ANCHORS.incomePosition} title="Where your income sits" preview="Income · Distribution">
-            <FactList
-              items={[
-                [
-                  "Income",
-                  "Household net income after taxes and with benefits, divided by your household's size on the HBAI scale.",
-                ],
-                [
-                  "Distribution",
-                  `We publish it from the ${ordinal(LOWEST_PERCENTILE)} to the ${ordinal(HIGHEST_PERCENTILE)} percentile, as averages over bands one percentile wide.`,
-                ],
-              ]}
-            />
           </Topic>
         </MethodSection>
 

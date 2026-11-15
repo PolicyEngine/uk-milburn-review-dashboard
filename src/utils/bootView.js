@@ -8,10 +8,10 @@
 
 import { POVERTY_FIGURES_SHOWN } from "./povertyFigures";
 
-export const BOOT_TABS = Object.freeze(["dashboard", "household", "policies", "methodology"]);
+export const BOOT_TABS = Object.freeze(["dashboard", "policies", "methodology"]);
 export const BOOT_SUBS = Object.freeze({
   // Poverty only while its figures are shown (povertyFigures.js), as PopulationImpactView
-  dashboard: Object.freeze(["age", "all", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : []), "finances", "scenarios", "benchmarks"]),
+  dashboard: Object.freeze(["age", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : []), "finances", "scenarios", "benchmarks"]),
 });
 // Old sub-tab names that now open another (App.jsx oldAgeSubGroup)
 const SUB_ALIASES = Object.freeze({ young: "age", pensioners: "age" });
@@ -20,7 +20,6 @@ const SUB_ALIASES = Object.freeze({ young: "age", pensioners: "age" });
 export function bootView({ search, hash }) {
   const params = new URLSearchParams(search);
   if (hash === "#young-people") return "dashboard:age";
-  if (hash === "#deciles") return "dashboard:all";
   const asked = params.get("tab");
   const tab = BOOT_TABS.includes(asked) ? asked : "dashboard";
   const subs = BOOT_SUBS[tab];
@@ -35,7 +34,7 @@ export const BOOT_VIEW_SCRIPT =
   "(function(){try{" +
   `var T=${JSON.stringify(BOOT_TABS)},S=${JSON.stringify(BOOT_SUBS)},A=${JSON.stringify(SUB_ALIASES)};` +
   "var l=window.location,p=new URLSearchParams(l.search),v;" +
-  'if(l.hash==="#young-people")v="dashboard:age";else if(l.hash==="#deciles")v="dashboard:all";else{' +
+  'if(l.hash==="#young-people")v="dashboard:age";else{' +
   'var t=T.indexOf(p.get("tab"))>=0?p.get("tab"):"dashboard",s=S[t];' +
   'if(!s)v=t;else{var r=p.get("sub"),u=A[r]||r;v=t+":"+(s.indexOf(u)>=0?u:s[0]);}}' +
   'document.documentElement.setAttribute("data-boot-view",v);' +

@@ -8,14 +8,15 @@ const CASES = [
   ["?tab=dashboard&sub=finances", "", "dashboard:finances"],
   ["?tab=dashboard&sub=scenarios", "", "dashboard:scenarios"],
   ["?tab=dashboard&sub=benchmarks", "", "dashboard:benchmarks"],
-  ["?tab=dashboard&sub=all", "", "dashboard:all"],
+  // All households and the Household calculator were removed: their links open the default
+  ["?tab=dashboard&sub=all", "", "dashboard:age"],
   ["?sub=young", "", "dashboard:age"],
   ["?tab=dashboard&sub=pensioners", "", "dashboard:age"],
-  ["?tab=household", "", "household"],
+  ["?tab=household", "", "dashboard:age"],
   ["?tab=outlook&sub=forecast", "", "dashboard:age"],
   ["?tab=nonsense", "", "dashboard:age"],
   ["?policies=alpha", "#young-people", "dashboard:age"],
-  ["", "#deciles", "dashboard:all"],
+  ["", "#deciles", "dashboard:age"],
 ];
 
 afterEach(() => document.documentElement.removeAttribute("data-boot-view"));
@@ -34,7 +35,7 @@ describe("the view an address opens, before the page's code", () => {
   });
 
   it("knows the page's views and sub-tabs", () => {
-    expect(VIEWS.map((view) => view.value).sort()).toEqual(["dashboard", "household", "methodology", "policies"]);
+    expect(VIEWS.map((view) => view.value).sort()).toEqual(["dashboard", "methodology", "policies"]);
     expect(BOOT_SUBS.dashboard).toEqual(POPULATION_SUB_TABS.map((tab) => tab.value));
     expect(BOOT_SUBS.outlook).toBeUndefined();
   });

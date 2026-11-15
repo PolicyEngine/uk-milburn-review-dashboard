@@ -25,7 +25,7 @@ import { join } from 'node:path';
 
 const TITLE = 'Milburn review: young people and work';
 const DESCRIPTION =
-  'PolicyEngine UK estimates of candidate measures for the Milburn review of young people and work, modelled before the review is published: the public finances, households by age, income and area, and your own household. These are not announced policy.';
+  'PolicyEngine UK estimates of candidate measures for the Milburn review of young people and work, modelled before the review is published: the public finances, households by age, and the package if some young people move into work. These are not announced policy.';
 
 // Inter, committed with the page (fonts/: the variable face, every weight,
 // Latin subset; SIL Open Font License in fonts/OFL.txt): the

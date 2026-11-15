@@ -13,10 +13,10 @@ describe("a view's loading placeholder", () => {
   });
 
   it("shows the view's heading, its sub-tab chosen and a loading caption, never a number", () => {
-    const { container } = render(<ViewSkeleton view="dashboard:all" />);
-    expect(screen.getByRole("heading", { name: "By area" })).toBeInTheDocument();
+    const { container } = render(<ViewSkeleton view="dashboard:finances" />);
+    expect(screen.getByRole("heading", { name: "Public finances" })).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Loading results…");
-    expect(container.querySelector('.sub-tab[aria-selected="true"]')).toHaveTextContent("All households");
+    expect(container.querySelector('.sub-tab[aria-selected="true"]')).toHaveTextContent("Public finances");
     expect(container.textContent).not.toMatch(/£|\d/);
     expect(container.textContent).not.toMatch(/approved for publication/);
   });
@@ -26,9 +26,8 @@ describe("a view's loading placeholder", () => {
   // copy of the bar keeps every tab, the later ones in its tail
   it("starts the sub-tab row at the left under the first tab, with the later tabs in a tail", () => {
     const viewTabs = [
-      { value: "dashboard", label: "Population impact" },
-      { value: "household", label: "Household calculator" },
-      { value: "policies", label: "Policies" },
+      { value: "dashboard", label: "Impact" },
+      { value: "policies", label: "Measures" },
       { value: "methodology", label: "Methodology" },
     ];
     const labels = (node) => [...node.querySelectorAll(".view-tab-label")].map((label) => label.textContent);
@@ -52,6 +51,7 @@ describe("a view's loading placeholder", () => {
   it("puts every view's placeholder in the server's HTML, one per address", () => {
     const html = renderToString(<BootSkeleton />);
     for (const view of SKELETON_VIEWS) expect(html).toContain(`data-boot-variant="${view}"`);
-    expect(html).toContain("Choose a household");
+    expect(html).not.toContain("Choose a household");
+    expect(html).not.toContain("By area");
   });
 });

@@ -1,5 +1,5 @@
 /**
- * Every view that draws charts, the map or the household calculator, as one
+ * Every view that draws charts, as one
  * chunk that App.jsx loads on first use (utils/lazyView). One chunk, not one
  * per view: the bundler copies a module shared by two dynamic imports into
  * each, so separate imports shipped Recharts and the cards' helpers five
@@ -7,14 +7,10 @@
  */
 export { default as BudgetaryImpactChart } from "./BudgetaryImpactChart";
 export { ObrComparisonCard } from "./OBRComparisonTable";
-export { default as ConstituencyMap } from "./ConstituencyMap";
-export { default as DecileImpactCard } from "./DecileImpactCard";
-export { default as HouseholdScatter } from "./HouseholdScatter";
 export { default as AgeSection } from "./AgeSection";
 export { default as GrowthWithMeasuresCard } from "./livingStandards/GrowthWithMeasuresCard";
 export { default as SummaryMetricChart, SUMMARY_METRICS } from "./SummaryMetricChart";
 export { PovertyMeasuresRow } from "./MeasuresPovertyCard";
-export { default as PersonalImpactTab } from "./PersonalImpactTab";
 export { default as LivingStandardsTab } from "./livingStandards/LivingStandardsTab";
 export { default as BehaviouralScenarios } from "./milburn/BehaviouralScenarios";
 

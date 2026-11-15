@@ -36,6 +36,7 @@ import { useMeasureCatalogue } from "../utils/measureCatalogue";
 import { policyDetailsFor, shortNameOf } from "../utils/policyDetails";
 import { legendMembership, noPovertyEffectReason } from "../utils/legendMembership";
 import { wholeSelectionRun } from "../utils/ageImpact";
+import { summaryPovertyCount, useMilburnSummary } from "../utils/milburn/summary";
 import "./livingStandards/LivingStandards.css";
 import "./MeasuresPovertyCard.css";
 
@@ -103,19 +104,25 @@ export function povertyCardRows(rows, catalogue, selectedPolicies, year, chosen)
  * Returns { steps, zero, peopleMode }; each step is
  * { id, name, pp, x, start, end, colour, kind: "measure" | "none" | "total" }.
  */
-export function povertyWaterfall(measures, total, millions, idle = []) {
+export function povertyWaterfall(measures, total, millions, idle = [], direct = null) {
   const peopleMode = Boolean(millions);
-  const toX = (pp) => (peopleMode ? -(pp / 100) * millions * 1e6 : -pp);
+  // A run's direct count of people moved into poverty, where one is given
+  // (direct(id), "package" for the combined run), in place of pp × people
+  const toX = (pp, id) => {
+    if (!peopleMode) return -pp;
+    const count = direct ? direct(id) : null;
+    return count === null || count === undefined ? -(pp / 100) * millions * 1e6 : -count;
+  };
   const zero = [...measures.filter((m) => m.value === 0), ...idle];
   const moving = measures.filter((m) => m.value !== 0).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
   const steps = moving.map((m) => {
-    const x = toX(m.value);
+    const x = toX(m.value, m.id);
     return { id: m.id, name: m.name, pp: m.value, x, start: 0, end: x, colour: m.colour, kind: "measure" };
   });
   // At 0 to 0, so a row with no bar never widens the axis
   for (const m of zero) steps.push({ id: m.id, name: m.name, pp: 0, x: 0, start: 0, end: 0, colour: m.colour, kind: "none" });
   if (total !== null) {
-    const x = toX(total);
+    const x = toX(total, "package");
     steps.push({ id: "package", name: TOGETHER, pp: total, x, start: 0, end: x, colour: null, kind: "total" });
   }
   return { steps, zero, peopleMode };
@@ -164,7 +171,7 @@ function WfTicks({ ticks, domain, format }) {
   );
 }
 
-export default function MeasuresPovertyCard({ rows, policies, selectedPolicies, selectedYear, population, choiceAbove = false }) {
+export default function MeasuresPovertyCard({ rows, policies, selectedPolicies, selectedYear, population, directCount = null, choiceAbove = false }) {
   const plotRef = useRef(null);
   const catalogue = useMeasureCatalogue();
   const { poverty: chosen, controls } = usePovertyChoice();
@@ -183,7 +190,8 @@ export default function MeasuresPovertyCard({ rows, policies, selectedPolicies, 
   const { measures, idle, total } = read;
   // The shown measure's people: everyone's when the card falls back
   const millions = population ? population(selectedYear, metric.group) : null;
-  const { steps, peopleMode } = povertyWaterfall(measures, total, millions, idle);
+  const direct = directCount ? (id) => directCount(id === "package" ? catalogue.combinedId : id, selectedYear, metric.key) : null;
+  const { steps, peopleMode } = povertyWaterfall(measures, total, millions, idle, direct);
   const who = metric.group === "children" ? "children" : "people";
 
   // The rate's change in words: "down 0.005 percentage points"
@@ -414,12 +422,17 @@ export default function MeasuresPovertyCard({ rows, policies, selectedPolicies, 
  * Poverty with the selected measures, as one row of two cards: the change
  * in the poverty rate by year, and which measures move it in the selected
  * year, sharing one poverty choice. People counts use the outlook's
- * populations once it is read.
+ * populations once it is read; on the local build route, absolute poverty
+ * after housing costs in the summary's year uses the run's direct count
+ * from milburn_summary.json instead, so it matches Key figures.
  */
 export function PovertyMeasuresRow({ rows, policies, selectedPolicies, selectedYear }) {
   const { data } = useOutlook();
+  const catalogue = useMeasureCatalogue();
+  const { summary } = useMilburnSummary(catalogue.manifest?.snapshotSha256 ?? null, { enabled: Boolean(catalogue.localBuild) });
   const population = outlookPopulation(data);
-  const props = { rows, policies, selectedPolicies, selectedYear, population };
+  const directCount = summaryPovertyCount(summary);
+  const props = { rows, policies, selectedPolicies, selectedYear, population, directCount };
   return (
     <>
       {/* Each card's Options pill holds the poverty measure; the two share

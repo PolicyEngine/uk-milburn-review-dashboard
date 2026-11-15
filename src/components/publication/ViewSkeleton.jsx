@@ -20,11 +20,10 @@ import "./publication.css";
 export const SKELETON_SUB_TABS = {
   dashboard: [
     { value: "age", label: "Young people", icon: "usersRound" },
-    { value: "all", label: "All households", icon: "users" },
     // Only while the poverty figures are shown (povertyFigures.js)
     ...(POVERTY_FIGURES_SHOWN ? [{ value: "poverty", label: "Poverty", icon: "percent" }] : []),
     { value: "finances", label: "Public finances", icon: "landmark" },
-    { value: "scenarios", label: "Behavioural scenarios", icon: "sliders" },
+    { value: "scenarios", label: "Return to work", icon: "sliders" },
     { value: "benchmarks", label: "Benchmarks", icon: "scale" },
   ],
 };
@@ -36,24 +35,17 @@ const LAYOUTS = {
   "dashboard:finances": [
     { icon: "banknote", title: "Public finances", subtitle: "Net effect of the selected policies on government revenue and spending, by year.", cards: [["bars", "wide"], ["bars"], ["bars"]] },
   ],
-  "dashboard:all": [
-    { icon: "compass", title: "By area", subtitle: "Average change in household income in each parliamentary constituency.", cards: [["map", "wide"]] },
-    { icon: "wallet", title: "By income", subtitle: "How the change differs between lower- and higher-income households.", cards: [["bars"], ["bars"]] },
-  ],
   "dashboard:age": [
     { icon: "usersRound", title: "How each age group's income changes", cards: [["lines", "wide"], ["bars"], ["bars"]] },
   ],
   "dashboard:scenarios": [
-    { icon: "sliders", title: "Behavioural scenarios", subtitle: "Illustrative scenarios, not a PolicyEngine estimate. The main figures are static.", cards: [["bars", "wide"]] },
+    { icon: "sliders", title: "Return to work", subtitle: "The package with a quarter of affected young people moving into work, microsimulated, beside the static estimate.", cards: [["text", "wide"]] },
   ],
   "dashboard:benchmarks": [
     { icon: "scale", title: "Benchmarks", subtitle: "Published figures on young people, work and health-related benefits.", cards: [["text", "wide"]] },
   ],
   "dashboard:poverty": [
     { icon: "lifebuoy", title: "How the policies change poverty", subtitle: "With the selected policies.", cards: [["bars"], ["bars"]] },
-  ],
-  household: [
-    { icon: "users", title: "Choose a household", subtitle: "Enter your own household, or start from an example below.", cards: Array.from({ length: 8 }, () => ["example"]) },
   ],
   policies: [
     { icon: "fileText", title: "Measures we model", subtitle: "What each candidate measure changes, and how we model it.", cards: [["text", "wide"], ["text", "wide"], ["text", "wide"]] },

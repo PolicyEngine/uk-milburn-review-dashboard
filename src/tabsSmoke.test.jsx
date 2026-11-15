@@ -74,7 +74,7 @@ const NOT_YET_PUBLISHED = new Set([
   "/data/constituency.csv",
   "/data/release-index.json",
   "/data/official_costings.json",
-  // Written by the pipeline: until then Behavioural scenarios says it is unavailable
+  // Written by the pipeline: until then Return to work says its entry cases are unavailable
   "/data/milburn_scenarios.json",
 ]);
 
@@ -92,12 +92,11 @@ const FAILURE_TEXT = [
 // What each tab shows only once its data has loaded. (jsdom lays nothing
 // out, so charts draw no values; these are the data-driven text around them.)
 const LOADED = {
-  // App.jsx renders All households' sections only once the CSVs are read.
-  dashboard: (panel) => within(panel).findAllByRole("heading", { name: "By area" }),
-  // Population impact's other sub-tabs, by ?sub=
-  // Behavioural scenarios: the pipeline's file is not in public/ yet, so it
-  // says the scenarios are unavailable, never zeros
-  scenarios: (panel) => within(panel).findAllByText(/behavioural scenarios are not available/),
+  // Impact opens on Young people, which reads the age table (below)
+  dashboard: (panel) => within(panel).findAllByText(/Results by age are not available/),
+  // Impact's other sub-tabs, by ?sub=
+  // Return to work: led by the microsimulated run from milburn_summary.json
+  scenarios: (panel) => within(panel).findAllByRole("heading", { name: "With a quarter moving into work" }),
   benchmarks: (panel) => within(panel).findAllByRole("table"),
   // Population impact's Poverty while its figures are shown; while they are
   // withheld (povertyFigures.js), ?sub=poverty opens Public finances
@@ -105,9 +104,6 @@ const LOADED = {
     ? { poverty: (panel) => within(panel).findAllByRole("heading", { name: /Change in the poverty rate/ }) }
     : { povertyFallback: (panel) => within(panel).findAllByText(/Results by age are not available/) }),
   finances: (panel) => within(panel).findAllByRole("heading", { name: /Revenue impact/ }),
-  // The cards, "Your household" first; the form and results are checked
-  // below.
-  household: (panel) => within(panel).findAllByRole("heading", { name: "Choose a household" }),
   // Population impact's Young people sub-tab (?sub=young): the cards
   // render once age_impact.csv is read.
   // Young people and Pensioners read the age table from verified artifacts;
@@ -202,15 +198,15 @@ afterEach(() => {
 // What a withheld poverty or people-affected figure would say (povertyFigures.js),
 // and the views that must say none of it
 const WITHHELD_TEXT = /poverty|people affected|of people move|winners and losers|better off|worse off/i;
-const WITHHELD_IN = new Set(["dashboard", "age", "finances", "povertyFallback", "household"]);
+const WITHHELD_IN = new Set(["dashboard", "age", "finances", "povertyFallback"]);
 
 // Each tab by its address, and Population impact's other sub-tabs:
 // [name, LOADED key, address, the panel's label]
 const CASES = [
-  // Population impact opens on Public finances; All households is ?sub=all
-  ...VIEWS.map((v) => [v.label, v.value, v.value === "dashboard" ? "/?sub=all" : `/?tab=${v.value}`, v.label]),
+  // Impact opens on Young people
+  ...VIEWS.map((v) => [v.label, v.value, `/?tab=${v.value}`, v.label]),
   ["Population impact: Young people", "age", "/?sub=age", "Young people"],
-  ["Population impact: Behavioural scenarios", "scenarios", "/?sub=scenarios", "Behavioural scenarios"],
+  ["Population impact: Return to work", "scenarios", "/?sub=scenarios", "Return to work"],
   ["Population impact: Benchmarks", "benchmarks", "/?sub=benchmarks", "Benchmarks"],
   POVERTY_FIGURES_SHOWN
     ? ["Population impact: Poverty", "poverty", "/?sub=poverty", "Poverty"]
@@ -257,176 +253,7 @@ describe("each of the four tabs and Population impact's sub-tabs, on a verified 
         (r) => r.status !== 200 && !NOT_YET_PUBLISHED.has(r.url),
       );
       expect(missing).toEqual([]);
-      if (value === "household") {
-        // "Your household" opens the form; its first box is the head's
-        // age, with its default
-        fireEvent.click(within(panel).getByRole("button", { name: /^Your household/ }));
-        expect(within(panel).getByRole("spinbutton", { name: "Age" })).toHaveValue(30);
-        // Before Calculate the only requests are the example cards' own
-        // figures (the fixture's measures are not the presets file's, so
-        // they are asked in the background): headlines, never your household
-        const yours = (r) => JSON.parse(r.body).household.age === 30;
-        const beforeCalculate = requests.filter((r) => route(r.url) === HOUSEHOLD_API);
-        expect(beforeCalculate.filter(yours)).toEqual([]);
-        expect(beforeCalculate.every((r) => JSON.parse(r.body).include.length === 0)).toBe(true);
-        // Every answer has a default: one press asks the household API in
-        // two stages and shows the answer
-        fireEvent.click(within(panel).getByRole("button", { name: /^Calculate/ }));
-        expect(
-          await within(panel).findByText(/^Your change$/, {}, { timeout: 5000 }),
-        ).toBeInTheDocument();
-        await waitFor(() => expect(panel.querySelector('.net-income-waterfall[data-split="ready"]')).not.toBeNull(), {
-          timeout: 5000,
-        });
-        for (const menu of downloadMenus(panel)) expect(menu.formats, menu.name).toEqual(STANDARD_FORMATS);
-        const asked = requests.filter((r) => route(r.url) === HOUSEHOLD_API);
-        expect(asked.filter(yours).map((r) => JSON.parse(r.body).include)).toEqual([[], ["sweep"], ["by_policy"]]);
-        // Every request, the example cards' too, names each measure it
-        // asks about with that measure's approved commit. The saver's card
-        // also asks with the calculator-only savings rise, which has no
-        // published figures and so no approved definition to name
-        expect(asked.some((r) => JSON.parse(r.body).policies.includes(SAVINGS_INCOME_RATES_ID))).toBe(true);
-        for (const r of asked) {
-          const named = requestedDefinitions(r.url);
-          expect(named.map(([id]) => id)).toEqual(withoutCalculatorOnly(JSON.parse(r.body).policies).sort());
-          for (const [id, commit] of named) expect(commit).toBe(publishedDefinition(id).git_sha);
-        }
-        expect(requests.filter((r) => r.url.startsWith(API)).every((r) => route(r.url) === HOUSEHOLD_API)).toBe(
-          true,
-        );
-        for (const pattern of FAILURE_TEXT) {
-          expect(document.body.textContent, String(pattern)).not.toMatch(pattern);
-        }
-        expect(consoleErrors).toEqual([]);
-      }
     },
     15000,
   );
-
-  it("fails the Household calculator tab when the API URL is not set", async () => {
-    // The tab's call never leaves the page, and it says so where the
-    // results would be: the check above would catch it.
-    vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", "");
-    window.history.replaceState({}, "", "/?tab=personal");
-    render(<App />);
-    fireEvent.click(await screen.findByRole("button", { name: /^Your household/ }));
-    fireEvent.click(await screen.findByRole("button", { name: /^Calculate/ }));
-    await waitFor(() =>
-      expect(document.body.textContent).toMatch(/This build has no NEXT_PUBLIC_HOUSEHOLD_API_URL/),
-    );
-    expect(requests.some((r) => r.url.startsWith(API))).toBe(false);
-  });
-
-  it("keeps a household calculation running across a tab switch, and shows its answer on return", async () => {
-    // Hold the household API's answers until released
-    const held = [];
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (input, init = {}) => {
-        const url = typeof input === "string" ? input : input.url;
-        if (route(url) === HOUSEHOLD_API) {
-          return new Promise((resolve, reject) => {
-            init.signal?.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")));
-            held.push(() => resolve(serve(input, init)));
-          });
-        }
-        return serve(input, init);
-      }),
-    );
-    window.history.replaceState({}, "", "/?tab=personal");
-    render(<App />);
-    // The views are rebuilt once the publication verifies
-    await waitFor(() => expect(document.querySelector('.app[data-publication="verified"]')).not.toBeNull());
-    const personal = await screen.findByRole("tabpanel", { name: "Household calculator" });
-    fireEvent.click(await within(personal).findByRole("button", { name: /^Your household/ }));
-    fireEvent.click(await within(personal).findByRole("button", { name: /^Calculate/ }));
-    await waitFor(() => expect(held).toHaveLength(1));
-
-    // Away to Methodology while the first stage is in flight
-    fireEvent.click(screen.getByRole("tab", { name: "Methodology" }));
-    expect(personal).not.toBeVisible();
-    held.shift()();
-    // The second stage (the sweep and the split by policy, asked for at
-    // once) follows while the view is hidden
-    await waitFor(() => expect(held).toHaveLength(2));
-    held.shift()();
-    held.shift()();
-    await waitFor(() => expect(requests.filter((r) => route(r.url) === HOUSEHOLD_API)).toHaveLength(3));
-
-    // Back: the same view, with the finished answer, and nothing asked again
-    fireEvent.click(screen.getByRole("tab", { name: "Household calculator" }));
-    expect(screen.getByRole("tabpanel", { name: "Household calculator" })).toBe(personal);
-    expect(await within(personal).findByText(/^Your change$/)).toBeInTheDocument();
-    await waitFor(() => expect(personal.querySelector('.net-income-waterfall[data-split="ready"]')).not.toBeNull());
-    expect(requests.filter((r) => route(r.url) === HOUSEHOLD_API)).toHaveLength(3);
-    expect(held).toHaveLength(0);
-  });
-
-  it("keeps a hidden view's progress inside it: nothing of it shows on another view", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (input, init = {}) => {
-        const url = typeof input === "string" ? input : input.url;
-        // The household API never answers here (every request names the
-        // definitions it expects, so it is told by its route)
-        if (route(url) === HOUSEHOLD_API) return new Promise(() => {});
-        return serve(input, init);
-      }),
-    );
-    window.history.replaceState({}, "", "/?tab=household");
-    render(<App />);
-    await waitFor(() => expect(document.querySelector('.app[data-publication="verified"]')).not.toBeNull());
-    const household = await screen.findByRole("tabpanel", { name: "Household calculator" });
-    fireEvent.click(await within(household).findByRole("button", { name: /^Your household/ }));
-    fireEvent.click(await within(household).findByRole("button", { name: /^Calculate/ }));
-    await waitFor(() => expect(household.querySelector(".processing-panel")).not.toBeNull());
-    fireEvent.click(screen.getByRole("tab", { name: "Methodology" }));
-    expect(household).not.toBeVisible();
-    for (const node of document.querySelectorAll(".processing-panel, .processing-bar, .skeleton-chip")) {
-      expect(node.closest('[role="tabpanel"]')).toBe(household);
-      expect(node).not.toBeVisible();
-    }
-    const methodology = screen.getByRole("tabpanel", { name: "Methodology" });
-    expect(methodology).toBeVisible();
-    expect(methodology.textContent).not.toMatch(/Calculating your household/);
-  });
-});
-
-describe("the income decile card", () => {
-  it("is on All households after the map: one card, £ or % in its Options, beside the household scatter", async () => {
-    window.history.replaceState({}, "", "/?sub=all");
-    render(<App />);
-    await waitFor(() => expect(document.querySelector('.app[data-publication="verified"]')).not.toBeNull());
-    const panel = await screen.findByRole("tabpanel", { name: "All households" });
-    const title = await within(panel).findByRole("heading", { level: 3, name: /^Impact by income decile, \d{4}-\d{2}$/ }, { timeout: 5000 });
-    expect(within(panel).queryByRole("heading", { level: 3, name: /^(Absolute|Relative) impact by income decile/ })).toBeNull();
-    const section = title.closest("#deciles");
-    expect(section).not.toBeNull();
-    // The scatter shares the decile card's row
-    const scatter = await within(section).findByRole("heading", { level: 3, name: /^Household income impacts/ }, { timeout: 5000 });
-    expect(scatter.closest(".charts-grid")).toBe(title.closest(".charts-grid"));
-    // No section-level Policies key above the map: each chart draws its own
-    const map = panel.querySelector("#constituencies");
-    for (const key of panel.querySelectorAll(".measure-key")) expect(key.compareDocumentPosition(map) & Node.DOCUMENT_POSITION_FOLLOWING).toBeFalsy();
-    expect(within(panel).getByRole("heading", { level: 2, name: "By income" })).toBeInTheDocument();
-    expect(panel.querySelector("#constituencies").compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    // £ by default; % of net income in the Options, kept in the address
-    const card = title.closest(".waterfall-chart");
-    expect(card).not.toBeNull();
-    fireEvent.click(within(card).getByRole("button", { name: /^Options:/ }));
-    fireEvent.click(within(within(card).getByRole("radiogroup", { name: "Show the change as" })).getByRole("radio", { name: "% of net income (relative)" }));
-    await waitFor(() => expect(section.querySelector(".distributional-chart")).not.toBeNull());
-    expect(section.querySelector(".waterfall-chart")).toBeNull();
-    expect(within(section).getByRole("heading", { level: 3, name: /^Impact by income decile, / })).toBeInTheDocument();
-    expect(new URLSearchParams(window.location.search).get("decile")).toBe("relative");
-  }, 15000);
-
-  it("opens All households from an old #deciles link", async () => {
-    window.history.replaceState({}, "", "/?sub=living#deciles");
-    render(<App />);
-    await waitFor(() => expect(document.querySelector('.app[data-publication="verified"]')).not.toBeNull());
-    const panel = await screen.findByRole("tabpanel", { name: "All households" });
-    expect(new URLSearchParams(window.location.search).get("sub")).toBe("all");
-    expect(await within(panel).findByRole("heading", { level: 3, name: /^Impact by income decile/ }, { timeout: 5000 })).toBeInTheDocument();
-  }, 15000);
 });
