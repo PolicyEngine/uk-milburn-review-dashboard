@@ -114,7 +114,7 @@ export default function BenchmarksTable() {
         </div>
         <p className="milburn-control-note">
           The PolicyEngine estimate is static: people aged 16 to 24 in households whose net income falls under the
-          modelled package, from its verified run. It counts a different group from the published figures, so it is
+          modelled package, from its {catalogue.localBuild ? "local build" : "verified"} run. It counts a different group from the published figures, so it is
           context, not a check on them; other rows have no comparable estimate and are left blank.
         </p>
       </section>

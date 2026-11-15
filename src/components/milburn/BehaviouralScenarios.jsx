@@ -133,7 +133,7 @@ export default function BehaviouralScenarios() {
   } else if (affected === null || staticBn === null) {
     body = (
       <Unavailable>
-        The behavioural scenarios are not available: the package&rsquo;s verified results for {fiscalYearTick(year)}{" "}
+        The behavioural scenarios are not available: the package&rsquo;s {catalogue.localBuild ? "local build" : "verified"} results for {fiscalYearTick(year)}{" "}
         {affected === null ? "give no count of young people affected" : "give no figure for the public finances"}.
       </Unavailable>
     );
@@ -285,7 +285,7 @@ export default function BehaviouralScenarios() {
           <ul>
             <li>
               Young people affected: people aged 16 to 24 in households whose net income falls under the package
-              in {yearLabel}, from the verified static results.
+              in {yearLabel}, from the {catalogue.localBuild ? "local build’s" : "verified"} static results.
             </li>
             <li>
               Each young person who moves into work is assumed to match the selected entry case; the Exchequer
