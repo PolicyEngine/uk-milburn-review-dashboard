@@ -1388,7 +1388,9 @@ def _create_youth_allowance_at_25_plus_rate() -> Reform:
             "couples in which both are under 25 receive the couple rate for "
             "those aged 25 and over. The protected health element is held at "
             "its current-law amount, which the law otherwise links to the "
-            "under-25 allowances."
+            "under-25 allowances. Briefings before the report point to a "
+            "youth allowance at the under-25 rate, which would leave awards "
+            "unchanged; this variant shows the higher rate."
         ),
         parameter_changes={
             **youth_allowance_rates(),
@@ -1408,7 +1410,9 @@ def _create_employer_nics_zero_under_25() -> Reform:
             "earnings up to the upper secondary threshold (£50,270 a year) "
             "for employees under 25, extending the zero rate for under-21s. "
             "The model passes employers' National Insurance through to "
-            "wages, so the saving shows as higher pay for these employees."
+            "wages, so the saving shows as higher pay for these employees. "
+            "Recommended by the Work and Pensions Committee; briefings do "
+            "not attribute it to the review."
         ),
         parameter_changes=threshold_change(
             EMPLOYER_NI_ZERO_RATE_AGE,
