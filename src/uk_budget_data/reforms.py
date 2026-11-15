@@ -58,6 +58,7 @@ from uk_budget_data.budget_measures.pension_tax_allowance import (
     pension_tax_allowance,
 )
 from uk_budget_data.budget_measures.pip_removed_ages_18_to_24 import (
+    pip_halved_ages_18_to_24,
     pip_removed_ages_18_to_24,
 )
 from uk_budget_data.budget_measures.planned_cash_isa_limit import (
@@ -74,7 +75,9 @@ from uk_budget_data.budget_measures.state_pension_only_income_tax_allowance impo
     state_pension_only_income_tax_allowance,
 )
 from uk_budget_data.budget_measures.uc_health_element_removed_under_25 import (
+    uc_health_element_removed_under_22,
     uc_health_element_removed_under_25,
+    uc_health_element_removed_under_25_severe_kept,
 )
 from uk_budget_data.budget_measures.uc_health_element_removed_under_25_new_claims import (
     uc_health_element_removed_under_25_new_claims,
@@ -1492,6 +1495,59 @@ def get_not_computable_measures() -> list[NotComputableMeasure]:
 # The measures the package brings together, by id: the health element
 # removal for all claimants and the PIP removal for 18 to 24-year-olds.
 MILBURN_PACKAGE_COMPONENTS = (UC_HEALTH_UNDER_25_ID, PIP_UNDER_25_ID)
+
+
+UC_HEALTH_UNDER_22_ID = "uc_health_element_removed_under_22"
+UC_HEALTH_UNDER_25_SEVERE_KEPT_ID = "uc_health_element_removed_under_25_severe_kept"
+PIP_HALVED_ID = "pip_halved_under_25"
+MILBURN_CENTRAL_ID = "milburn_package_central"
+MILBURN_CENTRAL_COMPONENTS = (UC_HEALTH_UNDER_25_SEVERE_KEPT_ID, PIP_HALVED_ID)
+
+
+def _create_uc_health_element_removed_under_22() -> Reform:
+    return Reform(
+        id=UC_HEALTH_UNDER_22_ID,
+        name="UC health element removed for under-22s",
+        description=(
+            "From April 2027 Universal Credit awards no longer include the "
+            "health (LCWRA) element where the claimant with limited "
+            "capability for work and work-related activity is under 22, for "
+            "existing and new claimants alike: the age limit proposed in the "
+            "2025 Pathways to Work green paper."
+        ),
+        simulation_modifier=uc_health_element_removed_under_22,
+    )
+
+
+def _create_uc_health_element_removed_under_25_severe_kept() -> Reform:
+    return Reform(
+        id=UC_HEALTH_UNDER_25_SEVERE_KEPT_ID,
+        name="UC health element removed for under-25s, severe cases kept",
+        description=(
+            "As the removal for under-25s, except that a young claimant "
+            "with limited capability for work and work-related activity "
+            "who has an enhanced PIP daily living award keeps the element. "
+            "The enhanced award stands in for the trailed higher-rate "
+            "benefit for people with the most severe conditions, whose "
+            "eligibility rules are not yet known."
+        ),
+        simulation_modifier=uc_health_element_removed_under_25_severe_kept,
+    )
+
+
+def _create_pip_halved_under_25() -> Reform:
+    return Reform(
+        id=PIP_HALVED_ID,
+        name="PIP at half rate for 18 to 24-year-olds",
+        description=(
+            "From April 2027 people aged 18 to 24 receive half their current "
+            "Personal Independence Payment. This is an illustrative stand-in "
+            "for a smaller, non-means-tested additional cost allowance in "
+            "place of PIP, whose rules are not yet known; Scottish Adult "
+            "Disability Payment, recorded as PIP, is included."
+        ),
+        simulation_modifier=pip_halved_ages_18_to_24,
+    )
 # The registry's combined run and its parts, under the names the rest of the
 # package imports (geography's PACKAGES, the household calculation).
 COMBINED_ID = MILBURN_PACKAGE_ID
@@ -1507,10 +1563,18 @@ _MEASURE_FACTORIES = (
     _create_pip_removed_under_25,
     _create_youth_allowance_at_25_plus_rate,
     _create_employer_nics_zero_under_25,
+    _create_uc_health_element_removed_under_22,
+    _create_uc_health_element_removed_under_25_severe_kept,
+    _create_pip_halved_under_25,
 )
 
 
-def _create_milburn_package(members: list[Reform]) -> Reform:
+def _create_milburn_package(
+    members: list[Reform],
+    package_id: str = None,
+    name: str = "Milburn package (combined)",
+    description: str = None,
+) -> Reform:
     """One simulation of the package's measures.
 
     Built by ``publication.combine.combine_measures``, as a combined run
@@ -1523,9 +1587,10 @@ def _create_milburn_package(members: list[Reform]) -> Reform:
 
     combined = combine_measures(members, DataConfig())
     return Reform(
-        id=MILBURN_PACKAGE_ID,
-        name="Milburn package (combined)",
-        description=(
+        id=package_id or MILBURN_PACKAGE_ID,
+        name=name,
+        description=description
+        or (
             "The health element removal for under-25s (all claimants) and "
             "the PIP removal for 18 to 24-year-olds simulated together, "
             "with their interactions."
@@ -1554,8 +1619,20 @@ def _get_reforms() -> list[Reform]:
             for member in members
             if member.id in MILBURN_PACKAGE_COMPONENTS
         ]
+        central = [m for m in members if m.id in MILBURN_CENTRAL_COMPONENTS]
         _REFORMS_CACHE = [
             _create_milburn_package(package),  # Combined first
+            _create_milburn_package(
+                central,
+                package_id=MILBURN_CENTRAL_ID,
+                name="Milburn package, central variant (combined)",
+                description=(
+                    "The health element removal for under-25s with severe "
+                    "cases kept, and PIP at half rate for 18 to 24-year-olds "
+                    "in place of a new additional cost allowance, simulated "
+                    "together with their interactions."
+                ),
+            ),
             *members,
         ]
     return _REFORMS_CACHE

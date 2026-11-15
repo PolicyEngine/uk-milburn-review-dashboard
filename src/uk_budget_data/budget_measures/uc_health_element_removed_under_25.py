@@ -18,6 +18,7 @@ def uc_health_element_removed_under_25(
     start_year=2027,
     end_year=2032,
     age_limit=25,
+    keep_enhanced_pip_daily_living=False,
 ):
     """Remove the LCWRA element from awards in which no claimant aged
     ``age_limit`` or over has limited capability for work and work-related
@@ -54,8 +55,38 @@ def uc_health_element_removed_under_25(
             & person("uc_limited_capability_for_WRA", period)
             & (person("age", period) >= age_limit)
         )
+        if keep_enhanced_pip_daily_living:
+            # Severity proxy: a young claimant with LCWRA whose PIP daily
+            # living category is enhanced keeps the element. The category,
+            # not the payment, is read, so a PIP change in the same run
+            # does not move it.
+            category = person("pip_dl_category", period)
+            if hasattr(category, "possible_values"):
+                enhanced = category == category.possible_values.ENHANCED
+            else:
+                enhanced = np.asarray(category).astype(str) == "ENHANCED"
+            qualifying = qualifying | (
+                claimant
+                & person("uc_limited_capability_for_WRA", period)
+                & enhanced
+            )
         keep = benunit.any(qualifying)
         set_model_value(
             sim, "uc_LCWRA_element", year, np.where(keep, element, 0.0)
         )
     return sim
+
+
+def uc_health_element_removed_under_22(sim):
+    """As above with the age limit at 22 (the 2025 Pathways to Work
+    proposal)."""
+    return uc_health_element_removed_under_25(sim, age_limit=22)
+
+
+def uc_health_element_removed_under_25_severe_kept(sim):
+    """As above, but young claimants with LCWRA and an enhanced PIP daily
+    living award keep the element: a proxy for the trailed higher-rate
+    benefit for people with the most severe conditions."""
+    return uc_health_element_removed_under_25(
+        sim, keep_enhanced_pip_daily_living=True
+    )

@@ -15,6 +15,7 @@ def pip_removed_ages_18_to_24(
     lowest_age=18,
     age_limit=25,
     include_scotland=True,
+    share_kept=0.0,
 ):
     """Pay no PIP daily living or mobility component to people aged
     ``lowest_age`` to ``age_limit`` - 1 from ``start_year`` (fiscal years).
@@ -49,7 +50,14 @@ def pip_removed_ages_18_to_24(
                 removed = removed & (
                     country != country.possible_values.SCOTLAND
                 )
-            return np.where(removed, 0.0, current)
+            return np.where(removed, current * share_kept, current)
 
         _replace_formula(sim, name, formula)
     return sim
+
+
+def pip_halved_ages_18_to_24(sim):
+    """PIP for 18 to 24-year-olds paid at half its current amount: an
+    illustrative stand-in for a smaller, non-means-tested additional cost
+    allowance whose rules are not yet known."""
+    return pip_removed_ages_18_to_24(sim, share_kept=0.5)

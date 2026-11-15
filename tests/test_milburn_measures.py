@@ -271,11 +271,15 @@ def test_the_package_removes_both_for_a_20_year_old():
 def test_the_registry_holds_the_milburn_measures_only():
     assert list_reform_ids() == [
         MILBURN_PACKAGE_ID,
+        "milburn_package_central",
         UC_HEALTH_UNDER_25_ID,
         UC_HEALTH_UNDER_25_NEW_CLAIMS_ID,
         PIP_UNDER_25_ID,
         YOUTH_ALLOWANCE_ID,
         EMPLOYER_NICS_UNDER_25_ID,
+        "uc_health_element_removed_under_22",
+        "uc_health_element_removed_under_25_severe_kept",
+        "pip_halved_under_25",
     ]
     assert MILBURN_PACKAGE_COMPONENTS == (
         UC_HEALTH_UNDER_25_ID,
@@ -356,3 +360,37 @@ def test_a_couple_keeps_the_element_only_through_a_claimant_aged_25_plus(
     )
     assert before == pytest.approx(12 * PROTECTED_LCWRA, abs=0.05)
     assert after == pytest.approx(before if older_has_lcwra else 0)
+
+
+# Variants added 15 Nov 2026: under-22 age limit, severe cases kept,
+# PIP at half rate.
+
+
+def test_under_22_removes_the_element_at_21_but_not_at_23():
+    lost_21 = change("uc_health_element_removed_under_22", single(21, lcwra=True))
+    assert lost_21[0] - lost_21[1] == pytest.approx(12 * PROTECTED_LCWRA, abs=0.05)
+    lost_23 = change("uc_health_element_removed_under_22", single(23, lcwra=True))
+    assert lost_23[0] == pytest.approx(lost_23[1], abs=0.01)
+
+
+def _with_dl(situation, category):
+    situation["people"]["p"]["pip_dl_category"] = {YEAR: category}
+    situation["people"]["p"]["pip_m_category"] = {YEAR: "NONE"}
+    return situation
+
+
+def test_severe_cases_kept_spares_an_enhanced_daily_living_award():
+    rid = "uc_health_element_removed_under_25_severe_kept"
+    kept = change(rid, _with_dl(single(22, lcwra=True), "ENHANCED"), "uc_LCWRA_element")
+    assert kept[1] == pytest.approx(kept[0], abs=0.01) and kept[0] > 0
+    lost = change(rid, _with_dl(single(22, lcwra=True), "STANDARD"), "uc_LCWRA_element")
+    assert lost[1] == 0 and lost[0] > 0
+
+
+def test_pip_at_half_rate_halves_a_20_year_olds_award():
+    before, after = change("pip_halved_under_25", single(20, rent=0, pip=True))
+    assert before - after == pytest.approx(8_433.58 / 2, abs=0.05)
+
+
+def test_the_central_package_is_registered():
+    assert "milburn_package_central" in list_reform_ids()
