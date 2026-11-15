@@ -73,3 +73,14 @@ target-version = "py313"
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
 ignore = ["E501"]
+
+[tool.uv]
+# Milburn review: run on Microcosm build
+# uk-frs-calibration-attempt-20261112T133744Z-6f918b81 with the engine it was
+# built on. No policyengine.py release pins this pair, so the engine is
+# overridden here and uk_budget_data.local_build refuses any other version
+# (and any other dataset file) before a simulation is built.
+override-dependencies = [
+    "policyengine-uk==2.177.7",
+    "policyengine-core==3.34.10",
+]

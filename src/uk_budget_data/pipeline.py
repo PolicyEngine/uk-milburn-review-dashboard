@@ -58,8 +58,14 @@ def build_microsimulation(dataset_path: Optional[str], scenario=None):
             certified dataset (requires HUGGING_FACE_TOKEN).
         scenario: Scenario to apply, or None for current law.
     """
+    from uk_budget_data import local_build
     from uk_budget_data.forecast import with_forecast
 
+    if local_build.engine_matches():
+        # The Milburn dashboard's build: policyengine_uk directly, on the
+        # local Microcosm file only (its SHA-256 checked), never the
+        # bundle's dataset, which the overridden engine must not load.
+        return local_build.build_microsimulation(dataset_path, scenario)
     return pe.uk.managed_microsimulation(
         dataset=dataset_path,
         allow_unmanaged=dataset_path is not None,
@@ -393,6 +399,16 @@ class DataPipeline:
                 # Keep the numeric tables in the canonical artifact schema.
                 save_csv(data[key], output_dir / filename)
 
+        from uk_budget_data import local_build
+
+        if local_build.engine_matches():
+            # No policyengine.py certificate covers this build: the label
+            # travels with the tables instead.
+            local_build.write_build_record(
+                output_dir / local_build.RECORD_FILE,
+                [reform.id for reform in self.reforms],
+                self.config.years,
+            )
         console.print(f"[green]Saved results to {output_dir}/[/green]")
 
         # Constituency rows from the legacy calculators carry no disclosure

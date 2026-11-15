@@ -370,6 +370,17 @@ def run_projections(log=print) -> dict:
     Returns the per-year aggregates keyed by year (as strings), with a
     ``meta`` block naming the engine and the dataset the run used.
     """
+    from uk_budget_data import local_build
+
+    if local_build.engine_matches():
+        # The bundle's certified dataset must not be loaded on the
+        # overridden engine (a mixed model and data pair voids figures).
+        raise local_build.LocalBuildError(
+            "The living standards projections run on policyengine.py's "
+            "certified bundle only; with policyengine-uk "
+            f"{local_build.ENGINE['policyengine-uk']} installed for "
+            f"Microcosm build {local_build.BUILD_SHORT}, they are not run."
+        )
     versions = engine_versions()
     expected = certified_dataset()
     from uk_budget_data.forecast import with_forecast

@@ -2,6 +2,14 @@
 
 # ruff: noqa: E402
 
+# The Milburn dashboard runs on a local Microcosm build whose engine no
+# policyengine.py release pins (uk_budget_data.local_build): drop the Hugging
+# Face token first, or importing policyengine fetches its own data
+# certificate and refuses the overridden engine.
+from uk_budget_data.local_build import drop_hugging_face_token
+
+drop_hugging_face_token()
+
 # Importing the released recorder initializes policyengine, including core
 # and the UK wrapper. The wrapper records model/core/wrapper versions before
 # loading policyengine_uk. Record all three here during uk_budget_data import,

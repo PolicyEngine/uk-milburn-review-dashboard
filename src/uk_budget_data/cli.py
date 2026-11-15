@@ -276,6 +276,36 @@ def parse_args(args: list[str] = None) -> argparse.Namespace:
         help="Output directory (default: ./public/data)",
     )
 
+    # The Milburn review's entry-to-work cases: household calculations only
+    milburn_parser = subparsers.add_parser(
+        "milburn-scenarios",
+        help=(
+            "Write milburn_scenarios.json: a young LCWRA claimant moving "
+            "into work, under current law and the Milburn package (no "
+            "dataset needed)"
+        ),
+    )
+    milburn_parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("./public/data/milburn_scenarios.json"),
+        help="Output file (default: ./public/data/milburn_scenarios.json)",
+    )
+    # The Milburn registry, with the measures listed as not computable
+    measures_parser = subparsers.add_parser(
+        "milburn-measures",
+        help=(
+            "Write milburn_measures.json: every Milburn candidate measure, "
+            "computable or not, with its description or reason"
+        ),
+    )
+    measures_parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("./public/data/milburn_measures.json"),
+        help="Output file (default: ./public/data/milburn_measures.json)",
+    )
+
     add_publish_parser(subparsers)
     add_geography_parser(subparsers)
     add_constituencies_parser(subparsers)
@@ -873,6 +903,16 @@ def main(args: list[str] = None) -> int:
 
         console.print(f"Wrote {write(parsed.output_dir)}")
         return 0
+    elif parsed.command == "milburn-scenarios":
+        from uk_budget_data.milburn_scenarios import write
+
+        console.print(f"Wrote {write(parsed.output)}")
+        return 0
+    elif parsed.command == "milburn-measures":
+        from uk_budget_data.milburn_measures import write
+
+        console.print(f"Wrote {write(parsed.output)}")
+        return 0
     elif parsed.command == "publish":
         return run_publish(parsed)
     elif parsed.command == "geography":
@@ -893,6 +933,14 @@ def main(args: list[str] = None) -> int:
         console.print("  income-curve - The example households' curves only")
         console.print(
             "  policy-table - Each measure's parameters, before and after"
+        )
+        console.print(
+            "  milburn-scenarios - Entry-to-work cases, current law and "
+            "package"
+        )
+        console.print(
+            "  milburn-measures - The Milburn registry, not-computable "
+            "measures included"
         )
         console.print(
             "  publish   - Reconcile, stage, approve and check publications"

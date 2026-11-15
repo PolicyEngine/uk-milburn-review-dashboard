@@ -93,10 +93,11 @@ from uk_budget_data.publication.combine import (
 from uk_budget_data.reforms import (
     AUTUMN_BUDGET_2026_COMBINED_ID,
     CASH_ISA_LIMIT_ID,
-    EMPLOYER_NI_ID,
+    EMPLOYER_NICS_UNDER_25_ID,
     MACHINE_GAMES_DUTY_FROM,
     MACHINE_GAMES_DUTY_ID,
     TRADING_ALLOWANCE_FROM,
+    UC_HEALTH_UNDER_25_NEW_CLAIMS_ID,
     WARM_HOME_DISCOUNT_ID,
     get_autumn_budget_2026_reforms,
     get_reform,
@@ -178,12 +179,22 @@ EDUCATION_START_AGE = 16
 # Notes on a measure's household change, where the number alone would
 # mislead: £0 by construction, or an amount that depends on receipt.
 HOUSEHOLD_NOTES: dict[str, dict] = {
-    EMPLOYER_NI_ID: {
-        "kind": "employer_cost",
+    EMPLOYER_NICS_UNDER_25_ID: {
+        "kind": "assumption",
         "text": (
-            "No household effect (employer cost): employers pay less "
-            "National Insurance, and wages are held fixed, so no household's "
-            "net income changes."
+            "Employers pay the National Insurance; the model passes it "
+            "through to wages, so an employee under 25 earning above the "
+            "secondary threshold is shown with higher pay (and the income "
+            "tax and National Insurance on it)."
+        ),
+    },
+    UC_HEALTH_UNDER_25_NEW_CLAIMS_ID: {
+        "kind": "assumption",
+        "text": (
+            "Applies only if your Universal Credit health element is paid at "
+            "the rate for claims made from April 2026; a household is "
+            "treated as a protected (earlier) claimant unless it says "
+            "otherwise."
         ),
     },
     WARM_HOME_DISCOUNT_ID: {

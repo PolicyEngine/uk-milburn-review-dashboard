@@ -1,6 +1,16 @@
-"""Candidate measures for the UK Autumn Budget 2026 (28 October 2026).
+"""Candidate measures for the Milburn review of young people and work.
 
-These are candidates, modelled before the Budget from reporting and
+The active registry is the Milburn section at the end of this module: five
+computable measures and their combined package, each compared against
+current law in policyengine-uk 2.177.7 (Microcosm build 6f918b81, see
+``uk_budget_data.local_build``) from 2027-28, and four measures listed as
+not computable with their reasons (``NOT_COMPUTABLE_MEASURES``).
+
+The candidate Autumn Budget 2026 measures above them are retired: their
+factories and ids stay, unregistered, because other modules and kept tests
+import them. What follows describes them as written for the Budget.
+
+These were candidates, modelled before the Budget from reporting and
 briefing up to 24 October 2026; none is announced policy. They replaced
 the nine Autumn Budget 2025 placeholder measures on 24 October, all of
 which are already in the policyengine-uk 2.132.6 baseline or had lapsed.
@@ -19,6 +29,7 @@ may live here).
 Year Y is fiscal year Y-(Y+1).
 """
 
+from dataclasses import dataclass
 from datetime import date
 from typing import Optional
 
@@ -46,6 +57,9 @@ from uk_budget_data.budget_measures.household_energy_payment_2026 import (
 from uk_budget_data.budget_measures.pension_tax_allowance import (
     pension_tax_allowance,
 )
+from uk_budget_data.budget_measures.pip_removed_ages_18_to_24 import (
+    pip_removed_ages_18_to_24,
+)
 from uk_budget_data.budget_measures.planned_cash_isa_limit import (
     planned_cash_isa_limit,
 )
@@ -59,6 +73,12 @@ from uk_budget_data.budget_measures.state_pension_income_tax_allowance import (
 from uk_budget_data.budget_measures.state_pension_only_income_tax_allowance import (
     state_pension_only_income_tax_allowance,
 )
+from uk_budget_data.budget_measures.uc_health_element_removed_under_25 import (
+    uc_health_element_removed_under_25,
+)
+from uk_budget_data.budget_measures.uc_health_element_removed_under_25_new_claims import (
+    uc_health_element_removed_under_25_new_claims,
+)
 from uk_budget_data.budget_measures.warm_home_discount_top_up import (
     warm_home_discount_top_up,
 )
@@ -71,7 +91,11 @@ from uk_budget_data.forecast import (
     forecast_parameters,
     fuel_duty_rpi_steps,
 )
-from uk_budget_data.measure_templates import rate_change, threshold_change
+from uk_budget_data.measure_templates import (
+    rate_change,
+    threshold_change,
+    uc_health_element_change,
+)
 from uk_budget_data.models import Reform
 
 # Default years for parameter changes: the policy years in
@@ -1208,106 +1232,303 @@ def _create_state_pension_double_lock_2030() -> Reform:
 
 
 # =============================================================================
+# MILBURN REVIEW CANDIDATE MEASURES (THE ACTIVE REGISTRY)
+# =============================================================================
+#
+# Candidate measures for the independent review of young people and work
+# (the Milburn review; final report expected 17 November 2026). None is
+# announced policy. Each is compared against current law in the installed
+# policyengine-uk (2.177.7 on Microcosm build 6f918b81: see
+# ``uk_budget_data.local_build``), from 2027-28 through the last policy year.
+# The Autumn Budget 2026 measures above are retired: their factories stay,
+# unregistered, for the modules and tests that still read them.
+
+MILBURN_FIRST_YEAR = 2027
+UC_HEALTH_UNDER_25_ID = "uc_health_element_removed_under_25"
+UC_HEALTH_UNDER_25_NEW_CLAIMS_ID = (
+    "uc_health_element_removed_under_25_new_claims"
+)
+PIP_UNDER_25_ID = "pip_removed_under_25"
+YOUTH_ALLOWANCE_ID = "youth_allowance_at_25_plus_rate"
+EMPLOYER_NICS_UNDER_25_ID = "employer_nics_zero_under_25"
+MILBURN_PACKAGE_ID = "milburn_package"
+
+UC_STANDARD_ALLOWANCE = "gov.dwp.universal_credit.standard_allowance.amount"
+# The age below which an earner is in the under-21 group, whose employer
+# (secondary) Class 1 contributions are zero-rated up to the upper secondary
+# threshold (SSCBA 1992 s.9A; policyengine-uk's secondary_class_1_threshold).
+EMPLOYER_NI_ZERO_RATE_AGE = (
+    "gov.hmrc.national_insurance.class_1.secondary_zero_rate_age_limits."
+    "under_21_group"
+)
+
+
+def _milburn_years() -> list[int]:
+    return [y for y in POLICY_YEARS if y >= MILBURN_FIRST_YEAR]
+
+
+def youth_allowance_rates() -> dict[str, dict[str, float]]:
+    """The under-25 standard allowances set to the 25-and-over amounts in
+    each year from 2027-28, read from current law on the forecast (monthly
+    amounts, as the parameter holds them). Every year is given: the amounts
+    are uprated, so a bounded change would return to the old path
+    (policyengine-uk #2430)."""
+    amounts = forecast_parameters().get_child(UC_STANDARD_ALLOWANCE)
+    changes = {}
+    for young, old in (
+        ("SINGLE_YOUNG", "SINGLE_OLD"),
+        ("COUPLE_YOUNG", "COUPLE_OLD"),
+    ):
+        changes.update(
+            threshold_change(
+                f"{UC_STANDARD_ALLOWANCE}.{young}",
+                {
+                    str(y): amounts.children[old](f"{y}-04-30")
+                    for y in _milburn_years()
+                },
+            )
+        )
+    return changes
+
+
+def current_law_protected_health_element() -> dict[str, float]:
+    """Current law's protected LCWRA amount (monthly) in each year the
+    Universal Credit Act 2025 s. 4 floor sets it (2027-28 to 2029-30), as
+    the engine computes it on the forecast.
+
+    The floor pairs the protected amount with every standard allowance
+    amount, the under-25 ones included, and in 2027-28 the under-25 single
+    allowance is the one that binds. Raising the under-25 allowances
+    would therefore lower the floor and cut every protected claimant's
+    element (by about £0.70 a month in 2027-28), which is not part of the
+    youth allowance measure; it holds the protected amount at current
+    law's instead. From 2030-31 the amount is the year before's uprated,
+    so it follows."""
+    from policyengine_uk import Simulation
+    from policyengine_uk.scenarios import uc_reform
+
+    from uk_budget_data.forecast import forecast_scenario
+
+    situation = {
+        "people": {"p": {}},
+        "benunits": {"b": {"members": ["p"]}},
+        "households": {"h": {"members": ["p"]}},
+    }
+    sim = Simulation(situation=situation, scenario=forecast_scenario())
+    return {
+        str(y): round(
+            uc_reform._protected_existing_health_element_monthly(sim, y), 6
+        )
+        for y in range(MILBURN_FIRST_YEAR, uc_reform.SECTION_4_LAST_YEAR + 1)
+    }
+
+
+def _create_uc_health_element_removed_under_25() -> Reform:
+    return Reform(
+        id=UC_HEALTH_UNDER_25_ID,
+        name="UC health element removed for under-25s",
+        description=(
+            "From April 2027 Universal Credit awards no longer include the "
+            "health (LCWRA) element where the claimant with limited "
+            "capability for work and work-related activity is under 25, for "
+            "existing and new claimants alike; an award keeps it where a "
+            "joint claimant aged 25 or over has that capability. The "
+            "assessment itself is unchanged, so the work allowance still "
+            "applies, but an award without the element loses the benefit "
+            "cap exception that rests on it."
+        ),
+        simulation_modifier=uc_health_element_removed_under_25,
+    )
+
+
+def _create_uc_health_element_removed_under_25_new_claims() -> Reform:
+    return Reform(
+        id=UC_HEALTH_UNDER_25_NEW_CLAIMS_ID,
+        name="UC health element removed for under-25 new claims",
+        description=(
+            "From April 2027 Universal Credit awards paid the health "
+            "element at the new-claimant rate (claims from April 2026) no "
+            "longer include it where the claimant with limited capability "
+            "for work and work-related activity is under 25; protected "
+            "claimants keep it. The data hold no claim dates: the model "
+            "assigns the new-claimant rate by a random draw at the expected "
+            "share of claims, regardless of age, so the figure rests on "
+            "that assumption."
+        ),
+        simulation_modifier=uc_health_element_removed_under_25_new_claims,
+    )
+
+
+def _create_pip_removed_under_25() -> Reform:
+    return Reform(
+        id=PIP_UNDER_25_ID,
+        name="PIP removed for 18 to 24-year-olds",
+        description=(
+            "From April 2027 people aged 18 to 24 receive neither component "
+            "of Personal Independence Payment; 16 and 17-year-olds keep it "
+            "and Disability Living Allowance for children is unchanged. "
+            "Entitlements that depend on receiving PIP go with it. Scottish "
+            "recipients of Adult Disability Payment, which the data record "
+            "as PIP, are included."
+        ),
+        simulation_modifier=pip_removed_ages_18_to_24,
+    )
+
+
+def _create_youth_allowance_at_25_plus_rate() -> Reform:
+    return Reform(
+        id=YOUTH_ALLOWANCE_ID,
+        name="Under-25 UC standard allowance at the 25-and-over rate",
+        description=(
+            "From April 2027 single Universal Credit claimants under 25 "
+            "receive the standard allowance for those aged 25 and over, and "
+            "couples in which both are under 25 receive the couple rate for "
+            "those aged 25 and over. The protected health element is held at "
+            "its current-law amount, which the law otherwise links to the "
+            "under-25 allowances."
+        ),
+        parameter_changes={
+            **youth_allowance_rates(),
+            **uc_health_element_change(
+                protected=current_law_protected_health_element()
+            ),
+        },
+    )
+
+
+def _create_employer_nics_zero_under_25() -> Reform:
+    return Reform(
+        id=EMPLOYER_NICS_UNDER_25_ID,
+        name="Employer NICs zero rate extended to under-25s",
+        description=(
+            "From April 2027 employers pay no Class 1 National Insurance on "
+            "earnings up to the upper secondary threshold (£50,270 a year) "
+            "for employees under 25, extending the zero rate for under-21s. "
+            "The model passes employers' National Insurance through to "
+            "wages, so the saving shows as higher pay for these employees."
+        ),
+        parameter_changes=threshold_change(
+            EMPLOYER_NI_ZERO_RATE_AGE,
+            {str(y): 25 for y in _milburn_years()},
+        ),
+    )
+
+
+# =============================================================================
+# MEASURES REGISTERED AS NOT COMPUTABLE
+# =============================================================================
+
+
+@dataclass(frozen=True)
+class NotComputableMeasure:
+    """A candidate measure the model and data cannot cost. It is listed
+    with its reason and never given a figure (not even £0)."""
+
+    id: str
+    name: str
+    description: str
+    reason: str
+    status: str = "not_computable"
+
+
+NOT_COMPUTABLE_MEASURES = (
+    NotComputableMeasure(
+        id="severe_conditions_higher_rate",
+        name="Higher health element for severe conditions",
+        description=(
+            "A higher Universal Credit health element for claimants who "
+            "meet the severe conditions criteria."
+        ),
+        reason=(
+            "The data hold no severe conditions flag, so the claimants it "
+            "would reach cannot be identified."
+        ),
+    ),
+    NotComputableMeasure(
+        id="additional_cost_allowance",
+        name="Additional cost allowance",
+        description=(
+            "A new allowance towards the extra costs of disability, "
+            "replacing PIP for young people."
+        ),
+        reason="Its rules (eligibility, rates) have not been set out.",
+    ),
+    NotComputableMeasure(
+        id="youth_conditionality",
+        name="Conditionality for young people",
+        description=(
+            "Work-related requirements and sanctions for young Universal "
+            "Credit claimants."
+        ),
+        reason=(
+            "Its effect works through behaviour (job search, sanctions), "
+            "which a static model does not capture."
+        ),
+    ),
+    NotComputableMeasure(
+        id="youth_guarantee_expansion",
+        name="Youth Guarantee expansion",
+        description=(
+            "More training, job and work experience places for young people "
+            "under the Youth Guarantee."
+        ),
+        reason=(
+            "It is a spending programme, not a tax or benefit rule the "
+            "model applies to households."
+        ),
+    ),
+)
+
+
+def get_not_computable_measures() -> list[NotComputableMeasure]:
+    """The measures listed without a figure, with their reasons."""
+    return list(NOT_COMPUTABLE_MEASURES)
+
+
+# =============================================================================
 # COMBINED PACKAGE
 # =============================================================================
 
-AUTUMN_BUDGET_2026_COMBINED_ID = "autumn_budget_2026_combined"
-# The candidate set Vahid chose on the evening of 27 October 2026 (#222):
-# every registered measure, eight; on Budget day the Carer's Allowance
-# earnings taper (``CARERS_ALLOWANCE_TAPER_ID``, withdrawn on 27 October
-# for #263) was registered again once announced (HCWS421), making nine.
-# Withdrawn, so in neither the package nor the registry
-# (``_MEASURE_FACTORIES``), and run or published by no default command:
-# the Local Housing Allowance unfreeze (``LHA_UNFREEZE_ID``), whose cells
-# by decile rest on fewer than 10 survey households, and the road fuel VAT
-# cut (``FUEL_VAT_ID``) that evening, and earlier that day the Business Asset Disposal Relief cut (``BADR_ID``) and
-# the employer NI relief for under-25s (``EMPLOYER_NI_ID``). Their
-# factories stay above, unregistered. Considered that evening and left out:
-# tobacco duty at RPI+2% (already in current law: policyengine-uk 2.151.0
-# has the rise from 1 October 2026) and alcohol duty at RPI (the data hold
-# no tobacco or alcohol quantities, so both duties are about zero), and
-# working-age benefits at CPI-1% (no parametric route leaves pensioner
-# benefits alone).
-# The measures the combined reform brings together, by id. The combined
-# reform is simulated whole, so this list does not change what it does; it
-# names its parts, so results by area can check it as a package of them.
-AUTUMN_BUDGET_2026_COMBINED_COMPONENTS = (
-    FUEL_DUTY_DEFERRAL_ID,
-    STATE_PENSION_ALLOWANCE_ID,
-    ELECTRICITY_VAT_ID,
-    PROPERTY_INCOME_RATES_ID,
-    # Budget day: registered once announced (HCWS421). Its cells in some
-    # deciles rest on fewer than 3 survey households, so the combined run
-    # refuses while it is here: drop it and keep it in _MEASURE_FACTORIES,
-    # listed but not combined.
-    CARERS_ALLOWANCE_TAPER_ID,
-    HOUSEHOLD_ENERGY_PAYMENT_ID,
-    TRADING_ALLOWANCE_ID,
-    # 29 October 2026 (María): the £2 bus fare cap, left out on Budget day
-    # only because runs were in flight. Package of eight.
-    BUS_FARE_CAP_ID,
-)
+# The measures the package brings together, by id: the health element
+# removal for all claimants and the PIP removal for 18 to 24-year-olds.
+MILBURN_PACKAGE_COMPONENTS = (UC_HEALTH_UNDER_25_ID, PIP_UNDER_25_ID)
+# The registry's combined run and its parts, under the names the rest of the
+# package imports (geography's PACKAGES, the household calculation).
+COMBINED_ID = MILBURN_PACKAGE_ID
+COMBINED_COMPONENTS = MILBURN_PACKAGE_COMPONENTS
+# Kept for importers written for the Autumn Budget registry: they now name
+# the Milburn package.
+AUTUMN_BUDGET_2026_COMBINED_ID = COMBINED_ID
+AUTUMN_BUDGET_2026_COMBINED_COMPONENTS = COMBINED_COMPONENTS
 
-# Withdrawn on Budget day, not in the Budget 2026 document: the Warm Home
-# Discount top-up, the threshold freeze to 2031-32 (not extended), the
-# Plan 2 threshold unfreeze (the freeze stays) and the employer NI
-# secondary threshold (stays £5,000). Their factories stay, unregistered.
-# Also withdrawn that day: the savings and property income tax rates as one
-# measure (``UNEARNED_INCOME_RATES_ID``), split into the property and the
-# savings measures, Table 6.1 rows 61 and 62. Nine registered since the £2
-# bus fare cap (29 October 2026); eight in the package (savings held back).
-# The cash ISA limit kept at £20,000 (Table 6.1 row 11) joined on
-# 29 October, for the Household calculator only: ten registered. The
-# Machine Games Duty rise (row 56) joined on 2 November, likewise for the
-# Household calculator only: eleven registered. Each of the three held
-# back joins the package by adding its id to
-# AUTUMN_BUDGET_2026_COMBINED_COMPONENTS (and leaving
-# calculatorOnlyMeasures.js).
 _MEASURE_FACTORIES = (
-    _create_fuel_duty_rise_deferral,
-    _create_state_pension_income_tax_protection,
-    _create_domestic_electricity_zero_vat,
-    _create_property_income_rates_up,
-    _create_savings_income_rates_up,
-    _create_carers_allowance_earnings_taper,
-    _create_household_energy_payment_2026,
-    _create_trading_allowance_raise,
-    _create_bus_fare_cap_2027,
-    _create_cash_isa_limit_kept,
-    _create_machine_games_duty_rise,
+    _create_uc_health_element_removed_under_25,
+    _create_uc_health_element_removed_under_25_new_claims,
+    _create_pip_removed_under_25,
+    _create_youth_allowance_at_25_plus_rate,
+    _create_employer_nics_zero_under_25,
 )
 
 
-_NUMBER_WORDS = {
-    n: word
-    for n, word in enumerate(
-        "zero one two three four five six seven eight nine ten eleven "
-        "twelve".split()
-    )
-}
-
-
-def _create_combined_autumn_budget_reform(members: list[Reform]) -> Reform:
-    """One simulation of every candidate measure.
+def _create_milburn_package(members: list[Reform]) -> Reform:
+    """One simulation of the package's measures.
 
     Built by ``publication.combine.combine_measures``, as a combined run
     is: the members' merged parameter changes (it refuses two members
-    changing one parameter) and each member's modifier, in order of measure
-    id. The Plan 2 measure brings its baseline modifier, so the combined
-    baseline counts modelled student loan repayments too.
+    changing one parameter) and each member's modifier, in order of
+    measure id.
     """
     from uk_budget_data.models import DataConfig
     from uk_budget_data.publication.combine import combine_measures
 
     combined = combine_measures(members, DataConfig())
     return Reform(
-        id=AUTUMN_BUDGET_2026_COMBINED_ID,
-        name="Autumn Budget 2026 measures (combined)",
+        id=MILBURN_PACKAGE_ID,
+        name="Milburn package (combined)",
         description=(
-            f"All {_NUMBER_WORDS[len(members)]} announced measures simulated "
-            "together: "
-            + ", ".join(member.name for member in members)
-            + ". Shows the package's impact with interactions."
+            "The health element removal for under-25s (all claimants) and "
+            "the PIP removal for 18 to 24-year-olds simulated together, "
+            "with their interactions."
         ),
         parameter_changes=combined.parameter_changes,
         simulation_modifier=combined.simulation_modifier,
@@ -1320,46 +1541,45 @@ def _create_combined_autumn_budget_reform(members: list[Reform]) -> Reform:
 # REFORM COLLECTIONS (lazy-loaded to avoid import-time work)
 # =============================================================================
 
-_AUTUMN_BUDGET_2026_REFORMS_CACHE: list[Reform] | None = None
+_REFORMS_CACHE: list[Reform] | None = None
 _REFORM_LOOKUP_CACHE: dict[str, Reform] | None = None
 
 
-def _get_autumn_budget_2026_reforms() -> list[Reform]:
-    global _AUTUMN_BUDGET_2026_REFORMS_CACHE
-    if _AUTUMN_BUDGET_2026_REFORMS_CACHE is None:
+def _get_reforms() -> list[Reform]:
+    global _REFORMS_CACHE
+    if _REFORMS_CACHE is None:
         members = [factory() for factory in _MEASURE_FACTORIES]
-        # The package holds its components only (today every registered
-        # measure; a measure registered outside them is listed, not
-        # combined).
         package = [
             member
             for member in members
-            if member.id in AUTUMN_BUDGET_2026_COMBINED_COMPONENTS
+            if member.id in MILBURN_PACKAGE_COMPONENTS
         ]
-        _AUTUMN_BUDGET_2026_REFORMS_CACHE = [
-            _create_combined_autumn_budget_reform(package),  # Combined first
+        _REFORMS_CACHE = [
+            _create_milburn_package(package),  # Combined first
             *members,
         ]
-    return _AUTUMN_BUDGET_2026_REFORMS_CACHE
+    return _REFORMS_CACHE
 
 
 def _get_reform_lookup() -> dict[str, Reform]:
     global _REFORM_LOOKUP_CACHE
     if _REFORM_LOOKUP_CACHE is None:
-        _REFORM_LOOKUP_CACHE = {
-            r.id: r for r in _get_autumn_budget_2026_reforms()
-        }
+        _REFORM_LOOKUP_CACHE = {r.id: r for r in _get_reforms()}
     return _REFORM_LOOKUP_CACHE
 
 
-def get_autumn_budget_2026_reforms() -> list[Reform]:
-    """The combined package, then the registered measures."""
-    return _get_autumn_budget_2026_reforms()
+def get_milburn_reforms() -> list[Reform]:
+    """The combined package, then the registered (computable) measures."""
+    return _get_reforms()
+
+
+# The name the pipeline, CLI and household code call: the active registry.
+get_autumn_budget_2026_reforms = get_milburn_reforms
 
 
 def get_all_reforms() -> list[Reform]:
     """Every registered reform: the same list."""
-    return _get_autumn_budget_2026_reforms()
+    return _get_reforms()
 
 
 def get_reform(reform_id: str) -> Optional[Reform]:
