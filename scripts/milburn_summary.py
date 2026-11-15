@@ -68,6 +68,11 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
             k: round(float(metrics[f"poverty_{k}_change_pp"]), 3)
             for k in ("rel_bhc", "rel_ahc", "abs_bhc", "abs_ahc")
         },
+        "people_into_poverty_abs_ahc": round(
+            float(metrics["poverty_abs_ahc_change_pp"])
+            / 100
+            * float(ages["all"]["people"])
+        ),
         "people_into_poverty_rel_ahc": round(
             float(metrics["poverty_rel_ahc_change_pp"])
             / 100
