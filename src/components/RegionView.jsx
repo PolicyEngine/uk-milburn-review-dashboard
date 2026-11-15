@@ -126,7 +126,7 @@ function RegionView({ selectedPolicies = [], selectedYear = DEFAULT_DISPLAY_YEAR
       ["Reform", view.reform],
       ["Year", yearLabel],
       ["Units", EXPORT_UNITS],
-      ["Source", "PolicyEngine UK Autumn Budget 2026 dashboard"],
+      ["Source", "PolicyEngine Milburn review dashboard"],
     ];
     const filename = `results-by-region-${view.reform}-${selectedYear}`;
     downloadFile(

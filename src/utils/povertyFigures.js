@@ -35,7 +35,7 @@
  * On (`true`), as before: set the constant below to true. Nothing else
  * changes; the tests under each component check both settings.
  */
-export const POVERTY_FIGURES_SHOWN = false;
+export const POVERTY_FIGURES_SHOWN = true;
 
 /** The one sentence the Methodology and About this dashboard give in their place. */
 export const WITHHELD_SENTENCE = "The policies' poverty and people-affected figures are not shown while they are reviewed.";

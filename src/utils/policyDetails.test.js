@@ -1,8 +1,6 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { expect, it } from "vitest";
 import fc from "fast-check";
-import { measureSummary, POLICY_DETAILS, policyDetailsFor, withPolicyDetails } from "./policyDetails";
+import { measureSummary, MILBURN_POLICY_DETAILS, POLICY_DETAILS, policyDetailsFor, withPolicyDetails } from "./policyDetails";
 
 // The catalogue decides which measures exist, their names, descriptions,
 // order and colours (#104); a details entry only adds a card's text, and
@@ -85,54 +83,6 @@ it("gives every measure policyDetails was written for a tip as described now, or
   }
 });
 
-// The measures of the Budget 2026 package (28 October 2026), as the file
-// the page serves describes them (`uk-budget-data policy-table` copies
-// reforms.py's description verbatim): each entry must be written for
-// exactly that text, or its card falls back to the bare description.
-const CANDIDATES = [
-  "fuel_duty_rise_deferral",
-  "state_pension_income_tax_protection",
-  "domestic_electricity_zero_vat",
-  "property_income_rates_up",
-  "carers_allowance_earnings_taper",
-  "household_energy_payment_2026",
-  "trading_allowance_raise",
-];
-
-it("has an entry written for each candidate measure's published description, byte for byte", () => {
-  const file = JSON.parse(readFileSync(join(__dirname, "..", "..", "public", "data", "policy_parameters.json"), "utf8"));
-  for (const id of CANDIDATES) {
-    const entry = POLICY_DETAILS.find((policy) => policy.id === id);
-    expect(entry, id).toBeTruthy();
-    expect(file.measures[id], id).toBeTruthy();
-    expect(entry.writtenFor, id).toBe(file.measures[id].description);
-    expect(policyDetailsFor({ id, description: file.measures[id].description }), id).not.toBeNull();
-  }
-});
-
-// Every card the page publishes is complete and parallel: a plain one-line
-// summary, a start, when it is in force, the modelling details and a source.
-it("gives every published measure a summary, start, timeline, who it affects, points, About this result and a source", () => {
-  const file = JSON.parse(readFileSync(join(__dirname, "..", "..", "public", "data", "policy_parameters.json"), "utf8"));
-  for (const [id, measure] of Object.entries(file.measures)) {
-    const fields = policyDetailsFor({ id, description: measure.description });
-    expect(fields, id).not.toBeNull();
-    expect(fields.summary, id).toMatch(/^[A-Z].*\.$/);
-    expect(fields.summary.startsWith("Candidate measure"), id).toBe(false);
-    expect(fields.starts, id).toBeTruthy();
-    expect(fields.inForce?.from, id).toMatch(/^\d{4}-\d{2}$/);
-    if (fields.inForce.to) expect(fields.ends, id).toBeTruthy();
-    expect(fields.summary.length, id).toBeLessThanOrEqual(200);
-    expect(fields.affects, id).toBeTruthy();
-    expect(fields.points?.length, id).toBeGreaterThanOrEqual(2);
-    expect(fields.details?.length, id).toBeGreaterThan(0);
-    expect(fields.source?.label, id).toBeTruthy();
-    expect(fields.source?.href, id).toMatch(/^https:\/\/www\.(gov\.uk|legislation\.gov\.uk)\//);
-  }
-});
-
-// Short card text (Vahid, 29 Oct: "bullets, not long paragraphs"): a
-// one-line summary, 2 to 4 short points, and About this result as bullets
 const words = (text) => text.trim().split(/\s+/).length;
 
 it("keeps every entry's card text short: summary in 15 words, 2 to 4 points of 12, details as bullets of 20", () => {
@@ -185,4 +135,23 @@ describe("nounOf: a measure as a noun after 'the'", () => {
     const savings = POLICY_DETAILS.find((entry) => entry.id === "savings_income_rates_up");
     expect(nounOf({ id: savings.id, description: savings.writtenFor })).toBe("savings income tax rise");
   });
+});
+
+it("describes each Milburn candidate measure in one neutral line, applied whatever its published description", () => {
+  const ids = [
+    "uc_health_element_removed_under_25",
+    "uc_health_element_removed_under_25_new_claims",
+    "pip_removed_under_25",
+    "youth_allowance_at_25_plus_rate",
+    "employer_nics_zero_under_25",
+  ];
+  expect(MILBURN_POLICY_DETAILS.map((entry) => entry.id)).toEqual(ids);
+  for (const entry of MILBURN_POLICY_DETAILS) {
+    expect(words(entry.summary), entry.id).toBeLessThanOrEqual(15);
+    expect(entry.summary, entry.id).toMatch(/^[A-Z].*\.$/);
+    expect(entry.points.length, entry.id).toBeGreaterThanOrEqual(2);
+    for (const point of entry.points) expect(words(typeof point === "string" ? point : point.text), entry.id).toBeLessThanOrEqual(12);
+    for (const detail of entry.details) expect(words(detail), entry.id).toBeLessThanOrEqual(20);
+    expect(policyDetailsFor({ id: entry.id, description: "Anything the backend writes." })?.summary).toBe(entry.summary);
+  }
 });

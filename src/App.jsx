@@ -9,9 +9,9 @@ import useScrollReveal from "./hooks/useScrollReveal";
 import ViewTabs from "./components/ViewTabs";
 import { SUB_TAB_PARAM, subTabId } from "./components/SubTabs";
 import SectionHeading from "./components/SectionHeading";
-import TwinLink from "./components/TwinLink";
-import { GROWTH_CURRENT_LAW_ANCHOR, YOUNG_PEOPLE_ANCHOR } from "./utils/viewAnchors";
+import { YOUNG_PEOPLE_ANCHOR } from "./utils/viewAnchors";
 import PopulationImpactView from "./components/PopulationImpactView";
+import MilburnBanner from "./components/MilburnBanner";
 import { DEFAULT_DISPLAY_YEAR, DisplayYearsContext, EARLY_YEAR, SELECTABLE_YEARS, selectableYearOr, yearsForSelection } from "./utils/displayYears";
 import { opensLanding } from "./utils/landing";
 import { useNarrowViewport } from "./utils/chartTheme";
@@ -21,17 +21,8 @@ import { buildMeasureCatalogue, catalogueProvisional, MeasureCatalogueProvider, 
 import { dashboardFromParts, loadDashboard, loadDashboardParts, loadVerifiedTablesOnce, budgetChartData, sameParts } from "./utils/loadDashboard";
 import { pruneVerifiedCache } from "./utils/publication/cache";
 import { prefetchGeography } from "./hooks/useGeographyData";
-import { loadOutlook } from "./utils/livingStandards/outlook";
-import { loadGrowthWithMeasures } from "./utils/livingStandards/growthWithMeasures";
 import { selectionPackageKey } from "./utils/geography/selection";
 
-// Growth with the selected policies (Living standards) reads one flat file
-// of every run (about 90kB gzipped): on a page opened on Population impact
-// it is asked for with the manifest, not once its card has mounted behind
-// every artifact's tables, so the card draws as soon as it is shown
-if (typeof window !== "undefined" && /[?&]tab=dashboard\b/.test(window.location.search) && !/[?&]sub=(?!living\b)/.test(window.location.search)) {
-  loadGrowthWithMeasures().catch(() => {});
-}
 import { loadPresetChanges } from "./utils/householdPresets";
 import { loadManifest } from "./utils/publication/load";
 import { PublicationCheckContext, serialisedChecks } from "./utils/publication/check";
@@ -54,37 +45,29 @@ import { createBandIntent, createSiteNavIntent, isProgrammaticScroll, LANDSCAPE_
 // the text views have their own. A view whose code has loaded renders at once.
 const chartViews = () => import("./components/chartViews");
 const BudgetaryImpactChart = lazyView(chartViews, (m) => m.BudgetaryImpactChart);
-const ObrComparisonCard = lazyView(chartViews, (m) => m.ObrComparisonCard);
 const ConstituencyMap = lazyView(chartViews, (m) => m.ConstituencyMap);
 const DecileImpactCard = lazyView(chartViews, (m) => m.DecileImpactCard);
 const HouseholdScatter = lazyView(chartViews, (m) => m.HouseholdScatter);
 const AgeSection = lazyView(chartViews, (m) => m.AgeSection);
-const GrowthWithMeasuresCard = lazyView(chartViews, (m) => m.GrowthWithMeasuresCard);
-const InequalityChart = lazyView(chartViews, (m) => {
-  const Chart = m.SummaryMetricChart;
-  const inequality = m.SUMMARY_METRICS.inequality;
-  return function InequalityChart(props) {
-    return <Chart metric={inequality} {...props} />;
-  };
-});
 const PovertyMeasuresRow = lazyView(chartViews, (m) => m.PovertyMeasuresRow);
 const PersonalImpactTab = lazyView(chartViews, (m) => m.PersonalImpactTab);
-const LivingStandardsTab = lazyView(chartViews, (m) => m.LivingStandardsTab);
 const PolicyCards = lazyView(() => import("./components/PolicyCards"));
-const UnmodelledMeasures = lazyView(() => import("./components/policies/UnmodelledMeasures"));
+const NotComputableMeasures = lazyView(() => import("./components/milburn/NotComputableMeasures"));
 const MethodologyTab = lazyView(() => import("./components/MethodologyTab"));
+const BehaviouralScenarios = lazyView(chartViews, (m) => m.BehaviouralScenarios);
+const BenchmarksTable = lazyView(() => import("./components/milburn/BenchmarksTable"));
 
 // The code each view ("tab" or "tab:sub", as bootView names them) needs
 const VIEW_CODE = {
-  "dashboard:finances": [BudgetaryImpactChart, ObrComparisonCard],
+  "dashboard:finances": [BudgetaryImpactChart],
   "dashboard:all": [ConstituencyMap, DecileImpactCard, HouseholdScatter],
   "dashboard:age": [AgeSection],
-  "dashboard:living": [GrowthWithMeasuresCard, InequalityChart],
   // Withheld for now (povertyFigures.js): no sub-tab, so no code to load
   ...(POVERTY_FIGURES_SHOWN ? { "dashboard:poverty": [PovertyMeasuresRow] } : {}),
   household: [PersonalImpactTab],
-  outlook: [LivingStandardsTab],
-  policies: [PolicyCards, UnmodelledMeasures],
+  "dashboard:scenarios": [BehaviouralScenarios],
+  "dashboard:benchmarks": [BenchmarksTable],
+  policies: [PolicyCards, NotComputableMeasures],
   methodology: [MethodologyTab],
 };
 
@@ -107,26 +90,19 @@ if (typeof window !== "undefined" && !opensLanding(window.location)) {
 /** The placeholder a view shows while its code loads. */
 function viewFallback(value) {
   if (value === "dashboard") return <ViewSkeleton view={loadingView(value)} />;
-  if (value !== "outlook") return <ViewSkeleton view={value} />;
-  const params = new URLSearchParams(window.location.search);
-  params.set("tab", value);
-  return <ViewSkeleton view={bootView({ search: `?${params}`, hash: "" })} />;
+  return <ViewSkeleton view={value} />;
 }
 
 // The views, as tabs under the band. `year` and `policies` say which of
 // the band's pills apply to a view; the others stay in the band, faded and
-// inactive, their reason in their accessible names. Pre-measures forecast is current law (incomes and poverty
-// without the measures) and the OBR forecast behind it, Policies describes every measure and Methodology is text: no
-// pill applies to them. Population impact's sub-tabs (Public finances, All
-// households, Young people, Pensioners, Living standards, Poverty) are in
-// PopulationImpactView; the Pre-measures forecast tab's (Living standards,
-// Poverty, Forecast changes) in LivingStandardsTab. Living standards and Poverty
-// are twins: with the selected measures on Population impact, without them
-// (current law) on the Pre-measures forecast.
+// inactive, their reason in their accessible names. Policies describes
+// every measure and Methodology is text: no pill applies to them.
+// Population impact's sub-tabs (Young people, All households, Poverty,
+// Public finances, Behavioural scenarios, Benchmarks) are in
+// PopulationImpactView.
 export const VIEWS = [
   { value: "dashboard", label: "Population impact", year: true, policies: true },
   { value: "household", label: "Household calculator", year: true, policies: true },
-  { value: "outlook", label: "Pre-measures forecast", year: false, policies: false },
   { value: "policies", label: "Policies", year: false, policies: false },
   { value: "methodology", label: "Methodology", year: false, policies: false },
 ];
@@ -140,9 +116,7 @@ export const POLICIES_INACTIVE = "Policy choices don't change this tab";
 
 // Old ?tab= values still opened by shared links, and the view each is now;
 // the address is rewritten to the new value
-// (?tab=living was the Pre-measures forecast tab's address; for its old
-// ?sub=baseline see oldOutlookBaseline)
-const VIEW_ALIASES = { personal: "household", living: "outlook" };
+const VIEW_ALIASES = { personal: "household" };
 const viewKey = (tab) => VIEW_ALIASES[tab] ?? tab;
 
 // The view under the landing page, and the one an address with no ?tab=
@@ -168,17 +142,6 @@ export function opensYoungPeople({ search, hash }) {
   return (
     hash === `#${YOUNG_PEOPLE_ANCHOR}` || new URLSearchParams(search).get("tab") === "young"
   );
-}
-
-/**
- * Whether a page address is an old link to the Pre-measures forecast tab's
- * former Baseline outlook sub-tab (?tab=outlook or ?tab=living, with
- * ?sub=baseline): incomes and poverty under current law, now its Living
- * standards sub-tab, the default.
- */
-export function oldOutlookBaseline({ search }) {
-  const params = new URLSearchParams(search);
-  return viewKey(params.get("tab")) === "outlook" && params.get(SUB_TAB_PARAM) === "baseline";
 }
 
 /**
@@ -334,13 +297,9 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     if (!catalogue.manifest || !catalogue.tablesByKey) return undefined;
     // One step per idle period, the views' own tables first
     const steps = [
-      // Growth with the selected policies (Living standards): one flat
-      // file, read and parsed once, so its card draws at once
-      () => loadGrowthWithMeasures().catch(() => {}),
       // Every view's code, so a tab switch need not wait for it
       ...Object.keys(VIEW_CODE).map((view) => () => preloadView(view)),
       ...IDLE_TABLES.map((table) => () => loadVerifiedTablesOnce(catalogue, table).catch(() => {})),
-      () => loadOutlook().catch(() => {}),
       () => pruneVerifiedCache().catch(() => {}),
     ];
     let cancel;
@@ -400,7 +359,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   const aboutTabRef = useRef(null);
   const aboutInRow = useNarrowViewport();
   const closeOverview = useCallback(() => setOverviewOpen(false), []);
-  const PRESETS = [{ id: "autumn-budget", name: "All policies" }];
+  const PRESETS = [{ id: "milburn-package", name: "All measures" }];
   // Cards fade and rise in as they scroll into view
   const mainRef = useRef(null);
   useScrollReveal(mainRef);
@@ -424,9 +383,6 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     else if (oldGroup) dropSubTab("age", { age: oldGroup });
     // A link to the decile pair opens All households, where it now is
     else if (opensDeciles(window.location)) dropSubTab("all");
-    // An old Baseline outlook link opens the Pre-measures forecast tab's Living
-    // standards, its default sub-tab (?sub=forecast is still its Forecast changes)
-    if (oldOutlookBaseline(window.location)) dropSubTab(null);
     setLanding(opensLanding(window.location));
     setActiveTab(view);
     // A shared link's ?year= opens that year; one not offered opens the
@@ -994,7 +950,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   // The views with sub-tabs open into their band (SubTabs); not while
   // Population impact shows its unavailable notice instead, nor on the
   // landing page, where no view tab is chosen
-  const hasSubTabs = !landing && (activeTab === "outlook" || (activeTab === "dashboard" && !viewUnavailable("dashboard")));
+  const hasSubTabs = !landing && activeTab === "dashboard" && !viewUnavailable("dashboard");
 
   const view = VIEW_BY_KEY[activeTab] ?? VIEW_BY_KEY[DEFAULT_VIEW];
   // Both pills show on the landing page: the band stays the same from the
@@ -1022,7 +978,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           policies: policiesLabel(value === "household" ? householdPolicies : selectedPolicies, POLICIES),
           provisional: notice || null,
         }
-      : { policies: value === "outlook" ? "Current law, without the Budget measures" : null, provisional: null };
+      : { policies: null, provisional: null };
 
   // Which policies the charts show, when not all (under Population
   // impact's sub-tabs)
@@ -1069,52 +1025,11 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     </Suspense>
   );
   const populationContent = (sub) => {
+    // Illustrative and reference material: neither follows the band's
+    // selection or year (each says what it reads)
+    if (sub === "scenarios") return <BehaviouralScenarios />;
+    if (sub === "benchmarks") return <BenchmarksTable />;
     if (selectedPolicies.length === 0) return emptyState;
-    // Living standards and Poverty show the selected measures' effect; their
-    // twins on the Pre-measures forecast (same names) show current law
-    const twin = (twinSub) => <TwinLink tab="outlook" sub={twinSub} onShow={handleTabChange} />;
-    if (sub === "living") {
-      if (!results) return null;
-      return (
-        <div className="results-container">
-          <SectionHeading
-            icon="wallet"
-            title="How the policies change incomes"
-            subtitle="With the selected policies: how they change income growth across the income distribution. The change by income decile is on All households."
-          />
-          {/* Growth across the distribution with the measures: the twin of
-              the Pre-measures forecast's chart (current law), which links
-              back here */}
-          <section className="report-section ls-section">
-            <div className="charts-grid">
-              <GrowthWithMeasuresCard
-                selectedPolicies={selectedPolicies}
-                selectedYear={distributionalYear}
-                twinLink={
-                  <TwinLink tab="outlook" sub="living" onShow={handleTabChange} label="Without the policies" anchor={GROWTH_CURRENT_LAW_ANCHOR} />
-                }
-              />
-            </div>
-          </section>
-          <SectionHeading
-            id="inequality-heading"
-            icon="scale"
-            title="Inequality"
-            subtitle={<>With the selected policies. {twin("living")}</>}
-          />
-          <section id="inequality" className="report-section">
-            <div className="charts-grid">
-              <InequalityChart
-                rows={results.rawMetrics}
-                policies={POLICIES}
-                selectedPolicies={selectedPolicies}
-                selectedYear={distributionalYear}
-              />
-            </div>
-          </section>
-        </div>
-      );
-    }
     // The sub-tab is not offered while the poverty figures are withheld
     // (povertyFigures.js); this keeps it from rendering if asked for anyway
     if (sub === "poverty") {
@@ -1124,7 +1039,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           <SectionHeading
             icon="lifebuoy"
             title="How the policies change poverty"
-            subtitle={<>With the selected policies. {twin("poverty")}</>}
+            subtitle="With the selected policies: the change in poverty rates, static (no change in behaviour)."
           />
           {/* The change by year beside which measures move it */}
           <section id="poverty" className="report-section">
@@ -1161,12 +1076,6 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           <section id="revenue" className="report-section hero-chart">
             <BudgetaryImpactChart data={results.budgetData} selectedYear={distributionalYear} selectedPolicies={selectedPolicies} />
           </section>
-          {/* The official costings beside our estimates: a card of its own,
-              which says when it fills in until they are published */}
-          <ObrComparisonCard
-            selectedPolicies={selectedPolicies}
-            selectedYear={distributionalYear}
-          />
         </div>
       );
     }
@@ -1251,6 +1160,8 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
       {/* A div, not <main>: the PolicyEngine shell around the page is the
           main landmark, and a second one inside it is a landmark error */}
       <div className="main-content" ref={mainRef}>
+        {/* Always on: the measures are candidates, not announced policy */}
+        <MilburnBanner />
         {/* The title row is the page's sticky header: it docks at the top
             once the reader scrolls past it, compact, with the policy
             selector still in reach. The sentinel tells it when it is stuck. */}
@@ -1258,7 +1169,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         <div className={`title-row ${titleStuck ? "is-stuck" : ""}`}>
           <div className="title-head">
             <TitleMark />
-            <h1>UK Autumn Budget 2026</h1>
+            <h1>Milburn review: young people and work</h1>
           </div>
 
           {/* The year applies to every chart on Population impact (both
@@ -1351,7 +1262,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           <UnavailableNotice reason={viewUnavailable(value).reason}>
             {viewUnavailable(value).detail && <p>{viewUnavailable(value).detail}</p>}
             {unavailable ? (
-              unavailable.empty && <p>Figures appear here once the 2026 Budget policies are approved for publication.</p>
+              unavailable.empty && <p>Figures appear here once the candidate measures&rsquo; results are published.</p>
             ) : (
               <>
                 <p>No figures are shown for a selection while any of it is unavailable.</p>
@@ -1362,17 +1273,13 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
               </>
             )}
           </UnavailableNotice>
-        ) : value === "outlook" ? (
-          // Current law needs no publication: its sub-tabs read only the
-          // independent outlook, so they show whatever Population impact shows
-          <LivingStandardsTab active={activeTab === value} onShowTab={handleTabChange} selectedYear={distributionalYear} />
         ) : value === "policies" ? (
           // Every published measure's card, whatever the band's selection
           <div className="results-container">
             <SectionHeading
               icon="fileText"
-              title="Policies we model"
-              subtitle={`${notice ? `${notice}. ` : ""}What each policy changes, when, and how we model it.`}
+              title="Measures we model"
+              subtitle={`${notice ? `${notice}. ` : ""}Candidate measures for the Milburn review: what each changes, and how we model it.`}
             />
             <section id="policy-details" className="report-section policy-details-content">
               <PolicyCards
@@ -1384,8 +1291,8 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
                 onShowEffect={handleShowEffect}
               />
             </section>
-            {/* The Budget's measures the dashboard leaves out, as cards of the same kind */}
-            <UnmodelledMeasures />
+            {/* The candidate measures the dashboard cannot compute, with the reason */}
+            <NotComputableMeasures />
           </div>
         ) : value === "methodology" ? (
           <MethodologyTab onShowTab={handleTabChange} />
@@ -1554,7 +1461,7 @@ function App({ boot = null }) {
     : error
     ? { reason: "Published results are unavailable", detail: error }
     : published.status === "no-manifest"
-      ? { reason: "No Budget results are published yet", empty: true }
+      ? { reason: "No results are published yet", empty: true }
       : null;
   const shown = unavailable ? NOTHING_PUBLISHED : published;
   // One snapshot per mount: a newer one starts the views afresh

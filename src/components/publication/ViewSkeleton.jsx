@@ -19,17 +19,13 @@ import "./publication.css";
 // them in step). Copied, not imported, so the placeholder needs neither view.
 export const SKELETON_SUB_TABS = {
   dashboard: [
-    { value: "finances", label: "Public finances", icon: "landmark" },
+    { value: "age", label: "Young people", icon: "usersRound" },
     { value: "all", label: "All households", icon: "users" },
-    { value: "age", label: "By age", icon: "usersRound" },
-    { value: "living", label: "Living standards", icon: "coins" },
     // Only while the poverty figures are shown (povertyFigures.js)
     ...(POVERTY_FIGURES_SHOWN ? [{ value: "poverty", label: "Poverty", icon: "percent" }] : []),
-  ],
-  outlook: [
-    { value: "living", label: "Living standards", icon: "coins" },
-    { value: "poverty", label: "Poverty", icon: "percent" },
-    { value: "forecast", label: "Forecast changes", icon: "trend" },
+    { value: "finances", label: "Public finances", icon: "landmark" },
+    { value: "scenarios", label: "Behavioural scenarios", icon: "sliders" },
+    { value: "benchmarks", label: "Benchmarks", icon: "scale" },
   ],
 };
 const SUB_TABS = SKELETON_SUB_TABS;
@@ -47,8 +43,11 @@ const LAYOUTS = {
   "dashboard:age": [
     { icon: "usersRound", title: "How each age group's income changes", cards: [["lines", "wide"], ["bars"], ["bars"]] },
   ],
-  "dashboard:living": [
-    { icon: "wallet", title: "How the policies change incomes", subtitle: "With the selected policies: how they change income growth across the income distribution.", cards: [["lines", "wide"]] },
+  "dashboard:scenarios": [
+    { icon: "sliders", title: "Behavioural scenarios", subtitle: "Illustrative scenarios, not a PolicyEngine estimate. The main figures are static.", cards: [["bars", "wide"]] },
+  ],
+  "dashboard:benchmarks": [
+    { icon: "scale", title: "Benchmarks", subtitle: "Published figures on young people, work and health-related benefits.", cards: [["text", "wide"]] },
   ],
   "dashboard:poverty": [
     { icon: "lifebuoy", title: "How the policies change poverty", subtitle: "With the selected policies.", cards: [["bars"], ["bars"]] },
@@ -56,17 +55,8 @@ const LAYOUTS = {
   household: [
     { icon: "users", title: "Choose a household", subtitle: "Enter your own household, or start from an example below.", cards: Array.from({ length: 8 }, () => ["example"]) },
   ],
-  "outlook:living": [
-    { icon: "wallet", title: "Living standards under current law", subtitle: "Current law, before any Budget policy.", cards: [["lines", "wide"], ["lines"], ["lines"]] },
-  ],
-  "outlook:poverty": [
-    { icon: "lifebuoy", title: "Poverty under current law", subtitle: "Current law, before any Budget policy.", cards: [["lines"], ["lines"]] },
-  ],
-  "outlook:forecast": [
-    { icon: "trend", title: "Economic forecast", cards: [["lines", "wide"], ["lines"], ["lines"]] },
-  ],
   policies: [
-    { icon: "fileText", title: "Policies we model", subtitle: "What each policy changes, when, and how we model it.", cards: [["text", "wide"], ["text", "wide"], ["text", "wide"]] },
+    { icon: "fileText", title: "Measures we model", subtitle: "What each candidate measure changes, and how we model it.", cards: [["text", "wide"], ["text", "wide"], ["text", "wide"]] },
   ],
   methodology: [
     { icon: "book", title: "Methodology", cards: [["text", "wide"], ["text", "wide"]] },
@@ -237,7 +227,7 @@ function StaticSubTabs({ tab, sub, viewTabs = null }) {
  */
 export default function ViewSkeleton({ view, subTabs = true, caption = true, viewTabs = null }) {
   const [tab, sub] = view.split(":");
-  const sections = LAYOUTS[view] ?? LAYOUTS["dashboard:finances"];
+  const sections = LAYOUTS[view] ?? LAYOUTS["dashboard:age"];
   return (
     <div className="skeleton-view" data-view={view}>
       {viewTabs && <StaticViewTabs tabs={viewTabs} tab={tab} />}

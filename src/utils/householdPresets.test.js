@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fc from "fast-check";
 import { HOUSEHOLD_EXAMPLES } from "./householdExamples";
 import { SELECTABLE_YEARS } from "./displayYears";
@@ -8,6 +8,10 @@ import { cardFigures } from "../components/personal/HouseholdCards";
 import { presetCacheEntries, presetChanges, presetInputs, presetPolicies, presetRequests } from "./householdPresets";
 import { approvedDefinition } from "../test/definitionsFixture";
 import { IDENTITY_FIELDS } from "./publication/definitions";
+
+// The Autumn Budget's calculator-only measures, so the mechanism stays covered
+vi.mock("./calculatorOnlyMeasures", async (original) => (await import("../test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
+
 
 const committed = JSON.parse(readFileSync("public/data/household_presets.json", "utf8"));
 // What the receipts approved for each of the file's measures (synthetic),

@@ -1,32 +1,34 @@
-import { Github, Package } from "lucide-react";
+import { Database, Package } from "lucide-react";
 
 /**
- * The links behind the About drawer's "Built with" list (OverviewDrawer):
- * the repository, and the policyengine.py release this build's uv.lock
- * pins (read in next.config.ts), its entry left out when unknown. The page
- * says them there once; no line at the foot of every tab repeats them.
+ * The build's model and data, as the About drawer's "Built with" list
+ * (OverviewDrawer) and the site footer say them. This build loads
+ * policyengine-uk and a Microcosm UK build directly, not through a
+ * policyengine.py release, so the line names both and links neither to a
+ * release that does not contain them.
  */
-const REPO = "PolicyEngine/uk-autumn-budget-dashboard-2026";
+export const MICROCOSM_BUILD = "6f918b81";
+export const POLICYENGINE_UK_VERSION = "2.177.7";
 
-/** The chips' links: the code, then the package release when its version is known. */
-export function replicationLinks({ policyengine } = {}) {
-  const links = [
+/** The one-line statement of what produced the figures. */
+export const REPLICATION_LINE = `Microcosm UK build ${MICROCOSM_BUILD}, policyengine-uk ${POLICYENGINE_UK_VERSION}, not in a policyengine.py release`;
+
+/** The chips: the data build, then the model package (on PyPI). */
+export function replicationLinks() {
+  return [
     {
-      key: "code",
-      label: "replication code",
-      title: `${REPO} on GitHub`,
-      href: `https://github.com/${REPO}`,
-      Icon: Github,
+      key: "data",
+      label: `Microcosm UK build ${MICROCOSM_BUILD}`,
+      title: "Microcosm UK 2024-25 build, loaded directly: not in a policyengine.py release",
+      href: null,
+      Icon: Database,
+    },
+    {
+      key: "package",
+      label: `policyengine-uk ${POLICYENGINE_UK_VERSION}`,
+      title: `policyengine-uk ${POLICYENGINE_UK_VERSION} on PyPI`,
+      href: `https://pypi.org/project/policyengine-uk/${POLICYENGINE_UK_VERSION}/`,
+      Icon: Package,
     },
   ];
-  if (policyengine) {
-    links.push({
-      key: "package",
-      label: `policyengine.py ${policyengine}`,
-      title: `policyengine.py ${policyengine} on PyPI`,
-      href: `https://pypi.org/project/policyengine/${encodeURIComponent(policyengine)}/`,
-      Icon: Package,
-    });
-  }
-  return links;
 }

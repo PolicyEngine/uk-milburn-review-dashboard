@@ -355,7 +355,7 @@ export default function EarningsChart({ initialView = "after", sweep, salary, ye
       buildChartCsv({
         title: viewTitle,
         units: "£ a year; taxes negative",
-        source: "PolicyEngine UK household calculation, UK Autumn Budget 2026 dashboard",
+        source: "PolicyEngine UK household calculation, Milburn review dashboard",
         columns: [
           { key: "income", label: "Employment income (£)", decimals: 0 },
           ...layerColumns,

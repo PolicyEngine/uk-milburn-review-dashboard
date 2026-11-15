@@ -1,6 +1,6 @@
 {
-  "name": "uk-autumn-budget-dashboard-2026",
-  "description": "PolicyEngine dashboard for the UK Autumn Budget 2026: candidate measures, household impacts and living standards",
+  "name": "uk-milburn-review-dashboard",
+  "description": "PolicyEngine dashboard for the Milburn review of young people and work: candidate measures modelled before the review is published",
   "private": true,
   "version": "0.0.0",
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "node scripts/check-public-files.mjs && next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run --pool=forks",
     "test:watch": "vitest"
   },
   "dependencies": {

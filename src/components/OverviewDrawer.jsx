@@ -189,16 +189,22 @@ export default function OverviewDrawer({ open, onClose, onOpen, provisional, pro
         <footer className="overview-footer">
           <p id="overview-built" className="overview-group-label">Built with</p>
           <ul className="overview-built-links" aria-labelledby="overview-built">
-            {replicationLinks({ policyengine: process.env.NEXT_PUBLIC_POLICYENGINE_VERSION }).map(({ key, label, title, href, Icon }) => (
+            {replicationLinks().map(({ key, label, title, href, Icon }) => (
               <li key={key}>
                 <Tip content={title}>
-                  <a href={href} target="_blank" rel="noopener noreferrer">
-                    <Icon size={14} strokeWidth={2} aria-hidden="true" />
-                    {/* A row's own start: "Replication code"; a package keeps its name */}
-                    <span>{key === "code" ? "Replication code" : label}</span>
-                    <ArrowUpRight className="overview-built-arrow" size={12} strokeWidth={2} aria-hidden="true" />
-                    <span className="visually-hidden"> (opens in a new tab)</span>
-                  </a>
+                  {href ? (
+                    <a href={href} target="_blank" rel="noopener noreferrer">
+                      <Icon size={14} strokeWidth={2} aria-hidden="true" />
+                      <span>{label}</span>
+                      <ArrowUpRight className="overview-built-arrow" size={12} strokeWidth={2} aria-hidden="true" />
+                      <span className="visually-hidden"> (opens in a new tab)</span>
+                    </a>
+                  ) : (
+                    <span tabIndex={0}>
+                      <Icon size={14} strokeWidth={2} aria-hidden="true" />
+                      <span>{label}</span>
+                    </span>
+                  )}
                 </Tip>
               </li>
             ))}

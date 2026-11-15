@@ -16,7 +16,7 @@ const link = (html) => {
 describe("analytics", () => {
   it("configures policyengine.org's GA property, with the page view tagged as this tool", () => {
     expect(GA_MEASUREMENT_ID).toBe("G-2YHG89FY0N");
-    expect(TOOL_NAME).toBe("autumn-budget-2026");
+    expect(TOOL_NAME).toBe("milburn-review");
     expect(GA_INIT_SCRIPT).toContain(`gtag('config', '${GA_MEASUREMENT_ID}', { tool_name: '${TOOL_NAME}' })`);
   });
 
@@ -27,11 +27,11 @@ describe("analytics", () => {
   it("sends an event through gtag, tagged with the tool's name", () => {
     window.gtag = vi.fn();
     trackEvent("view_opened", { view: "policies" });
-    expect(window.gtag).toHaveBeenCalledWith("event", "view_opened", { view: "policies", tool_name: "autumn-budget-2026" });
+    expect(window.gtag).toHaveBeenCalledWith("event", "view_opened", { view: "policies", tool_name: "milburn-review" });
   });
 
   it("names a download by its file, and a post by its slug and where its link sits", () => {
-    expect(linkEvent(link('<a href="/uk/autumn-budget-2026/reports/report.pdf" download>PDF</a>'))).toEqual(["report_downloaded", { file: "report.pdf" }]);
+    expect(linkEvent(link('<a href="/uk/milburn-review/reports/report.pdf" download>PDF</a>'))).toEqual(["report_downloaded", { file: "report.pdf" }]);
     expect(linkEvent(link('<div class="policy-card"><a href="https://www.policyengine.org/uk/research/fuel-duty-cut-extension">Read</a></div>'))).toEqual([
       "policy_brief_opened",
       { slug: "fuel-duty-cut-extension", placement: "policies" },
@@ -44,7 +44,7 @@ describe("analytics", () => {
       "outbound_click",
       { url: "https://www.gov.uk/budget", target_hostname: "www.gov.uk" },
     ]);
-    expect(linkEvent(link('<a href="/uk/autumn-budget-2026?tab=policies">Policies</a>'))).toBeNull();
+    expect(linkEvent(link('<a href="/uk/milburn-review?tab=policies">Policies</a>'))).toBeNull();
     expect(linkEvent(link('<a href="#methodology">Methodology</a>'))).toBeNull();
     expect(linkEvent(link('<a href="mailto:hello@policyengine.org">Email</a>'))).toBeNull();
   });
@@ -58,7 +58,7 @@ describe("analytics", () => {
     expect(window.gtag).toHaveBeenCalledWith("event", "policy_brief_opened", {
       slug: "pension-tax-allowance",
       placement: "other",
-      tool_name: "autumn-budget-2026",
+      tool_name: "milburn-review",
     });
     stop();
     a.click();
@@ -80,10 +80,10 @@ describe("analytics", () => {
     scrollTo(1232); // 100%, passing 75%
     const depths = window.gtag.mock.calls.filter(([, name]) => name === "scroll_depth").map(([, , params]) => params);
     expect(depths).toEqual([
-      { percent: 25, tool_name: "autumn-budget-2026" },
-      { percent: 50, tool_name: "autumn-budget-2026" },
-      { percent: 75, tool_name: "autumn-budget-2026" },
-      { percent: 100, tool_name: "autumn-budget-2026" },
+      { percent: 25, tool_name: "milburn-review" },
+      { percent: 50, tool_name: "milburn-review" },
+      { percent: 75, tool_name: "milburn-review" },
+      { percent: 100, tool_name: "milburn-review" },
     ]);
     stop();
     scrollTo(0);

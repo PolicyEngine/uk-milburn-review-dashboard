@@ -37,7 +37,7 @@ describe("a downloaded chart's frame", () => {
     });
     expect(frame.subtitle).toBe("All 9 policies · % of net income · Before housing costs");
     expect(frame.footer).toBe(
-      "Source: PolicyEngine UK, UK Autumn Budget 2026 dashboard · Provisional figures · 27 October 2026",
+      "Source: PolicyEngine UK, Milburn review dashboard · Provisional figures · 27 October 2026",
     );
     expect(downloadFrame({ title: "X, 2027-28", now: NOW }).footer).not.toMatch(/Provisional/);
   });
@@ -87,7 +87,7 @@ describe("the CSV's frame lines", () => {
         "\"# Chart: Impact by income decile, 2027-28\"",
         "# Policies: All 9 policies",
         "# Options: £ per household",
-        '"# Source: PolicyEngine UK, UK Autumn Budget 2026 dashboard · 27 October 2026"',
+        '"# Source: PolicyEngine UK, Milburn review dashboard · 27 October 2026"',
       ]),
     );
     expect(lines[header + 1]).toBe("1,2");

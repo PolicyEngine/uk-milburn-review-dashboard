@@ -11,12 +11,12 @@ import { BASE_PATH, fixtureFetch, fixtureJson } from "./test/publicationFixture"
 beforeAll(preloadAllViews, 60_000);
 
 const INTRO =
-  /^Estimates from PolicyEngine UK( \(opens in a new tab\))? of how Autumn Budget 2026 policies affect the public finances and household incomes across the income distribution, regions and age groups, set against the pre-measures forecast\. Costings are our own except the bus fare cap’s, which is the Treasury’s; the economic forecast is the OBR’s Economic and fiscal outlook, October 2026( \(opens in a new tab\))?\.$/;
+  /^Estimates from PolicyEngine UK( \(opens in a new tab\))? of how candidate measures for the independent review of young people and work would affect the public finances and household incomes, by age, income and area\. The review’s final report is expected on 17 November 2026; the measures here are modelled before it is published and are not announced policy\. The main figures are static: they assume no change in behaviour\.$/;
 
 const BOXES = {
-  society: /^The Budget and society/,
+  society: /^Young people/,
   household: /^Your household/,
-  policies: /^What's in the Budget/,
+  policies: /^The measures modelled/,
 };
 
 beforeEach(() => {
@@ -38,7 +38,8 @@ async function renderApp() {
   return rendered;
 }
 
-const landing = () => screen.queryByRole("region", { name: "Autumn Budget 2026: fiscal and distributional analysis" });
+const HEADING = "Young people and work: candidate measures modelled";
+const landing = () => screen.queryByRole("region", { name: HEADING });
 const box = (name) => screen.getByRole("link", { name: BOXES[name] });
 const tabBar = () => screen.queryByRole("tablist", { name: "Views" });
 const viewTab = (name) => within(tabBar()).getByRole("tab", { name });
@@ -54,14 +55,14 @@ describe("the landing page", () => {
     const page = landing();
     expect(page).not.toBeNull();
     expect(page.querySelector(".landing-eyebrow")).toBeNull();
-    expect(within(page).getByRole("heading", { level: 2 })).toHaveTextContent("Autumn Budget 2026: fiscal and distributional analysis");
+    expect(within(page).getByRole("heading", { level: 2 })).toHaveTextContent(HEADING);
     expect(within(page).getByText(/^Estimates from/)).toHaveTextContent(INTRO);
     expect(container).not.toHaveTextContent("Choose a year and policies");
     // Each box: a title, one short line and "Explore", and no figure
     expect(within(page).getAllByRole("link", { name: /Explore$/ }).map((link) => [link.getAttribute("href"), link.textContent])).toEqual([
-      ["?tab=dashboard&sub=finances", "The Budget and societyCosts and who gains or losesExplore→"],
+      ["?tab=dashboard&sub=age", "Young peopleWho gains or loses, and the costExplore→"],
       ["?tab=household", "Your householdSee how your income changesExplore→"],
-      ["?tab=policies", "What's in the BudgetEvery policy, and how we model itExplore→"],
+      ["?tab=policies", "The measures modelledEvery candidate measure, and how we model itExplore→"],
     ]);
     expect(page.querySelector(".landing-box-figure")).toBeNull();
     expect(page.querySelector(".landing-boxes")).not.toHaveTextContent(/£|\d/);
@@ -72,10 +73,9 @@ describe("the landing page", () => {
     expect(container.querySelector(".app")).not.toHaveAttribute("data-sub-band");
     const tabbable = [...container.querySelectorAll(".main-content a[href], .main-content button, .main-content [tabindex]")]
       .filter((node) => !node.closest(".title-row, [hidden], [inert]") && node.tabIndex >= 0);
-    expect(tabbable.slice(0, 5).map((node) => node.textContent)).toEqual([
+    expect(tabbable.slice(0, 4).map((node) => node.textContent)).toEqual([
       // A source link says it opens in a new tab, to a screen reader
       "PolicyEngine UK (opens in a new tab)",
-      "Economic and fiscal outlook, October 2026 (opens in a new tab)",
       expect.stringMatching(BOXES.society),
       expect.stringMatching(BOXES.household),
       expect.stringMatching(BOXES.policies),
@@ -103,23 +103,21 @@ describe("the landing page", () => {
     // Once, under the paragraph, in the manifest's own wording
     expect(notes()).toHaveLength(1);
     expect(landing().querySelector(".publication-provisional")).toHaveTextContent(provisionalLabel(manifest));
-    // While provisional, the policies box names modelled measures, not the Budget's contents
-    expect(screen.queryByRole("link", { name: BOXES.policies })).toBeNull();
-    fireEvent.click(screen.getByRole("link", { name: /^The policies modelled/ }));
+    // The policies box names modelled measures
+    fireEvent.click(box("policies"));
     // Not over any view (the overview drawer has it only while open)
     expect(notes()).toHaveLength(0);
     // The Policies view's subtitle says the measures are provisional
     expect(
-      screen.getByText(`${provisionalLabel(manifest)}. What each policy changes, when, and how we model it.`),
+      screen.getByText(`${provisionalLabel(manifest)}. Candidate measures for the Milburn review: what each changes, and how we model it.`),
     ).toBeInTheDocument();
   });
 
-  it("names the policies box after the Budget, with no provisional subtitle, once every measure is approved", async () => {
+  it("names the policies box after the measures modelled, with no provisional subtitle, once every measure is approved", async () => {
     const { container } = await renderApp();
     expect(container.querySelectorAll(".publication-provisional")).toHaveLength(0);
-    expect(screen.queryByRole("link", { name: /^The policies modelled/ })).toBeNull();
     fireEvent.click(box("policies"));
-    expect(screen.getByText("What each policy changes, when, and how we model it.")).toBeInTheDocument();
+    expect(screen.getByText("Candidate measures for the Milburn review: what each changes, and how we model it.")).toBeInTheDocument();
   });
 
   it("draws a silhouette of Public finances behind it, with no view mounted", async () => {
@@ -138,15 +136,15 @@ describe("the landing page", () => {
     expect(screen.getByRole("tabpanel", { name: "Population impact" })).toBeInTheDocument();
   });
 
-  it("opens Population impact at Public finances from the first box, and brings the tab bar", async () => {
+  it("opens Population impact at Young people from the first box, and brings the tab bar", async () => {
     const { container } = await renderApp();
     fireEvent.click(box("society"));
     expect(landing()).toBeNull();
     expect(container.querySelector(".view-tabs-bar")).not.toHaveAttribute("hidden");
     expect(selectedViewTabs().map((tab) => tab.textContent)).toEqual(["Population impact"]);
-    expect(screen.getByRole("tab", { name: "Public finances" })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("tabpanel", { name: "Public finances" })).toBeInTheDocument();
-    // Public finances is the default sub-tab, so ?sub= is left out
+    expect(screen.getByRole("tab", { name: "Young people" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel", { name: "Young people" })).toBeInTheDocument();
+    // Young people is the default sub-tab, so ?sub= is left out
     expect([search().get("tab"), search().get("sub")]).toEqual(["dashboard", null]);
   });
 
@@ -303,7 +301,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
     const tag = within(dialog).getByText("About this dashboard");
     expect(tag).toHaveClass("overview-tag");
     expect(header.contains(tag)).toBe(false);
-    const title = within(dialog).getByRole("heading", { level: 2, name: "Autumn Budget 2026: fiscal and distributional analysis" });
+    const title = within(dialog).getByRole("heading", { level: 2, name: HEADING });
     expect(tag.nextElementSibling.contains(title)).toBe(true);
     // Two groups: the three views in this dashboard, then PolicyEngine's
     // website on its own; group labels in sentence case
@@ -311,9 +309,9 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
     expect(within(nav).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["In this dashboard", "More from PolicyEngine"]);
     const rows = within(within(nav).getByRole("list", { name: "In this dashboard" })).getAllByRole("link");
     expect(rows.map((row) => row.textContent)).toEqual([
-      "The Budget and societyCosts and who gains or loses",
+      "Young peopleWho gains or loses, and the cost",
       "Your householdSee how your income changes",
-      "What's in the BudgetEvery policy, and how we model it",
+      "The measures modelledEvery candidate measure, and how we model it",
     ]);
     const site = within(within(nav).getByRole("region", { name: "More from PolicyEngine" })).getByRole("link");
     expect(site).toHaveTextContent("policyengine.orgResearch, the model and the API (opens in a new tab)");
@@ -369,15 +367,16 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
   it("names what it is built with, its links as chips that open a new tab", async () => {
     await openDrawer();
     const built = within(drawer()).getByRole("list", { name: "Built with" });
-    const [code] = within(built).getAllByRole("link");
-    expect(code).toHaveTextContent(/^Replication code \(opens in a new tab\)$/);
-    expect(code).toHaveAttribute("target", "_blank");
+    expect(built).toHaveTextContent("Microcosm UK build 6f918b81");
+    const [model] = within(built).getAllByRole("link");
+    expect(model).toHaveTextContent(/^policyengine-uk 2\.177\.7 \(opens in a new tab\)$/);
+    expect(model).toHaveAttribute("target", "_blank");
   });
 
   it.each([
-    [/^The Budget and society/, "Population impact", "dashboard"],
+    [/^Young people/, "Population impact", "dashboard"],
     [/^Your household/, "Household calculator", "household"],
-    [/^What's in the Budget/, "Policies", "policies"],
+    [/^The measures modelled/, "Policies", "policies"],
   ])("opens a view from a box and closes: %s", async (name, view, tab) => {
     await openDrawer();
     fireEvent.click(within(drawer()).getByRole("link", { name }));

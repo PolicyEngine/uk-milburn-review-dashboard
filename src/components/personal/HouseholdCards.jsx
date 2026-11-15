@@ -519,7 +519,7 @@ function YourHouseholdCard({ selected, formOpen, formId, change, onClick }) {
         <span className="household-card-name visually-hidden">Your household</span>
         <span className="household-yours-title">Enter your own household</span>
         <span className="household-yours-lead">
-          {provisional ? "See how the selected policies change your income" : "See how the Budget changes your income"}
+          {provisional ? "See how the selected policies change your income" : "See how the measures change your income"}
           {", in about 30 seconds."}
         </span>
       </span>

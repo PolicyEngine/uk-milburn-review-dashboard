@@ -26,6 +26,15 @@ import {
   Users,
   Workflow,
   Cake,
+  Accessibility,
+  Briefcase,
+  CircleSlash,
+  Dice5,
+  Landmark,
+  Layers,
+  Megaphone,
+  Package,
+  Sliders,
 } from "lucide-react";
 
 // An icon for each term the Methodology view defines, by its text
@@ -85,6 +94,22 @@ const TERM_ICONS = {
   Prices: PoundSterling,
   "UC health element": HeartPulse,
   Sources: BookOpen,
+  // The Milburn review's terms
+  Build: Package,
+  "Against current law": Gavel,
+  "Each measure and the package": Layers,
+  "Cash terms": PoundSterling,
+  "Under 25": Users,
+  Illustrative: Sliders,
+  "Young people affected": Users,
+  "Moving into work": Briefcase,
+  "Exchequer offset": Landmark,
+  "No NEET variable": CircleSlash,
+  "PIP in Scotland": Accessibility,
+  "New-claimant health element rate": Dice5,
+  "Small samples at 16 and 17": Users,
+  "Not computable": CircleSlash,
+  "Not announced policy": Megaphone,
 };
 
 /**

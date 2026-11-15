@@ -34,7 +34,7 @@ function publishedGeography(): string {
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH !== undefined
   ? process.env.NEXT_PUBLIC_BASE_PATH
-  : '/uk/autumn-budget-2026';
+  : '/uk/milburn-review';
 
 
 // The Household impact tab's API URL is baked in at build time: fail a
@@ -57,6 +57,12 @@ const nextConfig: NextConfig = {
   // byte against the manifest, which is always fetched fresh
   async headers() {
     return [
+      // A local review build: not for search engines (the page's robots
+      // meta says the same)
+      {
+        source: '/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
       {
         source: '/data/artifacts/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],

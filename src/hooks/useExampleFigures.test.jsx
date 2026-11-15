@@ -17,6 +17,10 @@ import { SELECTABLE_YEARS } from "../utils/displayYears";
 import { HOUSEHOLD_EXAMPLES } from "../utils/householdExamples";
 import { presetInputs } from "../utils/householdPresets";
 
+// The Autumn Budget's calculator-only measures, so the mechanism stays covered
+vi.mock("../utils/calculatorOnlyMeasures", async (original) => (await import("../test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
+
+
 const EXAMPLES = HOUSEHOLD_EXAMPLES.slice(0, 2).map((example) => ({ id: example.id, inputs: presetInputs(example) }));
 const POLICIES = ["fuel_duty_rise_deferral"];
 const YEAR = SELECTABLE_YEARS[0];

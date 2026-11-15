@@ -61,15 +61,14 @@ export function describePovertyFigures(shown, { files, catalogueRef, ageRowsRef 
       const { SKELETON_SUB_TABS } = await import("../components/publication/ViewSkeleton");
       for (const values of [POPULATION_SUB_TABS.map((t) => t.value), BOOT_SUBS.dashboard, SKELETON_SUB_TABS.dashboard.map((t) => t.value)]) {
         expect(values.includes("poverty")).toBe(shown);
-        expect(values.slice(0, 4)).toEqual(["finances", "all", "age", "living"]);
+        expect(values).toEqual(["age", "all", ...(shown ? ["poverty"] : []), "finances", "scenarios", "benchmarks"]);
       }
-      // The Pre-measures forecast's current-law Poverty stays either way
-      expect(BOOT_SUBS.outlook).toContain("poverty");
+      expect(BOOT_SUBS.outlook).toBeUndefined();
     });
 
-    it(`?sub=poverty opens ${either("Poverty", "Public finances")} before and after the page's code runs`, async () => {
+    it(`?sub=poverty opens ${either("Poverty", "Young people")} before and after the page's code runs`, async () => {
       const { BOOT_VIEW_SCRIPT, bootView } = await import("../utils/bootView");
-      const expected = either("dashboard:poverty", "dashboard:finances");
+      const expected = either("dashboard:poverty", "dashboard:age");
       for (const search of ["?sub=poverty", "?tab=dashboard&sub=poverty"]) {
         expect(bootView({ search, hash: "" })).toBe(expected);
         window.history.replaceState({}, "", `/${search}`);
@@ -77,18 +76,16 @@ export function describePovertyFigures(shown, { files, catalogueRef, ageRowsRef 
         expect(document.documentElement.getAttribute("data-boot-view")).toBe(expected);
       }
       document.documentElement.removeAttribute("data-boot-view");
-      // The current-law twin keeps its address
-      expect(bootView({ search: "?tab=outlook&sub=poverty", hash: "" })).toBe("outlook:poverty");
     });
 
-    it(`${either("renders", "is not rendered")}, and ?sub=poverty ${either("opens it", "falls back to Public finances")}`, async () => {
+    it(`${either("renders", "is not rendered")}, and ?sub=poverty ${either("opens it", "falls back to Young people")}`, async () => {
       const { default: PopulationImpactView } = await import("../components/PopulationImpactView");
       window.history.replaceState({}, "", "/?tab=dashboard&sub=poverty");
       render(<PopulationImpactView>{(sub) => <p>Panel {sub}</p>}</PopulationImpactView>);
       const selected = await screen.findByRole("tab", { selected: true });
-      expect(selected).toHaveTextContent(either("Poverty", "Public finances"));
+      expect(selected).toHaveTextContent(either("Poverty", "Young people"));
       expect(screen.queryByRole("tab", { name: "Poverty" }) !== null).toBe(shown);
-      expect(screen.getByText(`Panel ${either("poverty", "finances")}`)).toBeInTheDocument();
+      expect(screen.getByText(`Panel ${either("poverty", "age")}`)).toBeInTheDocument();
       // The address follows the tab shown: no ?sub= for the default
       await waitFor(() => expect(new URLSearchParams(window.location.search).get("sub")).toBe(either("poverty", null)));
     });
@@ -255,27 +252,7 @@ export function describePovertyFigures(shown, { files, catalogueRef, ageRowsRef 
       );
       const text = container.textContent;
       expect(text.split(WITHHELD_SENTENCE).length - 1).toBe(either(0, 1));
-      for (const described of [
-        "People moved out of or into poverty",
-        "The poverty figures leave out the £100 energy payment",
-        "The headline poverty measure here is absolute",
-        "count winners and losers in each age band",
-        "Household net income rises or falls by more than 0.01%",
-        "a person moves up when the whole percentile",
-        "the headline poverty and inequality figures",
-        // #321: the bus fare cap's place in the poverty figures
-        "and the £2 bus fare cap's fare savings",
-        "not in the HBAI income poverty is measured on",
-        // Definitions compared and the deciles' floor point at none of it
-        "By age: as under Results by age",
-        "Income deciles · Winners and losers",
-        "winners and losers figure for all households",
-      ]) {
-        expect(text.includes(described), described).toBe(shown);
-      }
-      // Inequality and the current-law Poverty sub-tab are described either way
-      expect(text).toContain("The relative change in the Gini coefficient");
-      expect(within(container).getAllByRole("link", { name: "Poverty" }).length).toBeGreaterThan(0);
+      expect(text.includes("The change in the share of people in"), "poverty described").toBe(shown);
     });
 
     it(`About this dashboard ${either("says nothing of it", "says once that they are withheld")}`, async () => {

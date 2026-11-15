@@ -1,5 +1,5 @@
 /**
- * Smoke test of the five tabs, and Population impact's other sub-tabs,
+ * Smoke test of the four tabs, and Population impact's other sub-tabs,
  * on the real data.
  *
  * Each tab is opened by its address (?tab=, ?sub=), as a shared link opens it, and
@@ -32,11 +32,13 @@ import { householdAnswerFor } from "./test/householdFixture";
 import { dashboardFixtureFetch } from "./test/dashboardFixture";
 import { fixtureJson } from "./test/publicationFixture";
 import { receiptEngine } from "./utils/publication/load";
-import { CANDIDATE_PROVISIONAL_LABEL } from "./utils/publication/manifest";
 import { receiptDefinitionFor, reportedDefinitions, requestedDefinitions, route } from "./test/definitionsFixture";
 import { SAVINGS_INCOME_RATES_ID, withoutCalculatorOnly } from "./utils/calculatorOnlyMeasures";
-import { OBR_CARD_TITLE, OBR_PENDING } from "./components/OBRComparisonTable";
 import { POVERTY_FIGURES_SHOWN } from "./utils/povertyFigures";
+
+// The Autumn Budget's calculator-only measures, so the mechanism stays covered
+vi.mock("./utils/calculatorOnlyMeasures", async (original) => (await import("./test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
+
 
 // Every view's code is in before a test renders it (App.jsx lazyView)
 beforeAll(preloadAllViews, 60_000);
@@ -72,6 +74,8 @@ const NOT_YET_PUBLISHED = new Set([
   "/data/constituency.csv",
   "/data/release-index.json",
   "/data/official_costings.json",
+  // Written by the pipeline: until then Behavioural scenarios says it is unavailable
+  "/data/milburn_scenarios.json",
 ]);
 
 // Text that means a tab failed instead of showing its content.
@@ -91,12 +95,15 @@ const LOADED = {
   // App.jsx renders All households' sections only once the CSVs are read.
   dashboard: (panel) => within(panel).findAllByRole("heading", { name: "By area" }),
   // Population impact's other sub-tabs, by ?sub=
-  living: (panel) => within(panel).findAllByRole("heading", { name: /Change in income inequality/ }),
+  // Behavioural scenarios: the pipeline's file is not in public/ yet, so it
+  // says the scenarios are unavailable, never zeros
+  scenarios: (panel) => within(panel).findAllByText(/behavioural scenarios are not available/),
+  benchmarks: (panel) => within(panel).findAllByRole("table"),
   // Population impact's Poverty while its figures are shown; while they are
   // withheld (povertyFigures.js), ?sub=poverty opens Public finances
   ...(POVERTY_FIGURES_SHOWN
     ? { poverty: (panel) => within(panel).findAllByRole("heading", { name: /Change in the poverty rate/ }) }
-    : { povertyFallback: (panel) => within(panel).findAllByRole("heading", { name: /Revenue impact/ }) }),
+    : { povertyFallback: (panel) => within(panel).findAllByText(/Results by age are not available/) }),
   finances: (panel) => within(panel).findAllByRole("heading", { name: /Revenue impact/ }),
   // The cards, "Your household" first; the form and results are checked
   // below.
@@ -106,11 +113,6 @@ const LOADED = {
   // Young people and Pensioners read the age table from verified artifacts;
   // the fixture's carry none, so both say so (#104)
   age: (panel) => within(panel).findAllByText(/Results by age are not available/),
-  // The Pre-measures forecast's sub-tabs (?tab=outlook&sub=): each heading
-  // shows once the outlook is read. Living standards is the default.
-  outlook: (panel) => within(panel).findAllByRole("heading", { name: "Living standards under current law" }),
-  outlookPoverty: (panel) => within(panel).findAllByRole("heading", { name: "Poverty under current law" }),
-  outlookForecast: (panel) => within(panel).findAllByRole("heading", { name: /economic forecasts?$/ }),
   // Every published measure's card, whatever the band's selection
   policies: (panel) => within(panel).findAllByRole("listitem"),
   methodology: (panel) => within(panel).findAllByRole("heading"),
@@ -200,25 +202,24 @@ afterEach(() => {
 // What a withheld poverty or people-affected figure would say (povertyFigures.js),
 // and the views that must say none of it
 const WITHHELD_TEXT = /poverty|people affected|of people move|winners and losers|better off|worse off/i;
-const WITHHELD_IN = new Set(["dashboard", "age", "living", "finances", "povertyFallback", "household"]);
+const WITHHELD_IN = new Set(["dashboard", "age", "finances", "povertyFallback", "household"]);
 
 // Each tab by its address, and Population impact's other sub-tabs:
 // [name, LOADED key, address, the panel's label]
 const CASES = [
   // Population impact opens on Public finances; All households is ?sub=all
   ...VIEWS.map((v) => [v.label, v.value, v.value === "dashboard" ? "/?sub=all" : `/?tab=${v.value}`, v.label]),
-  ["Population impact: By age", "age", "/?sub=age", "By age"],
-  ["Population impact: Living standards", "living", "/?sub=living", "Living standards"],
+  ["Population impact: Young people", "age", "/?sub=age", "Young people"],
+  ["Population impact: Behavioural scenarios", "scenarios", "/?sub=scenarios", "Behavioural scenarios"],
+  ["Population impact: Benchmarks", "benchmarks", "/?sub=benchmarks", "Benchmarks"],
   POVERTY_FIGURES_SHOWN
     ? ["Population impact: Poverty", "poverty", "/?sub=poverty", "Poverty"]
-    : ["Population impact: ?sub=poverty, withheld", "povertyFallback", "/?sub=poverty", "Public finances"],
+    : ["Population impact: ?sub=poverty, withheld", "povertyFallback", "/?sub=poverty", "Young people"],
   // The bare address is the landing page, over this view (landing.test.jsx)
-  ["Population impact: Public finances", "finances", "/?tab=dashboard", "Public finances"],
-  ["Pre-measures forecast: Poverty", "outlookPoverty", "/?tab=outlook&sub=poverty", "Poverty"],
-  ["Pre-measures forecast: Forecast changes", "outlookForecast", "/?tab=outlook&sub=forecast", "Forecast changes"],
+  ["Population impact: Public finances", "finances", "/?tab=dashboard&sub=finances", "Public finances"],
 ];
 
-describe("each of the five tabs and Population impact's sub-tabs, on a verified publication and real baseline data", () => {
+describe("each of the four tabs and Population impact's sub-tabs, on a verified publication and real baseline data", () => {
   it("covers every tab", () => {
     expect(CASES.map((c) => c[1]).sort()).toEqual(Object.keys(LOADED).sort());
   });
@@ -302,58 +303,6 @@ describe("each of the five tabs and Population impact's sub-tabs, on a verified 
     15000,
   );
 
-  // Living standards and Poverty are in both views, under the same names:
-  // with the selected measures on Population impact (?sub=living,
-  // ?sub=poverty), without them on the Pre-measures forecast
-  // (?tab=outlook&sub=…), each linking to its twin
-  it.each([
-    ["living", "Living standards", /^Change in income inequality/, "Living standards under current law", ["Incomes over time", "Growth across the distribution", "Inequality over time \\(current law\\)"]],
-    // Only while the policies' poverty figures are shown (povertyFigures.js)
-    ...(POVERTY_FIGURES_SHOWN
-      ? [["poverty", "Poverty", /^Change in the poverty rate/, "Poverty under current law", ["Poverty over time", "Change in poverty by group"]]]
-      : []),
-  ])("?sub=%s shows the measures, its twin on the Pre-measures forecast current law", async (sub, label, measures, currentLaw, cards) => {
-    window.history.replaceState({}, "", `/?sub=${sub}`);
-    render(<App />);
-    await waitFor(() => expect(document.querySelector('.app[data-publication="verified"]')).not.toBeNull());
-    const panel = await screen.findByRole("tabpanel", { name: label });
-    expect(await within(panel).findAllByRole("heading", { name: measures }, { timeout: 5000 })).not.toHaveLength(0);
-    expect(panel.textContent).toMatch(/With the selected policies[.:,]/);
-    // (the growth card with the measures links to its twin as "Without the measures")
-    expect(panel.textContent).not.toMatch(/Without the policies \(current law\)|Without the policies:/);
-    expect(within(panel).queryByRole("heading", { name: currentLaw })).toBeNull();
-    // The one link to its twin
-    fireEvent.click(within(panel).getByRole("link", { name: "See without them →" }));
-    const twin = screen.getByRole("tabpanel", { name: label });
-    expect(twin.closest("#panel-outlook")).not.toBeNull();
-    await within(twin).findByRole("heading", { name: currentLaw }, { timeout: 5000 });
-    for (const name of cards) {
-      expect(await within(twin).findByRole("heading", { level: 3, name: new RegExp(`^${name}$`) })).toBeInTheDocument();
-    }
-    expect(twin.textContent).toMatch(/Current law, before any Budget policy\./);
-    expect(twin.textContent).not.toMatch(/With the selected policies/);
-    expect(within(twin).getByRole("link", { name: "See with the policies →" })).toBeInTheDocument();
-    expect(requests.filter((r) => r.url.endsWith("living_standards_outlook.json"))).toHaveLength(1);
-    expect(consoleErrors).toEqual([]);
-  }, 15000);
-
-  it("reads the outlook once for all of the Pre-measures forecast's sub-tabs", async () => {
-    window.history.replaceState({}, "", "/?tab=outlook");
-    render(<App />);
-    await waitFor(() => expect(document.querySelector('.app[data-publication="verified"]')).not.toBeNull());
-    const living = await screen.findByRole("tabpanel", { name: "Living standards" });
-    await within(living).findByRole("heading", { level: 3, name: /^Incomes over time$/ }, { timeout: 5000 });
-    fireEvent.click(screen.getByRole("tab", { name: "Poverty" }));
-    const poverty = screen.getByRole("tabpanel", { name: "Poverty" });
-    await within(poverty).findByRole("heading", { level: 3, name: /^Poverty over time$/ }, { timeout: 5000 });
-    fireEvent.click(screen.getByRole("tab", { name: "Forecast changes" }));
-    const forecast = screen.getByRole("tabpanel", { name: "Forecast changes" });
-    expect(await within(forecast).findByRole("heading", { name: /economic forecasts?$/ })).toBeInTheDocument();
-    expect(requests.filter((r) => r.url.endsWith("living_standards_outlook.json"))).toHaveLength(1);
-    expect(document.querySelectorAll("#current-law-incomes")).toHaveLength(1);
-    expect(document.querySelectorAll("#current-law-poverty")).toHaveLength(1);
-  }, 15000);
-
   it("fails the Household calculator tab when the API URL is not set", async () => {
     // The tab's call never leaves the page, and it says so where the
     // results would be: the check above would catch it.
@@ -413,41 +362,6 @@ describe("each of the five tabs and Population impact's sub-tabs, on a verified 
     expect(held).toHaveLength(0);
   });
 
-  it("shows the OBR comparison's card empty, with no figures, until the OBR's costings are in", async () => {
-    window.history.replaceState({}, "", "/?sub=finances");
-    render(<App />);
-    await screen.findByRole("heading", { name: /Revenue impact/ }, { timeout: 5000 });
-    await screen.findByText(OBR_PENDING, {}, { timeout: 5000 });
-    const cards = document.querySelectorAll("#obr-comparison");
-    expect(cards).toHaveLength(1);
-    expect(within(cards[0]).getByRole("heading", { name: OBR_CARD_TITLE })).toBeInTheDocument();
-    expect(within(cards[0]).queryByRole("button")).toBeNull();
-    expect(cards[0].textContent).not.toMatch(/£/);
-    // Below Revenue impact
-    expect(document.querySelector("#revenue").compareDocumentPosition(cards[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Compare with the official costings" })).toBeNull();
-  });
-
-  it("says nothing that stops being true on Budget day, on any view but Methodology", async () => {
-    window.history.replaceState({}, "", "/?sub=finances");
-    render(<App />);
-    await screen.findByRole("heading", { name: /Revenue impact/ }, { timeout: 5000 });
-    // Poverty only while its figures are shown (povertyFigures.js)
-    for (const tab of ["All households", "Living standards", ...(POVERTY_FIGURES_SHOWN ? ["Poverty"] : []), "Household calculator", "Pre-measures forecast", "Population impact"]) {
-      fireEvent.click(screen.getByRole("tab", { name: tab }));
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
-    // Every view opened so far stays mounted; Methodology is never opened
-    // The one exception: the provisional label names candidate measures
-    // while the manifest predates the Budget (Vahid, 26 October)
-    // and the official costings card's empty line, which names their date
-    // until the file is published (Vahid, 27 October)
-    const text = document.body.textContent.replaceAll(CANDIDATE_PROVISIONAL_LABEL, "").replaceAll(OBR_PENDING, "");
-    expect(text).not.toMatch(/pre-Budget/i);
-    expect(text).not.toMatch(/28 October/);
-    expect(text).not.toMatch(/candidate/i);
-  });
-
   it("keeps a hidden view's progress inside it: nothing of it shows on another view", async () => {
     vi.stubGlobal(
       "fetch",
@@ -479,7 +393,7 @@ describe("each of the five tabs and Population impact's sub-tabs, on a verified 
 });
 
 describe("the income decile card", () => {
-  it("is on All households after the map: one card, £ or % in its Options, beside the household scatter, and not on Living standards", async () => {
+  it("is on All households after the map: one card, £ or % in its Options, beside the household scatter", async () => {
     window.history.replaceState({}, "", "/?sub=all");
     render(<App />);
     await waitFor(() => expect(document.querySelector('.app[data-publication="verified"]')).not.toBeNull());
@@ -505,11 +419,6 @@ describe("the income decile card", () => {
     expect(section.querySelector(".waterfall-chart")).toBeNull();
     expect(within(section).getByRole("heading", { level: 3, name: /^Impact by income decile, / })).toBeInTheDocument();
     expect(new URLSearchParams(window.location.search).get("decile")).toBe("relative");
-    window.history.replaceState({}, "", "/");
-    fireEvent.click(screen.getByRole("tab", { name: "Living standards" }));
-    const living = screen.getByRole("tabpanel", { name: "Living standards" });
-    await within(living).findAllByRole("heading", { name: /^Change in income inequality/ }, { timeout: 5000 });
-    expect(within(living).queryByRole("heading", { name: /impact by income decile/i })).toBeNull();
   }, 15000);
 
   it("opens All households from an old #deciles link", async () => {

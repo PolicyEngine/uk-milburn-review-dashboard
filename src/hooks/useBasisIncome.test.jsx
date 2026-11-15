@@ -8,6 +8,10 @@ import { HOUSEHOLD_FIXTURE, householdAnswerFor } from "../test/householdFixture"
 import { APPROVED_COMMIT, approvedDefinition, reportedDefinitions, requestedDefinitions } from "../test/definitionsFixture";
 import { IDENTITY_FIELDS } from "../utils/publication/definitions";
 
+// The Autumn Budget's calculator-only measures, so the mechanism stays covered
+vi.mock("../utils/calculatorOnlyMeasures", async (original) => (await import("../test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
+
+
 const API = "https://api.test/api/household-impact";
 const PUBLICATION = "snapshot-a";
 const BASIS_YEAR = 2027;

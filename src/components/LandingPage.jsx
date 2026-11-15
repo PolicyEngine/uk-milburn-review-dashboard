@@ -37,10 +37,10 @@ function LandingBox({ tab, sub, icon, title, description, onOpen }) {
  * measures are provisional, the policies box names them as modelled
  * measures, not the Budget's contents.
  */
-const boxes = (provisional) => [
-  ["dashboard", "finances", "users", "The Budget and society", "Costs and who gains or loses"],
+const boxes = () => [
+  ["dashboard", "age", "usersRound", "Young people", "Who gains or loses, and the cost"],
   ["household", undefined, "house", "Your household", "See how your income changes"],
-  ["policies", undefined, "list", provisional ? "The policies modelled" : "What's in the Budget", "Every policy, and how we model it"],
+  ["policies", undefined, "list", "The measures modelled", "Every candidate measure, and how we model it"],
 ];
 
 /**
@@ -51,14 +51,15 @@ const boxes = (provisional) => [
 export function LandingIntro({ headingId, provisional, note = null, className = "landing-hero" }) {
   return (
     <div className={className}>
-      <h2 id={headingId} className="landing-heading">Autumn Budget 2026: fiscal and distributional analysis</h2>
+      <h2 id={headingId} className="landing-heading">Young people and work: candidate measures modelled</h2>
       <p className="landing-intro">
         Estimates from <SourceLink source="policyengine_uk_model" />{" "}of how
-        Autumn Budget 2026 policies affect the public finances and household
-        incomes across the income distribution, regions and age groups, set
-        against the pre-measures forecast. Costings are our own except the bus fare cap&rsquo;s, which is the Treasury&rsquo;s; the economic
-        forecast is the OBR&rsquo;s{" "}
-        <SourceLink source="obr_efo_current">Economic and fiscal outlook, October 2026</SourceLink>.
+        candidate measures for the independent review of young people and
+        work would affect the public finances and household incomes, by
+        age, income and area. The review&rsquo;s final report is expected on
+        17 November 2026; the measures here are modelled before it is
+        published and are not announced policy. The main figures are static:
+        they assume no change in behaviour.
       </p>
       {note && <p className="landing-intro landing-intro-note">{note}</p>}
       {provisional}

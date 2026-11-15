@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fc from "fast-check";
 import {
   CALCULATOR_ONLY_MEASURES,
@@ -12,6 +12,10 @@ import {
   withoutCalculatorOnly,
 } from "./calculatorOnlyMeasures";
 import { policyRows } from "./singleYear";
+
+// The Autumn Budget's calculator-only measures, so the mechanism stays covered
+vi.mock("./calculatorOnlyMeasures", async (original) => (await import("../test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
+
 
 const CASH_ISA_LIMIT_ID = "cash_isa_limit_kept";
 const MACHINE_GAMES_DUTY_ID = "machine_games_duty_rise";

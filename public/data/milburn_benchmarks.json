@@ -1,0 +1,88 @@
+{
+  "title": "Benchmarks: published figures on young people, work and health-related benefits",
+  "note": "Reference figures from other sources, as published. They are not PolicyEngine estimates, and each has its own definitions, coverage and date.",
+  "policyengine_estimate_year": 2027,
+  "rows": [
+    {
+      "id": "neet_16_24",
+      "figure": "Young people aged 16 to 24 not in education, employment or training (NEET)",
+      "value": "About 1.0 million",
+      "basis": "Labour Force Survey estimate, UK",
+      "source": "ONS Labour Force Survey, via the review's interim report",
+      "url": "https://gov.uk/government/publications/young-people-and-work-interim-report",
+      "date": "28 May 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "uc_health_no_work_requirements",
+      "figure": "Young people on Universal Credit health with no work requirements",
+      "value": "260,000",
+      "basis": "Resolution Foundation analysis",
+      "source": "Resolution Foundation",
+      "url": "https://www.resolutionfoundation.org/comment/youve-got-mail-finally-your-milburn-cram-sheet-inside/",
+      "date": "13 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "kept_out_of_poverty",
+      "figure": "Young people kept out of poverty by UC health and/or PIP",
+      "value": "120,000",
+      "basis": "Resolution Foundation analysis",
+      "source": "Resolution Foundation",
+      "url": "https://www.resolutionfoundation.org/comment/youve-got-mail-finally-your-milburn-cram-sheet-inside/",
+      "date": "13 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "uc_lcwra_16_24",
+      "figure": "People aged 16 to 24 on Universal Credit with limited capability for work and work-related activity (LCWRA)",
+      "value": "62,570",
+      "basis": "DWP administrative statistics, May 2026",
+      "source": "DWP, via Benefits and Work",
+      "url": "https://benefitsandwork.co.uk/news/milburn-proposes-abolition-of-%20pip-and-uc-health-for-under-25s",
+      "date": "May 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "incapacity_spending_18_24",
+      "figure": "Incapacity benefit spending on people aged 18 to 24",
+      "value": "£1.3bn (2022) to £2.0bn (2025)",
+      "basis": "IFS analysis",
+      "source": "Institute for Fiscal Studies",
+      "url": "https://ifs.org.uk/articles/challenges-milburn-review",
+      "date": "",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "pip_16_24",
+      "figure": "PIP claimants aged 16 to 24, England and Wales",
+      "value": "About 430,000",
+      "basis": "DWP statistics as reported in the press",
+      "source": "DWP statistics (press report)",
+      "url": null,
+      "date": "",
+      "press_report": true,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "package_young_people_affected",
+      "figure": "Young people affected by the modelled package",
+      "value": "",
+      "basis": "No published figure: shown for the PolicyEngine estimate only",
+      "source": "",
+      "url": null,
+      "date": "",
+      "press_report": false,
+      "policyengine_estimate": {
+        "run": "package",
+        "metric": "young_people_worse_off",
+        "label": "People aged 16 to 24 in households made worse off by the combined package"
+      }
+    }
+  ]
+}

@@ -230,7 +230,9 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
   const ids = [...registry.matchAll(/^(?!AUTUMN_BUDGET_2026_COMBINED)[A-Z0-9_]+_ID = "([a-z0-9_]+)"$/gm)].map((match) => match[1]);
   const names = [...registry.matchAll(/^\s+name="([^"]+)",$/gm)].map((match) => match[1]).filter((name) => !/\(combined\)/.test(name));
   expect(ids.length).toBeGreaterThan(0);
-  expect(names.length).toBe(ids.length);
+  // Each registered measure has a name; the measures listed as not
+  // computable have a name and no id constant
+  expect(names.length).toBeGreaterThanOrEqual(ids.length);
   const escaped = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const registered = new RegExp([...ids, ...names].map(escaped).join("|"), "i");
   // #185 on #104, until the publication carries their text (reforms.py),
@@ -275,7 +277,10 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
   // Comments are not scanned: they show nothing. Anything else in these
   // files, and every other file, still fails.
   const allowed = {
-    "utils/policyDetails.js": [/export const POLICY_DETAILS = \[[\s\S]*?\n\];/],
+    "utils/policyDetails.js": [/export const POLICY_DETAILS = \[[\s\S]*?\n\];/, /export const MILBURN_POLICY_DETAILS = \[[\s\S]*?\n\];/],
+    // The Milburn review: the measures listed as not computable, in the
+    // registry's own words
+    "utils/milburn/notComputable.js": [/export const NOT_COMPUTABLE_MEASURES = \[[\s\S]*?\n\];/],
     "utils/householdExamples.js": [/^\s*(?:measure|measures|tag): .*$/gm],
     "components/personal/SingleYearResults.jsx": [/export const SPENDING_MEASURES = \[.*\];/],
     "utils/measureModelling.js": [/export const MODELLING_NOTE = \{[\s\S]*?\n\};/],

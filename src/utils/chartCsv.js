@@ -9,7 +9,7 @@
 import { csvField } from "./geography/exportTable";
 
 export const CSV_SOURCE =
-  "PolicyEngine UK microsimulation, UK Autumn Budget 2026 dashboard";
+  "PolicyEngine UK microsimulation, Milburn review dashboard";
 
 /** A number as CSV text: rounded to `decimals`, no trailing noise. */
 export function formatCsvNumber(value, decimals = 4) {

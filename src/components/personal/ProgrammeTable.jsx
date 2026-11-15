@@ -189,7 +189,7 @@ export default function ProgrammeTable({
         buildChartCsv({
           title,
           units: "£ a year; taxes and pension contributions as negative amounts; the change is the effect on the household's net income",
-          source: "PolicyEngine UK household calculation, UK Autumn Budget 2026 dashboard",
+          source: "PolicyEngine UK household calculation, Milburn review dashboard",
           columns: [
             { key: "group", label: "Group" },
             { key: "item", label: "Item" },
@@ -226,7 +226,7 @@ export default function ProgrammeTable({
         buildChartCsv({
           title: policyTitle,
           units: "£ a year; the change in the household's net income, by policy, and the tax and benefit rows each policy moves",
-          source: "PolicyEngine UK household calculation, UK Autumn Budget 2026 dashboard",
+          source: "PolicyEngine UK household calculation, Milburn review dashboard",
           columns: [
             { key: "policy", label: "Policy" },
             { key: "item", label: "Item" },
@@ -255,7 +255,7 @@ export default function ProgrammeTable({
               title: policyTitle,
               units:
                 "As shown in each row (£ a year, pence a litre or a rate); taxes as negative amounts; the effect is the change in the household's net income from this policy alone",
-              source: "PolicyEngine UK household calculation and the model's policy parameters, UK Autumn Budget 2026 dashboard",
+              source: "PolicyEngine UK household calculation and the model's policy parameters, Milburn review dashboard",
               columns: [
                 { key: "section", label: "Section" },
                 { key: "item", label: "Item" },

@@ -673,17 +673,124 @@ export const POLICY_DETAILS = [
   },
 ];
 
-const DETAILS_BY_ID = Object.fromEntries(
-  POLICY_DETAILS.map(({ id, name: _name, description: _description, writtenFor, ...fields }) => [id, { writtenFor, fields }]),
-);
+/**
+ * The Milburn review's candidate measures (ids fixed by the pipeline): one
+ * neutral line each, with no `writtenFor`, so an entry applies whatever
+ * description the publication carries for its id. The Autumn Budget
+ * entries above stay for the components' fixtures; their ids are never
+ * published by this build.
+ */
+export const MILBURN_POLICY_DETAILS = [
+  {
+    id: "uc_health_element_removed_under_25",
+    shortName: "UC health element removed under 25",
+    noun: "removal of the UC health element under 25",
+    sentence: "removing the Universal Credit health element for claimants under 25",
+    summary: "Removes the Universal Credit health element for claimants aged under 25.",
+    points: [
+      { label: "Who", text: "Universal Credit claimants under 25 with the health element." },
+      { label: "Claims", text: "Applies to existing and new claims alike." },
+    ],
+    affects: "UC claimants under 25 with limited capability for work",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "The health element is the LCWRA element in policyengine-uk.",
+    ],
+  },
+  {
+    id: "uc_health_element_removed_under_25_new_claims",
+    shortName: "UC health element removed under 25 (new claims)",
+    noun: "removal of the UC health element under 25 for new claims",
+    sentence: "removing the Universal Credit health element for new claimants under 25",
+    summary: "Removes the Universal Credit health element for new claimants aged under 25.",
+    points: [
+      { label: "Who", text: "New Universal Credit claimants under 25." },
+      { label: "Claims", text: "Existing awards continue; only new claims are affected." },
+    ],
+    affects: "New UC claimants under 25 with limited capability for work",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "Which health element rate a new claimant receives is assigned by a draw that does not depend on age.",
+    ],
+  },
+  {
+    id: "pip_removed_under_25",
+    shortName: "PIP removed for 18 to 24-year-olds",
+    noun: "removal of PIP for 18 to 24-year-olds",
+    sentence: "removing Personal Independence Payment for people aged 18 to 24",
+    summary: "Removes Personal Independence Payment for people aged 18 to 24.",
+    points: [
+      { label: "Who", text: "PIP recipients aged 18 to 24; 16 and 17-year-olds keep it." },
+      { label: "Scotland", text: "Adult Disability Payment records are held as PIP in the data." },
+    ],
+    affects: "PIP recipients aged 18 to 24",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: recipients do not change their work or claims in response.",
+      "Benefits that depend on PIP receipt change with it, as the model's rules set out.",
+    ],
+  },
+  {
+    id: "youth_allowance_at_25_plus_rate",
+    shortName: "Youth allowance at the 25-and-over rate",
+    noun: "youth allowance at the 25-and-over rate",
+    sentence: "paying under-25s the Universal Credit standard allowance at the 25-and-over rate",
+    summary: "Pays Universal Credit claimants under 25 the standard allowance for those 25 and over.",
+    points: [
+      { label: "Who", text: "Universal Credit claimants under 25." },
+      { label: "Couples", text: "Couples both under 25 get the 25-and-over couple rate." },
+    ],
+    affects: "UC claimants under 25",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "The protected health element is held at its current-law amount.",
+    ],
+  },
+  {
+    id: "employer_nics_zero_under_25",
+    shortName: "Zero employer NICs under 25",
+    noun: "zero employer National Insurance under 25",
+    sentence: "setting employer National Insurance to zero for employees under 25",
+    summary: "Sets employer National Insurance contributions to zero for employees aged under 25.",
+    points: [
+      { label: "Who", text: "Employers of people under 25, and those employees." },
+      { label: "Earnings", text: "Zero rate up to the upper secondary threshold, as for under-21s." },
+    ],
+    affects: "Employees under 25 and their employers",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "National Insurance",
+    details: [
+      "Static: employment and hours do not change in response.",
+      "The model passes employer National Insurance through to wages, so the saving shows as higher pay.",
+    ],
+  },
+];
+
+const DETAILS_BY_ID = Object.fromEntries([
+  ...POLICY_DETAILS.map(({ id, name: _name, description: _description, writtenFor, ...fields }) => [id, { writtenFor, fields }]),
+  ...MILBURN_POLICY_DETAILS.map(({ id, ...fields }) => [id, { writtenFor: undefined, fields }]),
+]);
 
 /**
  * The card details for a catalogue measure, or null: none unless the
  * publication describes it exactly as when its entry was written.
  */
 export function policyDetailsFor(measure) {
-  const entry = measure ? DETAILS_BY_ID[measure.id] : undefined;
-  return entry && entry.writtenFor === measure.description ? entry.fields : null;
+  const entry = measure && Object.hasOwn(DETAILS_BY_ID, measure.id) ? DETAILS_BY_ID[measure.id] : undefined;
+  // A Milburn entry (no writtenFor) applies whatever the description
+  return entry && (entry.writtenFor === undefined || entry.writtenFor === measure.description) ? entry.fields : null;
 }
 
 /**

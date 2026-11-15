@@ -21,11 +21,11 @@ export const NOT_COMPUTABLE = "not_computable";
  * statement's measures, not yet approved against the Treasury's costing.
  */
 export const PROVISIONAL_LABEL =
-  "Provisional: statement figures, awaiting Treasury costing";
+  "Provisional: figures awaiting review";
 
 /** The provisional label before the Budget: the entries are candidates. */
 export const CANDIDATE_PROVISIONAL_LABEL =
-  "Provisional: candidate policies we modelled before the Budget, not announced policy";
+  "Provisional: candidate measures modelled before the review is published, not announced policy";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}/;
 

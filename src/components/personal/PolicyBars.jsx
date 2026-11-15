@@ -112,7 +112,7 @@ export default function PolicyBars({ rows, noEffect, noEffectItems = [], underAP
       buildChartCsv({
         title,
         units: "£ a year; positive values raise the household's net income",
-        source: "PolicyEngine UK household calculation, UK Autumn Budget 2026 dashboard",
+        source: "PolicyEngine UK household calculation, Milburn review dashboard",
         columns: [
           { key: "name", label: "Policy" },
           { key: "change", label: "Change in net income (£)", decimals: 0 },

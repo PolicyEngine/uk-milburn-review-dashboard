@@ -378,7 +378,7 @@ export default function MarginalRateChart({ sweep, salary, yearLabel, sync = nul
       buildChartCsv({
         title,
         units: "Share of an extra £1 of salary; from this salary to the next point",
-        source: "PolicyEngine UK household calculation, UK Autumn Budget 2026 dashboard",
+        source: "PolicyEngine UK household calculation, Milburn review dashboard",
         columns: csvColumns,
         rows: csvRows,
       }),

@@ -8,11 +8,10 @@
 
 import { POVERTY_FIGURES_SHOWN } from "./povertyFigures";
 
-export const BOOT_TABS = Object.freeze(["dashboard", "household", "outlook", "policies", "methodology"]);
+export const BOOT_TABS = Object.freeze(["dashboard", "household", "policies", "methodology"]);
 export const BOOT_SUBS = Object.freeze({
   // Poverty only while its figures are shown (povertyFigures.js), as PopulationImpactView
-  dashboard: Object.freeze(["finances", "all", "age", "living", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : [])]),
-  outlook: Object.freeze(["living", "poverty", "forecast"]),
+  dashboard: Object.freeze(["age", "all", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : []), "finances", "scenarios", "benchmarks"]),
 });
 // Old sub-tab names that now open another (App.jsx oldAgeSubGroup)
 const SUB_ALIASES = Object.freeze({ young: "age", pensioners: "age" });

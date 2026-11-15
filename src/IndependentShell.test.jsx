@@ -13,7 +13,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 it.each(["missing", "invalid", "unreachable", "2025"])("keeps the shell and independent views available for a %s manifest", async (failure) => {
   await fc.assert(fc.asyncProperty(
-    fc.constantFrom("living", "methodology"),
+    fc.constantFrom("methodology"),
     async (view) => {
       const requests = [];
       vi.stubGlobal("fetch", async (url) => {
@@ -33,10 +33,10 @@ it.each(["missing", "invalid", "unreachable", "2025"])("keeps the shell and inde
       window.history.replaceState({}, "", `/?tab=${view}`);
       render(<App />);
       expect(await screen.findByRole("tablist", { name: "Views" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "UK Autumn Budget 2026" })).toBeInTheDocument();
-      const label = view === "living" ? "Pre-measures forecast" : "Methodology";
+      expect(screen.getByRole("heading", { name: "Milburn review: young people and work" })).toBeInTheDocument();
+      const label = "Methodology";
       expect(screen.getByRole("tab", { name: label })).toHaveAttribute("aria-selected", "true");
-      expect(await screen.findByRole("heading", { name: view === "living" ? "Living standards under current law" : "At a glance" })).toBeInTheDocument();
+      expect(await screen.findByRole("heading", { name: "At a glance" })).toBeInTheDocument();
       expect(requests.some((url) => url.endsWith(".csv"))).toBe(false);
       cleanup();
       vi.unstubAllGlobals();

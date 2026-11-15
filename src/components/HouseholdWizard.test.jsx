@@ -6,6 +6,10 @@ import { parseAmount } from "./personal/FormControls";
 import { buildHouseholdRequest } from "../utils/householdImpactApi";
 import { APPROVED_COMMIT, approvedDefinition, requestedDefinitions, route } from "../test/definitionsFixture";
 
+// The Autumn Budget's calculator-only measures, so the mechanism stays covered
+vi.mock("../utils/calculatorOnlyMeasures", async (original) => (await import("../test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
+
+
 beforeEach(() => {
   resetSavedWizard();
 });

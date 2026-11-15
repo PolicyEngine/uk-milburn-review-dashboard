@@ -1,0 +1,179 @@
+/* Behavioural scenarios and Benchmarks (Population impact sub-tabs) */
+
+.milburn-label {
+  margin: 0 0 16px;
+  padding: 6px 10px;
+  display: inline-block;
+  border-radius: 4px;
+  background: var(--c-notice-bg);
+  color: var(--c-notice-text);
+  font-size: var(--fs-small);
+  font-weight: 500;
+}
+
+.milburn-unavailable {
+  padding: 24px;
+  border: 1px dashed var(--c-axis);
+  border-radius: 8px;
+  background: var(--c-muted-fill);
+  color: var(--c-text);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.milburn-unavailable p {
+  margin: 0;
+}
+
+.milburn-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  padding: var(--card-padding, 20px);
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+  background: var(--c-surface);
+}
+
+.milburn-control {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.milburn-control-label {
+  font-size: 0.95rem;
+  color: var(--c-text);
+}
+
+.milburn-control input[type="range"] {
+  width: 100%;
+  accent-color: var(--c-gain);
+}
+
+.milburn-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.milburn-chip {
+  padding: 6px 14px;
+  border: 1px solid var(--c-axis);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-small);
+  cursor: pointer;
+}
+
+.milburn-chip:hover {
+  background: var(--c-hover);
+}
+
+.milburn-chip.is-selected {
+  border-color: var(--c-gain);
+  background: var(--c-highlight-band);
+  color: var(--c-gain-text);
+  font-weight: 600;
+}
+
+.milburn-chip:focus-visible {
+  outline: 2px solid var(--c-gain);
+  outline-offset: 2px;
+}
+
+.milburn-control-note {
+  margin: 0;
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: var(--c-axis-title);
+}
+
+.milburn-chart-card {
+  padding: var(--card-padding, 20px);
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+  background: var(--c-surface);
+  min-width: 0;
+}
+
+.milburn-notes h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.milburn-notes ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--c-text);
+}
+
+.milburn-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+  background: var(--c-surface);
+}
+
+.milburn-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--c-text);
+}
+
+.milburn-table th,
+.milburn-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--c-grid);
+  text-align: left;
+  vertical-align: top;
+}
+
+.milburn-table thead th {
+  background: var(--c-row-band);
+  color: var(--c-axis-title);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.milburn-table tbody th {
+  font-weight: 500;
+  min-width: 220px;
+}
+
+.milburn-table tbody tr:last-child th,
+.milburn-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.milburn-table a {
+  color: var(--c-gain-text);
+}
+
+.milburn-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--c-loss-soft);
+  color: var(--c-loss-text);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.milburn-estimate {
+  display: block;
+  font-weight: 600;
+}
+
+.milburn-estimate-label {
+  display: block;
+  color: var(--c-axis-title);
+  font-size: 0.75rem;
+}

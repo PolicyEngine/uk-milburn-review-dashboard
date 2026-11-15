@@ -15,7 +15,7 @@
  */
 import { CHART_COLOURS } from "./chartTheme";
 
-export const EXPORT_SOURCE = "Source: PolicyEngine UK, UK Autumn Budget 2026 dashboard";
+export const EXPORT_SOURCE = "Source: PolicyEngine UK, Milburn review dashboard";
 
 // The dashboard's face (Inter), then the system faces it falls back to
 export const EXPORT_FONT = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";

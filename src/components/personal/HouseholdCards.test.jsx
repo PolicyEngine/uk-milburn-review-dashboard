@@ -1,9 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import HouseholdCards, { YearBars } from "./HouseholdCards";
 import { HOUSEHOLD_EXAMPLES } from "../../utils/householdExamples";
 import { buildMeasureCatalogue, MeasureCatalogueProvider } from "../../utils/measureCatalogue";
 import { fixtureJson } from "../../test/publicationFixture";
+
+// The Autumn Budget's calculator-only measures, so the mechanism stays covered
+vi.mock("../../utils/calculatorOnlyMeasures", async (original) => (await import("../../test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
+
 
 // #104 review (m23, P2): a card names the measures it features only while
 // the catalogue publishes every one of them. The landlord's card features the

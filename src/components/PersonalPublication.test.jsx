@@ -7,6 +7,10 @@ import { fixtureJson } from "../test/publicationFixture";
 import { approvedDefinition } from "../test/definitionsFixture";
 import { SAVINGS_INCOME_RATES_ID } from "../utils/calculatorOnlyMeasures";
 
+// The Autumn Budget's calculator-only measures, so the mechanism stays covered
+vi.mock("../utils/calculatorOnlyMeasures", async (original) => (await import("../test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
+
+
 vi.mock("./HouseholdCalculator", () => ({
   default: ({ selectedPolicies, publicationKey, expectedEngine, expectedDefinitions, presetEngine, presetDefinitions }) => (
     <div data-testid="live-calculator" data-policies={selectedPolicies.join(",")} data-snapshot={publicationKey} data-engine={JSON.stringify(expectedEngine)} data-definitions={JSON.stringify(expectedDefinitions)} data-preset-engine={JSON.stringify(presetEngine)} data-preset-definitions={JSON.stringify(presetDefinitions)}>£123,456</div>

@@ -6,16 +6,19 @@ import { YOUNG_PEOPLE_ANCHOR } from "../utils/viewAnchors";
 import { scrollBelowBars, settleHeadings } from "../utils/pageScroll";
 
 /**
- * Population impact's sub-tabs; the first, Public finances, is the default.
- * Poverty is left out while the poverty figures are withheld
- * (povertyFigures.js), so ?sub=poverty opens the default.
+ * Population impact's sub-tabs; the first, Young people (?sub=age, the
+ * age-group view opened on 16 to 24), is the default. Poverty is left out
+ * while the poverty figures are withheld (povertyFigures.js), so
+ * ?sub=poverty opens the default. Behavioural scenarios and Benchmarks are
+ * illustrative and reference material, beside the static results.
  */
 export const POPULATION_SUB_TABS = [
-  { value: "finances", label: "Public finances", icon: "landmark" },
+  { value: "age", label: "Young people", icon: "usersRound" },
   { value: "all", label: "All households", icon: "users" },
-  { value: "age", label: "By age", icon: "usersRound" },
-  { value: "living", label: "Living standards", icon: "coins" },
   { value: "poverty", label: "Poverty", icon: "percent" },
+  { value: "finances", label: "Public finances", icon: "landmark" },
+  { value: "scenarios", label: "Behavioural scenarios", icon: "sliders" },
+  { value: "benchmarks", label: "Benchmarks", icon: "scale" },
 ].filter((tab) => POVERTY_FIGURES_SHOWN || tab.value !== "poverty");
 
 const SUB_TAB_VALUES = POPULATION_SUB_TABS.map((tab) => tab.value);

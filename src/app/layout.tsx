@@ -23,9 +23,9 @@ import { chartChunkFiles, chartChunkScript } from '@/utils/chartChunk';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-const TITLE = 'UK Autumn Budget 2026 dashboard';
+const TITLE = 'Milburn review: young people and work';
 const DESCRIPTION =
-  'This dashboard uses PolicyEngine UK to show how Autumn Budget 2026 policies affect the public finances and households: by income, area and age, and for your own household, alongside the pre-measures forecast.';
+  'PolicyEngine UK estimates of candidate measures for the Milburn review of young people and work, modelled before the review is published: the public finances, households by age, income and area, and your own household. These are not announced policy.';
 
 // Inter, committed with the page (fonts/: the variable face, every weight,
 // Latin subset; SIL Open Font License in fonts/OFL.txt): the
@@ -66,6 +66,9 @@ function builtChartFiles(): string[] {
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
+  // A local review build: kept out of search engines (next.config.ts sends
+  // X-Robots-Tag too)
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {

@@ -19,89 +19,96 @@
  * one, take it out of this list and add it to the package
  * (AUTUMN_BUDGET_2026_COMBINED_COMPONENTS in reforms.py). This is the one
  * place the page names them outside the measure catalogue.
+ *
+ * The Milburn review has none: the helpers below are built from an empty
+ * list (calculatorOnlyHelpers), so the calculator adds nothing to a
+ * request. Tests build them from the Autumn Budget's list
+ * (test/calculatorOnlyFixture.js) to keep the mechanism covered.
  */
 export const SAVINGS_INCOME_RATES_ID = "savings_income_rates_up";
 
-export const CALCULATOR_ONLY_MEASURES = {
-  [SAVINGS_INCOME_RATES_ID]: {
-    id: SAVINGS_INCOME_RATES_ID,
-    name: "Savings income tax up",
-    // As the result card names it after the count ("with 7 policies and …")
-    phrase: "the savings income tax rise",
-  },
-  cash_isa_limit_kept: {
-    id: "cash_isa_limit_kept",
-    name: "Cash ISA limit kept at £20,000",
-    phrase: "the cash ISA limit kept at £20,000",
-  },
-  machine_games_duty_rise: {
-    id: "machine_games_duty_rise",
-    name: "Machine Games Duty up to 25% on higher-stake machines",
-    phrase: "the rise in Machine Games Duty",
-  },
-};
-
-const CALCULATOR_ONLY_IDS = Object.keys(CALCULATOR_ONLY_MEASURES);
-
-export const isCalculatorOnly = (id) => Object.hasOwn(CALCULATOR_ONLY_MEASURES, id);
-
 /**
- * A household request's measures: the header's selection, then every
- * calculator-only measure not already in it. With nothing selected, nothing
- * (no request is made then).
+ * The helpers for a list of calculator-only measures (id to { id, name,
+ * phrase }).
  */
-export const withCalculatorOnly = (policies) =>
-  policies.length === 0 ? [] : [...policies, ...CALCULATOR_ONLY_IDS.filter((id) => !policies.includes(id))];
+export function calculatorOnlyHelpers(measures) {
+  const ids = Object.keys(measures);
+  const isCalculatorOnly = (id) => Object.hasOwn(measures, id);
 
-/** The measures without the calculator-only ones (for the national figures). */
-export const withoutCalculatorOnly = (policies) => policies.filter((id) => !isCalculatorOnly(id));
+  /**
+   * A household request's measures: the header's selection, then every
+   * calculator-only measure not already in it. With nothing selected,
+   * nothing (no request is made then).
+   */
+  const withCalculatorOnly = (policies) =>
+    policies.length === 0 ? [] : [...policies, ...ids.filter((id) => !policies.includes(id))];
 
-/**
- * Whether taking `ids` out of the selection (`selected`) can lift a refusal
- * of them: only when each one is selected and none is calculator-only,
- * which every household request carries, selected or not
- * (withCalculatorOnly), so a Remove would change nothing.
- */
-export const removableFromSelection = (ids, selected) =>
-  ids.every((id) => selected.includes(id) && !isCalculatorOnly(id));
+  /** The measures without the calculator-only ones (for the national figures). */
+  const withoutCalculatorOnly = (policies) => policies.filter((id) => !isCalculatorOnly(id));
 
-/**
- * The measures of a household request for `policies` (withCalculatorOnly)
- * that must be checked against their published figures: every selected
- * one, and each calculator-only measure the request adds once the
- * publication names it (`isPublished`); until then it has no receipt to
- * check it against. A named one's receipt's engine and definition are
- * required as a selected measure's are; with none, the calculator is
- * unavailable, never unchecked (PersonalImpactTab).
- */
-export const publishedRequest = (policies, isPublished) =>
-  withCalculatorOnly(policies).filter((id) => policies.includes(id) || isPublished(id));
+  /**
+   * Whether taking `ids` out of the selection (`selected`) can lift a
+   * refusal of them: only when each one is selected and none is
+   * calculator-only, which every household request carries, selected or
+   * not (withCalculatorOnly), so a Remove would change nothing.
+   */
+  const removableFromSelection = (refused, selected) =>
+    refused.every((id) => selected.includes(id) && !isCalculatorOnly(id));
 
-/**
- * The measures among `policies` whose answers are checked against an
- * approved definition (`definitions`): every one but a calculator-only
- * measure with none. The page approves every measure of `publishedRequest`
- * or answers nothing, so the ones left unchecked are exactly the
- * calculator-only measures the publication does not name: they publish no
- * figures, the API's running code computes them, and the calculator says
- * they are not in the national results.
- */
-export const definitionChecked = (policies, definitions) =>
-  policies.filter((id) => !isCalculatorOnly(id) || Object.hasOwn(definitions ?? {}, id));
+  /**
+   * The measures of a household request for `policies` (withCalculatorOnly)
+   * that must be checked against their published figures: every selected
+   * one, and each calculator-only measure the request adds once the
+   * publication names it (`isPublished`); until then it has no receipt to
+   * check it against.
+   */
+  const publishedRequest = (policies, isPublished) =>
+    withCalculatorOnly(policies).filter((id) => policies.includes(id) || isPublished(id));
 
-/**
- * The measures a household's result covers, in words: the selected ones by
- * number, then each calculator-only one by name ("7 policies and the
- * savings income tax rise"). The number matches the header's selection
- * ("All 7"), and the measures the calculator adds are named, not counted
- * in it, since the result includes them (#306). `count` and `named` say
- * the same as `text`.
- */
-export function resultPolicies(policies) {
-  const ids = [...new Set(policies)];
-  const count = withoutCalculatorOnly(ids).length;
-  const named = ids.filter(isCalculatorOnly).map((id) => CALCULATOR_ONLY_MEASURES[id].phrase);
-  const parts = [...(count > 0 || named.length === 0 ? [`${count} ${count === 1 ? "policy" : "policies"}`] : []), ...named];
-  const text = parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
-  return { count, named, text };
+  /**
+   * The measures among `policies` whose answers are checked against an
+   * approved definition (`definitions`): every one but a calculator-only
+   * measure with none.
+   */
+  const definitionChecked = (policies, definitions) =>
+    policies.filter((id) => !isCalculatorOnly(id) || Object.hasOwn(definitions ?? {}, id));
+
+  /**
+   * The measures a household's result covers, in words: the selected ones
+   * by number, then each calculator-only one by name ("7 policies and the
+   * savings income tax rise"). `count` and `named` say the same as `text`.
+   */
+  function resultPolicies(policies) {
+    const distinct = [...new Set(policies)];
+    const count = withoutCalculatorOnly(distinct).length;
+    const named = distinct.filter(isCalculatorOnly).map((id) => measures[id].phrase);
+    const parts = [...(count > 0 || named.length === 0 ? [`${count} ${count === 1 ? "policy" : "policies"}`] : []), ...named];
+    const text = parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
+    return { count, named, text };
+  }
+
+  return {
+    CALCULATOR_ONLY_MEASURES: measures,
+    isCalculatorOnly,
+    withCalculatorOnly,
+    withoutCalculatorOnly,
+    removableFromSelection,
+    publishedRequest,
+    definitionChecked,
+    resultPolicies,
+  };
 }
+
+// None for the Milburn review: the Autumn Budget's calculator-only measures
+// (the savings income tax rise, the cash ISA limit, Machine Games Duty) are
+// not part of it, so the household calculator adds nothing to a request
+export const {
+  CALCULATOR_ONLY_MEASURES,
+  isCalculatorOnly,
+  withCalculatorOnly,
+  withoutCalculatorOnly,
+  removableFromSelection,
+  publishedRequest,
+  definitionChecked,
+  resultPolicies,
+} = calculatorOnlyHelpers({});

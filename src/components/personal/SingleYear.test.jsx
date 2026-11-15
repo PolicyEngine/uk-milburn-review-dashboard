@@ -17,6 +17,10 @@ import { APPROVED_COMMIT, approvedDefinition, requestedDefinitions, route, withR
 import { keepSentence, marginalRateSentence } from "../../utils/singleYear";
 import { withCalculatorOnly } from "../../utils/calculatorOnlyMeasures";
 
+// The Autumn Budget's calculator-only measures, so the mechanism stays covered
+vi.mock("../../utils/calculatorOnlyMeasures", async (original) => (await import("../../test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
+
+
 const HOUSEHOLD_API = "https://api.test/api/household-impact";
 // The receipts' model versions, which the household fixture's answer runs:
 // Household calculator shows nothing when the two differ.

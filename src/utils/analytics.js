@@ -1,7 +1,7 @@
 /**
  * Google Analytics 4, as policyengine.org's own pages send it: the same
  * property, so the dashboard's visits sit beside the site's (the page is
- * served at policyengine.org/uk/autumn-budget-2026). The layout loads gtag
+ * served at policyengine.org/uk/milburn-review). The layout loads gtag
  * in a production build only; in tests and `next dev` every call here does
  * nothing.
  *
@@ -26,7 +26,7 @@
 export const GA_MEASUREMENT_ID = "G-2YHG89FY0N";
 
 /** The dashboard's name in the property's tool_name dimension. */
-export const TOOL_NAME = "autumn-budget-2026";
+export const TOOL_NAME = "milburn-review";
 
 /** The inline script that starts gtag once its library has loaded. */
 export const GA_INIT_SCRIPT = [

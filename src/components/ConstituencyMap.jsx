@@ -133,7 +133,7 @@ function constituencyCsvText(table, { reform, year, yearLabel, packageChoice, la
     ["Reform", reform],
     ["Year", yearLabel],
     ["Units", EXPORT_UNITS],
-    ["Source", "PolicyEngine UK Autumn Budget 2026 dashboard"],
+    ["Source", "PolicyEngine Milburn review dashboard"],
   ]);
 }
 
