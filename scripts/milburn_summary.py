@@ -42,15 +42,20 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     young = ages["16-24"]
     people = float(young["people"])
     worse = float(young["pct_worse_off"]) / 100
+    better = float(young["pct_better_off"]) / 100
+    gains = better > worse
+    if gains:
+        worse = better
     mean_change = float(young["mean_change"])
     affected = people * worse
     # Average change in household net income for a young person in an
     # affected household (household-level loss attributed to the person).
-    loss_affected = -mean_change / worse if worse else None
+    loss_affected = (-mean_change / worse if worse else None)
     out = {
         "id": rid,
         "label": build["label"],
         "saving_bn": {str(y): round(v, 3) for y, v in sorted(budget.items())},
+        "direction": "gain" if gains else "loss",
         "young_people_in_losing_households": round(affected),
         "share_of_16_24_in_losing_households_pct": round(worse * 100, 2),
         "average_loss_young_person_in_losing_household": (
@@ -78,7 +83,7 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     # where it was. Gains from work come from the household case (a single
     # 22-year-old renter with LCWRA); a household with PIP or a partner
     # gains differently, so this is an order of magnitude, not an estimate.
-    if loss_affected and scenarios:
+    if loss_affected and loss_affected > 0 and not gains and scenarios:
         cases = scenarios.get("entry_cases", [])
         # s = L / g: the share of young people in losing households who
         # would need to move into work for the group's average income to
