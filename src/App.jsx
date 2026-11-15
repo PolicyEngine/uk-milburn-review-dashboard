@@ -58,6 +58,7 @@ const NotComputableMeasures = lazyView(() => import("./components/milburn/NotCom
 const MethodologyTab = lazyView(() => import("./components/MethodologyTab"));
 const BehaviouralScenarios = lazyView(chartViews, (m) => m.BehaviouralScenarios);
 const BenchmarksTable = lazyView(() => import("./components/milburn/BenchmarksTable"));
+const KeyFigures = lazyView(() => import("./components/milburn/KeyFigures"));
 
 // The code each view ("tab" or "tab:sub", as bootView names them) needs
 const VIEW_CODE = {
@@ -115,6 +116,10 @@ const VIEW_BY_KEY = Object.fromEntries(VIEWS.map((view) => [view.value, view]));
 // view shown (no visible tip)
 export const YEAR_INACTIVE = "The year doesn't change this tab";
 export const POLICIES_INACTIVE = "Policy choices don't change this tab";
+
+// Under the decile chart on the local build route (Methodology, Limitations)
+export const DECILE_SAMPLE_NOTE =
+  "These results rest on roughly 500 to 650 survey records of young claimants, so the pattern across individual deciles is noisy.";
 
 // Old ?tab= values still opened by shared links, and the view each is now;
 // the address is rewritten to the new value
@@ -1030,7 +1035,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   const populationContent = (sub) => {
     // Illustrative and reference material: neither follows the band's
     // selection or year (each says what it reads)
-    if (sub === "scenarios") return <BehaviouralScenarios />;
+    if (sub === "scenarios") return <BehaviouralScenarios selectedRun={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} />;
     if (sub === "benchmarks") return <BenchmarksTable />;
     if (selectedPolicies.length === 0) return emptyState;
     // The sub-tab is not offered while the poverty figures are withheld
@@ -1059,12 +1064,21 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     if (sub === "age") {
       // By age: every age group, pensioners and all ages, one group chosen
       // (?age=); the Young people and Pensioners sub-tabs were here
+      // On the local build route, the selected run's key figures first
+      // (milburn_summary.json; the full package unless one run is chosen)
       return (
-        <AgeSection
-          selectedPolicies={selectedPolicies}
-          selectedYear={distributionalYear}
-          policies={POLICIES}
-        />
+        <>
+          {catalogue.localBuild && (
+            <div className="results-container milburn-key-wrap">
+              <KeyFigures runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} />
+            </div>
+          )}
+          <AgeSection
+            selectedPolicies={selectedPolicies}
+            selectedYear={distributionalYear}
+            policies={POLICIES}
+          />
+        </>
       );
     }
     if (!results) return null;
@@ -1116,12 +1130,19 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
               scatter: two columns on a wide screen, stacked on a narrow one */}
           <section id={DECILES_ANCHOR} className="report-section distributional-section">
             <div className="charts-grid">
-              <DecileImpactCard
-                winnersLosers={results.rawWinnersLosers}
-                distributional={results.rawDistributional}
-                selectedPolicies={selectedPolicies}
-                selectedYear={distributionalYear}
-              />
+              <div className="decile-with-note">
+                <DecileImpactCard
+                  winnersLosers={results.rawWinnersLosers}
+                  distributional={results.rawDistributional}
+                  selectedPolicies={selectedPolicies}
+                  selectedYear={distributionalYear}
+                />
+                {catalogue.localBuild && (
+                  <p className="milburn-chart-note" role="note">
+                    {DECILE_SAMPLE_NOTE}
+                  </p>
+                )}
+              </div>
               <HouseholdScatter
                 selectedPolicies={selectedPolicies}
                 policies={POLICIES}

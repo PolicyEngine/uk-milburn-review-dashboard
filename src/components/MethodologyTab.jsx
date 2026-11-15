@@ -67,7 +67,10 @@ export const MILBURN_LIMITATIONS = [
   ["Static", "The main figures hold behaviour fixed: nobody changes their work, hours, claims or education because of a measure. The Behavioural scenarios tab shows illustrative second-round effects separately."],
   ["No NEET variable", "The data have no variable for being not in education, employment or training (NEET), so no figure here is for NEETs as such."],
   ["PIP in Scotland", "Adult Disability Payment records in Scotland are held as PIP in the data, so PIP figures for Scotland use ADP records."],
-  ["New-claimant health element rate", "Which Universal Credit health element rate a new claimant receives is assigned by a random draw that does not depend on age."],
+  ["New-claimant health element rate", "Which Universal Credit health element rate a new claimant receives is assigned by a random draw that does not depend on age. New claimants since April 2026 receive the lower health element (£217.26 a month, £2,607 a year) rather than £442.10 a month, so removing it takes less from them."],
+  ["Few young claimant records", "The results rest on roughly 500 to 650 survey records of young claimants, so the pattern across individual income deciles and single years of age is noisy; national totals are steadier than any one decile or age."],
+  ["Overlapping losses", "In the data, limited capability for work among under-25s mostly coincides with PIP receipt, so the package stacks both losses on largely the same people. Per-person losses are an upper bound and headcounts a lower bound."],
+  ["No replacement in the upper bound", "The full abolition package (upper bound) includes no replacement fund, cost allowance or insurance payment. The central variant stands in for a smaller allowance with PIP at half rate."],
   ["Small samples at 16 and 17", "Few survey households include people aged 16 or 17, so figures for those ages rest on small samples."],
   ["Not computable", "Some candidate measures cannot be computed with these data and this model; they are listed with the reason, and never shown as £0."],
   ["Not announced policy", "The measures are candidates modelled before the review's final report. They may differ from anything the review recommends or the government adopts."],
@@ -313,9 +316,12 @@ function MethodologyTab({ onShowTab }) {
           <Topic id={METHOD_ANCHORS.poverty} title="Poverty and inequality" preview="Absolute and relative poverty · Gini">
             {POVERTY_FIGURES_SHOWN ? (
               <p className="method-more">
-                The change in the share of people in <Term id="absolutePoverty">absolute poverty</Term>, before and
-                after housing costs, on the HBAI measure, and the change in the{" "}
-                <Term id="gini">Gini coefficient</Term> of equivalised household net income.
+                The change in the share of people in relative poverty (below 60% of median income in the same year) and
+                in <Term id="absolutePoverty">absolute poverty</Term>, each before and after housing costs, on the HBAI
+                measure, and the change in the <Term id="gini">Gini coefficient</Term>{" "}
+                of equivalised household net income. Every poverty figure names its measure; where there is a choice,
+                absolute poverty after housing costs is shown first. The relative line is 60% of the median, which
+                itself moves with these measures; the absolute line is fixed in real terms.
               </p>
             ) : (
               <p className="method-more">{WITHHELD_SENTENCE}</p>

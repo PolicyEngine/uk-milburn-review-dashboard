@@ -341,3 +341,15 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* The Milburn runs' groups on the Policies tab */
+.policy-card-group + .policy-card-group {
+  margin-top: 48px;
+}
+
+.policy-card-group-heading {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--c-text);
+}

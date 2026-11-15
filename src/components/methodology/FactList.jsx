@@ -108,6 +108,9 @@ const TERM_ICONS = {
   "PIP in Scotland": Accessibility,
   "New-claimant health element rate": Dice5,
   "Small samples at 16 and 17": Users,
+  "Few young claimant records": Users,
+  "Overlapping losses": Layers,
+  "No replacement in the upper bound": CircleSlash,
   "Not computable": CircleSlash,
   "Not announced policy": Megaphone,
 };

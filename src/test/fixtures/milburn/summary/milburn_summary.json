@@ -1,0 +1,73 @@
+{
+  "year": 2027,
+  "runs": [
+    {
+      "id": "milburn_package",
+      "label": "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release",
+      "direction": "loss",
+      "saving_bn": {
+        "2027": 4.0,
+        "2028": 4.1
+      },
+      "young_people_in_losing_households": 500400,
+      "share_of_16_24_in_losing_households_pct": 7.5,
+      "average_loss_young_person_in_losing_household": 12000,
+      "everyone_in_losing_households_pct": 2.0,
+      "poverty_change_pp": {
+        "rel_bhc": 0.3,
+        "rel_ahc": 0.2,
+        "abs_bhc": 0.4,
+        "abs_ahc": 0.5
+      },
+      "people_into_poverty_rel_ahc": 150000,
+      "child_poverty_change_pp_rel_ahc": 0.4,
+      "break_even_share_in_work_pct": {
+        "h16": 150.0,
+        "h25": 95.5
+      },
+      "entrants_to_match_income_loss": {
+        "h16": 550000,
+        "h25": 440000
+      },
+      "exchequer_gain_per_entrant": {
+        "h16": 4000.0,
+        "h25": 9000.0
+      },
+      "people_into_poverty_abs_ahc": 300000
+    },
+    {
+      "id": "milburn_package_entry_25pct",
+      "label": "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release",
+      "direction": "loss",
+      "saving_bn": {
+        "2027": 3.0
+      },
+      "young_people_in_losing_households": 400000,
+      "share_of_16_24_in_losing_households_pct": 6.0,
+      "average_loss_young_person_in_losing_household": 9000,
+      "poverty_change_pp": {
+        "rel_ahc": 0.1
+      },
+      "people_into_poverty_rel_ahc": 80000,
+      "child_poverty_change_pp_rel_ahc": 0.2
+    },
+    {
+      "id": "youth_allowance_at_25_plus_rate",
+      "label": "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release",
+      "direction": "gain",
+      "saving_bn": {
+        "2027": -0.8
+      },
+      "young_people_in_losing_households": 1100000,
+      "share_of_16_24_in_losing_households_pct": 15.0,
+      "average_loss_young_person_in_losing_household": -1100,
+      "poverty_change_pp": {
+        "rel_ahc": -0.14,
+        "abs_ahc": -0.16
+      },
+      "people_into_poverty_rel_ahc": -99000,
+      "child_poverty_change_pp_rel_ahc": -0.18,
+      "people_into_poverty_abs_ahc": -120000
+    }
+  ]
+}

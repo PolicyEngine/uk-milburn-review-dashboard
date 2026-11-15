@@ -25,6 +25,7 @@
  */
 
 import { parseFlatTable, parseTable } from "../publication/csv";
+import { milburnDisplayName } from "./measureGroups";
 
 export const LOCAL_BUILD_ROUTE = "local-build";
 export const MEASURES_FILE = "milburn_measures.json";
@@ -165,7 +166,9 @@ export function localBuildParts(measuresFile, runs = {}) {
   const labels = new Set();
   for (const measure of measuresFile.computable) {
     const run = runs[measure.id] ?? null;
-    const entry = { name: measure.name, description: measure.description, years: [], unsupported_years: [] };
+    // The packages carry the page's own names (measureGroups.js); every
+    // description is as milburn_measures.json publishes it
+    const entry = { name: milburnDisplayName(measure.id, measure.name), description: measure.description, years: [], unsupported_years: [] };
     if (run?.record && run.tables) {
       measures[measure.id] = { ...entry, status: "provisional", years: [...run.record.years] };
       tablesByKey[measure.id] = { ...run.tables, engine: { ...run.record.engine }, record: run.record };

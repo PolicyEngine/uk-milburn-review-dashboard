@@ -103,6 +103,19 @@
   overscroll-behavior: contain;
 }
 
+/* The Milburn runs' groups: a small heading over each group's rows */
+.policy-group + .policy-group {
+  border-top: 1px solid var(--pe-gray-200);
+}
+
+.policy-group-heading {
+  padding: 12px 18px 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--pe-gray-600);
+}
+
 /* One row per policy on a grid: checkbox, icon and name over its
    category, the info tip at the right; a hairline between rows. The rows
    sit on the menu's own surface, edge to edge: no inset tinted panel

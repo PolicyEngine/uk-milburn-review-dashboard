@@ -121,7 +121,11 @@ export const POVERTY_CHOICES = [
   },
 ];
 
-const POVERTY_DEFAULT = { basis: "absolute", housing: "bhc", group: "all" };
+// Absolute poverty after housing costs by default: the absolute line is
+// fixed in real terms, while the relative line (60% of the median) moves
+// with the measures' own effect on the median
+export const POVERTY_DEFAULT = { basis: "absolute", housing: "ahc", group: "all" };
+const POVERTY_DEFAULT_TEXT = "absolute-ahc-all";
 
 const POVERTY_LINES = {
   absolute: "the absolute poverty line (60% of 2024-25 median income, constant in real terms)",
@@ -184,8 +188,12 @@ export function metricSentence(metric, yearText, value, count = null) {
 }
 
 /** What the sentence names: "income inequality (the Gini coefficient)", "the poverty rate". */
+// A poverty measure names its line and housing costs: "the poverty rate
+// (relative poverty after housing costs)"
 const subjectOf = (metric) =>
-  metric.key === "gini_change" ? "income inequality (the Gini coefficient)" : metric.title.replace(/^Change in /, "");
+  metric.key === "gini_change"
+    ? "income inequality (the Gini coefficient)"
+    : `${metric.title.replace(/^Change in /, "")}${metric.line ? ` (${metric.line})` : ""}`;
 
 /** The poverty chart's metric for one choice of line, housing costs and people. */
 export function povertyMetric({ basis, housing, group }) {
@@ -336,7 +344,7 @@ export function usePovertyChoice() {
   const choose = (name) => (value) => {
     const next = { ...poverty, [name]: value };
     const text = POVERTY_CHOICES.map((group) => next[group.name]).join("-");
-    writeParam(PARAM.poverty, text === "absolute-bhc-all" ? null : text);
+    writeParam(PARAM.poverty, text === POVERTY_DEFAULT_TEXT ? null : text);
     window.dispatchEvent(new CustomEvent(POVERTY_EVENT, { detail: next }));
   };
   const controls = POVERTY_CHOICES.map((group) => ({

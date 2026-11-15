@@ -7,6 +7,7 @@ import PillChevron from "./PillChevron";
 import { useMeasureCatalogue } from "../utils/measureCatalogue";
 import { measureSummary, shortNameOf } from "../utils/policyDetails";
 import Tip, { InfoTip } from "./Tip";
+import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
 
 // The menu's order: measures that raise revenue, then those that cost it,
 // then the rest, each in the catalogue's order. One flat list, not grouped
@@ -41,7 +42,7 @@ const DIRECTION_ORDER = ["revenue", "cost", "neutral"];
  *   or Clear
  */
 function PolicySelector({ policies: providedPolicies, selectedPolicies, onPolicyToggle, onPoliciesSet, disabledReason, loading = false, noneReason, inactiveReason, single = false }) {
-  const { displayable } = useMeasureCatalogue();
+  const { displayable, localBuild } = useMeasureCatalogue();
   const policies = (providedPolicies ?? displayable).filter(
     (policy) => policy.displayable !== false,
   );
@@ -199,9 +200,21 @@ function PolicySelector({ policies: providedPolicies, selectedPolicies, onPolicy
           {/* The sheet's own title on a phone, where the pill is out of sight */}
           <div className="policy-selector-sheet-title" aria-hidden="true">Policies</div>
           <div className="policy-list" role={single ? "radiogroup" : "group"} aria-label="Policies" ref={listRef} onKeyDown={handleListKeyDown}>
-            {DIRECTION_ORDER.flatMap((direction) =>
-              policies.filter((policy) => (DIRECTION_ORDER.includes(policy.direction) ? policy.direction : "neutral") === direction),
-            ).map((policy) => {
+            {/* The Milburn runs in their groups (packages, single measures,
+                comparators), each under its heading; otherwise one list */}
+            {(localBuild
+              ? groupMilburnMeasures(policies)
+              : [{ id: "all", label: null, measures: DIRECTION_ORDER.flatMap((direction) =>
+                  policies.filter((policy) => (DIRECTION_ORDER.includes(policy.direction) ? policy.direction : "neutral") === direction),
+                ) }]
+            ).map((group) => (
+              <div key={group.id} className={group.label ? "policy-group" : "policy-ungrouped"} role={group.label ? "group" : undefined} aria-labelledby={group.label ? `policy-group-${group.id}` : undefined}>
+                {group.label && (
+                  <div id={`policy-group-${group.id}`} className="policy-group-heading">
+                    {group.label}
+                  </div>
+                )}
+                {group.measures.map((policy) => {
               const summary = measureSummary(policy);
               const checked = selectedPolicies.includes(policy.id);
               return (
@@ -219,7 +232,9 @@ function PolicySelector({ policies: providedPolicies, selectedPolicies, onPolicy
                   {summary && <InfoTip wide content={summary} label={`About ${shortNameOf(policy)}`} />}
                 </div>
               );
-            })}
+                })}
+              </div>
+            ))}
           </div>
           {/* Select all, clear and close: on a phone the list fills the
               screen, so it needs its own way out */}

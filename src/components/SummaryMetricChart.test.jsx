@@ -167,7 +167,8 @@ describe("measure choices", () => {
     // toggles in its popover
     const choices = document.querySelector(".summary-metric-choices");
     expect(choices.previousElementSibling).toHaveClass("chart-header");
-    expect(screen.getByRole("button", { name: /^Options:/ })).toHaveAccessibleName("Options: Absolute · Before housing costs · All people");
+    // Absolute poverty after housing costs by default
+    expect(screen.getByRole("button", { name: /^Options:/ })).toHaveAccessibleName("Options: Absolute · After housing costs · All people");
     fireEvent.click(screen.getByRole("button", { name: /^Options:/ }));
     const choose = (group, option) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: group })).getByRole("radio", { name: option }));
@@ -207,10 +208,11 @@ describe("measure choices", () => {
 
 describe("povertyMetric and parsePovertyChoice", () => {
   it("keeps the headline column for absolute, before housing costs, everyone", () => {
-    expect(povertyMetric(parsePovertyChoice(null)).key).toBe("poverty_change_pp");
+    expect(povertyMetric(parsePovertyChoice("absolute-bhc-all")).key).toBe("poverty_change_pp");
+    expect(povertyMetric(parsePovertyChoice(null)).key).toBe("poverty_abs_ahc_change_pp");
     expect(povertyMetric(parsePovertyChoice("relative-ahc-children")).key).toBe("child_poverty_rel_ahc_change_pp");
     expect(povertyMetric(parsePovertyChoice("absolute-ahc-all")).key).toBe("poverty_abs_ahc_change_pp");
-    expect(parsePovertyChoice("nonsense-ahc")).toEqual({ basis: "absolute", housing: "ahc", group: "all" });
+    expect(parsePovertyChoice("nonsense-bhc")).toEqual({ basis: "absolute", housing: "bhc", group: "all" });
   });
 });
 
@@ -260,7 +262,7 @@ describe("the card's sentence", () => {
     expect(metricSentence(INEQUALITY_METRICS.gini, "2029-30", 0.16)).toBe(
       "In 2029-30 the selected policies raise income inequality (the Gini coefficient) by about 0.16%.",
     );
-    expect(metricSentence(povertyMetric(parsePovertyChoice(null)), "2029-30", -0.012, "about 4,200 people")).toBe(
+    expect(metricSentence(povertyMetric(parsePovertyChoice("absolute-bhc-all")), "2029-30", -0.012, "about 4,200 people")).toBe(
       "In 2029-30 the selected policies move about 4,200 people out of absolute poverty before housing costs, lowering the rate by about 0.012 percentage points.",
     );
   });

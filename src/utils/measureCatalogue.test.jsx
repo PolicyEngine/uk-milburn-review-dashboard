@@ -281,6 +281,11 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
     // The Milburn review: the measures listed as not computable, in the
     // registry's own words
     "utils/milburn/notComputable.js": [/export const NOT_COMPUTABLE_MEASURES = \[[\s\S]*?\n\];/],
+    // The Milburn runs' display names and groups (measureGroups.js), and
+    // the summary's default and 25%-entry runs (summary.js): page wording
+    // and order only; which runs exist comes from milburn_measures.json
+    "utils/milburn/measureGroups.js": [/export const MILBURN_DISPLAY_NAMES = Object\.freeze\(\{[\s\S]*?\n\}\);/, /export const MILBURN_GROUPS = Object\.freeze\(\[[\s\S]*?\n\]\);/],
+    "utils/milburn/summary.js": [/^export const (?:DEFAULT_SUMMARY_RUN|ENTRY_RUN) = "[a-z0-9_]+";$/gm],
     "utils/householdExamples.js": [/^\s*(?:measure|measures|tag): .*$/gm],
     "components/personal/SingleYearResults.jsx": [/export const SPENDING_MEASURES = \[.*\];/],
     "utils/measureModelling.js": [/export const MODELLING_NOTE = \{[\s\S]*?\n\};/],

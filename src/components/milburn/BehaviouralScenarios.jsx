@@ -30,6 +30,19 @@ import {
   scenarioFigures,
 } from "../../utils/milburn/scenarios";
 import { youngPeopleWorseOff } from "../../utils/milburn/youngPeople";
+import {
+  BREAK_EVEN_HOURS,
+  DEFAULT_SUMMARY_RUN,
+  ENTRY_RUN,
+  breakEvenText,
+  formatBn,
+  formatPeople,
+  formatPounds,
+  savingInYear,
+  summaryRun,
+  useMilburnSummary,
+} from "../../utils/milburn/summary";
+import { shortNameOf } from "../../utils/policyDetails";
 import "./milburn.css";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -75,6 +88,96 @@ function Unavailable({ children }) {
   );
 }
 
+/** The gain from work is the same with and without the package: said wherever the arithmetic is. */
+export const SAME_GAIN_SENTENCE =
+  "The gain from moving into work is the same under current law and under the package, so this is arithmetic about how far work could offset the loss, not an incentive the reform creates.";
+
+/**
+ * Break-even arithmetic for one run, from milburn_summary.json: the share
+ * of young people in losing households who would need to move into work
+ * for their average income to recover, the entrants whose gains would
+ * match the total income loss, and the Exchequer's gain per entrant, at 16
+ * and 25 hours a week. Beside it, where it has run, the package with an
+ * illustrative 25% moving into work, microsimulated.
+ */
+export function BreakEven({ runId, catalogue }) {
+  const id = runId || DEFAULT_SUMMARY_RUN;
+  const { status, summary } = useMilburnSummary(catalogue?.manifest?.snapshotSha256 ?? null);
+  const measure = catalogue?.byId?.get(id);
+  const name = measure ? shortNameOf(measure) : id;
+  let body;
+  if (status === "loading") {
+    body = (
+      <p className="view-status" role="status">
+        Loading the break-even arithmetic…
+      </p>
+    );
+  } else if (status !== "ready") {
+    body = <p role="status">Not available: the summary file has not been written yet.</p>;
+  } else {
+    const run = summaryRun(summary, id);
+    const yearLabel = fiscalYearTick(summary.year);
+    if (!run) {
+      body = <p role="status">Not yet run: the arithmetic for {name} appears here once its national run has finished.</p>;
+    } else if (run.direction === "gain") {
+      body = <p role="status">{name} raises young people&rsquo;s household incomes, so there is no loss for work to make up: no break-even arithmetic applies.</p>;
+    } else {
+      const fullId = DEFAULT_SUMMARY_RUN;
+      const full = summaryRun(summary, fullId);
+      const entry = summaryRun(summary, ENTRY_RUN);
+      const fullSaving = savingInYear(full, summary.year);
+      const entrySaving = savingInYear(entry, summary.year);
+      const fullName = catalogue?.byId?.get(fullId) ? shortNameOf(catalogue.byId.get(fullId)) : fullId;
+      body = (
+        <>
+          <p>
+            For {name}, {yearLabel}: how many of the young people aged 16 to 24 in losing households would need to move
+            into work for the gain to make up the loss. {SAME_GAIN_SENTENCE}
+          </p>
+          <div className="milburn-table-wrap">
+            <table className="milburn-table">
+              <thead>
+                <tr>
+                  <th scope="col">Hours a week</th>
+                  <th scope="col">Share who would need to move into work for their average income to recover</th>
+                  <th scope="col">Entrants whose gains would match the total income loss</th>
+                  <th scope="col">Exchequer gain per entrant, £ a year</th>
+                </tr>
+              </thead>
+              <tbody>
+                {BREAK_EVEN_HOURS.map(({ id: hoursId, hours }) => (
+                  <tr key={hoursId} data-hours={hours}>
+                    <th scope="row">{hours} hours</th>
+                    <td>{breakEvenText(run.breakEvenSharePct[hoursId]) || "Not in the summary"}</td>
+                    <td>{run.entrantsToMatch[hoursId] !== null ? formatPeople(run.entrantsToMatch[hoursId]) : "Not in the summary"}</td>
+                    <td>{run.exchequerGainPerEntrant[hoursId] !== null ? formatPounds(run.exchequerGainPerEntrant[hoursId]) : "Not in the summary"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p>
+            A share above 100% means that even if every young person in a losing household moved into work at those
+            hours, the average gain would not restore the average loss. Counts are rounded to the nearest thousand.
+          </p>
+          {entrySaving !== null && fullSaving !== null && (
+            <p data-entry-run="">
+              Static saving in {yearLabel}: {formatBn(fullSaving)} for {fullName}; {formatBn(entrySaving)} with 25%
+              moving into work, microsimulated.
+            </p>
+          )}
+        </>
+      );
+    }
+  }
+  return (
+    <section className="report-section milburn-breakeven" aria-labelledby="milburn-breakeven-heading">
+      <h3 id="milburn-breakeven-heading">Break-even arithmetic</h3>
+      {body}
+    </section>
+  );
+}
+
 /**
  * Population impact's Behavioural scenarios sub-tab: what the package's
  * effect on the public finances would be if a share of the young people it
@@ -83,7 +186,7 @@ function Unavailable({ children }) {
  * static figure from the verified results. Any of them missing shows an
  * unavailable state, never zeros.
  */
-export default function BehaviouralScenarios() {
+export default function BehaviouralScenarios({ selectedRun } = {}) {
   const narrow = useNarrowViewport();
   const catalogue = useMeasureCatalogue();
   const file = useScenariosFile();
@@ -306,6 +409,7 @@ export default function BehaviouralScenarios() {
     <div className="results-container milburn-scenarios">
       {heading}
       {label}
+      {catalogue.localBuild && <BreakEven runId={selectedRun} catalogue={catalogue} />}
       {body}
     </div>
   );

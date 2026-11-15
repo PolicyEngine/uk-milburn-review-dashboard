@@ -47,7 +47,9 @@ beforeEach(() => {
       return existsSync(path) ? new Response(readFileSync(path), { status: 200 }) : new Response("", { status: 404 });
     }),
   );
-  window.history.replaceState({}, "", "/?sub=poverty");
+  // The headline measure chosen explicitly (the default is absolute poverty
+  // after housing costs)
+  window.history.replaceState({}, "", "/?sub=poverty&poverty=absolute-bhc-all");
 });
 
 afterEach(() => {
@@ -179,7 +181,7 @@ describe("the Poverty sub-tab's measures pair", () => {
     const headline = measures.querySelector(".chart-description");
     // The total is the poverty rate card's sentence and the last bar, not
     // this headline too (each fact once)
-    expect(headline).toHaveTextContent(/^Of the policies on their own, unfreezing the student loan threshold moves the most: about [\d,]+ people out of poverty\.$/);
+    expect(headline).toHaveTextContent(/^Of the policies on their own, unfreezing the student loan threshold moves the most: about [\d,]+ people out of absolute poverty before housing costs\.$/);
     expect(headline.textContent).not.toMatch(/together/);
     expect(measures.textContent).not.toMatch(/package/i);
     expect(headline.textContent).not.toMatch(/≈|pp/);
@@ -304,7 +306,7 @@ describe("a measure whose artifact predates the poverty and inequality measures"
     // not of the children chosen
     const population = outlookPopulation(JSON.parse(readFileSync(join(PUBLIC, "data", "living_standards_outlook.json"), "utf8")));
     expect(about(population(2027, "children"))).not.toBe(about(population(2027, "all")));
-    await waitFor(() => expect(card.querySelector(".chart-description")).toHaveTextContent(`moves ${about(population(2027, "all"))} people out of poverty.`), { timeout: 5000 });
+    await waitFor(() => expect(card.querySelector(".chart-description")).toHaveTextContent(`moves ${about(population(2027, "all"))} people out of absolute poverty before housing costs.`), { timeout: 5000 });
   });
 
   it("still says so of a measure whose run carries the measure as no change, with no note", async () => {
@@ -417,7 +419,7 @@ describe("About this chart and the sentence follow the selection (W6 G1)", () =>
   it("names the poverty line, not 'this line', when no selected policy moves anyone", async () => {
     const card = await renderMeasures(["fuel_duty_rise_deferral"]);
     expect(card.querySelector(".chart-description")).toHaveTextContent(
-      /^No selected policy on its own moves anyone across the poverty line in 2027-28\.$/,
+      /^No selected policy on its own moves anyone into or out of absolute poverty before housing costs in 2027-28\.$/,
     );
   });
 });

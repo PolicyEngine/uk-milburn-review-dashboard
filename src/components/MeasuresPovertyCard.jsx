@@ -257,20 +257,20 @@ export default function MeasuresPovertyCard({ rows, policies, selectedPolicies, 
     peopleMode ? (
       totalStep ? (
         <>
-          Of the policies on their own, {inSentence(top)} moves the most: {about(top)} {who} {direction(top)} poverty.
+          Of the policies on their own, {inSentence(top)} moves the most: {about(top)} {who} {direction(top)} {metric.line}.
         </>
       ) : (
         <>
-          {subjectOf(top)} moves {about(top)} {who} {direction(top)} poverty.
+          {subjectOf(top)} moves {about(top)} {who} {direction(top)} {metric.line}.
         </>
       )
     ) : (
       <>
-        {top.name} moves the rate most, by {formatPp(top.pp).replace(/^[+−]/, "").replace(/pp$/, " percentage points")}.
+        {top.name} moves the rate of {metric.line} most, by {formatPp(top.pp).replace(/^[+−]/, "").replace(/pp$/, " percentage points")}.
       </>
     )
   ) : (
-    <>No selected policy on its own moves anyone across the poverty line in {year}.</>
+    <>No selected policy on its own moves anyone into or out of {metric.line} in {year}.</>
   );
 
   return (

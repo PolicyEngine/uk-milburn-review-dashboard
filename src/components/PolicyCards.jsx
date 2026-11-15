@@ -4,6 +4,8 @@ import "./MeasureRowLabel.css";
 import "./PolicyCards.css";
 import { measureCategoryOf } from "../utils/measureCategory";
 import { withPolicyDetails } from "../utils/policyDetails";
+import { useMeasureCatalogue } from "../utils/measureCatalogue";
+import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
 import { policyCardAnchor } from "../utils/methodLink";
 import { parameterTableFor } from "../utils/policyParameters";
 import PolicyChange, { changeView, usePolicyParameters } from "./PolicyChange";
@@ -613,6 +615,7 @@ export function PolicyCard({ policy, onShowEffect, parameters: given }) {
  */
 function PolicyCards({ policies, selectedPolicies, onShowEffect, parameterTables }) {
   const tables = usePolicyParameters(parameterTables);
+  const { localBuild } = useMeasureCatalogue();
   const shown = policies.filter((policy) => policy.displayable === true && selectedPolicies.includes(policy.id));
   // The Budget's Table 6.1 order; a measure with no row after, raises
   // first, then costs, then the rest, each in the catalogue's order
@@ -624,9 +627,9 @@ function PolicyCards({ policies, selectedPolicies, onShowEffect, parameterTables
     .map(withPolicyDetails)
     .sort((a, b) => (a.cardOrder ?? Infinity) - (b.cardOrder ?? Infinity) || budgetRank(a) - budgetRank(b) || rank(a) - rank(b) || a.order - b.order);
   if (!shown.length) return null;
-  return (
+  const list = (cards) => (
     <ul className="policy-cards">
-      {items.map((policy) => (
+      {cards.map((policy) => (
         <PolicyCard
           key={policy.id}
           policy={policy}
@@ -636,6 +639,23 @@ function PolicyCards({ policies, selectedPolicies, onShowEffect, parameterTables
       ))}
     </ul>
   );
+  // The Milburn runs in their groups: packages, single measures, then the
+  // comparators that are not review proposals
+  if (localBuild) {
+    return (
+      <>
+        {groupMilburnMeasures(items).map((group) => (
+          <section key={group.id} className="policy-card-group" aria-labelledby={`policy-card-group-${group.id}`}>
+            <h3 id={`policy-card-group-${group.id}`} className="policy-card-group-heading">
+              {group.label}
+            </h3>
+            {list(group.measures)}
+          </section>
+        ))}
+      </>
+    );
+  }
+  return list(items);
 }
 
 export default PolicyCards;

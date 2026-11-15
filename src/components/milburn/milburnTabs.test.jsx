@@ -80,7 +80,7 @@ describe("Benchmarks", () => {
     render(<BenchmarksTable />);
     expect(await screen.findByText("260,000")).toBeInTheDocument();
     expect(screen.getByText("62,570")).toBeInTheDocument();
-    expect(screen.getByText("Press report")).toBeInTheDocument();
+    expect(screen.getAllByText("Press report").length).toBeGreaterThan(0);
     for (const link of within(screen.getByRole("table")).getAllByRole("link")) {
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");

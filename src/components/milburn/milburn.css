@@ -211,3 +211,131 @@
 .milburn-pending-status {
   font-weight: 500;
 }
+
+/* Key figures (KeyFigures.jsx), at the top of the Young people sub-tab */
+.milburn-key {
+  padding: var(--card-padding, 20px);
+  margin-bottom: 24px;
+}
+
+.milburn-key-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 16px;
+}
+
+.milburn-key-heading h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.milburn-key-heading p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--c-axis-title);
+}
+
+.milburn-key-tiles {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 20px 24px;
+}
+
+.milburn-key-tile p {
+  margin: 0;
+}
+
+.milburn-key-value {
+  font-size: var(--fs-xl, 1.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.milburn-key-extra {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--c-axis-title);
+}
+
+.milburn-key-label {
+  margin-top: 4px !important;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--c-text);
+}
+
+.milburn-key-definition {
+  margin-top: 4px !important;
+  font-size: var(--fs-caption, 0.8rem);
+  line-height: 1.5;
+  color: var(--c-axis-title);
+}
+
+.milburn-key-missing {
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--c-axis);
+  border-radius: 8px;
+  background: var(--c-muted-fill);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.milburn-key-foot {
+  margin: 16px 0 0;
+  font-size: var(--fs-caption, 0.8rem);
+  color: var(--c-axis-title);
+}
+
+/* Break-even arithmetic (BehaviouralScenarios.jsx) */
+.milburn-breakeven {
+  padding: var(--card-padding, 20px);
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+  background: var(--c-surface);
+}
+
+.milburn-breakeven h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.milburn-breakeven p {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.milburn-breakeven .milburn-table-wrap {
+  margin-bottom: 12px;
+}
+
+.milburn-breakeven td {
+  font-variant-numeric: tabular-nums;
+}
+
+.milburn-breakeven .milburn-table thead th {
+  white-space: normal;
+  min-width: 120px;
+}
+
+.milburn-breakeven .milburn-table tbody th {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* The note under the decile chart on the local build route */
+.milburn-chart-note {
+  margin: 12px 0 0;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--c-axis-title);
+}
