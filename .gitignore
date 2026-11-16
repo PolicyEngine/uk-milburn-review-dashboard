@@ -51,3 +51,6 @@ public/data/household_scatter_full.csv
 # Local W5 validation snapshots and commit storage
 /.w5-probes/
 /.w5-commits.git/
+
+# Static export for a Claude artifact (ARTIFACT_EXPORT=1)
+/artifact-export/

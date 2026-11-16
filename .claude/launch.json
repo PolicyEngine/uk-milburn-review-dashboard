@@ -4,8 +4,25 @@
     {
       "name": "milburn-dashboard",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "dev", "--port", "3100"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--port",
+        "3100"
+      ],
       "port": 3100
+    },
+    {
+      "name": "artifact-export-test",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "3200",
+        "--directory",
+        "/private/tmp/claude-501/-Users-vahid-uk-milburn-review-dashboard/f8da878b-2210-4265-bae9-de88c7db72c3/scratchpad/serve"
+      ],
+      "port": 3200
     }
   ]
 }

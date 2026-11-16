@@ -44,7 +44,14 @@ function dataRoute(): string {
   return existsSync(join(process.cwd(), 'public', 'data', 'milburn_measures.json')) ? 'local-build' : 'verified';
 }
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH !== undefined
+// A static export for a Claude artifact (ARTIFACT_EXPORT=1): no base path,
+// no server redirects or headers, written to its own folder so the dev
+// server's .next is untouched.
+const artifactExport = process.env.ARTIFACT_EXPORT === '1';
+
+const basePath = artifactExport
+  ? ''
+  : process.env.NEXT_PUBLIC_BASE_PATH !== undefined
   ? process.env.NEXT_PUBLIC_BASE_PATH
   : '/uk/milburn-review';
 
@@ -56,8 +63,10 @@ checkHouseholdApiEnv(process.env);
 
 const nextConfig: NextConfig = {
   ...(basePath ? { basePath } : {}),
+  ...(artifactExport ? { output: 'export' as const, distDir: 'artifact-export', images: { unoptimized: true } } : {}),
   env: {
-    NEXT_PUBLIC_BASE_PATH: basePath,
+    // The artifact's files sit next to its page: fetch data relative to it
+    NEXT_PUBLIC_BASE_PATH: artifactExport ? '.' : basePath,
     NEXT_PUBLIC_POLICYENGINE_VERSION: lockedVersion('policyengine'),
     NEXT_PUBLIC_PUBLISHED_GEOGRAPHY: publishedGeography(),
     NEXT_PUBLIC_DATA_ROUTE: dataRoute(),
@@ -71,11 +80,13 @@ const nextConfig: NextConfig = {
   // The bare origin (http://localhost:3100) has no page under a base path;
   // send it to the dashboard rather than a 404.
   async redirects() {
+    if (artifactExport) return [];
     return basePath
       ? [{ source: '/', destination: basePath, basePath: false, permanent: false }]
       : [];
   },
   async headers() {
+    if (artifactExport) return [];
     return [
       // A local review build: not for search engines (the page's robots
       // meta says the same)
