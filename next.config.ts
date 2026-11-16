@@ -68,6 +68,13 @@ const nextConfig: NextConfig = {
   // An artifact directory is named by its digest and never changes once
   // written, so the browser may keep its files; the page still checks every
   // byte against the manifest, which is always fetched fresh
+  // The bare origin (http://localhost:3100) has no page under a base path;
+  // send it to the dashboard rather than a 404.
+  async redirects() {
+    return basePath
+      ? [{ source: '/', destination: basePath, basePath: false, permanent: false }]
+      : [];
+  },
   async headers() {
     return [
       // A local review build: not for search engines (the page's robots
