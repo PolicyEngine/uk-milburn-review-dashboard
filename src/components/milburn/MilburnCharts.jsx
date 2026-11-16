@@ -15,6 +15,7 @@ import {
   TOOLTIP_CONTENT_STYLE,
   UNSELECTED_OPACITY,
   axisWidth,
+  fiscalYearTick,
   zeroBasedAxis,
 } from "../../utils/chartTheme";
 import "./milburn.css";
@@ -169,5 +170,22 @@ export function FiguresTable({ children, label = "Figures as a table" }) {
       </summary>
       <div className="milburn-table-wrap">{children}</div>
     </details>
+  );
+}
+
+/** What the year-only chip says of a box whose figures are for one year. */
+export const yearOnlyText = (year, what = "these figures") => `${fiscalYearTick(year)} only: the year selector does not change ${what}.`;
+
+/**
+ * The chip on a box whose figures are for the summary's year whatever year
+ * is chosen above the page: "2027-28 only", with the reason beside it.
+ */
+export function YearOnlyChip({ year, what }) {
+  if (!Number.isInteger(year)) return null;
+  return (
+    <p className="milburn-status-chip milburn-year-only" data-year-only="" role="note">
+      <TitleIcon name="calendar" bare size={14} />
+      {yearOnlyText(year, what)}
+    </p>
   );
 }

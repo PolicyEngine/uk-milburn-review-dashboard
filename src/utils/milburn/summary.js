@@ -13,7 +13,16 @@
  *     child_poverty_change_pp_rel_ahc,
  *     break_even_share_in_work_pct: { h16, h25 },
  *     entrants_to_match_income_loss: { h16, h25 },
- *     exchequer_gain_per_entrant: { h16, h25 }, direction: "gain"|"loss" }] }
+ *     exchequer_gain_per_entrant: { h16, h25 }, people_directly_affected,
+ *     direction: "gain"|"loss" }] }
+ *
+ * The break-even figures share one definition: entrants_to_match_income_loss
+ * is the run's Exchequer saving divided by one entrant's gain from work
+ * (the household case), and break_even_share_in_work_pct is those entrants
+ * as a share of the young people in losing households. Above 100% there
+ * are more entrants than young people in those households.
+ * people_directly_affected is the people whose own earnings or taxes
+ * change: the movers in the run with a move into work.
  *
  * A "gain" run (the comparators) raises incomes: its *losing* and *loss*
  * fields hold the young people in gaining households and a negative loss
@@ -41,8 +50,26 @@ export const BREAK_EVEN_HOURS = Object.freeze([
   { id: "h25", hours: 25 },
 ]);
 
-/** Shown in place of a share above 100%. */
-export const NO_ENTRY_RATE_RESTORES = "No entry rate at these hours restores the average";
+/** What the entry run assumes, in words: who moves, and into what work (milburn_variants.py). */
+export const ENTRY_ASSUMPTION = Object.freeze({
+  share: "25%",
+  group: "non-working 18 to 24-year-olds with PIP or the health element",
+  work: "16 hours' work a week at the minimum wage for their age",
+});
+
+/** The entry run's assumption as one phrase. */
+export const ENTRY_ASSUMPTION_TEXT = `${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group} move into ${ENTRY_ASSUMPTION.work}`;
+
+/** What the break-even share is. */
+export const BREAK_EVEN_SHARE_DEFINITION =
+  "Entrants needed, as a share of the 16 to 24-year-olds in losing households.";
+
+/** What the entrants needed are. */
+export const BREAK_EVEN_ENTRANTS_DEFINITION =
+  "Entrants needed: the Exchequer saving (standing for the total income loss) divided by one entrant's gain from work.";
+
+/** Said of a share above 100%. */
+export const MORE_ENTRANTS_THAN_GROUP = "More entrants than there are 16 to 24-year-olds in losing households";
 
 const finite = (value) => (typeof value === "number" && Number.isFinite(value) ? value : null);
 
@@ -80,6 +107,7 @@ export function parseSummaryRun(run) {
     breakEvenSharePct: pick(run.break_even_share_in_work_pct, HOURS_KEYS),
     entrantsToMatch: pick(run.entrants_to_match_income_loss, HOURS_KEYS),
     exchequerGainPerEntrant: pick(run.exchequer_gain_per_entrant, HOURS_KEYS),
+    peopleDirectlyAffected: finite(run.people_directly_affected),
   };
 }
 
@@ -139,13 +167,31 @@ export function formatPct(value) {
 }
 
 /**
- * The break-even share in words: the percentage, or, above 100%, that no
- * entry rate at these hours restores the average. Empty when missing.
+ * The break-even share in words: the percentage, and, above 100%, that the
+ * entrants needed outnumber the young people in losing households. Empty
+ * when missing.
  */
 export function breakEvenText(sharePct) {
   if (finite(sharePct) === null) return "";
-  if (sharePct > 100) return `${NO_ENTRY_RATE_RESTORES} (${sharePct.toFixed(1)}% would be needed)`;
+  if (sharePct > 100) return `${sharePct.toFixed(1)}% (${MORE_ENTRANTS_THAN_GROUP.toLowerCase()})`;
   return `${sharePct.toFixed(1)}%`;
+}
+
+/**
+ * The people the run with a move into work moves, from its own results
+ * (people_directly_affected), or null when the file carries none: a static
+ * run's zero is not a count of movers.
+ */
+export function entryMovers(run) {
+  const count = finite(run?.peopleDirectlyAffected);
+  return count !== null && count > 0 ? count : null;
+}
+
+/** A run's saving in a year as a share of another's (0.448), or null when either is missing or the other is not positive. */
+export function savingShare(run, ofRun, year) {
+  const part = savingInYear(run, year);
+  const whole = savingInYear(ofRun, year);
+  return part !== null && whole !== null && whole > 0 ? part / whole : null;
 }
 
 /**
@@ -158,8 +204,10 @@ export function useMilburnSummary(refresh, { basePath = process.env.NEXT_PUBLIC_
   useEffect(() => {
     if (!enabled) return undefined;
     let cancelled = false;
-    fetch(`${basePath}/data/${SUMMARY_FILE}`, { cache: "no-cache" })
-      .then((response) => (response.ok ? response.json() : null))
+    // Inside a promise, so a fetch that throws or returns nothing reads as unavailable
+    Promise.resolve()
+      .then(() => fetch(`${basePath}/data/${SUMMARY_FILE}`, { cache: "no-cache" }))
+      .then((response) => (response?.ok ? response.json() : null))
       .then((json) => {
         const summary = parseSummary(json);
         if (!cancelled) setState({ status: summary ? "ready" : "unavailable", summary });

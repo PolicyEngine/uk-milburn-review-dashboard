@@ -15,6 +15,8 @@ import "./methodology/Methodology.css";
 import { scrollBelowBars, smoothUnlessReduced } from "../utils/pageScroll";
 import { POVERTY_FIGURES_SHOWN, WITHHELD_SENTENCE } from "../utils/povertyFigures";
 import { MICROCOSM_BUILD, POLICYENGINE_UK_VERSION, REPLICATION_LINE } from "./ReplicationLine";
+import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
+import { ENTRY_ASSUMPTION_TEXT } from "../utils/milburn/summary";
 import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
 
 /** The policyengine-core version this build runs, beside policyengine-uk. */
@@ -158,7 +160,11 @@ function useRevealLinkedAnchor() {
 function MethodologyTab({ onShowTab }) {
   const catalogue = useMeasureCatalogue();
   const UNAVAILABLE = unavailableMeasures(catalogue);
-  const modelled = (catalogue.measures ?? []).map((measure) => ({ id: measure.id, name: measure.name }));
+  // The measures the page offers, as the Measures tab and the selector group
+  // them: a hidden run (one that only feeds another tab) is not counted
+  const modelled = groupMilburnMeasures(catalogue.measures ?? []).flatMap((group) =>
+    group.measures.map((measure) => ({ id: measure.id, name: measure.name })),
+  );
   useRevealLinkedAnchor();
 
   return (
@@ -358,7 +364,7 @@ function MethodologyTab({ onShowTab }) {
               items={[
                 [
                   "Microsimulated",
-                  "The full abolition package is run again with a quarter of the young people it leaves worse off moving into work, and set beside the static package: the saving, poverty and average loss.",
+                  `The full abolition package is run again with ${ENTRY_ASSUMPTION_TEXT}, chosen at random, and set beside the static package: the saving, poverty and average loss.`,
                 ],
                 [
                   "Entry cases",
@@ -366,7 +372,7 @@ function MethodologyTab({ onShowTab }) {
                 ],
                 [
                   "Break-even",
-                  "How many of the young people in losing households would need to move into work for their gains to make up the loss. The gain from work is the same under current law and under the package.",
+                  "The entrants whose gains from work would add up to the Exchequer saving (standing for the total income loss), and those entrants as a share of the young people in losing households. One entrant's gain comes from the household entry case, where it is the same under current law and under the package.",
                 ],
               ]}
             />

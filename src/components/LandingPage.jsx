@@ -1,6 +1,7 @@
 import SourceLink from "./SourceLink";
 import { ChevronRight } from "lucide-react";
 import TitleIcon from "./TitleIcon";
+import { REPORT_DAY, subShownOnReportDay } from "../utils/milburn/reportDay";
 import "./LandingPage.css";
 
 /** One of the three boxes: a link that opens its view in place. */
@@ -35,13 +36,14 @@ function LandingBox({ tab, sub, icon, title, description, onOpen }) {
 /**
  * The three ways in, in order: [tab, sub, icon, title, line]. While the
  * measures are provisional, the policies box names them as modelled
- * measures, not the Budget's contents.
+ * measures, not the Budget's contents. A box whose sub-tab the report-day
+ * switch hides (utils/milburn/reportDay.js: Return to work) goes with it.
  */
-const boxes = () => [
+export const landingBoxes = ({ reportDay = REPORT_DAY } = {}) => [
   ["dashboard", "age", "usersRound", "Young people", "Who gains or loses, and the cost"],
   ["dashboard", "scenarios", "sliders", "Return to work", "The package if some young people move into work"],
   ["policies", undefined, "list", "The measures modelled", "Every candidate measure, and how we model it"],
-];
+].filter(([, sub]) => subShownOnReportDay(sub, reportDay));
 
 /**
  * What the dashboard is: the heading (its id given, as the
@@ -94,8 +96,8 @@ function LandingRow({ tab, sub, icon, title, description, onOpen }) {
  * rows (`list`, the overview drawer's "In this dashboard" card), labelled
  * by `labelledBy`.
  */
-export function LandingBoxes({ onOpen, list = false, labelledBy, provisional = false }) {
-  const BOXES = boxes(provisional);
+export function LandingBoxes({ onOpen, list = false, labelledBy, reportDay = REPORT_DAY }) {
+  const BOXES = landingBoxes({ reportDay });
   if (list) {
     return (
       <ul className="landing-rows" aria-labelledby={labelledBy}>

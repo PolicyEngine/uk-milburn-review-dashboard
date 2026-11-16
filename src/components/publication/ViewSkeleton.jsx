@@ -3,6 +3,7 @@ import TitleIcon from "../TitleIcon";
 import { TAB_ICONS } from "../ViewTabs";
 import { BOOT_SUBS, BOOT_TABS } from "../../utils/bootView";
 import { POVERTY_FIGURES_SHOWN } from "../../utils/povertyFigures";
+import { subShownOnReportDay } from "../../utils/milburn/reportDay";
 import "./publication.css";
 
 /**
@@ -25,7 +26,8 @@ export const SKELETON_SUB_TABS = {
     { value: "finances", label: "Public finances", icon: "landmark" },
     { value: "scenarios", label: "Return to work", icon: "sliders" },
     { value: "benchmarks", label: "Benchmarks", icon: "scale" },
-  ],
+    // Less the sub-tabs the report-day switch hides (milburn/reportDay.js)
+  ].filter((tab) => subShownOnReportDay(tab.value)),
 };
 const SUB_TABS = SKELETON_SUB_TABS;
 
@@ -39,7 +41,7 @@ const LAYOUTS = {
     { icon: "usersRound", title: "How each age group's income changes", cards: [["lines", "wide"], ["bars"], ["bars"]] },
   ],
   "dashboard:scenarios": [
-    { icon: "sliders", title: "Return to work", subtitle: "The package with a quarter of affected young people moving into work, microsimulated, beside the static estimate.", cards: [["text", "wide"]] },
+    { icon: "sliders", title: "Return to work", subtitle: "The package with some young people on PIP or the health element moving into work, microsimulated, beside the static estimate.", cards: [["text", "wide"]] },
   ],
   "dashboard:benchmarks": [
     { icon: "scale", title: "Benchmarks", subtitle: "Published figures on young people, work and health-related benefits.", cards: [["text", "wide"]] },

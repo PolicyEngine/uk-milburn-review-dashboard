@@ -3,7 +3,7 @@ import SectionHeading from "../SectionHeading";
 import TitleIcon from "../TitleIcon";
 import { Bar, BarChart, CartesianGrid, LabelList, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { TOOLTIP_PROPS } from "../ChartTooltip";
-import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard } from "./MilburnCharts";
+import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, YearOnlyChip } from "./MilburnCharts";
 import { buildChartCsv } from "../../utils/chartCsv";
 import {
   AXIS_LINE,
@@ -23,11 +23,16 @@ import { fiscalYearTick } from "../../utils/chartTheme";
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { HOURS_CASES, SCENARIOS_FILE, parseScenarios } from "../../utils/milburn/scenarios";
 import {
+  BREAK_EVEN_ENTRANTS_DEFINITION,
   BREAK_EVEN_HOURS,
+  BREAK_EVEN_SHARE_DEFINITION,
   DEFAULT_SUMMARY_RUN,
+  ENTRY_ASSUMPTION,
+  ENTRY_ASSUMPTION_TEXT,
   ENTRY_RUN,
-  NO_ENTRY_RATE_RESTORES,
+  MORE_ENTRANTS_THAN_GROUP,
   breakEvenText,
+  entryMovers,
   formatBn,
   formatPeople,
   formatPounds,
@@ -42,8 +47,7 @@ import "./milburn.css";
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 /** The label the sub-tab carries. */
-export const SCENARIOS_LABEL =
-  "Assumption: 25% of young people who lose move into work, microsimulated. Other tabs: static.";
+export const SCENARIOS_LABEL = `Assumption: ${ENTRY_ASSUMPTION_TEXT}, microsimulated. Other tabs: static.`;
 
 const pounds = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const penceExact = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -69,16 +73,27 @@ function useScenariosFile() {
   return state;
 }
 
-/** The gain from work is the same with and without the package: said wherever the arithmetic is. */
+/** The household case's gain from work is the same with and without the package: said wherever the arithmetic is. */
 export const SAME_GAIN_SENTENCE =
-  "Same gain from work under current law and the package: arithmetic, not a new incentive.";
+  "In the household case used, the gain from work is the same under current law and under the package.";
 
-/** Why the move into work changes the public finances so little, a point each. */
-export const SMALL_FISCAL_EFFECT_POINTS = [
-  "Many young PIP recipients are not on Universal Credit: they live with parents or work.",
-  "Losing households include siblings and partners, not only claimants.",
-  "So work recovers little benefit spending, and the effect on the public finances is small.",
-];
+/** The heading over what the run with a move into work does. */
+export const ENTRY_RUN_HEADING = "What the run changes";
+
+/**
+ * What the run with a move into work does, a point each: who moves (their
+ * number from the run's own results, left out when the file carries none),
+ * into what work, and what the figures beside it then count.
+ */
+export function entryRunPoints(movers) {
+  const share = `${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group}, chosen at random`;
+  return [
+    movers === null || movers === undefined ? `Who moves: ${share}.` : `Who moves: about ${formatPeople(movers)} people, ${share}.`,
+    `Each moves from no work into ${ENTRY_ASSUMPTION.work}.`,
+    "The Exchequer saving then counts the taxes paid on their earnings and any fall in their benefits.",
+    "The average loss covers every 16 to 24-year-old in a losing household, whether or not they move.",
+  ];
+}
 
 /** A bullet with an icon (the caveats and reading notes). */
 function Point({ icon = "pin", children, ...rest }) {
@@ -102,8 +117,9 @@ function povertyText(run) {
 
 /**
  * The lead: the full abolition package as a static run beside the same
- * package with a quarter of the young people it leaves worse off moving
- * into work, microsimulated, from milburn_summary.json.
+ * package with a quarter of non-working 18 to 24-year-olds who themselves
+ * have PIP or the health element moving into work, microsimulated, from
+ * milburn_summary.json.
  */
 export function EntryComparison({ summary, catalogue }) {
   const full = summaryRun(summary, DEFAULT_SUMMARY_RUN);
@@ -114,6 +130,7 @@ export function EntryComparison({ summary, catalogue }) {
   }
   const fullMeasure = catalogue?.byId?.get(DEFAULT_SUMMARY_RUN);
   const fullName = fullMeasure ? shortNameOf(fullMeasure) : DEFAULT_SUMMARY_RUN;
+  const movers = entryMovers(entry);
   const fullSaving = savingInYear(full, summary.year);
   const entrySaving = savingInYear(entry, summary.year);
   const signedBn = (value) => `${value >= 0 ? "+" : "−"}${formatBn(Math.abs(value))}`;
@@ -171,7 +188,7 @@ export function EntryComparison({ summary, catalogue }) {
   const csv = () =>
     buildChartCsv({
       title: `${title}: ${fullName}, ${yearLabel}`,
-      units: "As each row says; static, and with 25% of the young people the package leaves worse off moving into work",
+      units: `As each row says; static, and with ${ENTRY_ASSUMPTION_TEXT}`,
       columns: [
         { key: "label", label: "Figure" },
         { key: "full", label: "Static" },
@@ -185,7 +202,7 @@ export function EntryComparison({ summary, catalogue }) {
         id="milburn-entry-heading"
         icon="briefcase"
         title={title}
-        description={`${fullName}, ${yearLabel}: static, against 25% of the 16 to 24-year-olds it leaves worse off moving into work.`}
+        description={`${fullName}, ${yearLabel}: static, against ${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group} moving into work${movers !== null ? ` (about ${formatPeople(movers)} people)` : ""}.`}
         name="quarter-moving-into-work"
         csv={csv}
         legendItems={SERIES.map((series) => ({ color: series.color, label: series.name, type: "rect" }))}
@@ -215,7 +232,7 @@ export function EntryComparison({ summary, catalogue }) {
               <details className="milburn-details" data-entry-run-comparison="">
                 <summary>
                   <TitleIcon name="alert" bare size={14} />
-                  Why the effect is small
+                  {ENTRY_RUN_HEADING}
                 </summary>
                 <ul className="milburn-points">
                   <Point icon="landmark">
@@ -224,8 +241,8 @@ export function EntryComparison({ summary, catalogue }) {
                       {savingDelta >= 0 ? "to" : "from"} the Exchequer.
                     </strong>
                   </Point>
-                  {SMALL_FISCAL_EFFECT_POINTS.map((point, index) => (
-                    <Point key={point} icon={["wallet", "usersRound", "scale"][index]}>
+                  {entryRunPoints(movers).map((point, index) => (
+                    <Point key={point} icon={["usersRound", "briefcase", "wallet", "scale"][index]}>
                       {point}
                     </Point>
                   ))}
@@ -393,11 +410,11 @@ function EntryCases({ data }) {
 }
 
 /**
- * Break-even arithmetic for one run, from milburn_summary.json: the share
- * of young people in losing households who would need to move into work
- * for their average income to recover, the entrants whose gains would
- * match the total income loss, and the Exchequer's gain per entrant, at 16
- * and 25 hours a week.
+ * Break-even arithmetic for one run, from milburn_summary.json: the
+ * entrants whose gains from work would match the total income loss (the
+ * Exchequer saving), those entrants as a share of the young people in
+ * losing households, and the Exchequer's gain per entrant, at 16 and 25
+ * hours a week.
  */
 export function BreakEven({ runId, catalogue }) {
   const summaryState = useMilburnSummary(catalogue?.manifest?.snapshotSha256 ?? null);
@@ -437,27 +454,27 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
         entrants: run.entrantsToMatch[hoursId],
         perEntrant: run.exchequerGainPerEntrant[hoursId],
       }));
-      description = `${name}, ${yearLabel}: how many 16 to 24-year-olds in losing households would need to move into work.`;
+      description = `${name}, ${yearLabel}: the entrants whose gains from work would match the Exchequer saving, beside the 16 to 24-year-olds in losing households.`;
       csv = () =>
         buildChartCsv({
           title: `Break-even arithmetic: ${name}, ${yearLabel}`,
           units: "Share in %, entrants in people, Exchequer gain in £ a year per entrant",
           columns: [
             { key: "hours", label: "Hours a week" },
-            { key: "share", label: "Share needed to recover the average loss (%)", decimals: 1 },
-            { key: "entrants", label: "Entrants to match the total loss", decimals: 0 },
+            { key: "entrants", label: "Entrants needed (Exchequer saving divided by one entrant's gain from work)", decimals: 0 },
+            { key: "share", label: "Entrants needed as a share of 16 to 24-year-olds in losing households (%)", decimals: 1 },
             { key: "perEntrant", label: "Exchequer gain per entrant (£ a year)", decimals: 2 },
           ],
           rows: hoursRows,
         });
       body = (
         <div className="milburn-chart-grid cols-2">
-          <ChartPanel icon="percent" title="Share needed to recover the average loss">
+          <ChartPanel icon="percent" title="Entrants needed, as a share of 16–24s in losing households">
             <HorizontalBars
-              ariaLabel={`Share needed to recover the average loss: ${hoursRows.map((row) => `${row.name} ${row.share?.toFixed(1)}%`).join(", ")}; everyone moving into work is 100%`}
+              ariaLabel={`Entrants needed, as a share of 16 to 24-year-olds in losing households: ${hoursRows.map((row) => `${row.name} ${row.share?.toFixed(1)}%`).join(", ")}; all of them is 100%`}
               format={(value) => `${value}%`}
               labelWidth={76}
-              references={[{ value: 100, label: "Everyone moves into work" }]}
+              references={[{ value: 100, label: "All 16–24s in losing households" }]}
               rows={hoursRows.map((row) => ({
                 name: row.name,
                 value: row.share,
@@ -466,9 +483,9 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
               }))}
             />
           </ChartPanel>
-          <ChartPanel icon="usersRound" title="Entrants needed to match the total loss">
+          <ChartPanel icon="usersRound" title="Entrants needed to match the Exchequer saving">
             <HorizontalBars
-              ariaLabel={`Entrants needed to match the total loss: ${hoursRows.map((row) => `${row.name} ${formatPeople(row.entrants)}`).join(", ")}`}
+              ariaLabel={`Entrants needed to match the Exchequer saving: ${hoursRows.map((row) => `${row.name} ${formatPeople(row.entrants)}`).join(", ")}`}
               format={(value) => (value >= 1000 ? `${value / 1000}k` : String(value))}
               labelWidth={76}
               references={run.youngPeopleLosing !== null ? [{ value: run.youngPeopleLosing, label: `16–24s in losing households: ${formatPeople(run.youngPeopleLosing)}` }] : []}
@@ -489,8 +506,8 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
               <thead>
                 <tr>
                   <th scope="col">Hours a week</th>
-                  <th scope="col">Share needed to recover the average loss</th>
-                  <th scope="col">Entrants to match the total loss</th>
+                  <th scope="col">Entrants needed, as a share of 16–24s in losing households</th>
+                  <th scope="col">Entrants needed to match the Exchequer saving</th>
                   <th scope="col">Exchequer gain per entrant, £ a year</th>
                 </tr>
               </thead>
@@ -502,8 +519,8 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
                       {run.breakEvenSharePct[hoursId] > 100 ? (
                         <>
                           {run.breakEvenSharePct[hoursId].toFixed(1)}%{" "}
-                          <span className="milburn-tag" title={`${NO_ENTRY_RATE_RESTORES}.`}>
-                            Above 100%: not reachable
+                          <span className="milburn-tag" title={`${MORE_ENTRANTS_THAN_GROUP}.`}>
+                            Above 100%: more than the group
                           </span>
                         </>
                       ) : (
@@ -523,10 +540,13 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
               Notes and caveats
             </summary>
             <ul className="milburn-points">
-              <Point icon="scale">{SAME_GAIN_SENTENCE}</Point>
+              <Point icon="usersRound">{BREAK_EVEN_ENTRANTS_DEFINITION}</Point>
+              <Point icon="percent">{BREAK_EVEN_SHARE_DEFINITION}</Point>
               <Point icon="alert">
-                <strong>Above 100%.</strong> {NO_ENTRY_RATE_RESTORES}, even if all moved into work.
+                <strong>Above 100%.</strong> {MORE_ENTRANTS_THAN_GROUP}.
               </Point>
+              <Point icon="scale">{SAME_GAIN_SENTENCE}</Point>
+              <Point icon="user">The gain from work is one household case, set out above; other households gain differently.</Point>
               <Point icon="calculator">Counts rounded to the nearest thousand.</Point>
             </ul>
           </details>
@@ -553,8 +573,9 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
 
 /**
  * Impact's Return to work sub-tab (?sub=scenarios): the full abolition
- * package beside the same package with a quarter of the young people it
- * leaves worse off moving into work, microsimulated (milburn_summary.json);
+ * package beside the same package with a quarter of non-working 18 to
+ * 24-year-olds with PIP or the health element moving into work,
+ * microsimulated (milburn_summary.json);
  * then the household entry cases (milburn_scenarios.json) and the
  * break-even arithmetic for the selected run. Anything missing shows an
  * unavailable state, never zeros.
@@ -603,12 +624,13 @@ export default function BehaviouralScenarios({ selectedRun } = {}) {
       <SectionHeading
         icon="sliders"
         title="Return to work"
-        subtitle="What changes if some of the young people who lose move into work."
+        subtitle="What changes if some non-working young people with PIP or the health element move into work."
       />
       <p className="milburn-label" role="note">
         <TitleIcon name="alert" bare size={14} />
         <span>{SCENARIOS_LABEL}</span>
       </p>
+      {summaryState.status === "ready" && <YearOnlyChip year={summaryState.summary.year} what="this tab" />}
       {lead}
       {cases}
       <BreakEvenSection runId={selectedRun} catalogue={catalogue} summaryState={summaryState} />

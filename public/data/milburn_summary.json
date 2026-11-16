@@ -24,7 +24,8 @@
       },
       "people_into_poverty_abs_ahc": -82721,
       "people_into_poverty_rel_ahc": 126948,
-      "child_poverty_change_pp_rel_ahc": 0.502
+      "child_poverty_change_pp_rel_ahc": 0.502,
+      "people_directly_affected": 1976916
     },
     {
       "id": "milburn_package",
@@ -50,9 +51,10 @@
       "people_into_poverty_abs_ahc": 409743,
       "people_into_poverty_rel_ahc": 156379,
       "child_poverty_change_pp_rel_ahc": 0.421,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 160.5,
-        "h25": 125.4
+        "h16": 98.7,
+        "h25": 77.1
       },
       "entrants_to_match_income_loss": {
         "h16": 570502,
@@ -87,9 +89,10 @@
       "people_into_poverty_abs_ahc": 314214,
       "people_into_poverty_rel_ahc": 266476,
       "child_poverty_change_pp_rel_ahc": 0.698,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 89.0,
-        "h25": 69.5
+        "h16": 55.9,
+        "h25": 43.7
       },
       "entrants_to_match_income_loss": {
         "h16": 323421,
@@ -124,9 +127,10 @@
       "people_into_poverty_abs_ahc": 271907,
       "people_into_poverty_rel_ahc": 29665,
       "child_poverty_change_pp_rel_ahc": 0.021,
+      "people_directly_affected": 82467,
       "break_even_share_in_work_pct": {
-        "h16": 143.8,
-        "h25": 112.3
+        "h16": 104.7,
+        "h25": 81.8
       },
       "entrants_to_match_income_loss": {
         "h16": 586765,
@@ -161,9 +165,10 @@
       "people_into_poverty_abs_ahc": 143478,
       "people_into_poverty_rel_ahc": -45247,
       "child_poverty_change_pp_rel_ahc": -0.042,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 158.5,
-        "h25": 123.8
+        "h16": 106.9,
+        "h25": 83.5
       },
       "entrants_to_match_income_loss": {
         "h16": 255470,
@@ -198,9 +203,10 @@
       "people_into_poverty_abs_ahc": 199830,
       "people_into_poverty_rel_ahc": 166779,
       "child_poverty_change_pp_rel_ahc": 0.602,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 60.0,
-        "h25": 46.9
+        "h16": 39.3,
+        "h25": 30.7
       },
       "entrants_to_match_income_loss": {
         "h16": 218139,
@@ -235,9 +241,10 @@
       "people_into_poverty_abs_ahc": 499326,
       "people_into_poverty_rel_ahc": 245962,
       "child_poverty_change_pp_rel_ahc": 1.162,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 136.4,
-        "h25": 106.6
+        "h16": 87.0,
+        "h25": 68.0
       },
       "entrants_to_match_income_loss": {
         "h16": 562610,
@@ -272,9 +279,10 @@
       "people_into_poverty_abs_ahc": 305549,
       "people_into_poverty_rel_ahc": 85558,
       "child_poverty_change_pp_rel_ahc": 0.372,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 126.6,
-        "h25": 98.9
+        "h16": 78.8,
+        "h25": 61.6
       },
       "entrants_to_match_income_loss": {
         "h16": 437643,
@@ -309,9 +317,10 @@
       "people_into_poverty_abs_ahc": 37857,
       "people_into_poverty_rel_ahc": 37857,
       "child_poverty_change_pp_rel_ahc": 0.065,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 63.4,
-        "h25": 49.5
+        "h16": 32.5,
+        "h25": 25.4
       },
       "entrants_to_match_income_loss": {
         "h16": 76594,
@@ -346,9 +355,10 @@
       "people_into_poverty_abs_ahc": 84997,
       "people_into_poverty_rel_ahc": 66126,
       "child_poverty_change_pp_rel_ahc": 0.127,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 63.7,
-        "h25": 49.8
+        "h16": 36.2,
+        "h25": 28.3
       },
       "entrants_to_match_income_loss": {
         "h16": 146770,
@@ -383,9 +393,10 @@
       "people_into_poverty_abs_ahc": 2715,
       "people_into_poverty_rel_ahc": 2715,
       "child_poverty_change_pp_rel_ahc": 0.006,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 34.6,
-        "h25": 27.0
+        "h16": 26.8,
+        "h25": 20.9
       },
       "entrants_to_match_income_loss": {
         "h16": 8014,
@@ -420,9 +431,10 @@
       "people_into_poverty_abs_ahc": 69757,
       "people_into_poverty_rel_ahc": 57457,
       "child_poverty_change_pp_rel_ahc": 0.127,
+      "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 63.3,
-        "h25": 49.4
+        "h16": 36.8,
+        "h25": 28.7
       },
       "entrants_to_match_income_loss": {
         "h16": 105282,
@@ -456,7 +468,8 @@
       },
       "people_into_poverty_abs_ahc": -113703,
       "people_into_poverty_rel_ahc": -99512,
-      "child_poverty_change_pp_rel_ahc": -0.184
+      "child_poverty_change_pp_rel_ahc": -0.184,
+      "people_directly_affected": 0
     }
   ]
 }

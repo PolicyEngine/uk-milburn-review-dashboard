@@ -17,7 +17,7 @@ import { PACKAGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGrou
 import TitleIcon from "../TitleIcon";
 import { buildChartCsv } from "../../utils/chartCsv";
 import { CHART_COLOURS } from "../../utils/chartTheme";
-import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard } from "./MilburnCharts";
+import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
 /** The replacement support briefed for the review, which no run models. */
@@ -51,14 +51,22 @@ export function packageRange(summary) {
   }).filter(Boolean);
 }
 
+/** Under the range's title when the run shown above is one of the packages. */
+export const RANGE_WITH_SELECTION = "The packages side by side; the one shown above is in full colour.";
+
+/** Under the range's title when the run shown above is not a package: nothing is picked out. */
+export const RANGE_WITHOUT_SELECTION = "The packages side by side, for context; the measure shown above is not one of them.";
+
 function RangeStrip({ summary, selectedId }) {
   const rows = packageRange(summary);
   if (!rows.length) return null;
   const yearLabel = fiscalYearTick(summary.year);
   const title = `Package range, ${yearLabel}`;
   // The selected package at full strength, the others faded; all at full
-  // strength when the selection is not one of the packages
-  const faded = (row) => rows.some((other) => other.id === selectedId) && row.id !== selectedId;
+  // strength, and none said to be selected, when the selection is not one
+  // of the packages
+  const packageSelected = rows.some((row) => row.id === selectedId);
+  const faded = (row) => packageSelected && row.id !== selectedId;
   const csv = () =>
     buildChartCsv({
       title,
@@ -75,7 +83,7 @@ function RangeStrip({ summary, selectedId }) {
       as="h4"
       icon="layers"
       title={title}
-      description="The three packages side by side; the selected one is in full colour."
+      description={packageSelected ? RANGE_WITH_SELECTION : RANGE_WITHOUT_SELECTION}
       name="package-range"
       csv={csv}
       className="milburn-range"
@@ -226,6 +234,7 @@ export default function KeyFigures({ runId, nameShownAbove = false }) {
           {name}
         </p>
       )}
+      {status === "ready" && <YearOnlyChip year={summary.year} />}
     </div>
   );
   let body;

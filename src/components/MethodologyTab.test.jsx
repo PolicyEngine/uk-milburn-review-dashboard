@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import MethodologyTab, { METHOD_CONTENTS, METHOD_SECTIONS, MILBURN_LIMITATIONS } from "./MethodologyTab";
 import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
+import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
 import { METHOD_ANCHORS } from "./methodology/anchors";
 import { unavailableMeasures } from "./methodology/measures";
 import { buildMeasureCatalogue, MeasureCatalogueProvider } from "../utils/measureCatalogue";
@@ -77,6 +78,25 @@ describe("MethodologyTab", () => {
     levels.forEach((level, index) => {
       if (index > 0) expect(level - levels[index - 1]).toBeLessThanOrEqual(1);
     });
+  });
+
+  it("counts and lists the measures the page offers, leaving out a hidden run", () => {
+    const hidden = { ...catalogue.measures[0], id: "milburn_package_entry_25pct", name: "Hidden entry run" };
+    const withHidden = { ...catalogue, measures: [...catalogue.measures, hidden] };
+    render(<MeasureCatalogueProvider catalogue={withHidden}><MethodologyTab onShowTab={vi.fn()} /></MeasureCatalogueProvider>);
+    const shown = groupMilburnMeasures(withHidden.measures).flatMap((group) => group.measures);
+    expect(shown).toHaveLength(catalogue.measures.length);
+    const button = screen.getByRole("button", { name: /^Measures modelled/ });
+    expect(button).toHaveTextContent(`${shown.length} published`);
+    const card = button.closest(".method-topic");
+    expect([...card.querySelectorAll(".method-list li")].map((item) => item.textContent).sort()).toEqual(shown.map((measure) => measure.name).sort());
+    expect(card).not.toHaveTextContent("Hidden entry run");
+  });
+
+  it("describes the move into work by the group that moves", () => {
+    const { container } = renderTab();
+    expect(container).toHaveTextContent("25% of non-working 18 to 24-year-olds with PIP or the health element move into 16 hours' work a week");
+    expect(container.textContent).not.toMatch(/young people it leaves worse off/);
   });
 
   it("lists the unavailable measures only when there are any", () => {

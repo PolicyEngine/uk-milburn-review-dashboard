@@ -1340,7 +1340,13 @@ function App({ boot = null }) {
     };
     // One check at a time; one asked for mid-check runs when it ends
     const check = serialisedChecks(run);
-    const recheck = () => { if (!controller.signal.aborted && initialComplete) check(); };
+    // The local build route's runs are static files: a page showing them
+    // never reads them again; one whose load failed tries again
+    const recheck = () => {
+      if (controller.signal.aborted || !initialComplete) return;
+      if (localRoute && current.current !== null) return;
+      check();
+    };
     // A household request waits for a check that started after it was made:
     // true only if the snapshot it was made under is still the live one.
     confirmer.current = async (snapshot) => {

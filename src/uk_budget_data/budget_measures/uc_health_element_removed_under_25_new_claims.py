@@ -7,6 +7,8 @@ One modifier in a module of its own: see the package docstring.
 """
 
 import numpy as np
+
+from uk_budget_data.budget_measures import milburn_design as design
 from policyengine_core.periods import period as as_period
 from policyengine_uk.utils.supplied_inputs import set_model_value
 from policyengine_uk.utils.uc_work_related_requirements import (
@@ -16,9 +18,9 @@ from policyengine_uk.utils.uc_work_related_requirements import (
 
 def uc_health_element_removed_under_25_new_claims(
     sim,
-    start_year=2027,
-    end_year=2032,
-    age_limit=25,
+    start_year=design.START_YEAR,
+    end_year=design.UC_ELEMENT_LAST_YEAR,
+    age_limit=design.UC_HEALTH_UPPER_AGE,
 ):
     """As ``uc_health_element_removed_under_25``, but only for awards paid
     the new-claimant LCWRA rate (``uc_receives_new_claimant_health_element``

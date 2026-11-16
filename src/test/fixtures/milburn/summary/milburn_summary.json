@@ -22,8 +22,8 @@
       "people_into_poverty_rel_ahc": 150000,
       "child_poverty_change_pp_rel_ahc": 0.4,
       "break_even_share_in_work_pct": {
-        "h16": 150.0,
-        "h25": 95.5
+        "h16": 109.9,
+        "h25": 87.9
       },
       "entrants_to_match_income_loss": {
         "h16": 550000,
@@ -49,6 +49,7 @@
         "rel_ahc": 0.1
       },
       "people_into_poverty_rel_ahc": 80000,
+      "people_directly_affected": 70400,
       "child_poverty_change_pp_rel_ahc": 0.2
     },
     {

@@ -43,12 +43,11 @@ export const LOCAL_TABLES = Object.freeze({
 });
 
 /**
- * Tables a run's folder may hold besides: the binned household scatter
- * (All households), shown where present, unavailable where not.
+ * Tables a run's folder may hold besides, read where present. None today:
+ * the pipeline still writes household_scatter_binned.csv, but no chart on
+ * this route draws it, so the page does not fetch it.
  */
-export const OPTIONAL_LOCAL_TABLES = Object.freeze({
-  household_scatter_binned: "household_scatter_binned.csv",
-});
+export const OPTIONAL_LOCAL_TABLES = Object.freeze({});
 
 // Read as flat files: metrics.csv carries the poverty and inequality
 // columns after its contract columns (csv.js FLAT_EXTRA_COLUMNS)
@@ -268,10 +267,9 @@ export async function loadLocalBuildParts(basePath = "", { fetchImpl = fetch, si
 
 /**
  * One table's rows on the local route, as loadVerifiedTables returns them:
- * every run's rows, already loaded with the catalogue. A table the flat
- * run's folder does not hold (the binned household scatter, where it was not
- * written) gives no rows for it, and the run is listed as failed for it, so
- * the view shows it unavailable.
+ * every run's rows, already loaded with the catalogue. A table the route
+ * does not read (the binned household scatter) gives no rows, and each run
+ * is listed as failed for it, so a view of it shows it unavailable.
  */
 export function localTableRows(catalogue, table, isShown) {
   const keys = Object.keys(catalogue.tablesByKey ?? {});

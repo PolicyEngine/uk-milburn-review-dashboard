@@ -6,16 +6,17 @@ One modifier in a module of its own: see the package docstring.
 
 import numpy as np
 
+from uk_budget_data.budget_measures import milburn_design as design
 from uk_budget_data.measure_templates import _call_formula, _replace_formula
 
 
 def pip_removed_ages_18_to_24(
     sim,
-    start_year=2027,
-    lowest_age=18,
-    age_limit=25,
-    include_scotland=True,
-    share_kept=0.0,
+    start_year=design.START_YEAR,
+    lowest_age=design.PIP_LOWER_AGE,
+    age_limit=design.PIP_UPPER_AGE,
+    include_scotland=design.PIP_INCLUDE_SCOTLAND,
+    share_kept=design.PIP_REPLACEMENT_SHARE,
 ):
     """Pay no PIP daily living or mobility component to people aged
     ``lowest_age`` to ``age_limit`` - 1 from ``start_year`` (fiscal years).
@@ -60,9 +61,22 @@ def pip_halved_ages_18_to_24(sim):
     """PIP for 18 to 24-year-olds paid at half its current amount: an
     illustrative stand-in for a smaller, non-means-tested additional cost
     allowance whose rules are not yet known."""
-    return pip_removed_ages_18_to_24(sim, share_kept=0.5)
+    return pip_removed_ages_18_to_24(sim, share_kept=design.PIP_HALVED_SHARE)
 
 
 def pip_removed_ages_16_to_24(sim):
     """PIP removal from age 16 (\"under 25\" read literally)."""
     return pip_removed_ages_18_to_24(sim, lowest_age=16)
+
+
+def pip_removed_ages_18_to_24_excluding_scotland(sim):
+    """PIP removal for 18 to 24-year-olds with Scottish records (Adult
+    Disability Payment, held as PIP) left alone."""
+    return pip_removed_ages_18_to_24(sim, include_scotland=False)
+
+
+def pip_removed_ages_16_to_24_excluding_scotland(sim):
+    """PIP removal from age 16 with Scottish records left alone."""
+    return pip_removed_ages_18_to_24(
+        sim, lowest_age=16, include_scotland=False
+    )

@@ -6,6 +6,8 @@ One modifier in a module of its own: see the package docstring.
 """
 
 import numpy as np
+
+from uk_budget_data.budget_measures import milburn_design as design
 from policyengine_core.periods import period as as_period
 from policyengine_uk.utils.supplied_inputs import set_model_value
 from policyengine_uk.utils.uc_work_related_requirements import (
@@ -13,15 +15,14 @@ from policyengine_uk.utils.uc_work_related_requirements import (
 )
 
 
-SEVERE_DL_POINTS = 24
-
-
 def uc_health_element_removed_under_25(
     sim,
-    start_year=2027,
-    end_year=2032,
-    age_limit=25,
+    start_year=design.START_YEAR,
+    end_year=design.UC_ELEMENT_LAST_YEAR,
+    age_limit=design.UC_HEALTH_UPPER_AGE,
     keep_enhanced_pip_daily_living=False,
+    lowest_age=design.UC_HEALTH_LOWER_AGE,
+    severe_dl_points=design.SEVERE_DL_POINTS,
 ):
     """Remove the LCWRA element from awards in which no claimant aged
     ``age_limit`` or over has limited capability for work and work-related
@@ -44,6 +45,11 @@ def uc_health_element_removed_under_25(
     element is no longer exempt on that ground) and the carer element's
     LCWRA overlap rule. The LCWRA status itself is unchanged, so the work
     allowance and conditionality are unchanged.
+
+    ``lowest_age`` (default 0: nobody) spares a claimant with LCWRA who is
+    under it, for a design that leaves 16 and 17-year-olds alone;
+    ``severe_dl_points`` is the daily living score that spares a young
+    claimant when ``keep_enhanced_pip_daily_living`` is set.
     """
     person = sim.populations["person"]
     benunit = sim.populations["benunit"]
@@ -58,12 +64,18 @@ def uc_health_element_removed_under_25(
             & person("uc_limited_capability_for_WRA", period)
             & (person("age", period) >= age_limit)
         )
+        if lowest_age > 0:
+            qualifying = qualifying | (
+                claimant
+                & person("uc_limited_capability_for_WRA", period)
+                & (person("age", period) < lowest_age)
+            )
         if keep_enhanced_pip_daily_living:
             # Severity proxy: a young claimant with LCWRA scoring 24 or more
             # PIP daily living points (about a fifth of young recipients)
             # keeps the element. Points, not payments, are read, so a PIP
             # change in the same run does not move it.
-            severe = person("pip_dl_points", period) >= SEVERE_DL_POINTS
+            severe = person("pip_dl_points", period) >= severe_dl_points
             qualifying = qualifying | (
                 claimant
                 & person("uc_limited_capability_for_WRA", period)

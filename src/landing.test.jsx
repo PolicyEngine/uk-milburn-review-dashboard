@@ -1,4 +1,6 @@
 import { beforeAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { subShownOnReportDay } from "./utils/milburn/reportDay";
+const RETURN_TO_WORK_SHOWN = subShownOnReportDay("scenarios");
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import App, { preloadAllViews } from "./App";
 import { YOUNG_PEOPLE_ANCHOR } from "./components/YoungPeopleSection";
@@ -61,7 +63,7 @@ describe("the landing page", () => {
     // Each box: a title, one short line and "Explore", and no figure
     expect(within(page).getAllByRole("link", { name: /Explore$/ }).map((link) => [link.getAttribute("href"), link.textContent])).toEqual([
       ["?tab=dashboard&sub=age", "Young peopleWho gains or loses, and the costExplore→"],
-      ["?tab=dashboard&sub=scenarios", "Return to workThe package if some young people move into workExplore→"],
+      ...(RETURN_TO_WORK_SHOWN ? [["?tab=dashboard&sub=scenarios", "Return to workThe package if some young people move into workExplore→"]] : []),
       ["?tab=policies", "The measures modelledEvery candidate measure, and how we model itExplore→"],
     ]);
     expect(page.querySelector(".landing-box-figure")).toBeNull();
@@ -73,13 +75,14 @@ describe("the landing page", () => {
     expect(container.querySelector(".app")).not.toHaveAttribute("data-sub-band");
     const tabbable = [...container.querySelectorAll(".main-content a[href], .main-content button, .main-content [tabindex]")]
       .filter((node) => !node.closest(".title-row, [hidden], [inert]") && node.tabIndex >= 0);
-    expect(tabbable.slice(0, 4).map((node) => node.textContent)).toEqual([
+    const order = [
       // A source link says it opens in a new tab, to a screen reader
       "PolicyEngine UK (opens in a new tab)",
       expect.stringMatching(BOXES.society),
-      expect.stringMatching(BOXES.scenarios),
+      ...(RETURN_TO_WORK_SHOWN ? [expect.stringMatching(BOXES.scenarios)] : []),
       expect.stringMatching(BOXES.policies),
-    ]);
+    ];
+    expect(tabbable.slice(0, order.length).map((node) => node.textContent)).toEqual(order);
     // The band keeps both pills
     const band = container.querySelector(".title-row");
     for (const pill of [".band-year", ".band-policy"]) {
@@ -148,7 +151,7 @@ describe("the landing page", () => {
     expect([search().get("tab"), search().get("sub")]).toEqual(["dashboard", null]);
   });
 
-  it("opens Impact at Return to work from the second box", async () => {
+  it.skipIf(!RETURN_TO_WORK_SHOWN)("opens Impact at Return to work from the second box", async () => {
     await renderApp();
     fireEvent.click(box("scenarios"));
     expect(landing()).toBeNull();
@@ -310,7 +313,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
     const rows = within(within(nav).getByRole("list", { name: "In this dashboard" })).getAllByRole("link");
     expect(rows.map((row) => row.textContent)).toEqual([
       "Young peopleWho gains or loses, and the cost",
-      "Return to workThe package if some young people move into work",
+      ...(RETURN_TO_WORK_SHOWN ? ["Return to workThe package if some young people move into work"] : []),
       "The measures modelledEvery candidate measure, and how we model it",
     ]);
     const site = within(within(nav).getByRole("region", { name: "More from PolicyEngine" })).getByRole("link");
@@ -375,7 +378,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
 
   it.each([
     [/^Young people/, "Impact", "dashboard"],
-    [/^Return to work/, "Impact", "dashboard"],
+    ...(RETURN_TO_WORK_SHOWN ? [[/^Return to work/, "Impact", "dashboard"]] : []),
     [/^The measures modelled/, "Measures", "policies"],
   ])("opens a view from a box and closes: %s", async (name, view, tab) => {
     await openDrawer();

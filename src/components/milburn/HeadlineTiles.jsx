@@ -12,6 +12,7 @@ import {
 } from "../../utils/milburn/summary";
 import TitleIcon from "../TitleIcon";
 import { packageRange } from "./KeyFigures";
+import { YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
 /** The four poverty lines the summary carries, absolute after housing costs first. */
@@ -55,7 +56,7 @@ function useHeadlineRun(runId) {
   return { local: Boolean(catalogue.localBuild), named: Boolean(runId), name: measure ? shortNameOf(measure) : id, summary, run };
 }
 
-function Heading({ title, name, named, yearLabel }) {
+function Heading({ title, name, named, onlyYear }) {
   return (
     <div className="milburn-key-heading">
       <h3>
@@ -70,12 +71,8 @@ function Heading({ title, name, named, yearLabel }) {
           {name}
         </p>
       )}
-      {yearLabel && (
-        <p className="milburn-status-chip">
-          <TitleIcon name="calendar" bare size={14} />
-          {yearLabel}
-        </p>
-      )}
+      {/* The box's figures are for this year whatever year is chosen above the page */}
+      {onlyYear !== undefined && <YearOnlyChip year={onlyYear} />}
     </div>
   );
 }
@@ -98,7 +95,8 @@ function Tile({ icon, value, extra, label, note }) {
  * Poverty's headline, over its charts on the local build route: the people
  * moved across the absolute and relative lines, child poverty, and the
  * change on each of the four lines side by side, from milburn_summary.json
- * for the summary's year. Nothing while the run or the file is missing.
+ * for the summary's year only (the file has no other year's poverty
+ * figures), and labelled so. Nothing while the run or the file is missing.
  */
 export function PovertyHeadline({ runId }) {
   const { local, name, named, summary, run } = useHeadlineRun(runId);
@@ -108,7 +106,7 @@ export function PovertyHeadline({ runId }) {
   const values = lines.map((line) => run.povertyPp[line.key]);
   return (
     <section className="report-section milburn-key card" aria-label="Poverty headline">
-      <Heading title="Poverty at a glance" name={name} named={named} yearLabel={fiscalYearTick(summary.year)} />
+      <Heading title="Poverty at a glance" name={name} named={named} onlyYear={summary.year} />
       <ul className="milburn-key-tiles" aria-label="Figures">
         {run.peopleIntoPovertyAbsAhc !== null && (
           <Tile

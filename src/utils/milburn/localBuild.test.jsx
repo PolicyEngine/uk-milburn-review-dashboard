@@ -173,15 +173,21 @@ describe("the page's figures from the local build", () => {
     expect(missing.netImpact).toBeNull();
   });
 
-  it("give the lazily loaded tables from the runs already read, the scatter only where written", async () => {
-    const { catalogue } = dashboardFromParts(await loadParts());
+  it("give the lazily loaded tables from the runs already read, and never fetch the household scatter", async () => {
+    const calls = [];
+    const serve = fixtureFetch();
+    const fetchImpl = (url) => { calls.push(url); return serve(url); };
+    const { catalogue } = dashboardFromParts(await loadLocalBuildParts("", { fetchImpl }));
     const age = await loadVerifiedTables(catalogue, "age_impact");
     expect(age.failures).toEqual([]);
     expect(new Set(age.rows.map((row) => row.reform_id))).toEqual(new Set(RAN));
+    // The fixture's package folder holds a scatter; no chart on this route
+    // draws it, so no run's is requested and it reads as unavailable
+    expect(calls.some((url) => url.endsWith("/age_impact.csv"))).toBe(true);
+    expect(calls.filter((url) => url.includes("household_scatter"))).toEqual([]);
     const scatter = await loadVerifiedTables(catalogue, "household_scatter_binned");
-    // Present for the package only: the PIP run's scatter is unavailable
-    expect(scatter.rows.map((row) => row.reform_id)).toEqual([PACKAGE_ID, PACKAGE_ID]);
-    expect(scatter.failures).toEqual(["pip_removed_under_25"]);
+    expect(scatter.rows).toEqual([]);
+    expect(scatter.failures).toEqual(RAN);
   });
 
   it("feed the package's people affected and static cost to Behavioural scenarios and Benchmarks", async () => {

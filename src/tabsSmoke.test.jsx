@@ -16,6 +16,7 @@
  * What jsdom cannot show (that the built site serves the page and these
  * files with HTTP 200) the "Built site" CI job checks against `next start`.
  */
+import { subShownOnReportDay } from "./utils/milburn/reportDay";
 import { expectCompletePills } from "./test/optionsPills";
 import { downloadMenus, STANDARD_FORMATS } from "./test/downloadMenus";
 import { existsSync, readFileSync, statSync } from "node:fs";
@@ -206,8 +207,9 @@ const CASES = [
   // Impact opens on Young people
   ...VIEWS.map((v) => [v.label, v.value, `/?tab=${v.value}`, v.label]),
   ["Population impact: Young people", "age", "/?sub=age", "Young people"],
-  ["Population impact: Return to work", "scenarios", "/?sub=scenarios", "Return to work"],
-  ["Population impact: Benchmarks", "benchmarks", "/?sub=benchmarks", "Benchmarks"],
+  // Unless the report-day switch hides them (utils/milburn/reportDay.js)
+  ...(subShownOnReportDay("scenarios") ? [["Population impact: Return to work", "scenarios", "/?sub=scenarios", "Return to work"]] : []),
+  ...(subShownOnReportDay("benchmarks") ? [["Population impact: Benchmarks", "benchmarks", "/?sub=benchmarks", "Benchmarks"]] : []),
   POVERTY_FIGURES_SHOWN
     ? ["Population impact: Poverty", "poverty", "/?sub=poverty", "Poverty"]
     : ["Population impact: ?sub=poverty, withheld", "povertyFallback", "/?sub=poverty", "Young people"],
@@ -217,7 +219,8 @@ const CASES = [
 
 describe("each of the four tabs and Population impact's sub-tabs, on a verified publication and real baseline data", () => {
   it("covers every tab", () => {
-    expect(CASES.map((c) => c[1]).sort()).toEqual(Object.keys(LOADED).sort());
+    // Less the sub-tabs the report-day switch hides
+    expect(CASES.map((c) => c[1]).sort()).toEqual(Object.keys(LOADED).filter((key) => subShownOnReportDay(key)).sort());
   });
 
   it.each(CASES)(

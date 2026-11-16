@@ -2,12 +2,16 @@ import { afterEach, describe, expect, it } from "vitest";
 import { BOOT_SUBS, BOOT_VIEW_SCRIPT, bootView } from "./bootView";
 import { POPULATION_SUB_TABS } from "../components/PopulationImpactView";
 import { VIEWS } from "../App";
+import { subShownOnReportDay } from "./milburn/reportDay";
+
+// A sub-tab the report-day switch hides opens the default, as any unknown sub does
+const opens = (sub) => (subShownOnReportDay(sub) ? `dashboard:${sub}` : "dashboard:age");
 
 const CASES = [
   ["", "", "dashboard:age"],
   ["?tab=dashboard&sub=finances", "", "dashboard:finances"],
-  ["?tab=dashboard&sub=scenarios", "", "dashboard:scenarios"],
-  ["?tab=dashboard&sub=benchmarks", "", "dashboard:benchmarks"],
+  ["?tab=dashboard&sub=scenarios", "", opens("scenarios")],
+  ["?tab=dashboard&sub=benchmarks", "", opens("benchmarks")],
   // All households and the Household calculator were removed: their links open the default
   ["?tab=dashboard&sub=all", "", "dashboard:age"],
   ["?sub=young", "", "dashboard:age"],

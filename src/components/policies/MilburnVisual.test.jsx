@@ -1,10 +1,19 @@
-import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { policyVisual } from "./PolicyVisual";
 import { PolicyCard } from "../PolicyCards";
 import { MILBURN_POLICY_DETAILS } from "../../utils/policyDetails";
 import { MILBURN_GROUPS } from "../../utils/milburn/measureGroups";
-import { MILBURN_PHASING, MILBURN_RATES, milburnVisualView, phasedShare, weeklyToMonthly } from "../../utils/milburn/measureVisuals";
+import { MILBURN_PHASING, MILBURN_RATES, milburnVisualView, phasedSavingShares, weeklyToMonthly } from "../../utils/milburn/measureVisuals";
+import { parseSummary } from "../../utils/milburn/summary";
+
+const PUBLISHED_SUMMARY = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8");
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 const details = Object.fromEntries(MILBURN_POLICY_DETAILS.map((entry) => [entry.id, entry]));
 const policy = (id) => ({ ...details[id], id, name: "The measure", direction: "raise" });
@@ -64,12 +73,29 @@ describe("MilburnVisual", () => {
     expect(Math.round(weeklyToMonthly(MILBURN_RATES.pip.dailyLiving.standard))).toBe(344);
   });
 
-  it("phased package: the published 36%, 60% and 93%, from the pipeline's rule", () => {
-    show("milburn_package_phased");
-    expect(image()).toHaveAccessibleName(/about 36% in 2027-28, about 60% in 2028-29, about 76% in 2029-30, about 86% in 2030-31, about 93% in 2031-32/);
+  it("phased package: the rule in words, and its saving as a share of full abolition's from the results", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(PUBLISHED_SUMMARY, { status: 200 })));
+    const { container } = show("milburn_package_phased");
+    // The rule, said at once; no share is typed
+    expect(image()).toHaveAccessibleName(/People who turned 18 since April 2026 are reached at once; existing claimants as they are reassessed, at 25% of the remaining caseload a year\./);
     expect(MILBURN_PHASING.reassessedEachYear).toBe(0.25);
-    expect(phasedShare(2026).total).toBe(0);
-    expect(phasedShare(2033).total).toBe(1);
+    // Then the run's own saving over full abolition's, a year each
+    await screen.findByRole("img", { name: /Exchequer saving as a share of full abolition's, from the results: 45% in 2027-28, 72% in 2028-29, 81% in 2029-30, 90% in 2030-31, 97% in 2031-32\./ });
+    expect(container.querySelectorAll(".mviz-column")).toHaveLength(5);
+    expect(image()).not.toHaveAccessibleName(/36%/);
+    const shares = phasedSavingShares(parseSummary(JSON.parse(PUBLISHED_SUMMARY)), "milburn_package_phased");
+    expect(shares).toHaveLength(5);
+    expect(shares[0]).toEqual({ year: 2027, share: 2.009 / 4.486 });
+  });
+
+  it("phased package: the rule alone when the summary is missing, never a typed share", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 404 })));
+    const { container } = show("milburn_package_phased");
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
+    expect(image()).toHaveAccessibleName("The measure: People who turned 18 since April 2026 are reached at once; existing claimants as they are reassessed, at 25% of the remaining caseload a year.");
+    expect(container.querySelectorAll(".mviz-column")).toHaveLength(0);
+    expect(container).toHaveTextContent("25% of those remaining, each year");
+    expect(phasedSavingShares(null, "milburn_package_phased")).toEqual([]);
   });
 
   it("standard allowance: the under-25 rate beside the 25-and-over rate", () => {

@@ -10,14 +10,19 @@ import { join } from "node:path";
 import { render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-  NO_ENTRY_RATE_RESTORES,
+  BREAK_EVEN_ENTRANTS_DEFINITION,
+  BREAK_EVEN_SHARE_DEFINITION,
+  ENTRY_ASSUMPTION_TEXT,
+  MORE_ENTRANTS_THAN_GROUP,
   RELATIVE_LINE_NOTE,
   breakEvenText,
+  entryMovers,
   formatBn,
   formatPeople,
   formatSignedPp,
   parseSummary,
   savingInYear,
+  savingShare,
   summaryPovertyCount,
   summaryRun,
 } from "./summary";
@@ -26,9 +31,24 @@ import { groupMilburnMeasures, milburnDefaultMeasure, milburnDisplayName, milbur
 import { loadLocalBuildParts } from "./localBuild";
 import { dashboardFromParts } from "../loadDashboard";
 import { MeasureCatalogueProvider } from "../measureCatalogue";
-import KeyFigures, { REPLACEMENT_NOT_MODELLED_NOTE, REPLACEMENT_PARTS_NOTE, keyFigureTiles, packageRange } from "../../components/milburn/KeyFigures";
+import KeyFigures, {
+  RANGE_WITH_SELECTION,
+  RANGE_WITHOUT_SELECTION,
+  REPLACEMENT_NOT_MODELLED_NOTE,
+  REPLACEMENT_PARTS_NOTE,
+  keyFigureTiles,
+  packageRange,
+} from "../../components/milburn/KeyFigures";
+import { yearOnlyText } from "../../components/milburn/MilburnCharts";
 import { FinancesHeadline, PovertyHeadline, barShare } from "../../components/milburn/HeadlineTiles";
-import { BreakEven, EntryComparison, SAME_GAIN_SENTENCE, SMALL_FISCAL_EFFECT_POINTS } from "../../components/milburn/BehaviouralScenarios";
+import {
+  BreakEven,
+  ENTRY_RUN_HEADING,
+  EntryComparison,
+  SAME_GAIN_SENTENCE,
+  SCENARIOS_LABEL,
+  entryRunPoints,
+} from "../../components/milburn/BehaviouralScenarios";
 
 const FIXTURES = join(__dirname, "..", "..", "test", "fixtures", "milburn");
 const SUMMARY_TEXT = readFileSync(join(FIXTURES, "summary", "milburn_summary.json"), "utf8");
@@ -66,7 +86,10 @@ describe("parseSummary", () => {
     expect(savingInYear(run, 2027)).toBe(4);
     expect(run.youngPeopleLosing).toBe(500400);
     expect(run.povertyPp.rel_ahc).toBe(0.2);
-    expect(run.breakEvenSharePct).toEqual({ h16: 150, h25: 95.5 });
+    expect(run.breakEvenSharePct).toEqual({ h16: 109.9, h25: 87.9 });
+    // A static run's file may carry no movers; the entry run's count is read
+    expect(run.peopleDirectlyAffected).toBeNull();
+    expect(summaryRun(summary, "milburn_package_entry_25pct").peopleDirectlyAffected).toBe(70400);
   });
 
   it("treats a run the file does not list as not yet run", () => {
@@ -94,11 +117,23 @@ describe("parseSummary", () => {
 });
 
 describe("formatting", () => {
-  it("says no entry rate restores the average above 100%", () => {
-    expect(breakEvenText(150)).toBe(`${NO_ENTRY_RATE_RESTORES} (150.0% would be needed)`);
+  it("says, above 100%, that the entrants needed outnumber the group", () => {
+    expect(breakEvenText(150)).toBe(`150.0% (${MORE_ENTRANTS_THAN_GROUP.toLowerCase()})`);
     expect(breakEvenText(100)).toBe("100.0%");
     expect(breakEvenText(95.5)).toBe("95.5%");
     expect(breakEvenText(null)).toBe("");
+    // The old wording claimed something the arithmetic does not show
+    expect(MORE_ENTRANTS_THAN_GROUP).not.toMatch(/restores|reachable/i);
+  });
+
+  it("reads the movers only from a run that has some, and a saving's share only of a positive saving", () => {
+    expect(entryMovers(summaryRun(summary, "milburn_package_entry_25pct"))).toBe(70400);
+    expect(entryMovers(summaryRun(summary, "milburn_package"))).toBeNull();
+    expect(entryMovers({ peopleDirectlyAffected: 0 })).toBeNull();
+    const full = summaryRun(summary, "milburn_package");
+    expect(savingShare(summaryRun(summary, "milburn_package_entry_25pct"), full, 2027)).toBe(0.75);
+    expect(savingShare(full, summaryRun(summary, "milburn_package_entry_25pct"), 2028)).toBeNull();
+    expect(savingShare(full, summaryRun(summary, "youth_allowance_at_25_plus_rate"), 2027)).toBeNull();
   });
 
   it("formats £bn, people and pp", () => {
@@ -156,6 +191,11 @@ describe("KeyFigures", () => {
     expect(region.textContent).toContain("Relative poverty (60% of median, after housing costs): 150,000 people move into it (+0.20pp).");
     expect(region.textContent).toContain(REPLACEMENT_NOT_MODELLED_NOTE);
     expect(region.textContent).toContain(REPLACEMENT_PARTS_NOTE);
+    // A package is shown above: it is the one picked out in the range
+    expect(region.textContent).toContain(RANGE_WITH_SELECTION);
+    expect(region.querySelectorAll("tr.is-selected")).toHaveLength(1);
+    // The figures are for the summary's year whatever year is chosen: said
+    expect(region.querySelector("[data-year-only]").textContent).toBe(yearOnlyText(2027));
   });
 
   it("shows the packages' range strip whatever run is selected", async () => {
@@ -171,6 +211,12 @@ describe("KeyFigures", () => {
     // The fixture lists only the full package: the others are left out
     expect(rows).toHaveLength(2);
     expect(rows[1].textContent).toBe("Upper bound£4.00bnabout 300,000");
+    // Not a package: no row is picked out, and nothing is said to be selected
+    const region = screen.getByRole("region", { name: "Key figures" });
+    expect(region.textContent).toContain(RANGE_WITHOUT_SELECTION);
+    expect(region.textContent).not.toContain(RANGE_WITH_SELECTION);
+    expect(RANGE_WITHOUT_SELECTION).not.toMatch(/selected|full colour/);
+    expect(region.querySelectorAll("tr.is-selected")).toHaveLength(0);
     expect(packageRange(summary).map((row) => row.id)).toEqual(["milburn_package"]);
   });
 
@@ -211,6 +257,9 @@ describe("headline tiles", () => {
     expect(poverty.textContent).toContain("+0.50pp");
     expect(poverty.textContent).toContain("150,000");
     expect(poverty.textContent).toContain("Static");
+    // Its figures are for the summary's year whatever year is chosen: said
+    expect(poverty.querySelector("[data-year-only]").textContent).toBe(yearOnlyText(2027));
+    expect(yearOnlyText(2027)).toBe("2027-28 only: the year selector does not change these figures.");
     unmount();
     render(
       <MeasureCatalogueProvider catalogue={catalogue}>
@@ -236,13 +285,20 @@ describe("BreakEven", () => {
     render(<BreakEven runId="milburn_package" catalogue={catalogue} />);
     const table = await screen.findByRole("table");
     const rows = within(table).getAllByRole("row");
-    expect(rows[1].textContent).toContain("Above 100%: not reachable");
+    expect(rows[0].textContent).toContain("Entrants needed, as a share of 16–24s in losing households");
+    expect(rows[1].textContent).toContain("109.9%");
+    expect(rows[1].textContent).toContain("Above 100%: more than the group");
     expect(rows[1].textContent).toContain("550,000");
     expect(rows[1].textContent).toContain("£4,000");
-    expect(rows[2].textContent).toContain("95.5%");
+    expect(rows[2].textContent).toContain("87.9%");
+    expect(rows[2].textContent).not.toContain("Above 100%");
     const section = screen.getByRole("region", { name: "Break-even arithmetic" });
+    // Both figures defined, one definition; nothing said to be unreachable or an incentive
+    expect(section.textContent).toContain(BREAK_EVEN_ENTRANTS_DEFINITION);
+    expect(section.textContent).toContain(BREAK_EVEN_SHARE_DEFINITION);
     expect(section.textContent).toContain(SAME_GAIN_SENTENCE);
-    expect(section.textContent).toContain(NO_ENTRY_RATE_RESTORES);
+    expect(section.textContent).toContain(MORE_ENTRANTS_THAN_GROUP);
+    expect(section.textContent).not.toMatch(/not reachable|No entry rate|incentive/);
   });
 
   it("omits the arithmetic for a gain run, and says when a run has not yet run", async () => {
@@ -266,6 +322,31 @@ describe("the published summary", () => {
       ["Central", "£2.54bn", "about 314,000"],
       ["Phased", "£2.01bn", "about 143,000"],
     ]);
+  });
+
+  it("defines the break-even share like for like: entrants needed over the young people in losing households", () => {
+    const withArithmetic = [...published.runs.values()].filter((run) => run.entrantsToMatch.h16 !== null);
+    expect(withArithmetic.length).toBeGreaterThan(5);
+    for (const run of withArithmetic) {
+      for (const hours of ["h16", "h25"]) {
+        expect(run.breakEvenSharePct[hours], `${run.id} ${hours}`).toBeCloseTo((100 * run.entrantsToMatch[hours]) / run.youngPeopleLosing, 1);
+      }
+      // More hours, fewer entrants needed
+      expect(run.breakEvenSharePct.h25).toBeLessThan(run.breakEvenSharePct.h16);
+    }
+    const full = summaryRun(published, "milburn_package");
+    expect(full.breakEvenSharePct).toEqual({ h16: 98.7, h25: 77.1 });
+    // Above 100% still occurs, so its wording is still shown
+    expect(summaryRun(published, "milburn_package_phased").breakEvenSharePct.h16).toBeGreaterThan(100);
+  });
+
+  it("counts the entry run's movers from its own results, and none in a static run", () => {
+    expect(formatPeople(entryMovers(summaryRun(published, "milburn_package_entry_25pct")))).toBe("82,000");
+    expect(entryMovers(summaryRun(published, "milburn_package"))).toBeNull();
+    render(<EntryComparison summary={published} catalogue={null} />);
+    const section = screen.getByRole("region", { name: "With a quarter moving into work" });
+    expect(section.textContent).toContain("25% of non-working 18 to 24-year-olds with PIP or the health element moving into work (about 82,000 people)");
+    expect(section.textContent).toContain("Who moves: about 82,000 people, 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
   });
 
   it("leads Return to work with the 25% entry run against the static package", () => {
@@ -317,7 +398,20 @@ describe("EntryComparison", () => {
     expect(rows[3].textContent).toContain("£12,000");
     expect(rows[3].textContent).toContain("£9,000");
     expect(section.textContent).toContain("The move into work takes £1.00bn from the Exchequer.");
-    for (const point of SMALL_FISCAL_EFFECT_POINTS) expect(section.textContent).toContain(point);
+    // What the run does, with the movers from the file; no claim about why or how large
+    expect(section.textContent).toContain(ENTRY_RUN_HEADING);
+    for (const point of entryRunPoints(70400)) expect(section.textContent).toContain(point);
+    expect(entryRunPoints(70400)[0]).toContain("about 70,000 people");
+    expect(entryRunPoints(null)[0]).toBe("Who moves: 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
+    expect(section.textContent).not.toMatch(/Why the effect is small|worse off|young people who lose/);
+  });
+
+  it("names the group that moves, never the young people who lose", () => {
+    expect(ENTRY_ASSUMPTION_TEXT).toBe(
+      "25% of non-working 18 to 24-year-olds with PIP or the health element move into 16 hours' work a week at the minimum wage for their age",
+    );
+    expect(SCENARIOS_LABEL).toBe(`Assumption: ${ENTRY_ASSUMPTION_TEXT}, microsimulated. Other tabs: static.`);
+    expect(SAME_GAIN_SENTENCE).not.toMatch(/incentive/);
   });
 
   it("says when either run has not yet run", () => {

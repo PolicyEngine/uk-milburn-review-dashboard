@@ -5,7 +5,7 @@ model_build.json) and public/data/milburn_scenarios.json, and writes
 public/data/milburn_summary.json plus a Markdown table on stdout.
 
 Static figures only. The return-to-work break-even is arithmetic on the
-model's average loss and the household entry-to-work case, labelled as
+run's Exchequer saving and the household entry-to-work case, labelled as
 illustrative.
 """
 
@@ -82,29 +82,34 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
             float(metrics["child_poverty_rel_ahc_change_pp"]), 3
         ),
     }
-    # Illustrative break-even: the share of young people in losing
-    # households who would need to move into work (16 or 25 hours at the
-    # National Living Wage) for the group's average income to return to
-    # where it was. Gains from work come from the household case (a single
-    # 22-year-old renter with LCWRA); a household with PIP or a partner
-    # gains differently, so this is an order of magnitude, not an estimate.
+    # People whose own earnings or taxes change (calculators.py): the movers
+    # in a run with a move into work, none in a static run.
+    directly = ages["all"].get("people_directly_affected")
+    if directly not in (None, ""):
+        out["people_directly_affected"] = round(float(directly))
+    # Illustrative break-even, one definition throughout: the entrants
+    # whose gains from work (16 or 25 hours at the National Living Wage)
+    # would add up to the total static income loss, approximated by the
+    # Exchequer saving, and those entrants as a share of the young people
+    # in losing households. Gains from work come from the household case
+    # (a single 22-year-old renter with LCWRA); a household with PIP or a
+    # partner gains differently, so this is an order of magnitude, not an
+    # estimate.
     if loss_affected and loss_affected > 0 and not gains and scenarios:
         cases = scenarios.get("entry_cases", [])
-        # s = L / g: the share of young people in losing households who
-        # would need to move into work for the group's average income to
-        # recover. Above 100% means no entry rate at these hours restores
-        # it. Arithmetic, not an incentive the reform creates: the gain
-        # from work is the same under current law and the package.
-        out["break_even_share_in_work_pct"] = {
-            c["id"]: round(100 * loss_affected / c["net_income_gain_package"], 1)
-            for c in cases
-        }
-        # Entrants whose gains from work would match the total static
-        # income loss (approximated by the Exchequer saving).
         saving = budget.get(YEAR, 0) * 1e9
+        entrants = {
+            c["id"]: saving / c["net_income_gain_package"] for c in cases
+        }
+        # Entrants needed as a share of the young people in losing
+        # households. Above 100%: more entrants than there are young
+        # people in those households. The household loss is counted once
+        # here (in the saving), not once per young person in it.
+        out["break_even_share_in_work_pct"] = {
+            k: round(100 * v / affected, 1) for k, v in entrants.items()
+        }
         out["entrants_to_match_income_loss"] = {
-            c["id"]: round(saving / c["net_income_gain_package"])
-            for c in cases
+            k: round(v) for k, v in entrants.items()
         }
         out["exchequer_gain_per_entrant"] = {
             c["id"]: c["exchequer_gain_package"] for c in cases
@@ -126,7 +131,8 @@ def main():
     w = sys.stdout.write
     w(
         "| Measure | Saving 2027-28 | 16-24s in losing households |"
-        " Avg loss (losing hh) | Absolute AHC poverty | Break-even 16h / 25h |\n"
+        " Avg loss (losing hh) | Absolute AHC poverty |"
+        " Entrants needed, share of 16-24s in losing households 16h / 25h |\n"
     )
     w("|---|---|---|---|---|---|\n")
     for r in results:

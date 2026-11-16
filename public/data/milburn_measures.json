@@ -85,7 +85,7 @@
     {
       "id": "milburn_package_phased",
       "name": "Milburn package, phased as claimants are reassessed",
-      "description": "The health element and PIP removals for young people, reaching new entrants (people turning 18 from April 2026) at once and existing claimants as they are reassessed, at an assumed 25% of the remaining caseload a year: about 36% reached in 2027-28, 60% in 2028-29 and 93% by 2031-32. Who is reached is a random draw, as the data hold no reassessment dates.",
+      "description": "The health element and PIP removals for young people, reaching people who turned 18 since April 2026 at once, and existing claimants as they are reassessed, at an assumed 25% of those remaining each year. Who is reassessed is a random draw, as the data hold no reassessment dates.",
       "status": "computable",
       "first_year": 2027
     },

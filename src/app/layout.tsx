@@ -18,6 +18,7 @@ import { DEEP_LINK_SCRIPT } from '@/utils/landing';
 import { earlyManifestScript } from '@/utils/publication/early';
 import { BOOT_VIEW_SCRIPT } from '@/utils/bootView';
 import { publicationBoot } from './publicationBoot';
+import { isLocalBuildRoute } from '@/utils/milburn/localBuild';
 import { GA_INIT_SCRIPT, GA_MEASUREMENT_ID } from '@/utils/analytics';
 import { chartChunkFiles, chartChunkScript } from '@/utils/chartChunk';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -95,8 +96,12 @@ export default async function RootLayout({
             (utils/bootView.js) */}
         <script dangerouslySetInnerHTML={{ __html: BOOT_VIEW_SCRIPT }} />
         {/* The manifest request starts here, not after the page's code has
-            loaded (utils/publication/early.js) */}
-        <script dangerouslySetInnerHTML={{ __html: earlyManifestScript(process.env.NEXT_PUBLIC_BASE_PATH || '', { artifacts: !booted }) }} />
+            loaded (utils/publication/early.js). Not on the local build
+            route (utils/milburn/localBuild.js), which never reads the
+            manifest or its artifacts */}
+        {!isLocalBuildRoute() && (
+          <script dangerouslySetInnerHTML={{ __html: earlyManifestScript(process.env.NEXT_PUBLIC_BASE_PATH || '', { artifacts: !booted }) }} />
+        )}
         {/* A link to a chart view starts the chart code's download here,
             beside the page's own (utils/chartChunk.js) */}
         <script dangerouslySetInnerHTML={{ __html: chartChunkScript(process.env.NEXT_PUBLIC_BASE_PATH || '', builtChartFiles()) }} />

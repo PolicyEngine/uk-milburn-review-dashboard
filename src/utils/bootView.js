@@ -7,11 +7,17 @@
  */
 
 import { POVERTY_FIGURES_SHOWN } from "./povertyFigures";
+import { subShownOnReportDay } from "./milburn/reportDay";
 
 export const BOOT_TABS = Object.freeze(["dashboard", "policies", "methodology"]);
 export const BOOT_SUBS = Object.freeze({
   // Poverty only while its figures are shown (povertyFigures.js), as PopulationImpactView
-  dashboard: Object.freeze(["age", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : []), "finances", "scenarios", "benchmarks"]),
+  // Less the sub-tabs the report-day switch hides (milburn/reportDay.js)
+  dashboard: Object.freeze(
+    ["age", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : []), "finances", "scenarios", "benchmarks"].filter((sub) =>
+      subShownOnReportDay(sub),
+    ),
+  ),
 });
 // Old sub-tab names that now open another (App.jsx oldAgeSubGroup)
 const SUB_ALIASES = Object.freeze({ young: "age", pensioners: "age" });

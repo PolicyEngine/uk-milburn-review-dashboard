@@ -1,7 +1,8 @@
 import { Coins, FileClock, FilePlus2, Footprints, GraduationCap, HandHeart, ShieldCheck } from "lucide-react";
 import "./PolicyVisual.css";
 import "./MilburnVisual.css";
-import { milburnVisualView } from "../../utils/milburn/measureVisuals";
+import { milburnVisualView, phasedSavingShares, phasedView } from "../../utils/milburn/measureVisuals";
+import { useMilburnSummary } from "../../utils/milburn/summary";
 
 /*
  * The Milburn measures' card visuals, in two shapes: an amount by age (a
@@ -108,7 +109,8 @@ function Columns({ view }) {
   return (
     <div className="pviz mviz mviz-cols" role="img" aria-label={view.alt}>
       <Head view={view} />
-      <div className="mviz-groups" aria-hidden="true">
+      {/* No columns: the view is its chips alone (the phased rule without the summary) */}
+      <div className="mviz-groups" aria-hidden="true" hidden={view.groups.length === 0}>
         {view.groups.map((group, index) => (
           <div className="mviz-group" key={group.label ?? group.columns[0].label ?? index}>
             <div className="mviz-columns">
@@ -138,10 +140,22 @@ function Columns({ view }) {
 }
 
 /**
+ * The phased package: its rule, and its saving as a share of full
+ * abolition's in each year, read from milburn_summary.json. The rule alone
+ * while the file is loading or missing.
+ */
+function PhasedColumns({ policy }) {
+  const { summary } = useMilburnSummary(null);
+  const view = phasedView(policy.visual, policy.label ?? policy.name, phasedSavingShares(summary, policy.id));
+  return <Columns view={view} />;
+}
+
+/**
  * A Milburn measure's visual, or null where its spec does not hold. It
  * needs no policy_parameters.json entry: the rates are the spec's own.
  */
 export function milburnVisual(policy) {
+  if (policy?.visual?.kind === "milburn-phased") return <PhasedColumns policy={policy} />;
   const view = milburnVisualView(policy?.visual, policy?.label ?? policy?.name);
   if (!view) return null;
   return view.ages ? <AgeSteps view={view} /> : <Columns view={view} />;

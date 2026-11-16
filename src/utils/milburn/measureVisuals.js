@@ -25,12 +25,14 @@
  *   year).
  *
  * Projections are shown in whole pounds and said to be "about"; only the
- * legislated £217.26 is shown to the penny. The phased package's shares
- * are derived below from the rule in budget_measures/milburn_variants.py.
+ * legislated £217.26 is shown to the penny. The phased package's rule is
+ * said in words; its shares are its saving over full abolition's, from
+ * milburn_summary.json, never typed.
  * Every view returns null where its spec does not hold, and the card then
  * shows no visual.
  */
 import { percent, pounds, wholePounds } from "../policyVisuals";
+import { DEFAULT_SUMMARY_RUN, savingShare, summaryRun } from "./summary";
 
 export const MILBURN_RATES = Object.freeze({
   engine: "policyengine-uk 2.177.7",
@@ -48,11 +50,11 @@ export const MILBURN_RATES = Object.freeze({
 });
 
 /**
- * The phased package's rule (milburn_variants.py: START, REASSESSED_EACH_YEAR
- * and `reached`): people who turned 18 since April 2026 are reached at
- * once, the rest at a quarter of the remaining caseload a year.
+ * The phased package's rule (milburn_variants.py: START and
+ * REASSESSED_EACH_YEAR): people who turned 18 since April 2026 are reached
+ * at once, the rest at a quarter of the remaining caseload a year.
  */
-export const MILBURN_PHASING = Object.freeze({ start: 2026, reassessedEachYear: 0.25, ages: [18, 24], years: [2027, 2028, 2029, 2030, 2031] });
+export const MILBURN_PHASING = Object.freeze({ start: 2026, reassessedEachYear: 0.25 });
 
 /** PIP is a weekly rate: a month is 52 weeks over 12 months. */
 export const weeklyToMonthly = (weekly) => (weekly * 52) / 12;
@@ -249,38 +251,53 @@ export function packageView(visual, name) {
   };
 }
 
-/** The share of 18 to 24-year-olds the phased package reaches in a year, with equal numbers at each age. */
-export function phasedShare(year, phasing = MILBURN_PHASING) {
-  const years = year - phasing.start;
-  const cohorts = phasing.ages[1] - phasing.ages[0] + 1;
-  const entrants = Math.min(Math.max(years, 0), cohorts) / cohorts;
-  const reassessed = (1 - entrants) * (1 - (1 - phasing.reassessedEachYear) ** Math.max(years, 0));
-  return { entrants, reassessed, total: entrants + reassessed };
+/**
+ * The phased package's Exchequer saving as a share of full abolition's, a
+ * year each, from milburn_summary.json: [{ year, share }], for the years
+ * both runs carry. `runId` is the phased run's id (its card's measure).
+ * Empty without the file or either run. This is what the
+ * run's results show; the rule above gives who is reached, not this share.
+ */
+export function phasedSavingShares(summary, runId) {
+  const phased = summaryRun(summary, runId);
+  const full = summaryRun(summary, DEFAULT_SUMMARY_RUN);
+  if (!phased || !full) return [];
+  return Object.keys(phased.savingBn)
+    .sort()
+    .map((year) => ({ year: Number(year), share: savingShare(phased, full, year) }))
+    .filter((entry) => entry.share !== null && entry.share >= 0);
 }
 
-/** The phased package: the share reached each year, new entrants and reassessed claimants. */
-export function phasedView(_visual, name) {
-  const shares = MILBURN_PHASING.years.map((year) => ({ year: fiscalYear(year), ...phasedShare(year) }));
-  if (shares.some(({ total }) => !(total > 0 && total <= 1))) return null;
+/**
+ * The phased package: its rule in words (new entrants at once, a quarter
+ * of the remaining claimants a year) and, where the summary's shares are
+ * given, its saving as a share of full abolition's in each year, from the
+ * results. Without shares, the rule alone: no share is typed here.
+ */
+export function phasedView(_visual, name, shares = []) {
   const whole = (share) => `${Math.round(share * 100)}%`;
+  const each = whole(MILBURN_PHASING.reassessedEachYear);
+  const since = `April ${MILBURN_PHASING.start}`;
+  const rule = `People who turned 18 since ${since} are reached at once; existing claimants as they are reassessed, at ${each} of the remaining caseload a year.`;
+  const chips = [
+    { icon: "file-plus", when: `Turned 18 since ${since}`, value: "Reached at once" },
+    { icon: "file-clock", when: "Existing claimants", value: `${each} of those remaining, each year` },
+  ];
+  if (!shares.length) {
+    return { caption: "How the new rules are phased in", key: [], max: 1, groups: [], chips, alt: `${name}: ${rule}` };
+  }
   return {
-    caption: "Share of 18 to 24-year-olds the new rules reach (about)",
-    max: 1,
-    key: [["soft", "Turned 18 since April 2026"], ["after", "Reassessed"]],
-    groups: shares.map((share) => ({
-      columns: [
-        {
-          label: share.year,
-          text: whole(share.total),
-          ghost: 1,
-          parts: [{ value: share.reassessed, tone: "after" }, { value: share.entrants, tone: "soft" }],
-        },
-      ],
+    caption: "Exchequer saving as a share of full abolition's",
+    max: Math.max(1, ...shares.map((entry) => entry.share)),
+    key: [["after", "Phased package"], ["ghost", "Full abolition"]],
+    groups: shares.map((entry) => ({
+      columns: [{ label: fiscalYear(entry.year), text: whole(entry.share), ghost: 1, parts: [{ value: entry.share, tone: "after" }] }],
     })),
+    chips,
     alt:
-      `${name}: the share of 18 to 24-year-olds the new rules reach, with equal numbers at each age: ` +
-      shares.map((share) => `about ${whole(share.total)} in ${share.year}`).join(", ") +
-      `. People who turned 18 since April 2026 are reached at once; existing claimants at ${whole(MILBURN_PHASING.reassessedEachYear)} of the remaining caseload a year.`,
+      `${name}: ${rule} Its Exchequer saving as a share of full abolition's, from the results: ` +
+      shares.map((entry) => `${whole(entry.share)} in ${fiscalYear(entry.year)}`).join(", ") +
+      ".",
   };
 }
 

@@ -3,21 +3,30 @@ import { OPEN_POPULATION_SUB } from "../utils/populationSub";
 import { POVERTY_FIGURES_SHOWN } from "../utils/povertyFigures";
 import SubTabs, { SubTabPanel, subTabId, useSubTabParam } from "./SubTabs";
 import { YOUNG_PEOPLE_ANCHOR } from "../utils/viewAnchors";
+import { REPORT_DAY, subShownOnReportDay } from "../utils/milburn/reportDay";
 
 /**
  * Impact's sub-tabs; the first, Young people (?sub=age, the age-group view
  * opened on 16 to 24), is the default. Poverty is left out while the
  * poverty figures are withheld (povertyFigures.js), so ?sub=poverty opens
  * the default. Return to work (?sub=scenarios) and Benchmarks set the
- * static results beside a move into work and published figures.
+ * static results beside a move into work and published figures; both are
+ * left out while the report-day switch is on (utils/milburn/reportDay.js),
+ * so their links open the default too.
  */
-export const POPULATION_SUB_TABS = [
-  { value: "age", label: "Young people", icon: "usersRound" },
-  { value: "poverty", label: "Poverty", icon: "percent" },
-  { value: "finances", label: "Public finances", icon: "landmark" },
-  { value: "scenarios", label: "Return to work", icon: "sliders" },
-  { value: "benchmarks", label: "Benchmarks", icon: "scale" },
-].filter((tab) => POVERTY_FIGURES_SHOWN || tab.value !== "poverty");
+export function populationSubTabs({ reportDay = REPORT_DAY } = {}) {
+  return [
+    { value: "age", label: "Young people", icon: "usersRound" },
+    { value: "poverty", label: "Poverty", icon: "percent" },
+    { value: "finances", label: "Public finances", icon: "landmark" },
+    { value: "scenarios", label: "Return to work", icon: "sliders" },
+    { value: "benchmarks", label: "Benchmarks", icon: "scale" },
+  ]
+    .filter((tab) => POVERTY_FIGURES_SHOWN || tab.value !== "poverty")
+    .filter((tab) => subShownOnReportDay(tab.value, reportDay));
+}
+
+export const POPULATION_SUB_TABS = populationSubTabs();
 
 const SUB_TAB_VALUES = POPULATION_SUB_TABS.map((tab) => tab.value);
 

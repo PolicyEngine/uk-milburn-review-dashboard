@@ -57,6 +57,13 @@ from uk_budget_data.budget_measures.household_energy_payment_2026 import (
 from uk_budget_data.budget_measures.pension_tax_allowance import (
     pension_tax_allowance,
 )
+from uk_budget_data.budget_measures import milburn_design
+from uk_budget_data.budget_measures.milburn_report import (
+    milburn_report_package_phased,
+    milburn_report_package_with_entry_25pct,
+    milburn_report_pip,
+    milburn_report_uc_health,
+)
 from uk_budget_data.budget_measures.milburn_variants import (
     milburn_package_phased,
     milburn_package_with_entry_25pct,
@@ -64,7 +71,9 @@ from uk_budget_data.budget_measures.milburn_variants import (
 from uk_budget_data.budget_measures.pip_removed_ages_18_to_24 import (
     pip_halved_ages_18_to_24,
     pip_removed_ages_16_to_24,
+    pip_removed_ages_16_to_24_excluding_scotland,
     pip_removed_ages_18_to_24,
+    pip_removed_ages_18_to_24_excluding_scotland,
 )
 from uk_budget_data.budget_measures.planned_cash_isa_limit import (
     planned_cash_isa_limit,
@@ -1251,7 +1260,32 @@ def _create_state_pension_double_lock_2030() -> Reform:
 # The Autumn Budget 2026 measures above are retired: their factories stay,
 # unregistered, for the modules and tests that still read them.
 
-MILBURN_FIRST_YEAR = 2027
+# The 15 November designs' start year, age bands and rates live in
+# ``budget_measures/milburn_design.py`` (first group, not to be edited); the
+# text below is written from them. The report's design is the REPORT_*
+# group there, read by the reserved ``milburn_report_*`` ids further down.
+MILBURN_FIRST_YEAR = milburn_design.START_YEAR
+_FROM = milburn_design.start_text()  # "From April 2027"
+_UC_AGE = milburn_design.UC_HEALTH_UPPER_AGE  # 25
+_UNDER = milburn_design.under_text()  # "under-25s"
+_PIP_BAND = milburn_design.age_band_text()  # "18 to 24"
+_PIP_PEOPLE = milburn_design.age_band_people_text()  # "18 to 24-year-olds"
+# Sentences that date from before the report: rewrite them on report day.
+YOUTH_ALLOWANCE_BRIEFING_NOTE = (
+    "Briefings before the report point to a "
+    "youth allowance at the under-25 rate, which would leave awards "
+    "unchanged; this variant shows the higher rate."
+)
+EMPLOYER_NICS_BRIEFING_NOTE = (
+    "Recommended by the Work and Pensions Committee; briefings do "
+    "not attribute it to the review."
+)
+SEVERE_KEPT_BRIEFING_NOTE = (
+    "The points stand "
+    "in for the trailed higher-rate "
+    "benefit for people with the most severe conditions, whose "
+    "eligibility rules are not yet known."
+)
 UC_HEALTH_UNDER_25_ID = "uc_health_element_removed_under_25"
 UC_HEALTH_UNDER_25_NEW_CLAIMS_ID = (
     "uc_health_element_removed_under_25_new_claims"
@@ -1275,12 +1309,29 @@ def _milburn_years() -> list[int]:
     return [y for y in POLICY_YEARS if y >= MILBURN_FIRST_YEAR]
 
 
-def youth_allowance_rates() -> dict[str, dict[str, float]]:
+def youth_allowance_rates(monthly=None) -> dict[str, dict[str, float]]:
     """The under-25 standard allowances set to the 25-and-over amounts in
     each year from 2027-28, read from current law on the forecast (monthly
     amounts, as the parameter holds them). Every year is given: the amounts
     are uprated, so a bounded change would return to the old path
-    (policyengine-uk #2430)."""
+    (policyengine-uk #2430).
+
+    ``monthly`` sets given amounts instead, as ``{year: (single under 25,
+    couple both under 25)}`` for every year changed
+    (``milburn_design.REPORT_YOUTH_ALLOWANCE_MONTHLY``)."""
+    if monthly is not None:
+        changes = {}
+        for index, young in enumerate(("SINGLE_YOUNG", "COUPLE_YOUNG")):
+            changes.update(
+                threshold_change(
+                    f"{UC_STANDARD_ALLOWANCE}.{young}",
+                    {
+                        str(y): float(monthly[y][index])
+                        for y in sorted(monthly)
+                    },
+                )
+            )
+        return changes
     amounts = forecast_parameters().get_child(UC_STANDARD_ALLOWANCE)
     changes = {}
     for young, old in (
@@ -1334,13 +1385,13 @@ def current_law_protected_health_element() -> dict[str, float]:
 def _create_uc_health_element_removed_under_25() -> Reform:
     return Reform(
         id=UC_HEALTH_UNDER_25_ID,
-        name="UC health element removed for under-25s",
+        name=f"UC health element removed for {_UNDER}",
         description=(
-            "From April 2027 Universal Credit awards no longer include the "
+            f"{_FROM} Universal Credit awards no longer include the "
             "health (LCWRA) element where the claimant with limited "
-            "capability for work and work-related activity is under 25, for "
+            f"capability for work and work-related activity is under {_UC_AGE}, for "
             "existing and new claimants alike; an award keeps it where a "
-            "joint claimant aged 25 or over has that capability. The "
+            f"joint claimant aged {_UC_AGE} or over has that capability. The "
             "assessment itself is unchanged, so the work allowance still "
             "applies, but an award without the element loses the benefit "
             "cap exception that rests on it."
@@ -1352,12 +1403,12 @@ def _create_uc_health_element_removed_under_25() -> Reform:
 def _create_uc_health_element_removed_under_25_new_claims() -> Reform:
     return Reform(
         id=UC_HEALTH_UNDER_25_NEW_CLAIMS_ID,
-        name="UC health element removed for under-25 new claims",
+        name=f"UC health element removed for under-{_UC_AGE} new claims",
         description=(
-            "From April 2027 Universal Credit awards paid the health "
+            f"{_FROM} Universal Credit awards paid the health "
             "element at the new-claimant rate (claims from April 2026) no "
             "longer include it where the claimant with limited capability "
-            "for work and work-related activity is under 25; protected "
+            f"for work and work-related activity is under {_UC_AGE}; protected "
             "claimants keep it. The data hold no claim dates: the model "
             "assigns the new-claimant rate by a random draw at the expected "
             "share of claims, regardless of age, so the figure rests on "
@@ -1370,9 +1421,9 @@ def _create_uc_health_element_removed_under_25_new_claims() -> Reform:
 def _create_pip_removed_under_25() -> Reform:
     return Reform(
         id=PIP_UNDER_25_ID,
-        name="PIP removed for 18 to 24-year-olds",
+        name=f"PIP removed for {_PIP_PEOPLE}",
         description=(
-            "From April 2027 people aged 18 to 24 receive neither component "
+            f"{_FROM} people aged {_PIP_BAND} receive neither component "
             "of Personal Independence Payment; 16 and 17-year-olds keep it "
             "and Disability Living Allowance for children is unchanged. "
             "Entitlements that depend on receiving PIP go with it. Scottish "
@@ -1388,14 +1439,12 @@ def _create_youth_allowance_at_25_plus_rate() -> Reform:
         id=YOUTH_ALLOWANCE_ID,
         name="Under-25 UC standard allowance at the 25-and-over rate",
         description=(
-            "From April 2027 single Universal Credit claimants under 25 "
+            f"{_FROM} single Universal Credit claimants under 25 "
             "receive the standard allowance for those aged 25 and over, and "
             "couples in which both are under 25 receive the couple rate for "
             "those aged 25 and over. The protected health element is held at "
             "its current-law amount, which the law otherwise links to the "
-            "under-25 allowances. Briefings before the report point to a "
-            "youth allowance at the under-25 rate, which would leave awards "
-            "unchanged; this variant shows the higher rate."
+            "under-25 allowances. " + YOUTH_ALLOWANCE_BRIEFING_NOTE
         ),
         parameter_changes={
             **youth_allowance_rates(),
@@ -1411,13 +1460,12 @@ def _create_employer_nics_zero_under_25() -> Reform:
         id=EMPLOYER_NICS_UNDER_25_ID,
         name="Employer NICs zero rate extended to under-25s",
         description=(
-            "From April 2027 employers pay no Class 1 National Insurance on "
+            f"{_FROM} employers pay no Class 1 National Insurance on "
             "earnings up to the upper secondary threshold (£50,270 a year) "
             "for employees under 25, extending the zero rate for under-21s. "
             "The model passes employers' National Insurance through to "
             "wages, so the saving shows as higher pay for these employees. "
-            "Recommended by the Work and Pensions Committee; briefings do "
-            "not attribute it to the review."
+            + EMPLOYER_NICS_BRIEFING_NOTE
         ),
         parameter_changes=threshold_change(
             EMPLOYER_NI_ZERO_RATE_AGE,
@@ -1518,7 +1566,7 @@ def _create_uc_health_element_removed_under_22() -> Reform:
         id=UC_HEALTH_UNDER_22_ID,
         name="UC health element removed for under-22s",
         description=(
-            "From April 2027 Universal Credit awards no longer include the "
+            f"{_FROM} Universal Credit awards no longer include the "
             "health (LCWRA) element where the claimant with limited "
             "capability for work and work-related activity is under 22, for "
             "existing and new claimants alike: the age limit proposed in the "
@@ -1531,15 +1579,13 @@ def _create_uc_health_element_removed_under_22() -> Reform:
 def _create_uc_health_element_removed_under_25_severe_kept() -> Reform:
     return Reform(
         id=UC_HEALTH_UNDER_25_SEVERE_KEPT_ID,
-        name="UC health element removed for under-25s, severe cases kept",
+        name=f"UC health element removed for {_UNDER}, severe cases kept",
         description=(
-            "As the removal for under-25s, except that a young claimant "
+            f"As the removal for {_UNDER}, except that a young claimant "
             "with limited capability for work and work-related activity "
-            "who scores 24 or more PIP daily living points (about a fifth "
-            "of young PIP recipients) keeps the element. The points stand "
-            "in for the trailed higher-rate "
-            "benefit for people with the most severe conditions, whose "
-            "eligibility rules are not yet known."
+            f"who scores {milburn_design.SEVERE_DL_POINTS} or more PIP daily living points (about a fifth "
+            "of young PIP recipients) keeps the element. "
+            + SEVERE_KEPT_BRIEFING_NOTE
         ),
         simulation_modifier=uc_health_element_removed_under_25_severe_kept,
     )
@@ -1548,9 +1594,9 @@ def _create_uc_health_element_removed_under_25_severe_kept() -> Reform:
 def _create_pip_halved_under_25() -> Reform:
     return Reform(
         id=PIP_HALVED_ID,
-        name="PIP at half rate for 18 to 24-year-olds",
+        name=f"PIP at half rate for {_PIP_PEOPLE}",
         description=(
-            "From April 2027 people aged 18 to 24 receive half their current "
+            f"{_FROM} people aged {_PIP_BAND} receive half their current "
             "Personal Independence Payment. This is an illustrative stand-in "
             "for a smaller, non-means-tested additional cost allowance in "
             "place of PIP, whose rules are not yet known; Scottish Adult "
@@ -1571,11 +1617,28 @@ def _create_pip_removed_16_to_24() -> Reform:
         id=PIP_16_TO_24_ID,
         name="PIP removed for 16 to 24-year-olds",
         description=(
-            "As the PIP removal for 18 to 24-year-olds, but from age 16: "
+            f"As the PIP removal for {_PIP_PEOPLE}, but from age 16: "
             "'under 25' read literally. Disability Living Allowance for "
             "children under 16 is unchanged."
         ),
         simulation_modifier=pip_removed_ages_16_to_24,
+    )
+
+
+def _phasing_text(
+    rate=milburn_design.REASSESSED_EACH_YEAR,
+    cohort_start=milburn_design.COHORT_START_YEAR,
+    entrant_age=milburn_design.NEW_ENTRANT_AGE,
+) -> str:
+    """The phased runs' rule in words. It states the rule only: the share
+    reached in a year comes from the run (the page computes it)."""
+    return (
+        f"people who turned {entrant_age} since "
+        f"{milburn_design.start_date_text(cohort_start)} at once, and "
+        "existing claimants as they are reassessed, at an assumed "
+        f"{milburn_design.percent_text(rate)} of those remaining each "
+        "year. Who is reassessed is "
+        "a random draw, as the data hold no reassessment dates."
     )
 
 
@@ -1585,11 +1648,7 @@ def _create_milburn_package_phased() -> Reform:
         name="Milburn package, phased as claimants are reassessed",
         description=(
             "The health element and PIP removals for young people, reaching "
-            "new entrants (people turning 18 from April 2026) at once and "
-            "existing claimants as they are reassessed, at an assumed 25% "
-            "of the remaining caseload a year: about 36% reached in "
-            "2027-28, 60% in 2028-29 and 93% by 2031-32. Who is reached is "
-            "a random draw, as the data hold no reassessment dates."
+            + _phasing_text()
         ),
         simulation_modifier=milburn_package_phased,
     )
@@ -1601,7 +1660,7 @@ def _create_milburn_package_entry_25pct() -> Reform:
         name="Milburn package with an illustrative move into work",
         description=(
             "The full package, with a randomly chosen quarter of affected "
-            "young people who do not work (aged 18 to 24, with PIP or "
+            f"young people who do not work (aged {_PIP_BAND}, with PIP or "
             "limited capability for work and work-related activity) moving "
             "into 16 hours a week at their minimum wage. An illustrative "
             "scenario, not an estimate of how people would respond."
@@ -1656,8 +1715,8 @@ def _create_milburn_package(
         name=name,
         description=description
         or (
-            "The health element removal for under-25s (all claimants) and "
-            "the PIP removal for 18 to 24-year-olds simulated together, "
+            f"The health element removal for {_UNDER} (all claimants) and "
+            f"the PIP removal for {_PIP_PEOPLE} simulated together, "
             "with their interactions."
         ),
         parameter_changes=combined.parameter_changes,
@@ -1668,11 +1727,274 @@ def _create_milburn_package(
 
 
 # =============================================================================
+# RESERVED MEASURES (resolvable by id, not listed)
+# =============================================================================
+#
+# Registered so that ``generate --reforms <id>`` (and ``get_reform``) finds
+# them, but left out of ``get_milburn_reforms`` / ``list_reform_ids``: the
+# page lists every computable measure in ``milburn_measures.json`` (as "Not
+# yet run" until its folder exists), and that file, the summary and a
+# ``generate`` with no ``--reforms`` are all built from the listed registry.
+# To put one on the page, add its id to ``MILBURN_PROMOTED_IDS`` and
+# regenerate ``milburn_measures.json`` (then the frontend lists and the
+# registry test, docs/report-day/01-pipeline-runbook.md section 5).
+#
+# ``milburn_report_*`` are the final report's design, written from the
+# REPORT_* constants in ``budget_measures/milburn_design.py``: edit those,
+# then run these ids. The others are alternatives on the 15 November
+# designs: the package with PIP from 16, and PIP removal leaving Scottish
+# Adult Disability Payment alone.
+
+MILBURN_REPORT_PACKAGE_ID = "milburn_report_package"
+MILBURN_REPORT_PIP_ID = "milburn_report_pip"
+MILBURN_REPORT_UC_HEALTH_ID = "milburn_report_uc_health"
+MILBURN_REPORT_PHASED_ID = "milburn_report_package_phased"
+MILBURN_REPORT_ENTRY_ID = "milburn_report_package_entry_25pct"
+MILBURN_REPORT_YOUTH_ALLOWANCE_ID = "milburn_report_youth_allowance"
+MILBURN_REPORT_PACKAGE_COMPONENTS = (
+    MILBURN_REPORT_UC_HEALTH_ID,
+    MILBURN_REPORT_PIP_ID,
+)
+MILBURN_PACKAGE_16_TO_24_ID = "milburn_package_16_to_24"
+MILBURN_PACKAGE_16_TO_24_COMPONENTS = (UC_HEALTH_UNDER_25_ID, PIP_16_TO_24_ID)
+PIP_UNDER_25_EXCLUDING_SCOTLAND_ID = "pip_removed_under_25_excluding_scotland"
+PIP_16_TO_24_EXCLUDING_SCOTLAND_ID = "pip_removed_16_to_24_excluding_scotland"
+# Reserved ids to list on the page (empty until their runs exist).
+MILBURN_PROMOTED_IDS: tuple[str, ...] = ()
+
+_SCOTLAND_INCLUDED = (
+    "Scottish "
+    "recipients of Adult Disability Payment, which the data record "
+    "as PIP, are included."
+)
+_SCOTLAND_EXCLUDED = (
+    "Scottish recipients of Adult Disability Payment, which the data "
+    "record as PIP, are left as they are."
+)
+
+
+def _report_uc_health_text() -> tuple[str, str]:
+    d = milburn_design
+    low, high = d.REPORT_UC_HEALTH_LOWER_AGE, d.REPORT_UC_HEALTH_UPPER_AGE
+    start = d.start_text(d.REPORT_START_YEAR, d.REPORT_START_MONTH)
+    if low > 0:
+        people = d.age_band_people_text(low, high)
+        who = f"aged {d.age_band_text(low, high)}"
+    else:
+        people = d.under_text(high)
+        who = f"under {high}"
+    name = f"UC health element removed for {people}"
+    severe = ""
+    if d.REPORT_UC_HEALTH_SEVERE_KEPT:
+        name += ", severe cases kept"
+        severe = (
+            "A young claimant with that capability who scores "
+            f"{d.REPORT_SEVERE_DL_POINTS} or more PIP daily living points "
+            "keeps the element: the points stand in for the report's rule "
+            "for the most severe conditions, which the data cannot "
+            "identify. "
+        )
+    description = (
+        f"{start} Universal Credit awards no longer include the "
+        "health (LCWRA) element where the claimant with limited "
+        f"capability for work and work-related activity is {who}, for "
+        "existing and new claimants alike; an award keeps it where a "
+        f"joint claimant aged {high} or over has that capability. "
+        f"{severe}The "
+        "assessment itself is unchanged, so the work allowance still "
+        "applies, but an award without the element loses the benefit "
+        "cap exception that rests on it."
+    )
+    return name, description
+
+
+def _report_pip_text() -> tuple[str, str]:
+    d = milburn_design
+    low, high = d.REPORT_PIP_LOWER_AGE, d.REPORT_PIP_UPPER_AGE
+    start = d.start_text(d.REPORT_START_YEAR, d.REPORT_START_MONTH)
+    people = d.age_band_people_text(low, high)
+    share = d.REPORT_PIP_REPLACEMENT_SHARE
+    if share:
+        kept = d.percent_text(share)
+        name = f"PIP at {kept} of its rate for {people}"
+        receive = f"receive {kept} of their current Personal Independence Payment"
+    else:
+        name = f"PIP removed for {people}"
+        receive = "receive neither component of Personal Independence Payment"
+    if low >= 18:
+        younger = "; 16 and 17-year-olds keep it and "
+    elif low == 17:
+        younger = "; 16-year-olds keep it and "
+    else:
+        younger = "; "
+    description = (
+        f"{start} people aged {d.age_band_text(low, high)} {receive}"
+        f"{younger}Disability Living Allowance for children is unchanged. "
+        "Entitlements that depend on receiving PIP go with it. "
+        + (
+            _SCOTLAND_INCLUDED
+            if d.REPORT_PIP_INCLUDE_SCOTLAND
+            else _SCOTLAND_EXCLUDED
+        )
+    )
+    return name, description
+
+
+def _create_milburn_report_uc_health() -> Reform:
+    name, description = _report_uc_health_text()
+    return Reform(
+        id=MILBURN_REPORT_UC_HEALTH_ID,
+        name=name,
+        description=description,
+        simulation_modifier=milburn_report_uc_health,
+    )
+
+
+def _create_milburn_report_pip() -> Reform:
+    name, description = _report_pip_text()
+    return Reform(
+        id=MILBURN_REPORT_PIP_ID,
+        name=name,
+        description=description,
+        simulation_modifier=milburn_report_pip,
+    )
+
+
+def _create_milburn_report_package_phased() -> Reform:
+    d = milburn_design
+    if d.REPORT_REASSESSED_EACH_YEAR:
+        reach = _phasing_text(
+            d.REPORT_REASSESSED_EACH_YEAR,
+            d.REPORT_START_YEAR - 1,
+            d.REPORT_NEW_ENTRANT_AGE,
+        )
+    else:
+        reach = (
+            f"only people who turned {d.REPORT_NEW_ENTRANT_AGE} since "
+            f"{d.start_date_text(d.REPORT_START_YEAR - 1)}: existing "
+            "claimants keep their awards. New claims at older ages are "
+            "not identified, as the data hold no claim dates."
+        )
+    return Reform(
+        id=MILBURN_REPORT_PHASED_ID,
+        name="Milburn report package, phased as claimants are reassessed",
+        description=(
+            "The report's health element and PIP changes for young people, "
+            "reaching " + reach
+        ),
+        simulation_modifier=milburn_report_package_phased,
+    )
+
+
+def _create_milburn_report_package_entry_25pct() -> Reform:
+    d = milburn_design
+    band = d.age_band_text(
+        d.REPORT_PIP_LOWER_AGE,
+        max(d.REPORT_PIP_UPPER_AGE, d.REPORT_UC_HEALTH_UPPER_AGE),
+    )
+    return Reform(
+        id=MILBURN_REPORT_ENTRY_ID,
+        name="Milburn report package with an illustrative move into work",
+        description=(
+            "The report package, with a randomly chosen quarter of affected "
+            f"young people who do not work (aged {band}, with PIP or "
+            "limited capability for work and work-related activity) moving "
+            f"into {d.ENTRY_HOURS} hours a week at their minimum wage. An "
+            "illustrative scenario, not an estimate of how people would "
+            "respond."
+        ),
+        simulation_modifier=milburn_report_package_with_entry_25pct,
+    )
+
+
+def _create_milburn_report_youth_allowance() -> Optional[Reform]:
+    """The report's youth allowance at given amounts; None while
+    ``REPORT_YOUTH_ALLOWANCE_MONTHLY`` is None (at the under-25 rate no
+    award changes, so there is nothing to run)."""
+    d = milburn_design
+    monthly = d.REPORT_YOUTH_ALLOWANCE_MONTHLY
+    if monthly is None:
+        return None
+    d.check_report_design()
+    first = d.REPORT_START_YEAR
+    single, couple = monthly[first]
+    return Reform(
+        id=MILBURN_REPORT_YOUTH_ALLOWANCE_ID,
+        name="Youth allowance at the report's rates",
+        description=(
+            f"{d.start_text(first, d.REPORT_START_MONTH)} single Universal "
+            "Credit claimants under 25 receive a standard allowance of "
+            f"£{single:,.2f} a month and couples in which both are under "
+            f"25 £{couple:,.2f} a month (the {d.fiscal_year_text(first)} "
+            "amounts). The protected health element is held at its "
+            "current-law amount, which the law otherwise links to the "
+            "under-25 allowances."
+        ),
+        parameter_changes={
+            **youth_allowance_rates(monthly),
+            **uc_health_element_change(
+                protected=current_law_protected_health_element()
+            ),
+        },
+    )
+
+
+def _create_pip_removed_under_25_excluding_scotland() -> Reform:
+    return Reform(
+        id=PIP_UNDER_25_EXCLUDING_SCOTLAND_ID,
+        name=f"PIP removed for {_PIP_PEOPLE}, excluding Scotland",
+        description=(
+            f"As the PIP removal for {_PIP_PEOPLE}, except that "
+            + _SCOTLAND_EXCLUDED
+        ),
+        simulation_modifier=pip_removed_ages_18_to_24_excluding_scotland,
+    )
+
+
+def _create_pip_removed_16_to_24_excluding_scotland() -> Reform:
+    return Reform(
+        id=PIP_16_TO_24_EXCLUDING_SCOTLAND_ID,
+        name="PIP removed for 16 to 24-year-olds, excluding Scotland",
+        description=(
+            "As the PIP removal for 16 to 24-year-olds, except that "
+            + _SCOTLAND_EXCLUDED
+        ),
+        simulation_modifier=pip_removed_ages_16_to_24_excluding_scotland,
+    )
+
+
+_RESERVED_IDS = frozenset(
+    {
+        MILBURN_REPORT_PACKAGE_ID,
+        MILBURN_REPORT_PIP_ID,
+        MILBURN_REPORT_UC_HEALTH_ID,
+        MILBURN_REPORT_PHASED_ID,
+        MILBURN_REPORT_ENTRY_ID,
+        MILBURN_REPORT_YOUTH_ALLOWANCE_ID,
+        MILBURN_PACKAGE_16_TO_24_ID,
+        PIP_UNDER_25_EXCLUDING_SCOTLAND_ID,
+        PIP_16_TO_24_EXCLUDING_SCOTLAND_ID,
+    }
+)
+
+_RESERVED_FACTORIES = (
+    _create_milburn_report_pip,
+    _create_milburn_report_uc_health,
+    _create_milburn_report_package_phased,
+    _create_milburn_report_package_entry_25pct,
+    _create_milburn_report_youth_allowance,
+    _create_pip_removed_under_25_excluding_scotland,
+    _create_pip_removed_16_to_24_excluding_scotland,
+)
+
+
+# =============================================================================
 # REFORM COLLECTIONS (lazy-loaded to avoid import-time work)
 # =============================================================================
 
 _REFORMS_CACHE: list[Reform] | None = None
 _REFORM_LOOKUP_CACHE: dict[str, Reform] | None = None
+_RESERVED_CACHE: dict[str, Reform] | None = None
 
 
 def _get_reforms() -> list[Reform]:
@@ -1692,15 +2014,75 @@ def _get_reforms() -> list[Reform]:
                 package_id=MILBURN_CENTRAL_ID,
                 name="Milburn package, central variant (combined)",
                 description=(
-                    "The health element removal for under-25s with severe "
-                    "cases kept, and PIP at half rate for 18 to 24-year-olds "
+                    f"The health element removal for {_UNDER} with severe "
+                    f"cases kept, and PIP at half rate for {_PIP_PEOPLE} "
                     "in place of a new additional cost allowance, simulated "
                     "together with their interactions."
                 ),
             ),
             *members,
         ]
+        _REFORMS_CACHE += [
+            _get_reserved()[reform_id] for reform_id in MILBURN_PROMOTED_IDS
+        ]
     return _REFORMS_CACHE
+
+
+def _get_reserved() -> dict[str, Reform]:
+    """The reserved measures, by id: built on first use from the design
+    constants as they are then (``reset_reserved_reforms`` rebuilds)."""
+    global _RESERVED_CACHE
+    if _RESERVED_CACHE is None:
+        milburn_design.check_report_design()
+        singles = [factory() for factory in _RESERVED_FACTORIES]
+        reserved = {r.id: r for r in singles if r is not None}
+        name, _ = _report_uc_health_text()
+        pip_name, _ = _report_pip_text()
+        report = _create_milburn_package(
+            [reserved[i] for i in MILBURN_REPORT_PACKAGE_COMPONENTS],
+            package_id=MILBURN_REPORT_PACKAGE_ID,
+            name="Milburn report package (combined)",
+            description=(
+                f"The report's design, simulated together with their "
+                f"interactions: {name}; {pip_name}."
+            ),
+        )
+        # Not the cached lookup: this can run while _get_reforms is still
+        # adding promoted ids, and the lookup must be built after that.
+        listed = {r.id: r for r in _get_reforms()}
+        from_16 = _create_milburn_package(
+            [listed[i] for i in MILBURN_PACKAGE_16_TO_24_COMPONENTS],
+            package_id=MILBURN_PACKAGE_16_TO_24_ID,
+            name="Milburn package with PIP from 16 (combined)",
+            description=(
+                f"The health element removal for {_UNDER} (all claimants) "
+                "and the PIP removal for 16 to 24-year-olds simulated "
+                "together, with their interactions."
+            ),
+        )
+        _RESERVED_CACHE = {
+            report.id: report,
+            from_16.id: from_16,
+            **reserved,
+        }
+    return _RESERVED_CACHE
+
+
+def reset_reserved_reforms() -> None:
+    """Forget the reserved measures, so the next lookup rebuilds their
+    names and descriptions from the design constants (tests; a long-lived
+    process after a constant changed)."""
+    global _RESERVED_CACHE
+    _RESERVED_CACHE = None
+
+
+def get_reserved_reforms() -> list[Reform]:
+    """The reserved measures: resolvable by id, not listed."""
+    return list(_get_reserved().values())
+
+
+def list_reserved_reform_ids() -> list[str]:
+    return list(_get_reserved())
 
 
 def _get_reform_lookup() -> dict[str, Reform]:
@@ -1725,10 +2107,15 @@ def get_all_reforms() -> list[Reform]:
 
 
 def get_reform(reform_id: str) -> Optional[Reform]:
-    """Get a reform by its ID, or None if not found."""
-    return _get_reform_lookup().get(reform_id)
+    """Get a reform by its ID, or None if not found: a listed measure,
+    or a reserved one (resolvable, not listed)."""
+    found = _get_reform_lookup().get(reform_id)
+    if found is None and reform_id in _RESERVED_IDS:
+        found = _get_reserved().get(reform_id)
+    return found
 
 
 def list_reform_ids() -> list[str]:
-    """Get a list of all available reform IDs."""
+    """The listed reform ids (the reserved ones are in
+    ``list_reserved_reform_ids``)."""
     return list(_get_reform_lookup().keys())

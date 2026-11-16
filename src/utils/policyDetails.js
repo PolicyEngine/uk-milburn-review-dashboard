@@ -838,7 +838,7 @@ export const MILBURN_POLICY_DETAILS = [
     details: [
       "Static: claimants do not change their work or claims in response.",
       "Who is reassessed each year is a random draw: the data hold no reassessment dates.",
-      "The chart's shares assume equal numbers at each age from 18 to 24.",
+      "The chart's shares are this run's saving over full abolition's, from the results, not the share of claimants reached.",
     ],
     visual: { kind: "milburn-phased", place: "change" },
   },

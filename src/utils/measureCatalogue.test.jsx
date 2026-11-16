@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildMeasureCatalogue, catalogueProvisional, NEUTRAL_COLOR, isCatalogueRowDisplayable, publishedDefinitions } from "./measureCatalogue";
@@ -228,11 +228,17 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
   // pattern above lists only earlier Budgets' names
   const registry = readFileSync(join(root, "uk_budget_data", "reforms.py"), "utf8");
   const ids = [...registry.matchAll(/^(?!AUTUMN_BUDGET_2026_COMBINED)[A-Z0-9_]+_ID = "([a-z0-9_]+)"$/gm)].map((match) => match[1]);
-  const names = [...registry.matchAll(/^\s+name="([^"]+)",$/gm)].map((match) => match[1]).filter((name) => !/\(combined\)/.test(name));
+  // Literal names, plus the names the Milburn entries build from their design
+  // constants (name=f"..." or name=name), read as written into the measures file
+  const literal = [...registry.matchAll(/^\s+name="([^"]+)",$/gm)].map((match) => match[1]);
+  const built = [...registry.matchAll(/^\s+name=(?:f"[^"]+"|name),$/gm)];
+  const milburnFile = join(root, "..", "public", "data", "milburn_measures.json");
+  const milburnNames = existsSync(milburnFile) ? JSON.parse(readFileSync(milburnFile, "utf8")).measures.map((measure) => measure.name) : [];
+  const names = [...new Set([...literal, ...milburnNames])].filter((name) => !/\(combined\)/.test(name));
   expect(ids.length).toBeGreaterThan(0);
   // Each registered measure has a name; the measures listed as not
   // computable have a name and no id constant
-  expect(names.length).toBeGreaterThanOrEqual(ids.length);
+  expect(literal.length + built.length).toBeGreaterThanOrEqual(ids.length);
   const escaped = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const registered = new RegExp([...ids, ...names].map(escaped).join("|"), "i");
   // #185 on #104, until the publication carries their text (reforms.py),

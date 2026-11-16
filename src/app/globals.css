@@ -1814,6 +1814,22 @@ html[data-site-nav-shown] {
     display: none;
   }
 
+  /* A long policy name ends in an ellipsis inside the band: the pill
+     never runs past the band's right edge, and its chevron stays in view */
+  .band-policy {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .band-policy .band-control {
+    max-width: 100%;
+  }
+
+  .band-policy .band-control-text,
+  .band-policy .band-control-value {
+    min-width: 0;
+  }
+
   .main-content .recharts-default-legend {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, max-content));

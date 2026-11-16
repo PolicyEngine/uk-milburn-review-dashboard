@@ -194,6 +194,10 @@ const SINGLE_AGE_LEGEND = [
   { key: "young", label: "16 to 24 shaded", color: YOUNG_SWATCH },
 ];
 
+// On a phone the six short labels ("16–24", "25–34"...) fill their slots
+// at the axis's own size and read as one run; a size down leaves a gap
+export const NARROW_AGE_TICK_SIZE = 10;
+
 /** The 16 to 24 tick in bold, the others as usual. */
 function AgeTick({ x, y, payload, narrow, group = YOUNG_BAND }) {
   const band = AGE_BANDS.find((candidate) => candidate.label === payload.value);
@@ -203,7 +207,7 @@ function AgeTick({ x, y, payload, narrow, group = YOUNG_BAND }) {
       x={x}
       y={y + 12}
       textAnchor="middle"
-      fontSize={TICK_STYLE.fontSize}
+      fontSize={narrow ? NARROW_AGE_TICK_SIZE : TICK_STYLE.fontSize}
       fill={young ? CHART_COLOURS.highlight : TICK_STYLE.fill}
       fontWeight={young ? 600 : 400}
     >

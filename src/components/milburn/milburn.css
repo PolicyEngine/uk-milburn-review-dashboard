@@ -25,80 +25,6 @@
   margin: 0;
 }
 
-.milburn-controls {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  padding: var(--card-padding, 20px);
-  border: 1px solid var(--c-grid);
-  border-radius: 8px;
-  background: var(--c-surface);
-}
-
-.milburn-control {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.milburn-control-label {
-  font-size: 0.95rem;
-  color: var(--c-text);
-}
-
-.milburn-control input[type="range"] {
-  width: 100%;
-  accent-color: var(--c-gain);
-}
-
-.milburn-presets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.milburn-chip {
-  padding: 6px 14px;
-  border: 1px solid var(--c-axis);
-  border-radius: 999px;
-  background: var(--c-surface);
-  color: var(--c-text);
-  font: inherit;
-  font-size: var(--fs-small);
-  cursor: pointer;
-}
-
-.milburn-chip:hover {
-  background: var(--c-hover);
-}
-
-.milburn-chip.is-selected {
-  border-color: var(--c-gain);
-  background: var(--c-highlight-band);
-  color: var(--c-gain-text);
-  font-weight: 600;
-}
-
-.milburn-chip:focus-visible {
-  outline: 2px solid var(--c-gain);
-  outline-offset: 2px;
-}
-
-.milburn-control-note {
-  margin: 0;
-  font-size: var(--fs-small);
-  line-height: 1.55;
-  color: var(--c-axis-title);
-}
-
-.milburn-chart-card {
-  padding: var(--card-padding, 20px);
-  border: 1px solid var(--c-grid);
-  border-radius: 8px;
-  background: var(--c-surface);
-  min-width: 0;
-}
-
 .milburn-notes h3 {
   margin: 0 0 8px;
   font-size: 1rem;
@@ -165,17 +91,6 @@
   color: var(--c-loss-text);
   font-size: 0.75rem;
   white-space: nowrap;
-}
-
-.milburn-estimate {
-  display: block;
-  font-weight: 600;
-}
-
-.milburn-estimate-label {
-  display: block;
-  color: var(--c-axis-title);
-  font-size: 0.75rem;
 }
 
 /* The local build's label (LocalBuildLabel.jsx), under the view tabs */
@@ -289,12 +204,6 @@
   line-height: 1.55;
 }
 
-.milburn-key-foot {
-  margin: 16px 0 0;
-  font-size: var(--fs-caption, 0.8rem);
-  color: var(--c-axis-title);
-}
-
 /* Return to work's lead comparison and break-even arithmetic (BehaviouralScenarios.jsx) */
 .milburn-entry,
 .milburn-breakeven {
@@ -338,14 +247,6 @@
 .milburn-breakeven .milburn-table tbody th {
   min-width: 0;
   white-space: nowrap;
-}
-
-/* The note under the decile chart on the local build route */
-.milburn-chart-note {
-  margin: 12px 0 0;
-  font-size: var(--fs-small);
-  line-height: 1.5;
-  color: var(--c-axis-title);
 }
 
 /* Key figures' range strip: the three packages side by side (KeyFigures.jsx) */
@@ -505,25 +406,11 @@
 
 .milburn-entry h3,
 .milburn-breakeven h3,
-.milburn-notes h3,
-.milburn-bench-group h3 {
+.milburn-notes h3 {
   display: flex;
   align-items: center;
   margin: 0 0 12px;
   font-size: var(--fs-card-title);
-}
-
-.milburn-entry .milburn-sub,
-.milburn-breakeven .milburn-sub {
-  font-size: var(--fs-small);
-  color: var(--c-axis-title);
-}
-
-.milburn-row-icon {
-  display: inline-flex;
-  margin-right: 8px;
-  vertical-align: -2px;
-  color: var(--c-gain-text);
 }
 
 .milburn-notes .milburn-points {
@@ -554,135 +441,6 @@
 
 .milburn-breakeven .milburn-tag {
   margin-left: 0;
-}
-
-/* Benchmarks: cards by theme (BenchmarksTable.jsx) */
-.milburn-bench-group {
-  margin-bottom: 24px;
-}
-
-.milburn-bench-grid {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.milburn-bench-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border: 1px solid var(--c-grid);
-  border-radius: 8px;
-  background: var(--c-surface);
-  min-width: 0;
-}
-
-.milburn-bench-card h4 {
-  margin: 0;
-  font-size: var(--fs-small);
-  font-weight: 600;
-  line-height: 1.4;
-  color: var(--c-text);
-}
-
-.milburn-bench-figures {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-}
-
-.milburn-bench-figure {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.milburn-bench-figure.is-estimate {
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--c-highlight-band);
-}
-
-.milburn-bench-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: var(--fs-micro);
-  font-weight: 600;
-  color: var(--c-axis-title);
-}
-
-.milburn-bench-figure.is-estimate .milburn-bench-kicker {
-  color: var(--c-gain-text);
-}
-
-.milburn-bench-kicker > span[aria-hidden] {
-  display: inline-flex;
-}
-
-.milburn-bench-value {
-  font-size: var(--fs-card-title);
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--c-text);
-  font-variant-numeric: tabular-nums;
-}
-
-.milburn-bench-basis {
-  margin: 0;
-  font-size: var(--fs-caption);
-  line-height: 1.5;
-  color: var(--c-axis-title);
-}
-
-.milburn-bench-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 10px;
-  margin: auto 0 0;
-  font-size: var(--fs-micro);
-  color: var(--c-axis-title);
-}
-
-.milburn-bench-meta .milburn-tag {
-  margin-left: 0;
-}
-
-.milburn-source-chip,
-.milburn-bench-date {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.milburn-source-chip {
-  padding: 2px 8px;
-  border: 1px solid var(--c-grid);
-  border-radius: 999px;
-  background: var(--c-row-band);
-  color: var(--c-gain-text);
-  text-decoration: none;
-}
-
-a.milburn-source-chip:hover {
-  background: var(--c-hover);
-  text-decoration: underline;
-}
-
-a.milburn-source-chip:focus-visible {
-  outline: 2px solid var(--c-gain);
-  outline-offset: 2px;
-}
-
-.milburn-source-chip > span[aria-hidden],
-.milburn-bench-date > span[aria-hidden] {
-  display: inline-flex;
 }
 
 /* Headline rows over Poverty and Public finances (HeadlineTiles.jsx):
@@ -810,110 +568,6 @@ a.milburn-source-chip:focus-visible {
   color: var(--c-axis-title);
 }
 
-/* Benchmark cards: one line for each of title, note and source; two
-   figures side by side; equal heights across a row */
-.milburn-bench-grid.cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-@media (max-width: 900px) {
-  .milburn-bench-grid.cols-2 {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.milburn-bench-card {
-  gap: 12px;
-}
-
-.milburn-bench-card h4,
-.milburn-bench-notes li > span:last-child,
-.milburn-source-chip > span:not(.visually-hidden):not([aria-hidden]) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.milburn-bench-figures {
-  grid-template-columns: none;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-}
-
-/* An odd card out takes the whole row, so no row is half empty */
-.milburn-bench-grid.cols-2 > li:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-}
-
-.milburn-bench-figure {
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--c-row-band);
-}
-
-.milburn-bench-value {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.milburn-bench-notes {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 4px;
-  font-size: var(--fs-caption);
-  line-height: 1.5;
-  color: var(--c-axis-title);
-}
-
-.milburn-bench-notes li {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-
-.milburn-bench-notes li > span[aria-hidden] {
-  display: inline-flex;
-  flex: none;
-  color: var(--c-gain-text);
-}
-
-.milburn-bench-meta {
-  flex-wrap: nowrap;
-  min-width: 0;
-  padding-top: 10px;
-  border-top: 1px solid var(--c-grid);
-}
-
-.milburn-bench-meta > * {
-  flex: none;
-}
-
-.milburn-bench-meta > .milburn-source-chip {
-  flex: 0 1 auto;
-  min-width: 0;
-}
-
-/* The PolicyEngine figure names its build and year on one line, so its box is the wider */
-.milburn-bench-figures {
-  display: flex;
-}
-
-.milburn-bench-figure {
-  flex: 1 1 0;
-}
-
-.milburn-bench-figure.is-estimate {
-  flex: 1.5 1 0;
-}
-
-.milburn-bench-kicker {
-  white-space: nowrap;
-}
-
 /* Recharts cards on the Milburn tabs (MilburnCharts.jsx): a card's charts
    side by side in panels, the legend and the logo under them */
 .milburn-chart-grid {
@@ -938,6 +592,13 @@ a.milburn-source-chip:focus-visible {
   border: 1px solid var(--c-grid);
   border-radius: 8px;
   background: var(--c-surface);
+}
+
+/* A reference line's label ("16–24s in losing households: 578,000") is
+   anchored to its line and, on a phone, runs a few pixels past the plot:
+   it shows over the panel's own padding instead of being cut off there */
+.milburn-chart-panel .recharts-surface {
+  overflow: visible;
 }
 
 .milburn-chart-panel-title {

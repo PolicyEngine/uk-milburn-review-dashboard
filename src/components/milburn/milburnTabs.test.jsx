@@ -57,6 +57,13 @@ describe("Return to work", () => {
     expect(screen.getByRole("region", { name: "Break-even arithmetic" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Return to work" })).toBeInTheDocument();
     expect(screen.queryByRole("slider")).toBeNull();
+    // The assumption names the group that moves, and the tab says its figures are for one year
+    const tab = screen.getByRole("heading", { name: "Return to work" }).closest(".milburn-scenarios");
+    expect(tab.textContent).toContain(
+      "Assumption: 25% of non-working 18 to 24-year-olds with PIP or the health element move into 16 hours' work a week at the minimum wage for their age, microsimulated.",
+    );
+    expect(tab.querySelector("[data-year-only]").textContent).toBe("2027-28 only: the year selector does not change this tab.");
+    expect(tab.textContent).not.toMatch(/young people who lose|leaves worse off|Why the effect is small|not a new incentive|not reachable/);
     // The entry cases from the file: 16 hours at £10 an hour
     const cases = screen.getByRole("region", { name: "One young person moving into work" });
     expect(within(cases).getAllByRole("row")[1].textContent).toBe("16 hours£10.00£1,000; £2,000£3,000; £4,000");
