@@ -14,7 +14,7 @@ import { Calculator, ChartColumn, Compass, Database, Info, SlidersHorizontal } f
 import "./methodology/Methodology.css";
 import { scrollBelowBars, smoothUnlessReduced } from "../utils/pageScroll";
 import { POVERTY_FIGURES_SHOWN, WITHHELD_SENTENCE } from "../utils/povertyFigures";
-import { MICROCOSM_BUILD, POLICYENGINE_UK_VERSION, REPLICATION_LINE } from "./ReplicationLine";
+import { MICROCOSM_BUILD, POLICYENGINE_UK_VERSION, POLICYENGINE_VERSION, REPLICATION_LINE } from "./ReplicationLine";
 import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
 import { ENTRY_ASSUMPTION_TEXT } from "../utils/milburn/summary";
 import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
@@ -22,7 +22,7 @@ import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
 /** The policyengine-core version this build runs, beside policyengine-uk. */
 export const POLICYENGINE_CORE_VERSION = "3.34.10";
 /** The Microcosm UK build's full name. */
-export const MICROCOSM_BUILD_NAME = `uk-frs-calibration-attempt-20261112T133744Z-${MICROCOSM_BUILD}`;
+export const MICROCOSM_BUILD_NAME = `uk-frs-calibration-attempt-20261115T104657Z-${MICROCOSM_BUILD}`;
 
 /**
  * The ids of the Methodology view's sections and of the topics other
@@ -216,8 +216,8 @@ function MethodologyTab({ onShowTab }) {
                 [
                   "Build",
                   <>
-                    Microcosm UK 2024-25, build <code>{MICROCOSM_BUILD_NAME}</code>, loaded directly: it is not in
-                    a policyengine.py release, so no release certifies it.
+                    Microcosm UK 2024-25, build <code>{MICROCOSM_BUILD_NAME}</code>, certified in policyengine{" "}
+                    {POLICYENGINE_VERSION}, whose bundle pins it with policyengine-uk {POLICYENGINE_UK_VERSION}.
                   </>,
                 ],
                 [
@@ -364,7 +364,7 @@ function MethodologyTab({ onShowTab }) {
               items={[
                 [
                   "Microsimulated",
-                  `The full abolition package is run again with ${ENTRY_ASSUMPTION_TEXT}, chosen at random, and set beside the static package: the saving, poverty and average loss.`,
+                  `The full abolition package is run again on the assumption that ${ENTRY_ASSUMPTION_TEXT}, chosen at random, and set beside the static package: the saving, poverty and average loss.`,
                 ],
                 [
                   "Entry cases",

@@ -118,7 +118,7 @@ Mark any test that takes minutes with `@pytest.mark.slow`; under xdist such test
 
 ## Data generation
 
-> **Milburn review route: read this first.** This repository now holds the Milburn review dashboard, whose figures come from a local data build, not a policyengine.py bundle. For it, what this README and `.claude/CLAUDE.md` say about the token and the bundle is reversed: run with `HUGGING_FACE_TOKEN` (and `HF_TOKEN`, `HUGGINGFACE_HUB_TOKEN`) **unset**, and **do not** run `uv lock --upgrade-package policyengine` (`pyproject.toml` pins the engine to policyengine-uk 2.177.7). Commands, the order of regeneration and report-day re-parameterising are in [`docs/milburn-local-run.md`](docs/milburn-local-run.md).
+> **Milburn review route: read this first.** This repository now holds the Milburn review dashboard. Since 16 November 2026 its runs use Microcosm build `fcfac709`, certified in policyengine 6.20.1 (`local_build.py`, `bundle_certifies()`), loaded from the local file the bundle pins. Run the Milburn commands with the token variables unset (the file is local; `uk_budget_data` drops them anyway), upgrade only the bundle, and see [`docs/milburn-local-run.md`](docs/milburn-local-run.md) for fetching the file, the order of regeneration and report-day re-parameterising.
 
 The web app's population figures are files in `public/data/`, written by the `uk-budget-data` CLI (`uv run uk-budget-data --help` lists every command):
 

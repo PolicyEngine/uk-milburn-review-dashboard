@@ -2,12 +2,6 @@ version = 1
 revision = 3
 requires-python = ">=3.13"
 
-[manifest]
-overrides = [
-    { name = "policyengine-core", specifier = "==3.34.10" },
-    { name = "policyengine-uk", specifier = "==2.177.7" },
-]
-
 [[package]]
 name = "annotated-doc"
 version = "0.0.4"
@@ -1017,7 +1011,7 @@ wheels = [
 
 [[package]]
 name = "policyengine"
-version = "6.19.0"
+version = "6.20.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "h5py" },
@@ -1029,9 +1023,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e3/d3/3840c38b21d61ea6bc5e3fde1e8efdf4e2ee785bbb075a6414faa4bb0197/policyengine-6.19.0.tar.gz", hash = "sha256:e0bed171f3960ee02dffde698e60db2c019c42f56ac35363ed32d0cdfa855cd5", size = 1663227, upload-time = "2026-11-13T02:33:26.896Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/99/258dbc1c268492a801548c6fcc3737bde9c2ad15d65a25a8b49fc9605a49/policyengine-6.20.1.tar.gz", hash = "sha256:01a692a094275caa6b613bc3339828d2585d174523fc5b34548001cf9af14499", size = 1864332, upload-time = "2026-11-16T20:23:48.896Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/47/dfc019e4981cdc1b336306dc3523a4008ac03dd02329c1d15d0e0d0a0425/policyengine-6.19.0-py3-none-any.whl", hash = "sha256:03748947dcf6b98d17598343605388437a443fba283bff6229d8adf13c10281b", size = 579425, upload-time = "2026-11-13T02:33:25.15Z" },
+    { url = "https://files.pythonhosted.org/packages/c8/cc/16120b73e8015368e4c71117977e14beeef76f932407655c584900e2600c/policyengine-6.20.1-py3-none-any.whl", hash = "sha256:be81da010d436bdb5c56e23e1d3a420cf56af5147de9b5963c27f2df67a7a4e5", size = 774564, upload-time = "2026-11-16T20:23:46.538Z" },
 ]
 
 [package.optional-dependencies]
@@ -1777,7 +1771,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.24.0" },
     { name = "openpyxl", specifier = ">=3.1.0" },
     { name = "pandas", specifier = ">=2.2.0" },
-    { name = "policyengine", extras = ["uk"], specifier = ">=6.11.1" },
+    { name = "policyengine", extras = ["uk"], specifier = ">=6.20.1" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },

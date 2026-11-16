@@ -237,9 +237,9 @@ describe("MethodologyTab", () => {
 
   it("names the build, the model and that the figures are static", () => {
     const { container } = renderTab();
-    expect(container).toHaveTextContent("Microcosm UK build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release");
+    expect(container).toHaveTextContent("Microcosm UK build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1");
     expect(container).toHaveTextContent("policyengine-core 3.34.10");
-    expect(container).toHaveTextContent("uk-frs-calibration-attempt-20261112T133744Z-6f918b81");
+    expect(container).toHaveTextContent("uk-frs-calibration-attempt-20261115T104657Z-fcfac709");
     expect(container).toHaveTextContent("no behavioural response in the main figures");
     expect(container.textContent).not.toMatch(/Autumn Budget|October 2026/i);
   });

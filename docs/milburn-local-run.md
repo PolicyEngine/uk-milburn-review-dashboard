@@ -7,14 +7,33 @@ data build the review uses.
 
 ## The build
 
+> **Since 16 November 2026 the runs use a certified build.** policyengine
+> 6.20.1 (policyengine.py PR 759) certifies Microcosm build `fcfac709` with
+> policyengine-uk 2.177.7 and core 3.34.10, so `pyproject.toml` depends on
+> `policyengine[uk]>=6.20.1` with no engine override, and
+> `local_build.bundle_certifies()` checks the file against the installed
+> bundle. Sections below that describe the uncertified build `6f918b81`
+> (engine override, "not in a policyengine.py release", refused bundle) are
+> history; the token, environment and command steps still hold.
+
 | | |
 |---|---|
-| Data | Microcosm build `uk-frs-calibration-attempt-20261112T133744Z-6f918b81`, `microcosm_uk_2024_25.h5`, SHA-256 `e268e3af7932784ad4471f008097a5acc6c3c5bc15c4c54fbb5a489b2a0ac9ae` |
-| Engine | policyengine-uk 2.177.7, policyengine-core 3.34.10 (the build's own) |
-| Wrapper | policyengine 6.19.0, used for its API only (it pins 2.174.1 and build eeb6093e) |
-| Label carried into outputs | `build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release` |
+| Data | Microcosm build `uk-frs-calibration-attempt-20261115T104657Z-fcfac709`, `microcosm_uk_2024_25.h5`, SHA-256 `301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90` |
+| Engine | policyengine-uk 2.177.7, policyengine-core 3.34.10 (pinned by the bundle) |
+| Bundle | policyengine 6.20.1, whose UK data release certifies this build |
+| Label carried into outputs | `build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1` |
 
-`pyproject.toml` overrides the engine (`[tool.uv] override-dependencies`).
+Fetch the file once (it reads the Hugging Face CLI token; nothing is printed):
+
+```bash
+.venv/bin/python - <<'PY'
+import shutil; from pathlib import Path
+from huggingface_hub import hf_hub_download
+path = "releases/microcosm-uk-2024-25-national/uk-frs-calibration-attempt-20261115T104657Z-fcfac709/microcosm_uk_2024_25.h5"
+f = hf_hub_download("policyengine/populace-uk-private", path, repo_type="dataset", revision="ad84c0602ed28f694ef52662eb9b063779e4e923")
+dest = Path("/Users/vahid/data/microcosm") / path; dest.parent.mkdir(parents=True, exist_ok=True); shutil.copy2(f, dest)
+PY
+```
 `src/uk_budget_data/local_build.py` holds the build id, hash, engine and
 label, and every national simulation goes through it
 (`pipeline.build_microsimulation`):
@@ -81,11 +100,10 @@ This route is the opposite of what `.claude/CLAUDE.md` and most of
   when it is imported on this engine, but pytest's main process and other
   tools import policyengine directly, and with a token set that import
   fetches policyengine.py's data certificate and refuses the engine.
-- **Never run `uv lock --upgrade-package policyengine`** (or upgrade
-  policyengine-uk) on this route. The engine is pinned by `pyproject.toml`'s
-  `[tool.uv] override-dependencies` to policyengine-uk 2.177.7 /
-  policyengine-core 3.34.10, the pair the build was made with;
-  `local_build.check_engine()` refuses any other.
+- **Upgrade the bundle, never policyengine-uk alone**
+  (`uv lock --upgrade-package policyengine && uv sync --all-extras`), and
+  only to a release that certifies the build in `local_build.py`;
+  `local_build.check_engine()` refuses any other engine.
 - **Use `.venv/bin/...`, not `uv run`, once the venv is synced.** `uv run`
   can resync the shared venv under a running job.
 - Only `MILBURN_DATASET` (optional; same SHA-256) is read. Never set

@@ -2,11 +2,12 @@ import { describe, expect, it } from "vitest";
 import { REPLICATION_LINE, replicationLinks } from "./ReplicationLine";
 
 describe("Reproduce these results", () => {
-  it("names the data build and the model, outside any policyengine.py release", () => {
-    expect(REPLICATION_LINE).toBe("Microcosm UK build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release");
+  it("names the data build, the model and the policyengine.py release that certifies them", () => {
+    expect(REPLICATION_LINE).toBe("Microcosm UK build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1");
     expect(replicationLinks().map(({ label, href }) => [label, href])).toEqual([
-      ["Microcosm UK build 6f918b81", null],
+      ["Microcosm UK build fcfac709", null],
       ["policyengine-uk 2.177.7", "https://pypi.org/project/policyengine-uk/2.177.7/"],
+      ["policyengine 6.20.1", "https://pypi.org/project/policyengine/6.20.1/"],
     ]);
   });
 });

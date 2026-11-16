@@ -370,7 +370,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
   it("names what it is built with, its links as chips that open a new tab", async () => {
     await openDrawer();
     const built = within(drawer()).getByRole("list", { name: "Built with" });
-    expect(built).toHaveTextContent("Microcosm UK build 6f918b81");
+    expect(built).toHaveTextContent("Microcosm UK build fcfac709");
     const [model] = within(built).getAllByRole("link");
     expect(model).toHaveTextContent(/^policyengine-uk 2\.177\.7 \(opens in a new tab\)$/);
     expect(model).toHaveAttribute("target", "_blank");

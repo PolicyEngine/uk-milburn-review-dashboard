@@ -17,9 +17,9 @@ export default function LocalBuildLabel() {
   const pending = catalogue.measures.filter((measure) => measure.availability?.reason === NOT_YET_RUN);
   return (
     <p className="milburn-label milburn-build-label" role="note" data-local-build="">
-      <TitleIcon name="alert" bare size={14} />
+      <TitleIcon name={local.certified ? "shield" : "alert"} bare size={14} />
       <span>
-      Figures from {local.label}: not certified.
+      Figures from {local.label}{local.certified ? "." : ": not certified."}
       {pending.length > 0 && ` ${NOT_YET_RUN}: ${pending.map((measure) => measure.name).join(", ")}.`}
       </span>
     </p>

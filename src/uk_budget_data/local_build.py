@@ -1,28 +1,31 @@
 """The data build and engine the Milburn review dashboard runs on.
 
 The dashboard's national figures come from Microcosm build
-``uk-frs-calibration-attempt-20261112T133744Z-6f918b81`` (dataset SHA-256
-e268e3af...), on the engine it was built with: policyengine-uk 2.177.7 and
-policyengine-core 3.34.10. No policyengine.py release pins that pair
-(policyengine 6.19.0 pins policyengine-uk 2.174.1 with build eeb6093e), so
-``pyproject.toml`` overrides the engine through ``[tool.uv]
-override-dependencies`` and this module builds national simulations with
-``policyengine_uk.Microsimulation`` directly, on the local file only:
+``uk-frs-calibration-attempt-20261115T104657Z-fcfac709`` (dataset SHA-256
+301d2fe5...), on policyengine-uk 2.177.7 and policyengine-core 3.34.10.
+policyengine 6.20.1 certifies that pair (its bundle's UK data release,
+policyengine.py PR 759), so model and data are pinned together by the
+bundle; until 16 November 2026 the dashboard ran on the uncertified build
+6f918b81 with the engine overridden.
+
+National simulations are built on the build's local file, downloaded from
+the bundle's own location (``policyengine/populace-uk-private`` at the
+bundle's revision), and checked before a simulation is built:
 
 - :func:`check_engine` refuses any other policyengine-uk or
   policyengine-core version (a mixed model and data pair voids figures);
 - :func:`check_dataset` refuses any file whose SHA-256 is not the build's;
-- :func:`build_microsimulation` does both, then builds the simulation on
+- :func:`bundle_certifies` says whether the installed policyengine bundle
+  certifies this build (its UK data release names the same SHA-256);
+- :func:`build_microsimulation` checks, then builds the simulation on
   the forecast (``uk_budget_data.forecast.with_forecast``).
 
-``LABEL`` is carried into every output made on this build, in place of a
-policyengine.py certificate.
+``LABEL`` is carried into every output made on this build.
 
-policyengine.py 6.19.0 checks its data certificate when imported: with a
-Hugging Face token in the environment it fetches its data release manifest
-and refuses the overridden engine. The local build needs no download, so
-``drop_hugging_face_token`` removes the token variables before
-``uk_budget_data`` imports policyengine (``uk_budget_data/__init__.py``).
+The local file needs no download at run time, so ``drop_hugging_face_token``
+still removes the token variables before ``uk_budget_data`` imports
+policyengine (``uk_budget_data/__init__.py``); fetch the file once with the
+command in docs/milburn-local-run.md.
 """
 
 import hashlib
@@ -33,15 +36,17 @@ from importlib import metadata
 from pathlib import Path
 from typing import Optional
 
-BUILD_ID = "uk-frs-calibration-attempt-20261112T133744Z-6f918b81"
-BUILD_SHORT = "6f918b81"
+BUILD_ID = "uk-frs-calibration-attempt-20261115T104657Z-fcfac709"
+BUILD_SHORT = "fcfac709"
 DATASET_SHA256 = (
-    "e268e3af7932784ad4471f008097a5acc6c3c5bc15c4c54fbb5a489b2a0ac9ae"
+    "301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90"
 )
 ENGINE = {"policyengine-uk": "2.177.7", "policyengine-core": "3.34.10"}
+# The policyengine.py release whose bundle certifies this build
+POLICYENGINE_RELEASE = "6.20.1"
 LABEL = (
     f"build {BUILD_SHORT}, policyengine-uk {ENGINE['policyengine-uk']}, "
-    "not in a policyengine.py release"
+    f"certified in policyengine {POLICYENGINE_RELEASE}"
 )
 # Where the build lives on this machine; MILBURN_DATASET overrides it (the
 # file must still have the build's SHA-256).
@@ -136,8 +141,8 @@ def build_microsimulation(path=None, scenario=None):
     dataset = check_dataset(path)
     # policyengine.py's builder, as an unmanaged local file: it loads the
     # file with the installed policyengine_uk and records the runtime
-    # dataset and versions that receipts need. Its certificate does not
-    # cover this pair, so receipts record the run as uncertified.
+    # dataset and versions that receipts need. The file is the bundle's
+    # certified dataset (same SHA-256, bundle_certifies).
     sim = pe.uk.managed_microsimulation(
         dataset=str(dataset),
         allow_unmanaged=True,
@@ -152,6 +157,21 @@ def build_microsimulation(path=None, scenario=None):
     return sim
 
 
+def bundle_certifies() -> bool:
+    """Whether the installed policyengine bundle certifies this build: its
+    UK data release names this build and this dataset's SHA-256."""
+    try:
+        import importlib.resources as resources
+
+        manifest = json.loads(
+            (resources.files("policyengine") / "data" / "bundle" / "manifest.json").read_text()
+        )
+        artifact = manifest["data_releases"]["uk"]["certified_data_artifact"]
+    except (ModuleNotFoundError, FileNotFoundError, KeyError, ValueError):
+        return False
+    return artifact.get("build_id") == BUILD_ID and artifact.get("sha256") == DATASET_SHA256
+
+
 def drop_hugging_face_token() -> list[str]:
     """Remove the Hugging Face token variables when the local build's
     engine is installed, so importing policyengine.py does not fetch (and
@@ -164,6 +184,13 @@ def drop_hugging_face_token() -> list[str]:
 RECORD_FILE = "model_build.json"
 
 
+def _policyengine_version() -> Optional[str]:
+    try:
+        return metadata.version("policyengine")
+    except metadata.PackageNotFoundError:
+        return None
+
+
 def build_record(measure_ids=(), years=()) -> dict:
     """What the flat tables were made on, with the label."""
     return {
@@ -171,7 +198,8 @@ def build_record(measure_ids=(), years=()) -> dict:
         "build": BUILD_ID,
         "dataset_sha256": DATASET_SHA256,
         "engine": dict(ENGINE),
-        "certified": False,
+        "certified": bundle_certifies(),
+        "policyengine": _policyengine_version(),
         "measures": list(measure_ids),
         "years": [int(y) for y in years],
     }

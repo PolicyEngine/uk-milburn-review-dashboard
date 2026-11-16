@@ -1,6 +1,6 @@
 /**
  * The local build data route: the Milburn review's figures from the flat
- * results the pipeline writes on Microcosm build 6f918b81 with
+ * results the pipeline writes on Microcosm build fcfac709 with
  * policyengine-uk 2.177.7 (docs/milburn-local-run.md).
  *
  * The verified publication route (manifest.json and receipted artifacts,
@@ -102,12 +102,14 @@ export function parseBuildRecord(json, id) {
   if (!json || typeof json !== "object") return null;
   const label = text(json.label);
   const years = Array.isArray(json.years) ? json.years.filter((year) => Number.isInteger(year)) : [];
-  if (!label || json.certified !== false || !years.length) return null;
+  // certified: true once a policyengine.py bundle certifies the build
+  // (local_build.bundle_certifies), false for an uncertified build
+  if (!label || typeof json.certified !== "boolean" || !years.length) return null;
   if (!Array.isArray(json.measures) || !json.measures.includes(id)) return null;
   const engine = json.engine && typeof json.engine === "object" && !Array.isArray(json.engine)
     ? Object.fromEntries(Object.entries(json.engine).filter(([, version]) => typeof version === "string"))
     : {};
-  return { label, certified: false, build: text(json.build), datasetSha256: text(json.dataset_sha256), engine, years: [...years].sort((a, b) => a - b) };
+  return { label, certified: json.certified, build: text(json.build), datasetSha256: text(json.dataset_sha256), engine, years: [...years].sort((a, b) => a - b) };
 }
 
 /**
@@ -185,7 +187,8 @@ export function localBuildParts(measuresFile, runs = {}) {
   const snapshotSha256 = `local-build-${fingerprint(JSON.stringify([ran, Object.keys(failures).sort(), ran.map((id) => tablesByKey[id].record), ran.map((id) => tablesByKey[id].budgetary_impact)]))}`;
   const localBuild = {
     label,
-    certified: false,
+    // Certified only when every run's record says so
+    certified: ran.length > 0 && ran.every((id) => tablesByKey[id].record.certified === true),
     notRun,
     notComputable: measuresFile.notComputable,
     // The package: the run milburn_measures.json lists with its members
@@ -236,7 +239,7 @@ export async function loadRun(id, { basePath = "", fetchImpl = fetch, signal } =
       return null;
     }
     const record = parseBuildRecord(recordJson, id);
-    if (!record) return { error: `${BUILD_RECORD_FILE} does not state an uncertified run of ${id}` };
+    if (!record) return { error: `${BUILD_RECORD_FILE} does not state a run of ${id}` };
     const texts = await Promise.all(Object.entries(LOCAL_TABLES).map(async ([table, file]) => [table, await fetchText(fetchImpl, `${folder}/${file}`, signal)]));
     const missing = texts.filter(([, value]) => value === null).map(([table]) => LOCAL_TABLES[table]);
     if (missing.length) return { error: `${missing.join(", ")} missing` };
@@ -284,12 +287,13 @@ export function localTableRows(catalogue, table, isShown) {
  */
 export function localBuildNotice(localBuild) {
   if (!localBuild?.label) return "";
-  // "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py
-  // release" → "Local build 6f918b81 · policyengine-uk 2.177.7 · not certified"
+  // "build fcfac709, policyengine-uk 2.177.7, certified in policyengine
+  // 6.20.1" → "Build fcfac709 · policyengine-uk 2.177.7 · certified in
+  // policyengine 6.20.1"; an uncertified build adds "· not certified"
   const short = localBuild.label
     .replace(/^build\s+/i, "")
     .replace(/,?\s*not in a policyengine\.py release$/i, "")
     .split(/,\s*/)
     .join(" · ");
-  return `Local build ${short} · not certified`;
+  return localBuild.certified ? `Build ${short}` : `Local build ${short} · not certified`;
 }

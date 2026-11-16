@@ -93,8 +93,15 @@ describe("a run's build record", () => {
     expect(parsed.years).toEqual([2027, 2028]);
   });
 
-  it("is refused if certified, for another run, or without a label or years", () => {
-    expect(parseBuildRecord({ ...record, certified: true }, "milburn_package")).toBeNull();
+  it("carries whether a bundle certifies the build", () => {
+    expect(parseBuildRecord({ ...record, certified: true }, "milburn_package").certified).toBe(true);
+    expect(parseBuildRecord(record, "milburn_package").certified).toBe(false);
+  });
+
+  it("is refused without a certified flag, for another run, or without a label or years", () => {
+    const { certified: _omitted, ...unflagged } = record;
+    expect(parseBuildRecord(unflagged, "milburn_package")).toBeNull();
+    expect(parseBuildRecord({ ...record, certified: "yes" }, "milburn_package")).toBeNull();
     expect(parseBuildRecord(record, "pip_removed_under_25")).toBeNull();
     expect(parseBuildRecord({ ...record, label: "" }, "milburn_package")).toBeNull();
     expect(parseBuildRecord({ ...record, years: [] }, "milburn_package")).toBeNull();

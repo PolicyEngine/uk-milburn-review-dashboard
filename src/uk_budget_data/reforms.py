@@ -2,7 +2,7 @@
 
 The active registry is the Milburn section at the end of this module: five
 computable measures and their combined package, each compared against
-current law in policyengine-uk 2.177.7 (Microcosm build 6f918b81, see
+current law in policyengine-uk 2.177.7 (Microcosm build fcfac709, certified in policyengine 6.20.1; see
 ``uk_budget_data.local_build``) from 2027-28, and four measures listed as
 not computable with their reasons (``NOT_COMPUTABLE_MEASURES``).
 
@@ -1255,7 +1255,7 @@ def _create_state_pension_double_lock_2030() -> Reform:
 # Candidate measures for the independent review of young people and work
 # (the Milburn review; final report expected 17 November 2026). None is
 # announced policy. Each is compared against current law in the installed
-# policyengine-uk (2.177.7 on Microcosm build 6f918b81: see
+# policyengine-uk (2.177.7 on Microcosm build fcfac709: see
 # ``uk_budget_data.local_build``), from 2027-28 through the last policy year.
 # The Autumn Budget 2026 measures above are retired: their factories stay,
 # unregistered, for the modules and tests that still read them.
