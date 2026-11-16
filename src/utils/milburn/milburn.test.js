@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { packageStaticBn, parseScenarios } from "./scenarios";
 import { youngPeopleWorseOff } from "./youngPeople";
 import { packageKeyOf, packageYearShown } from "./packageRun";
-import { estimateFor, parseBenchmarks } from "./benchmarks";
+import { BENCHMARK_SHORT, comparisonFor, estimateFor, figureNumber, figureRange, figureShare, parseBenchmarks } from "./benchmarks";
 import { NOT_COMPUTABLE_MEASURES } from "./notComputable";
 import { CALCULATOR_ONLY_MEASURES, withCalculatorOnly } from "../calculatorOnlyMeasures";
 
@@ -117,6 +117,53 @@ describe("the benchmarks file", () => {
     expect(estimateFor(neetRow, sources)).toBeNull();
     expect(estimateFor(ucRow, { ...sources, ageRows: null })).toBeNull();
     expect(estimateFor(packageRow, { ...sources, packageRows: null, packageKey: null })).toBeNull();
+  });
+});
+
+describe("the benchmark charts", () => {
+  const parsed = parseBenchmarks(benchmarksFile);
+  const row = (id) => parsed.rows.find((each) => each.id === id);
+
+  it("read a figure as a number only where it is one plain number", () => {
+    expect(figureNumber("260,000")).toEqual({ number: 260000, unit: "count", text: "260,000" });
+    expect(figureNumber("£4.43bn a year")).toEqual({ number: 4.43, unit: "bn", text: "£4.43bn" });
+    for (const wording of ["About 1.0 million", "About £8bn a year", "£1.3bn (2022) to £2.0bn (2025)", "About 1 in 5", ""]) {
+      expect(figureNumber(wording), wording).toBeNull();
+    }
+  });
+
+  it("pair a published figure with a fixed estimate in the same unit, with the gap as a % of the published figure", () => {
+    expect(parsed.rows.filter((each) => comparisonFor(each)).map((each) => each.id)).toEqual([
+      "uc_health_no_work_requirements",
+      "employer_nics_under_25",
+    ]);
+    const health = comparisonFor(row("uc_health_no_work_requirements"));
+    expect(health).toMatchObject({ unit: "count", published: 260000, estimate: 232000 });
+    expect(health.gapPct).toBeCloseTo(((232000 - 260000) / 260000) * 100, 10);
+    const nics = comparisonFor(row("employer_nics_under_25"));
+    expect(nics).toMatchObject({ unit: "bn", published: 5.1, estimate: 4.43, publishedText: "£5.1bn", estimateText: "£4.43bn" });
+    expect(nics.gapPct).toBeCloseTo(((4.43 - 5.1) / 5.1) * 100, 10);
+    // Different units, or no fixed estimate, are never paired
+    expect(comparisonFor({ value: "260,000", estimate: { fixed: "£4.43bn a year" } })).toBeNull();
+    expect(comparisonFor(row("package_young_people_affected"))).toBeNull();
+    expect(comparisonFor(row("neet_16_24"))).toBeNull();
+  });
+
+  it("read a dated range and a share from their wording", () => {
+    expect(figureRange(row("incapacity_spending_18_24").value)).toEqual([
+      { label: "2022", text: "£1.3bn", number: 1.3 },
+      { label: "2025", text: "£2.0bn", number: 2 },
+    ]);
+    expect(figureRange("£5.1bn a year")).toBeNull();
+    expect(figureShare(row("pip_no_extra_costs").value)).toEqual({ count: 1, of: 5 });
+    expect(figureShare("About 6 in 5")).toBeNull();
+    expect(figureShare("120,000")).toBeNull();
+  });
+
+  it("give every figure in the file its own icon", () => {
+    const icons = parsed.rows.map((each) => BENCHMARK_SHORT[each.id]?.icon);
+    expect(icons.every(Boolean)).toBe(true);
+    expect(new Set(icons).size).toBe(icons.length);
   });
 });
 

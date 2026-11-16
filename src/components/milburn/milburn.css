@@ -913,3 +913,126 @@ a.milburn-source-chip:focus-visible {
 .milburn-bench-kicker {
   white-space: nowrap;
 }
+
+/* Recharts cards on the Milburn tabs (MilburnCharts.jsx): a card's charts
+   side by side in panels, the legend and the logo under them */
+.milburn-chart-grid {
+  display: grid;
+  gap: 16px 24px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 900px) {
+  .milburn-chart-grid.cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .milburn-chart-grid.cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.milburn-chart-panel {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+  background: var(--c-surface);
+}
+
+.milburn-chart-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 0 0 8px !important;
+  font-size: var(--fs-small) !important;
+  font-weight: 600;
+  line-height: 1.4 !important;
+  color: var(--c-text);
+}
+
+.milburn-chart-panel-title > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  color: var(--c-gain-text);
+}
+
+.milburn-delta {
+  margin-left: auto;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  background: var(--c-muted-fill);
+  color: var(--c-axis-title);
+}
+
+.milburn-delta.more {
+  background: var(--c-highlight-band);
+  color: var(--c-gain-text);
+}
+
+.milburn-delta.less {
+  background: var(--c-loss-soft);
+  color: var(--c-loss-text);
+}
+
+.milburn-chart-legend {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+  font-size: var(--fs-caption);
+  color: var(--c-text);
+}
+
+.milburn-chart-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.milburn-chart-legend i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.milburn-chart-empty {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+}
+
+.milburn-chart .milburn-details .milburn-table-wrap {
+  margin-top: 12px;
+}
+
+.milburn-chart .chart-description {
+  margin: 4px 0 12px;
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+}
+
+/* The range chart sits inside Key figures: its title one step smaller */
+.milburn-range.milburn-chart {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+  background: var(--c-surface);
+}
+
+.milburn-range .chart-header h4 {
+  display: flex;
+  align-items: center;
+  grid-column: 1;
+  margin: 0;
+  font-size: var(--fs-body-lg);
+  font-weight: 600;
+  color: var(--c-text);
+}

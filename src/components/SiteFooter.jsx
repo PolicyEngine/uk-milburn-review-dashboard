@@ -3,7 +3,6 @@
 // white logo, the links in one row, copyright. Replaces the ui-kit shell's
 // taller stacked footer (PolicyEngineShell showFooter={false}).
 import logo from "@/assets/policyengine-white.svg";
-import { REPLICATION_LINE } from "./ReplicationLine";
 
 const FOOTER_LINKS = [
   { label: "About us", href: "https://policyengine.org/uk/team" },
@@ -28,7 +27,6 @@ export default function SiteFooter() {
             </a>
           ))}
         </nav>
-        <p className="site-footer-copy">Milburn review: young people and work. {REPLICATION_LINE}.</p>
         <p className="site-footer-copy">&copy; {new Date().getFullYear()} PolicyEngine</p>
       </div>
     </footer>

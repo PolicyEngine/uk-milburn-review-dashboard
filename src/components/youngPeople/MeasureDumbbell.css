@@ -466,3 +466,67 @@
   padding: 0;
   background: transparent;
 }
+
+/* Under the dumbbell on the local build (PolicyStrip): three figures for
+   the one policy chosen, as a row of tiles */
+.measure-strip {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-grid);
+}
+
+.measure-strip-stats {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.measure-strip-stats li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 8px;
+  row-gap: 2px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+  background: var(--c-row-band);
+}
+
+.measure-strip-stats li > span[aria-hidden] {
+  display: inline-flex;
+  grid-row: 1 / span 2;
+  align-self: start;
+  margin-top: 2px;
+  color: var(--c-gain-text);
+}
+
+.measure-strip-label {
+  font-size: var(--fs-caption);
+  color: var(--c-axis-title);
+}
+
+.measure-strip-stats strong {
+  grid-column: 2;
+  font-size: var(--fs-body-lg);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+
+.measure-strip-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+}
+
+.measure-strip-note > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  color: var(--c-gain-text);
+}

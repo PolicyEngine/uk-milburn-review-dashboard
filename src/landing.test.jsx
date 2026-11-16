@@ -11,7 +11,7 @@ import { BASE_PATH, fixtureFetch, fixtureJson } from "./test/publicationFixture"
 beforeAll(preloadAllViews, 60_000);
 
 const INTRO =
-  /^Estimates from PolicyEngine UK( \(opens in a new tab\))? of how candidate measures for the independent review of young people and work would affect the public finances and household incomes, by age\. The review’s final report is expected on 17 November 2026; the measures here are modelled before it is published and are not announced policy\. The main figures are static: they assume no change in behaviour\.$/;
+  /^Estimates from PolicyEngine UK( \(opens in a new tab\))? of candidate measures for the young people and work review, by age\. Modelled before the final report on 17 November 2026; not announced policy\. Static: no change in behaviour\.$/;
 
 const BOXES = {
   society: /^Young people/,

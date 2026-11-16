@@ -1,0 +1,402 @@
+/* Benchmarks (BenchmarksTable.jsx): a card of comparison charts, one panel
+   per comparable pair, then stat tiles by theme. Colours are tokens only. */
+.bm {
+  display: grid;
+  gap: 24px;
+  color: var(--c-axis-title);
+}
+
+.milburn-benchmarks > .bm > .milburn-label {
+  justify-self: start;
+  margin-bottom: 0;
+}
+
+/* The comparison card: panels side by side, one under the other on a phone */
+.bm-compare-grid,
+.bm-tiles,
+.bm-notes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bm-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.bm-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+  background: var(--c-row-band);
+}
+
+.bm-compare-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.bm-compare h4,
+.bm-tile h4 {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--c-ink);
+}
+
+.bm-compare h4 {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* The gap between the two figures: a neutral chip, neither a gain nor a loss */
+.bm-gap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--c-highlight-band);
+  color: var(--c-highlight);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
+.bm-gap > span[aria-hidden],
+.bm-kicker > span[aria-hidden],
+.bm-chip > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+}
+
+/* The pair in text: the chart's legend and its values at once */
+.bm-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.bm-pair-figure {
+  padding: 10px 12px;
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+  background: var(--c-surface);
+}
+
+.bm-pair dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--c-axis-title);
+}
+
+.bm-pair dd {
+  margin: 2px 0 0;
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--c-ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.bm-pair-figure.is-estimate dd,
+.bm-figure.is-estimate .bm-value {
+  color: var(--c-gain-text);
+}
+
+.bm-swatch {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.bm-swatch.is-published {
+  background: var(--c-reference);
+}
+
+.bm-swatch.is-estimate {
+  background: var(--c-gain);
+}
+
+.bm-compare-plot {
+  min-width: 0;
+  padding: 8px 8px 4px;
+  border-radius: 8px;
+  background: var(--c-surface);
+}
+
+/* Notes: an icon and one line each */
+.bm-notes {
+  display: grid;
+  gap: 6px;
+  font-size: var(--fs-caption);
+  line-height: 1.45;
+  color: var(--c-axis-title);
+}
+
+.bm-notes li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bm-notes li > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  margin-top: 2px;
+  color: var(--c-gain-text);
+}
+
+.bm-notes li > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Source chips: the source (a link), its date, a press report, the build */
+.bm-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: auto 0 0;
+  padding-top: 4px;
+  font-size: var(--fs-micro);
+}
+
+.bm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 3px 9px;
+  border: 1px solid var(--c-grid);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-axis-title);
+  line-height: 1.4;
+}
+
+.bm-chip-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+a.bm-chip.is-link {
+  color: var(--c-gain-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a.bm-chip.is-link:hover {
+  background: var(--c-hover);
+  text-decoration: underline;
+}
+
+a.bm-chip.is-link:focus-visible {
+  outline: 2px solid var(--c-gain);
+  outline-offset: 2px;
+}
+
+.bm-chip.is-press {
+  border-color: var(--c-loss-border);
+  background: var(--c-loss-soft);
+  color: var(--c-loss-text);
+  font-weight: 600;
+}
+
+.bm-chip.is-build {
+  border-color: transparent;
+  background: var(--c-highlight-band);
+  color: var(--c-highlight);
+}
+
+/* Themes: a heading with its icon and count, then stat tiles */
+.bm-group h3 {
+  display: flex;
+  align-items: center;
+  margin: 0 0 12px;
+  font-size: var(--fs-card-title);
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+.bm-count {
+  margin-left: 10px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c-muted-fill);
+  color: var(--c-axis-title);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+}
+
+.bm-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+
+.bm-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: var(--card-padding, 20px);
+  border: 1px solid var(--c-grid);
+  border-top: 3px solid var(--c-reference);
+  border-radius: 8px;
+  background: var(--c-surface);
+}
+
+.bm-tile.is-estimate {
+  border-top-color: var(--c-gain);
+}
+
+.bm-tile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--c-highlight-band);
+  color: var(--c-gain-text);
+}
+
+.bm-tile-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.bm-figure {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  min-width: 0;
+}
+
+.bm-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--c-axis-title);
+}
+
+.bm-figure.is-estimate .bm-kicker {
+  color: var(--c-gain-text);
+}
+
+.bm-value {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--c-ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* Two dated points as bars from zero */
+.bm-range {
+  display: grid;
+  gap: 6px;
+}
+
+.bm-range-row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 52px;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-micro);
+  color: var(--c-axis-title);
+  font-variant-numeric: tabular-nums;
+}
+
+.bm-range-track {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--c-muted-fill);
+}
+
+.bm-range-fill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--c-before);
+}
+
+.bm-range-fill.is-latest {
+  background: var(--c-reference);
+}
+
+.bm-range-value {
+  font-weight: 600;
+  color: var(--c-text);
+  text-align: right;
+}
+
+/* A share as people: the counted ones filled in */
+.bm-share {
+  display: flex;
+  gap: 4px;
+}
+
+.bm-share-person {
+  display: inline-flex;
+  color: var(--c-axis);
+}
+
+.bm-share-person.is-counted {
+  color: var(--c-reference);
+}
+
+.bm-share-person.is-counted svg {
+  fill: currentColor;
+}
+
+/* About these figures: the page's notes, folded away */
+.bm-about {
+  margin-top: 0;
+}
+
+.bm-about .milburn-points {
+  margin-top: 12px;
+}
+
+@media (max-width: 480px) {
+  .bm-compare {
+    padding: 12px;
+  }
+
+  .bm-pair dd,
+  .bm-value {
+    font-size: var(--fs-section);
+  }
+
+  .bm-gap {
+    white-space: normal;
+  }
+}

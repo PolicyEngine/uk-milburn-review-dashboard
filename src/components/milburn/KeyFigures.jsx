@@ -15,6 +15,9 @@ import {
 } from "../../utils/milburn/summary";
 import { PACKAGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGroups";
 import TitleIcon from "../TitleIcon";
+import { buildChartCsv } from "../../utils/chartCsv";
+import { CHART_COLOURS } from "../../utils/chartTheme";
+import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard } from "./MilburnCharts";
 import "./milburn.css";
 
 /** The replacement support briefed for the review, which no run models. */
@@ -41,6 +44,8 @@ export function packageRange(summary) {
       id,
       name: RANGE_NAMES[index] ?? milburnDisplayName(id, id),
       saving: formatBn(savingInYear(run, summary.year)),
+      savingValue: savingInYear(run, summary.year),
+      povertyValue: run.peopleIntoPovertyAbsAhc,
       poverty: run.peopleIntoPovertyAbsAhc === null ? "" : `about ${formatPeople(run.peopleIntoPovertyAbsAhc)}`,
     };
   }).filter(Boolean);
@@ -49,28 +54,74 @@ export function packageRange(summary) {
 function RangeStrip({ summary, selectedId }) {
   const rows = packageRange(summary);
   if (!rows.length) return null;
+  const yearLabel = fiscalYearTick(summary.year);
+  const title = `Package range, ${yearLabel}`;
+  // The selected package at full strength, the others faded; all at full
+  // strength when the selection is not one of the packages
+  const faded = (row) => rows.some((other) => other.id === selectedId) && row.id !== selectedId;
+  const csv = () =>
+    buildChartCsv({
+      title,
+      units: "Exchequer saving in £bn; people moved into absolute poverty after housing costs",
+      columns: [
+        { key: "name", label: "Package" },
+        { key: "savingValue", label: "Exchequer saving (£bn)", decimals: 3 },
+        { key: "povertyValue", label: "People into absolute poverty after housing costs", decimals: 0 },
+      ],
+      rows,
+    });
   return (
-    <div className="milburn-table-wrap milburn-range">
-      <table className="milburn-table">
-        <caption>Package range, {fiscalYearTick(summary.year)}</caption>
-        <thead>
-          <tr>
-            <th scope="col">Package</th>
-            <th scope="col">Exchequer saving</th>
-            <th scope="col">Into absolute poverty (after housing costs)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id} data-run={row.id} className={row.id === selectedId ? "is-selected" : undefined}>
-              <th scope="row">{row.name}</th>
-              <td>{row.saving || "Not in the summary"}</td>
-              <td>{row.poverty || "Not in the summary"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <MilburnChartCard
+      as="h4"
+      icon="layers"
+      title={title}
+      description="The three packages side by side; the selected one is in full colour."
+      name="package-range"
+      csv={csv}
+      className="milburn-range"
+      after={
+        <FiguresTable>
+          <table className="milburn-table">
+            <caption className="visually-hidden">{title}</caption>
+            <thead>
+              <tr>
+                <th scope="col">Package</th>
+                <th scope="col">Exchequer saving</th>
+                <th scope="col">Into absolute poverty (after housing costs)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id} data-run={row.id} className={row.id === selectedId ? "is-selected" : undefined}>
+                  <th scope="row">{row.name}</th>
+                  <td>{row.saving || "Not in the summary"}</td>
+                  <td>{row.poverty || "Not in the summary"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </FiguresTable>
+      }
+    >
+      <div className="milburn-chart-grid cols-2">
+        <ChartPanel icon="landmark" title="Exchequer saving (£bn)">
+          <HorizontalBars
+            ariaLabel={`Exchequer saving by package: ${rows.map((row) => `${row.name} ${row.saving}`).join(", ")}`}
+            format={(value) => `£${value}bn`}
+            labelWidth={96}
+            rows={rows.map((row) => ({ name: row.name, value: row.savingValue, label: row.saving, color: CHART_COLOURS.gain, faded: faded(row) }))}
+          />
+        </ChartPanel>
+        <ChartPanel icon="percent" title="People into absolute poverty, after housing costs">
+          <HorizontalBars
+            ariaLabel={`People moved into absolute poverty after housing costs by package: ${rows.map((row) => `${row.name} ${row.poverty}`).join(", ")}`}
+            format={(value) => (Math.abs(value) >= 1000 ? `${value / 1000}k` : String(value))}
+            labelWidth={96}
+            rows={rows.map((row) => ({ name: row.name, value: row.povertyValue, label: row.poverty, color: CHART_COLOURS.loss, faded: faded(row) }))}
+          />
+        </ChartPanel>
+      </div>
+    </MilburnChartCard>
   );
 }
 
@@ -216,32 +267,38 @@ export default function KeyFigures({ runId, nameShownAbove = false }) {
       {heading}
       {body}
       {status === "ready" && <RangeStrip summary={summary} selectedId={id} />}
-      <ul className="milburn-points">
-        {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
+      {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
+        <ul className="milburn-points">
           <li data-poverty-note="">
             <TitleIcon name="percent" bare size={14} />
             <span>{relativePovertySentence(summaryRun(summary, id))}</span>
           </li>
-        )}
-        {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
+        </ul>
+      )}
+      <details className="milburn-details">
+        <summary>
+          <TitleIcon name="alert" bare size={14} />
+          Notes and caveats
+        </summary>
+        <ul className="milburn-points">
           <li>
             <TitleIcon name="scale" bare size={14} />
             <span>{RELATIVE_LINE_NOTE}</span>
           </li>
-        )}
-        <li data-replacement-note="">
-          <TitleIcon name="alert" bare size={14} />
-          <span>{REPLACEMENT_NOT_MODELLED_NOTE}</span>
-        </li>
-        <li>
-          <TitleIcon name="lifebuoy" bare size={14} />
-          <span>{REPLACEMENT_PARTS_NOTE}</span>
-        </li>
-        <li>
-          <TitleIcon name="calendar" bare size={14} />
-          <span>Static estimates for {fiscalYearTick(summary?.year ?? 2027)}, against current law. Counts rounded to the nearest thousand.</span>
-        </li>
-      </ul>
+          <li data-replacement-note="">
+            <TitleIcon name="alert" bare size={14} />
+            <span>{REPLACEMENT_NOT_MODELLED_NOTE}</span>
+          </li>
+          <li>
+            <TitleIcon name="lifebuoy" bare size={14} />
+            <span>{REPLACEMENT_PARTS_NOTE}</span>
+          </li>
+          <li>
+            <TitleIcon name="calendar" bare size={14} />
+            <span>Static estimates for {fiscalYearTick(summary?.year ?? 2027)}, against current law. Counts rounded to the nearest thousand.</span>
+          </li>
+        </ul>
+      </details>
     </section>
   );
 }

@@ -53,13 +53,10 @@ export function LandingIntro({ headingId, provisional, note = null, className = 
     <div className={className}>
       <h2 id={headingId} className="landing-heading">Young people and work: candidate measures modelled</h2>
       <p className="landing-intro">
-        Estimates from <SourceLink source="policyengine_uk_model" />{" "}of how
-        candidate measures for the independent review of young people and
-        work would affect the public finances and household incomes, by
-        age. The review&rsquo;s final report is expected on
-        17 November 2026; the measures here are modelled before it is
-        published and are not announced policy. The main figures are static:
-        they assume no change in behaviour.
+        Estimates from <SourceLink source="policyengine_uk_model" />{" "}of
+        candidate measures for the young people and work review, by age.
+        Modelled before the final report on 17 November 2026; not announced
+        policy. Static: no change in behaviour.
       </p>
       {note && <p className="landing-intro landing-intro-note">{note}</p>}
       {provisional}

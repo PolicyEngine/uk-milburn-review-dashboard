@@ -224,7 +224,7 @@ describe("the page's figures from the local build", () => {
 describe("the label and the Policies lists", () => {
   it("say the build and that it is not certified", async () => {
     const { catalogue } = dashboardFromParts(await loadParts());
-    expect(localBuildNotice(catalogue.localBuild)).toBe(`Local build: ${LABEL}, not certified`);
+    expect(localBuildNotice(catalogue.localBuild)).toBe("Local build 6f918b81 · policyengine-uk 2.177.7 · not certified");
     render(
       <MeasureCatalogueProvider catalogue={catalogue}>
         <LocalBuildLabel />

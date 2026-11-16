@@ -1988,7 +1988,7 @@ html[data-site-nav-shown] {
   padding: 16px 40px;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 12px 32px;
 }
 
@@ -2017,6 +2017,7 @@ html[data-site-nav-shown] {
 
 .site-footer-copy {
   margin: 0 0 0 auto;
+  white-space: nowrap;
   font-size: var(--fs-caption);
   color: var(--band-ink-muted);
 }
@@ -2033,6 +2034,7 @@ html[data-site-nav-shown] {
    so the band stays short. */
 @media (max-width: 768px) {
   .site-footer-inner {
+    flex-wrap: wrap;
     padding: 12px 16px 8px;
     gap: 4px 12px;
   }

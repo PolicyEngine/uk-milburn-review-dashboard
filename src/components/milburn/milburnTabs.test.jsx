@@ -96,6 +96,30 @@ describe("Benchmarks", () => {
       expect(row.textContent).toContain("PolicyEngine, build 6f918b81, 2027-28");
     }
     expect(screen.getByText("£4.43bn a year").closest("li").textContent).toContain("£5.1bn a year");
+    // Each comparable pair is a comparison panel with its gap as a % of the published figure
+    const region = screen.getByRole("region", { name: "Benchmarks" });
+    expect([...region.querySelectorAll(".bm-compare")].map((panel) => panel.dataset.benchmark)).toEqual([
+      "uc_health_no_work_requirements",
+      "employer_nics_under_25",
+    ]);
+    expect(screen.getByText("260,000").closest("li").textContent).toContain("PolicyEngine is 10.77% lower");
+    expect(screen.getByText("£4.43bn a year").closest("li").textContent).toContain("PolicyEngine is 13.14% lower");
+    // Every other figure is a stat tile under its theme, once, with its source and date
+    expect([...region.querySelectorAll(".bm-tile")].map((tile) => tile.dataset.benchmark)).toEqual([
+      "neet_16_24",
+      "uc_lcwra_16_24",
+      "package_young_people_affected",
+      "incapacity_spending_18_24",
+      "young_benefits_spend",
+      "kept_out_of_poverty",
+      "pip_no_extra_costs",
+    ]);
+    const lcwra = screen.getByText("62,570").closest("li");
+    expect(within(lcwra).getByRole("link", { name: /DWP, via Benefits and Work/ })).toBeInTheDocument();
+    expect(lcwra.textContent).toContain("May 2026");
+    expect(lcwra.textContent).toContain("Press report");
+    // The page's notes are folded away
+    expect(screen.getByText("About these figures").closest("details")).not.toHaveAttribute("open");
     // Rows without a source are gone, and no link carries a stray %20 or points elsewhere than its label
     expect(screen.queryByText(/465,000/)).toBeNull();
     expect(screen.queryByText(/440,000 by 2036/)).toBeNull();

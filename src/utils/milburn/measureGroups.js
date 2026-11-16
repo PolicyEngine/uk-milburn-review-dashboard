@@ -46,6 +46,16 @@ export const MILBURN_GROUPS = Object.freeze([
   { id: HIDDEN_GROUP, label: null, hidden: true, ids: ["milburn_package_entry_25pct", "uc_health_element_removed_under_25_new_claims"] },
 ]);
 
+/**
+ * A package's parts that have a run of their own, by package: the measures
+ * it combines (reforms.py). The phased package has none: its parts are not
+ * run on their own.
+ */
+export const PACKAGE_PARTS = Object.freeze({
+  milburn_package: ["uc_health_element_removed_under_25", "pip_removed_under_25"],
+  milburn_package_central: ["uc_health_element_removed_under_25_severe_kept", "pip_halved_under_25"],
+});
+
 /** The packages' run ids, in the order shown (Key figures' range strip). */
 export const PACKAGE_IDS = MILBURN_GROUPS.find((group) => group.id === PACKAGES_GROUP).ids;
 

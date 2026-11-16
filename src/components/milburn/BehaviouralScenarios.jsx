@@ -1,6 +1,24 @@
 import { useEffect, useState } from "react";
 import SectionHeading from "../SectionHeading";
 import TitleIcon from "../TitleIcon";
+import { Bar, BarChart, CartesianGrid, LabelList, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { TOOLTIP_PROPS } from "../ChartTooltip";
+import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard } from "./MilburnCharts";
+import { buildChartCsv } from "../../utils/chartCsv";
+import {
+  AXIS_LINE,
+  BAR_RADIUS,
+  CHART_COLOURS,
+  GRID_PROPS,
+  HOVER_CURSOR,
+  TICK_STYLE,
+  TOOLTIP_CONTENT_STYLE,
+  axisWidth,
+  chartMargin,
+  legendLabelStyle,
+  useNarrowViewport,
+  zeroBasedAxis,
+} from "../../utils/chartTheme";
 import { fiscalYearTick } from "../../utils/chartTheme";
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { HOURS_CASES, SCENARIOS_FILE, parseScenarios } from "../../utils/milburn/scenarios";
@@ -98,64 +116,143 @@ export function EntryComparison({ summary, catalogue }) {
   const fullName = fullMeasure ? shortNameOf(fullMeasure) : DEFAULT_SUMMARY_RUN;
   const fullSaving = savingInYear(full, summary.year);
   const entrySaving = savingInYear(entry, summary.year);
+  const signedBn = (value) => `${value >= 0 ? "+" : "−"}${formatBn(Math.abs(value))}`;
+  const signedPounds = (value) => `${value >= 0 ? "+" : "−"}${formatPounds(Math.abs(value))}`;
+  const difference = (after, before) => (after !== null && before !== null ? after - before : null);
+  // A fall in poverty or in the loss is the better outcome; a rise in the saving is
+  const tone = (delta, betterWhen) => (delta === null || delta === 0 ? "flat" : Math.sign(delta) === betterWhen ? "more" : "less");
+  const savingDelta = difference(entrySaving, fullSaving);
+  const povertyDelta = difference(entry.povertyPp.abs_ahc, full.povertyPp.abs_ahc);
+  const lossDelta = difference(entry.averageLossYoung, full.averageLossYoung);
   const rows = [
-    { key: "saving", icon: "landmark", label: `Exchequer saving, ${yearLabel}`, full: formatBn(fullSaving), entry: formatBn(entrySaving) },
-    { key: "poverty", icon: "percent", label: "Absolute poverty after housing costs, all ages", full: povertyText(full), entry: povertyText(entry) },
+    {
+      key: "saving",
+      icon: "landmark",
+      label: `Exchequer saving, ${yearLabel}`,
+      short: "Exchequer saving (£bn)",
+      full: formatBn(fullSaving),
+      entry: formatBn(entrySaving),
+      values: [fullSaving, entrySaving],
+      format: (value) => `£${value}bn`,
+      delta: savingDelta === null ? null : signedBn(savingDelta),
+      tone: tone(savingDelta, 1),
+    },
+    {
+      key: "poverty",
+      icon: "percent",
+      label: "Absolute poverty after housing costs, all ages",
+      short: "Absolute poverty rate (pp)",
+      full: povertyText(full),
+      entry: povertyText(entry),
+      values: [full.povertyPp.abs_ahc, entry.povertyPp.abs_ahc],
+      barLabels: [formatSignedPp(full.povertyPp.abs_ahc), formatSignedPp(entry.povertyPp.abs_ahc)],
+      format: (value) => `${value}pp`,
+      delta: povertyDelta === null ? null : formatSignedPp(povertyDelta),
+      tone: tone(povertyDelta, -1),
+    },
     {
       key: "loss",
       icon: "wallet",
       label: "Average loss, young people in losing households (£ a year)",
+      short: "Average household loss (£ a year)",
       full: formatPounds(full.averageLossYoung),
       entry: formatPounds(entry.averageLossYoung),
+      values: [full.averageLossYoung, entry.averageLossYoung],
+      format: (value) => `£${value.toLocaleString("en-GB")}`,
+      delta: lossDelta === null ? null : signedPounds(lossDelta),
+      tone: tone(lossDelta, -1),
     },
   ];
+  const SERIES = [
+    { name: "Static", color: CHART_COLOURS.before },
+    { name: "25% move into work", color: CHART_COLOURS.after },
+  ];
+  const title = "With a quarter moving into work";
+  const csv = () =>
+    buildChartCsv({
+      title: `${title}: ${fullName}, ${yearLabel}`,
+      units: "As each row says; static, and with 25% of the young people the package leaves worse off moving into work",
+      columns: [
+        { key: "label", label: "Figure" },
+        { key: "full", label: "Static" },
+        { key: "entry", label: "25% move into work" },
+      ],
+      rows,
+    });
   return (
     <section className="report-section milburn-entry" aria-labelledby="milburn-entry-heading">
-      <h3 id="milburn-entry-heading">
-        <TitleIcon name="briefcase" />
-        With a quarter moving into work
-      </h3>
-      <p className="milburn-sub">
-        {fullName}, {yearLabel}: static, against 25% of the 16 to 24-year-olds it leaves worse off moving into work.
-      </p>
-      <div className="milburn-table-wrap">
-        <table className="milburn-table">
-          <thead>
-            <tr>
-              <th scope="col">Figure</th>
-              <th scope="col">Static</th>
-              <th scope="col">25% move into work</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.key} data-row={row.key}>
-                <th scope="row">
-                  <TitleIcon name={row.icon} bare size={14} className="milburn-row-icon" />
-                  {row.label}
-                </th>
-                <td>{row.full || "Not in the summary"}</td>
-                <td>{row.entry || "Not in the summary"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {fullSaving !== null && entrySaving !== null && (
-        <ul className="milburn-points" data-entry-run-comparison="">
-          <Point icon="landmark">
-            <strong>
-              The move into work {entrySaving >= fullSaving ? "adds" : "takes"} {formatBn(Math.abs(entrySaving - fullSaving))}{" "}
-              {entrySaving >= fullSaving ? "to" : "from"} the Exchequer.
-            </strong>
-          </Point>
-          {SMALL_FISCAL_EFFECT_POINTS.map((point, index) => (
-            <Point key={point} icon={["wallet", "usersRound", "scale"][index]}>
-              {point}
-            </Point>
+      <MilburnChartCard
+        id="milburn-entry-heading"
+        icon="briefcase"
+        title={title}
+        description={`${fullName}, ${yearLabel}: static, against 25% of the 16 to 24-year-olds it leaves worse off moving into work.`}
+        name="quarter-moving-into-work"
+        csv={csv}
+        legendItems={SERIES.map((series) => ({ color: series.color, label: series.name, type: "rect" }))}
+        after={
+          <>
+            <FiguresTable>
+              <table className="milburn-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Figure</th>
+                    <th scope="col">Static</th>
+                    <th scope="col">25% move into work</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.key} data-row={row.key}>
+                      <th scope="row">{row.label}</th>
+                      <td>{row.full || "Not in the summary"}</td>
+                      <td>{row.entry || "Not in the summary"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </FiguresTable>
+            {savingDelta !== null && (
+              <details className="milburn-details" data-entry-run-comparison="">
+                <summary>
+                  <TitleIcon name="alert" bare size={14} />
+                  Why the effect is small
+                </summary>
+                <ul className="milburn-points">
+                  <Point icon="landmark">
+                    <strong>
+                      The move into work {savingDelta >= 0 ? "adds" : "takes"} {formatBn(Math.abs(savingDelta))}{" "}
+                      {savingDelta >= 0 ? "to" : "from"} the Exchequer.
+                    </strong>
+                  </Point>
+                  {SMALL_FISCAL_EFFECT_POINTS.map((point, index) => (
+                    <Point key={point} icon={["wallet", "usersRound", "scale"][index]}>
+                      {point}
+                    </Point>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </>
+        }
+      >
+        <div className="milburn-chart-grid cols-3">
+          {rows.map((row) => (
+            <ChartPanel key={row.key} icon={row.icon} title={row.short} chip={row.delta} chipTone={row.tone}>
+              <HorizontalBars
+                ariaLabel={`${row.label}: static ${row.full}, with 25% moving into work ${row.entry}`}
+                format={row.format}
+                labelWidth={132}
+                rows={SERIES.map((series, index) => ({
+                  name: series.name,
+                  value: row.values[index],
+                  label: row.barLabels?.[index] ?? (index === 0 ? row.full : row.entry),
+                  color: series.color,
+                }))}
+              />
+            </ChartPanel>
           ))}
-        </ul>
-      )}
+        </div>
+      </MilburnChartCard>
     </section>
   );
 }
@@ -172,56 +269,125 @@ function EntryCases({ data }) {
   );
   // The file's own sentences, too long for one-line bullets: prose, folded away
   const paragraphs = [data.basis, data.notes.join(" ")].filter(Boolean);
+  const narrow = useNarrowViewport();
+  // One bar per gain, and per law where the two differ
+  const series = same
+    ? [
+        { key: "net_income_gain_current_law", name: "Net income gain", color: CHART_COLOURS.gain },
+        { key: "exchequer_gain_current_law", name: "Exchequer gain", color: CHART_COLOURS.highlight },
+      ]
+    : [
+        { key: "net_income_gain_current_law", name: "Net income gain, current law", color: CHART_COLOURS.gainLight },
+        { key: "net_income_gain_package", name: "Net income gain, package", color: CHART_COLOURS.gain },
+        { key: "exchequer_gain_current_law", name: "Exchequer gain, current law", color: CHART_COLOURS.reference },
+        { key: "exchequer_gain_package", name: "Exchequer gain, package", color: CHART_COLOURS.highlight },
+      ];
+  const chartData = cases.map((entry) => ({ ...entry, name: `${entry.hours} hours` }));
+  const { domain, ticks } = zeroBasedAxis(chartData.flatMap((entry) => series.map((item) => entry[item.key])));
+  const tick = (value) => pounds.format(value);
+  const wage = cases[0] && cases.every((entry) => entry.hourly_wage === cases[0].hourly_wage) ? penceExact.format(cases[0].hourly_wage) : null;
+  const title = "One young person moving into work";
+  const description = `Gain from moving from no work to ${cases.map((entry) => entry.hours).join(" or ")} hours a week${wage ? ` at ${wage} an hour` : ""}, £ a year.`;
+  const csv = () =>
+    buildChartCsv({
+      title,
+      units: "£ a year, in work minus out of work",
+      columns: [
+        { key: "hours", label: "Hours a week" },
+        { key: "hourly_wage", label: "Hourly wage (£)", decimals: 2 },
+        { key: "net_income_gain_current_law", label: "Net income gain, current law", decimals: 2 },
+        { key: "net_income_gain_package", label: "Net income gain, package", decimals: 2 },
+        { key: "exchequer_gain_current_law", label: "Exchequer gain, current law", decimals: 2 },
+        { key: "exchequer_gain_package", label: "Exchequer gain, package", decimals: 2 },
+      ],
+      rows: cases,
+    });
   return (
     <section className="report-section milburn-notes milburn-card" aria-labelledby="milburn-cases-heading">
-      <h3 id="milburn-cases-heading">
-        <TitleIcon name="user" />
-        One young person moving into work
-      </h3>
-      <div className="milburn-table-wrap">
-        <table className="milburn-table">
-          <thead>
-            <tr>
-              <th scope="col">Hours a week</th>
-              <th scope="col">Hourly wage</th>
-              <th scope="col">Net income gain, £ a year{same ? "" : " (current law; package)"}</th>
-              <th scope="col">Exchequer gain, £ a year{same ? "" : " (current law; package)"}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cases.map((entry) => (
-              <tr key={entry.id} data-hours={entry.hours}>
-                <th scope="row">{entry.hours} hours</th>
-                <td>{penceExact.format(entry.hourly_wage)}</td>
-                <td>
-                  {pounds.format(entry.net_income_gain_current_law)}
-                  {!same && `; ${pounds.format(entry.net_income_gain_package)}`}
-                </td>
-                <td>
-                  {pounds.format(entry.exchequer_gain_current_law)}
-                  {!same && `; ${pounds.format(entry.exchequer_gain_package)}`}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {same && (
-        <ul className="milburn-points" data-same-gain="">
-          <Point icon="scale">The same under current law and under the package.</Point>
-        </ul>
-      )}
-      {paragraphs.length > 0 && (
-        <details className="milburn-details">
-          <summary>
-            <TitleIcon name="list" bare size={14} />
-            How the case is set up
-          </summary>
-          {paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </details>
-      )}
+      <MilburnChartCard
+        id="milburn-cases-heading"
+        icon="user"
+        title={title}
+        description={description}
+        name="one-young-person-moving-into-work"
+        csv={csv}
+        single
+        after={
+          <>
+            {same && (
+              <ul className="milburn-points" data-same-gain="">
+                <Point icon="scale">Same under current law and under the package.</Point>
+              </ul>
+            )}
+            <FiguresTable>
+              <table className="milburn-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Hours a week</th>
+                    <th scope="col">Hourly wage</th>
+                    <th scope="col">Net income gain, £ a year{same ? "" : " (current law; package)"}</th>
+                    <th scope="col">Exchequer gain, £ a year{same ? "" : " (current law; package)"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cases.map((entry) => (
+                    <tr key={entry.id} data-hours={entry.hours}>
+                      <th scope="row">{entry.hours} hours</th>
+                      <td>{penceExact.format(entry.hourly_wage)}</td>
+                      <td>
+                        {pounds.format(entry.net_income_gain_current_law)}
+                        {!same && `; ${pounds.format(entry.net_income_gain_package)}`}
+                      </td>
+                      <td>
+                        {pounds.format(entry.exchequer_gain_current_law)}
+                        {!same && `; ${pounds.format(entry.exchequer_gain_package)}`}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </FiguresTable>
+            {paragraphs.length > 0 && (
+              <details className="milburn-details">
+                <summary>
+                  <TitleIcon name="list" bare size={14} />
+                  How the case is set up
+                </summary>
+                {paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </details>
+            )}
+          </>
+        }
+      >
+        <div role="img" aria-label={`${title}: ${chartData.map((entry) => `${entry.name}, ${series.map((item) => `${item.name} ${tick(entry[item.key])}`).join(", ")}`).join("; ")}`}>
+          <ResponsiveContainer width="100%" height={narrow ? 300 : 340}>
+            <BarChart data={chartData} margin={chartMargin(narrow, { top: 24 })} barCategoryGap="24%" barGap={6}>
+              <CartesianGrid {...GRID_PROPS} />
+              <XAxis dataKey="name" tick={TICK_STYLE} axisLine={AXIS_LINE} tickLine={false} interval={0} />
+              <YAxis
+                domain={domain}
+                ticks={ticks}
+                width={axisWidth(ticks, tick, { title: false })}
+                tick={TICK_STYLE}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={tick}
+              />
+              <Tooltip {...TOOLTIP_PROPS} cursor={HOVER_CURSOR} contentStyle={TOOLTIP_CONTENT_STYLE} formatter={(value) => `${tick(value)} a year`} />
+              <Legend wrapperStyle={{ paddingTop: "20px" }} formatter={(value) => <span style={legendLabelStyle(narrow)}>{value}</span>} />
+              {series.map((item) => (
+                <Bar key={item.key} dataKey={item.key} name={item.name} fill={item.color} radius={[BAR_RADIUS, BAR_RADIUS, 0, 0]} maxBarSize={72} isAnimationActive={false}>
+                  {!(narrow && !same) && (
+                    <LabelList dataKey={item.key} position="top" formatter={tick} style={{ ...TICK_STYLE, fill: CHART_COLOURS.text, fontWeight: 600 }} />
+                  )}
+                </Bar>
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </MilburnChartCard>
     </section>
   );
 }
@@ -245,6 +411,9 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
   const measure = catalogue?.byId?.get(id);
   const name = measure ? shortNameOf(measure) : id;
   let body;
+  let after = null;
+  let csv = null;
+  let description = null;
   if (status === "loading") {
     body = (
       <p className="view-status" role="status">
@@ -261,13 +430,61 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
     } else if (run.direction === "gain") {
       body = <p role="status">{name} raises young people&rsquo;s household incomes, so there is no loss for work to make up: no break-even arithmetic applies.</p>;
     } else {
+      const hoursRows = BREAK_EVEN_HOURS.map(({ id: hoursId, hours }) => ({
+        hours,
+        name: `${hours} hours`,
+        share: run.breakEvenSharePct[hoursId],
+        entrants: run.entrantsToMatch[hoursId],
+        perEntrant: run.exchequerGainPerEntrant[hoursId],
+      }));
+      description = `${name}, ${yearLabel}: how many 16 to 24-year-olds in losing households would need to move into work.`;
+      csv = () =>
+        buildChartCsv({
+          title: `Break-even arithmetic: ${name}, ${yearLabel}`,
+          units: "Share in %, entrants in people, Exchequer gain in £ a year per entrant",
+          columns: [
+            { key: "hours", label: "Hours a week" },
+            { key: "share", label: "Share needed to recover the average loss (%)", decimals: 1 },
+            { key: "entrants", label: "Entrants to match the total loss", decimals: 0 },
+            { key: "perEntrant", label: "Exchequer gain per entrant (£ a year)", decimals: 2 },
+          ],
+          rows: hoursRows,
+        });
       body = (
+        <div className="milburn-chart-grid cols-2">
+          <ChartPanel icon="percent" title="Share needed to recover the average loss">
+            <HorizontalBars
+              ariaLabel={`Share needed to recover the average loss: ${hoursRows.map((row) => `${row.name} ${row.share?.toFixed(1)}%`).join(", ")}; everyone moving into work is 100%`}
+              format={(value) => `${value}%`}
+              labelWidth={76}
+              references={[{ value: 100, label: "Everyone moves into work" }]}
+              rows={hoursRows.map((row) => ({
+                name: row.name,
+                value: row.share,
+                label: row.share === null ? "" : `${row.share.toFixed(1)}%`,
+                color: row.share > 100 ? CHART_COLOURS.loss : CHART_COLOURS.gain,
+              }))}
+            />
+          </ChartPanel>
+          <ChartPanel icon="usersRound" title="Entrants needed to match the total loss">
+            <HorizontalBars
+              ariaLabel={`Entrants needed to match the total loss: ${hoursRows.map((row) => `${row.name} ${formatPeople(row.entrants)}`).join(", ")}`}
+              format={(value) => (value >= 1000 ? `${value / 1000}k` : String(value))}
+              labelWidth={76}
+              references={run.youngPeopleLosing !== null ? [{ value: run.youngPeopleLosing, label: `16–24s in losing households: ${formatPeople(run.youngPeopleLosing)}` }] : []}
+              rows={hoursRows.map((row) => ({
+                name: row.name,
+                value: row.entrants,
+                label: row.entrants === null ? "" : formatPeople(row.entrants),
+                color: CHART_COLOURS.highlight,
+              }))}
+            />
+          </ChartPanel>
+        </div>
+      );
+      after = (
         <>
-          <p className="milburn-sub">
-            {name}, {yearLabel}: how many 16 to 24-year-olds in losing households would need to move into work to
-            make up the loss.
-          </p>
-          <div className="milburn-table-wrap">
+          <FiguresTable>
             <table className="milburn-table">
               <thead>
                 <tr>
@@ -299,25 +516,37 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
                 ))}
               </tbody>
             </table>
-          </div>
-          <ul className="milburn-points">
-            <Point icon="scale">{SAME_GAIN_SENTENCE}</Point>
-            <Point icon="alert">
-              <strong>Above 100%.</strong> {NO_ENTRY_RATE_RESTORES}, even if all moved into work.
-            </Point>
-            <Point icon="calculator">Counts rounded to the nearest thousand.</Point>
-          </ul>
+          </FiguresTable>
+          <details className="milburn-details">
+            <summary>
+              <TitleIcon name="alert" bare size={14} />
+              Notes and caveats
+            </summary>
+            <ul className="milburn-points">
+              <Point icon="scale">{SAME_GAIN_SENTENCE}</Point>
+              <Point icon="alert">
+                <strong>Above 100%.</strong> {NO_ENTRY_RATE_RESTORES}, even if all moved into work.
+              </Point>
+              <Point icon="calculator">Counts rounded to the nearest thousand.</Point>
+            </ul>
+          </details>
         </>
       );
     }
   }
   return (
     <section className="report-section milburn-breakeven" aria-labelledby="milburn-breakeven-heading">
-      <h3 id="milburn-breakeven-heading">
-        <TitleIcon name="calculator" />
-        Break-even arithmetic
-      </h3>
-      {body}
+      <MilburnChartCard
+        id="milburn-breakeven-heading"
+        icon="calculator"
+        title="Break-even arithmetic"
+        description={description}
+        name="break-even-arithmetic"
+        csv={csv}
+        after={after}
+      >
+        {body}
+      </MilburnChartCard>
     </section>
   );
 }

@@ -285,5 +285,13 @@ export function localTableRows(catalogue, table, isShown) {
  * build's label, and that no certificate covers it.
  */
 export function localBuildNotice(localBuild) {
-  return localBuild?.label ? `Local build: ${localBuild.label}, not certified` : "";
+  if (!localBuild?.label) return "";
+  // "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py
+  // release" → "Local build 6f918b81 · policyengine-uk 2.177.7 · not certified"
+  const short = localBuild.label
+    .replace(/^build\s+/i, "")
+    .replace(/,?\s*not in a policyengine\.py release$/i, "")
+    .split(/,\s*/)
+    .join(" · ");
+  return `Local build ${short} · not certified`;
 }

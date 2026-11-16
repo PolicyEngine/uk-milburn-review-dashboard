@@ -10,7 +10,7 @@ import Note from "../Note";
 import { fiscalYearTick, CHART_COLOURS, fitTicks, magnitudeColours, emptyMeasuresNote } from "../../utils/chartTheme";
 import useElementWidth from "../../hooks/useElementWidth";
 import ControlBar from "../ControlBar";
-import { AGE_BANDS, ALL_BAND, YOUNG_BAND, isPublished } from "../../utils/ageImpact";
+import { AGE_BANDS, ALL_BAND, MIN_SAMPLE_SIZE, YOUNG_BAND, isPublished } from "../../utils/ageImpact";
 import { measureComparison, niceRange, pounds, signedPounds } from "./youngPeopleData";
 import { pensionerMeasures } from "../pensioners/pensionersData";
 import { NoEffectList } from "../personal/PolicyBars";
@@ -19,6 +19,7 @@ import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { noEffectRow } from "../../utils/legendMembership";
 import "./MeasureDumbbell.css";
 import TitleIcon from "../TitleIcon";
+import { PACKAGE_PARTS } from "../../utils/milburn/measureGroups";
 
 
 // The card's About this chart (the measures with no effect join its caveats)
@@ -56,7 +57,7 @@ export const DUMBBELL_MAX_STEPS = 4;
  * coloured by which is larger; the group's value and its gap to all ages at
  * the right. Hovering or focusing a row shows both values and the ratio.
  */
-export function MeasureDumbbell({ rows, domain, ticks: allTicks, groupName, yearLabel, height, compareName = "All ages", single = false }) {
+export function MeasureDumbbell({ rows, domain, ticks: allTicks, groupName, yearLabel, height, compareName = "All ages", single = false, narrow = false }) {
   const { byId } = useMeasureCatalogue();
   const [active, setActive] = useState(null);
   // The ticks whose labels fit the plot (always £0); gridlines at the same
@@ -134,7 +135,7 @@ export function MeasureDumbbell({ rows, domain, ticks: allTicks, groupName, year
               {hasGroup && <strong className="row-band-value">{money(row.group)}</strong>}
               {!single && !half && (
                 <span className={`measure-dumbbell-gap ${tone}`}>
-                  {close ? `≈ ${compareName.toLowerCase()}` : `${gap > 0 ? "▲" : "▼"} ${pounds(Math.abs(gap))} ${gap > 0 ? "higher" : "lower"} than ${compareName.toLowerCase()}`}
+                  {close ? `≈ ${compareName.toLowerCase()}` : `${gap > 0 ? "▲" : "▼"} ${pounds(Math.abs(gap))} ${narrow ? "vs" : `${gap > 0 ? "higher" : "lower"} than`} ${compareName.toLowerCase()}`}
                 </span>
               )}
               {!hasGroup && hasAll && (
@@ -182,6 +183,66 @@ export function MeasureDumbbell({ rows, domain, ticks: allTicks, groupName, year
   );
 }
 
+const percent = (value) => `${value.toFixed(2)}%`;
+
+/**
+ * Under the dumbbell on the local build, for the one policy chosen: the
+ * age group that loses (or gains) most on average, and the share worse off
+ * in the card's group and across all ages, from the policy's own run.
+ */
+export function PolicyStrip({ rows, id, year, band, partsShown }) {
+  // A thin group's figures are withheld here as in the chart (MIN_SAMPLE_SIZE)
+  const rowFor = (key) =>
+    (rows ?? []).find((row) => row.reform_id === id && row.year === Number(year) && row.age_band === key && row.sample_size >= MIN_SAMPLE_SIZE);
+  const bands = AGE_BANDS.map((item) => ({ ...item, row: rowFor(item.key) })).filter((item) => Number.isFinite(item.row?.mean_change));
+  const hardest = bands.reduce((worst, item) => (worst === null || item.row.mean_change < worst.row.mean_change ? item : worst), null);
+  const groupRow = band === ALL_BAND ? null : rowFor(band);
+  const allRow = rowFor(ALL_BAND);
+  const items = [
+    hardest &&
+      hardest.row.mean_change < 0 && {
+        key: "hardest",
+        icon: "usersRound",
+        label: "Largest average loss",
+        value: `${hardest.label}: ${money(hardest.row.mean_change)}`,
+      },
+    Number.isFinite(groupRow?.pct_worse_off) && {
+      key: "group",
+      icon: "user",
+      label: `${groupLabel(band)}, worse off`,
+      value: percent(groupRow.pct_worse_off),
+    },
+    Number.isFinite(allRow?.pct_worse_off) && {
+      key: "all",
+      icon: "users",
+      label: "All ages, worse off",
+      value: percent(allRow.pct_worse_off),
+    },
+  ].filter(Boolean);
+  if (!items.length && !partsShown) return null;
+  return (
+    <div className="measure-strip">
+      {items.length > 0 && (
+        <ul className="measure-strip-stats">
+          {items.map((item) => (
+            <li key={item.key} data-stat={item.key}>
+              <TitleIcon name={item.icon} bare size={16} />
+              <span className="measure-strip-label">{item.label}</span>
+              <strong>{item.value}</strong>
+            </li>
+          ))}
+        </ul>
+      )}
+      {partsShown && (
+        <p className="measure-strip-note">
+          <TitleIcon name="layers" bare size={14} />
+          <span>Each part is its own run, so the parts need not add up to the package.</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
 /** "Average change in household income from each policy, for 16 to 24-year-olds and people of all ages." */
 export const measuresDescription = (band, compareKey = ALL_BAND) =>
   `Average change in household income from each policy, for ${groupSubject(band).toLowerCase()} and ${groupSubject(compareKey).toLowerCase()}.`;
@@ -199,7 +260,11 @@ const UNIT = "Average change in household income, per person (£ a year)";
  * selected year. Every bar is one policy's own run, so nothing is added up.
  */
 function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, height, group = YOUNG_BAND, extraOptions = [], defaultCompare = ALL_BAND }) {
-  const { byId } = useMeasureCatalogue();
+  const { byId, localBuild } = useMeasureCatalogue();
+  // On the local build, one package chosen: its parts' own runs as rows under it
+  const lead = localBuild && selectedPolicies.length === 1 ? selectedPolicies[0] : null;
+  const parts = lead ? PACKAGE_PARTS[lead] ?? [] : [];
+  const drawnPolicies = parts.length ? [lead, ...parts] : selectedPolicies;
   const chartRef = useRef(null);
   // The section's age group (By age), which the card's Compare can override
   // until the section's group changes again
@@ -221,15 +286,20 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
   const yearLabel = fiscalYearTick(selectedYear);
   const published = isPublished(rows, selectedYear);
   // A policy withheld for the group is left out, with no note (Vahid, 29 Oct)
-  const { shown, noEffect } =
+  const { shown: sorted, noEffect } =
     band === "pensioners"
       ? pensionerMeasures(rows, policies, selectedPolicies, selectedYear, compareKey)
-      : measureComparison(rows, policies, selectedPolicies, selectedYear, band, compareKey);
+      : measureComparison(rows, policies, drawnPolicies, selectedYear, band, compareKey);
+  // The package first, then its parts by size
+  const shown = parts.length ? [...sorted.filter((row) => row.id === lead), ...sorted.filter((row) => row.id !== lead)] : sorted;
+  const partsShown = parts.length > 0 && shown.some((row) => row.id !== lead);
   const values = shown.flatMap((point) => [point.group, point.all]).filter(Number.isFinite);
   const { domain, ticks } = niceRange(Math.min(0, ...values), Math.max(0, ...values), {
     maxSteps: DUMBBELL_MAX_STEPS,
   });
 
+  // The local build's strip under the rows, for the one policy chosen
+  const strip = Boolean(lead) && published && shown.length > 0 && band !== "pensioners";
   const title = `Effect of each policy, ${yearLabel}`;
   const exportOptions = {
     title,
@@ -316,13 +386,16 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
             compareName={compareName}
             yearLabel={yearLabel}
             single={single}
-            height={height}
+            narrow={narrow}
+            // With the strip under it, the rows take their own height
+            height={strip ? undefined : height}
           />
         ) : (
           <div className="plot-empty" style={{ minHeight: height }} role="status">
             <p>{emptyMeasuresNote({ noEffect, selectedPolicies, yearLabel })}</p>
           </div>
         )}
+        {strip && <PolicyStrip rows={rows} id={lead} year={selectedYear} band={band} partsShown={partsShown} />}
       </div>
       <div className="chart-legend">
         {published && shown.length > 0 && (
