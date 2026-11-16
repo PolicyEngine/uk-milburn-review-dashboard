@@ -195,4 +195,4 @@ export function summaryPovertyCount(summary) {
 
 /** Said beside the two poverty measures: why they can point different ways. */
 export const RELATIVE_LINE_NOTE =
-  "The relative line is 60% of the median, which itself moves with these measures; the absolute line is fixed in real terms.";
+  "The relative line moves with the median; the absolute line is fixed in real terms.";

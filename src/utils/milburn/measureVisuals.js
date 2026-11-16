@@ -214,7 +214,7 @@ export function packageView(visual, name) {
   const before = Math.round(element) + Math.round(pip);
   const after = Math.round(kept);
   return {
-    caption: `An under-25 with the health element and standard daily living PIP, a month, ${MILBURN_RATES.year}`,
+    caption: `An under-25 with the health element and PIP, a month, ${MILBURN_RATES.year}`,
     max: element + pip,
     key: [["after", "Health element"], ["soft", "PIP"], ["ghost", "Removed"]],
     groups: [
@@ -228,7 +228,7 @@ export function packageView(visual, name) {
             parts: [{ value: pip, tone: "soft" }, { value: element, tone: "after" }],
           },
           {
-            label: "Under the package",
+            label: "Package",
             text: wholePounds(after),
             ghost: element + pip,
             parts: kept > 0 ? [{ value: kept, tone: "soft" }] : [],

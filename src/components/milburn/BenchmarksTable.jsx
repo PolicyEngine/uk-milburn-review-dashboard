@@ -4,7 +4,7 @@ import TitleIcon from "../TitleIcon";
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { fiscalYearTick } from "../../utils/chartTheme";
 import { useAgeImpactRows } from "../YoungPeopleSection";
-import { BENCHMARKS_FILE, benchmarkGroups, estimateFor, parseBenchmarks } from "../../utils/milburn/benchmarks";
+import { BENCHMARKS_FILE, BENCHMARK_SHORT, benchmarkGroups, estimateFor, parseBenchmarks, splitValue } from "../../utils/milburn/benchmarks";
 import { usePackageTable } from "../../utils/milburn/packageRun";
 import "./milburn.css";
 
@@ -65,50 +65,72 @@ export default function BenchmarksTable() {
     const card = (row) => {
       const estimate = estimateFor(row, { ageRows: age.rows, packageRows: packageAge.rows, packageKey: packageAge.key, year: data.year });
       const hasEstimate = Boolean(row.estimate?.fixed) || estimate !== null;
+      const short = BENCHMARK_SHORT[row.id] ?? {};
+      const published = splitValue(row.value);
+      const basis = short.basis ?? row.basis;
       return (
         <li key={row.id} className="milburn-bench-card" data-benchmark={row.id}>
-          <h4>{row.figure}</h4>
+          <h4 title={row.figure}>{short.label ?? row.figure}</h4>
           <div className="milburn-bench-figures">
-            {row.value && (
+            {published.value && (
               <div className="milburn-bench-figure">
-                <span className="milburn-bench-kicker">Published</span>
-                <span className="milburn-bench-value">{row.value}</span>
+                <span className="milburn-bench-kicker">
+                  <TitleIcon name="fileText" bare size={12} /> Published
+                </span>
+                <span className="milburn-bench-value">{published.value}</span>
               </div>
             )}
             {hasEstimate && (
               <div className="milburn-bench-figure is-estimate">
                 <span className="milburn-bench-kicker">
-                  <TitleIcon name="calculator" bare size={12} /> PolicyEngine
+                  <TitleIcon name="calculator" bare size={12} />{" "}
+                  {row.estimate.fixed ? row.estimate.label || "PolicyEngine" : `PolicyEngine${yearLabel ? `, ${yearLabel}` : ""}`}
                 </span>
                 <span className="milburn-bench-value milburn-estimate">{row.estimate.fixed || thousands(estimate)}</span>
-                {row.estimate.basis && <span className="milburn-estimate-label">{row.estimate.basis}</span>}
-                {row.estimate.label && <span className="milburn-estimate-label">{row.estimate.label}</span>}
-                {!row.estimate.fixed && yearLabel && <span className="milburn-estimate-label">{yearLabel}</span>}
               </div>
             )}
           </div>
-          {row.basis && <p className="milburn-bench-basis">{row.basis}</p>}
-          {(row.source || row.date || row.pressReport) && (
-            <p className="milburn-bench-meta">
-              {row.source &&
-                (row.url ? (
-                  <a className="milburn-source-chip" href={row.url} target="_blank" rel="noopener noreferrer">
-                    <TitleIcon name="link" bare size={12} />
-                    {row.source}
-                    <span className="visually-hidden"> (opens in a new tab)</span>
-                  </a>
-                ) : (
-                  <span className="milburn-source-chip">{row.source}</span>
-                ))}
-              {row.date && (
-                <span className="milburn-bench-date">
-                  <TitleIcon name="calendar" bare size={12} />
-                  {row.date}
+          <ul className="milburn-bench-notes">
+            {published.note && (
+              <li title={published.note}>
+                <TitleIcon name="pin" bare size={12} />
+                <span>{published.note}</span>
+              </li>
+            )}
+            {basis && (
+              <li title={row.basis}>
+                <TitleIcon name="book" bare size={12} />
+                <span>{basis}</span>
+              </li>
+            )}
+            {hasEstimate && (row.estimate.basis || row.estimate.label) && (
+              <li title={[row.estimate.basis, row.estimate.label].filter(Boolean).join(". ")}>
+                <TitleIcon name="calculator" bare size={12} />
+                <span>{row.estimate.basis || row.estimate.label}</span>
+              </li>
+            )}
+          </ul>
+          <p className="milburn-bench-meta">
+            {row.source &&
+              (row.url ? (
+                <a className="milburn-source-chip" href={row.url} target="_blank" rel="noopener noreferrer" title={row.source}>
+                  <TitleIcon name="link" bare size={12} />
+                  <span>{row.source}</span>
+                  <span className="visually-hidden"> (opens in a new tab)</span>
+                </a>
+              ) : (
+                <span className="milburn-source-chip">
+                  <span>{row.source}</span>
                 </span>
-              )}
-              {row.pressReport && <span className="milburn-tag">Press report</span>}
-            </p>
-          )}
+              ))}
+            {row.date && (
+              <span className="milburn-bench-date">
+                <TitleIcon name="calendar" bare size={12} />
+                {row.date}
+              </span>
+            )}
+            {row.pressReport && <span className="milburn-tag">Press report</span>}
+          </p>
         </li>
       );
     };
@@ -116,7 +138,7 @@ export default function BenchmarksTable() {
       <section className="report-section" aria-label="Benchmarks">
         <p className="milburn-label" role="note">
           <TitleIcon name="alert" bare size={14} />
-          <span>Published figures, each with its own definition, coverage and date. PolicyEngine estimates are context, not a check.</span>
+          <span>Published figures, each with its own definition and date. PolicyEngine estimates are context, not a check.</span>
         </p>
         {benchmarkGroups(data.rows).map((group) => (
           <div key={group.key} className="milburn-bench-group" data-theme={group.key}>
@@ -124,7 +146,7 @@ export default function BenchmarksTable() {
               <TitleIcon name={group.icon} />
               {group.title}
             </h3>
-            <ul className="milburn-bench-grid">{group.rows.map(card)}</ul>
+            <ul className="milburn-bench-grid cols-2">{group.rows.map(card)}</ul>
           </div>
         ))}
         <ul className="milburn-points">
@@ -139,8 +161,8 @@ export default function BenchmarksTable() {
           <li>
             <TitleIcon name="usersRound" bare size={14} />
             <span>
-              The package figure counts people aged 16 to 24 in households whose net income falls, from its{" "}
-              {catalogue.localBuild ? "local build" : "verified"} run.
+              Package figure: people aged 16 to 24 in households whose income falls (
+              {catalogue.localBuild ? "local build" : "verified"} run).
             </span>
           </li>
         </ul>

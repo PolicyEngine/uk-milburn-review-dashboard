@@ -116,7 +116,7 @@ export function PovertyHeadline({ runId }) {
             value={formatPeople(run.peopleIntoPovertyAbsAhc)}
             extra={formatSignedPp(run.povertyPp.abs_ahc)}
             label={`People ${direction(run.peopleIntoPovertyAbsAhc)} absolute poverty`}
-            note="After housing costs, all ages. Line fixed in real terms."
+            note="After housing costs; line fixed in real terms."
           />
         )}
         {run.peopleIntoPovertyRelAhc !== null && (
@@ -125,7 +125,7 @@ export function PovertyHeadline({ runId }) {
             value={formatPeople(run.peopleIntoPovertyRelAhc)}
             extra={formatSignedPp(run.povertyPp.rel_ahc)}
             label={`People ${direction(run.peopleIntoPovertyRelAhc)} relative poverty`}
-            note="After housing costs. The line is 60% of the median, which moves."
+            note="After housing costs; line moves with the median."
           />
         )}
         {run.childPovertyPpRelAhc !== null && (

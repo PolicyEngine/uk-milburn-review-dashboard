@@ -36,6 +36,32 @@ export const BENCHMARK_THEMES = [
   { key: "other", title: "Other figures", icon: "list", ids: [] },
 ];
 
+/**
+ * One-line card titles (and, where the published basis is long, a one-line
+ * basis) by row id; the file's full wording stays as the card's tooltip.
+ */
+export const BENCHMARK_SHORT = {
+  neet_16_24: { label: "16–24s not in education, employment or training" },
+  uc_health_no_work_requirements: { label: "On UC health with no work requirements" },
+  uc_lcwra_16_24: {
+    label: "16–24s in a UC LCWRA subgroup, as reported",
+    basis: "DWP statistics via Benefits and Work; a subgroup, not the full LCWRA caseload",
+  },
+  package_young_people_affected: { label: "Young people affected by the package", basis: "No published figure" },
+  incapacity_spending_18_24: { label: "Incapacity benefit spending, ages 18 to 24" },
+  young_benefits_spend: { label: "PIP and UC health spending on young people" },
+  employer_nics_under_25: { label: "Cost of zero employer NICs for under-25s" },
+  kept_out_of_poverty: { label: "Kept out of poverty by UC health and/or PIP" },
+  pip_no_extra_costs: { label: "Young PIP claimants reporting no extra costs" },
+};
+
+/** "£5.1bn a year; about £132,000 per extra job" as its headline value and a one-line note. */
+export function splitValue(value) {
+  const [head, ...rest] = String(value || "").split("; ");
+  const note = rest.join("; ");
+  return { value: head, note: note ? note.charAt(0).toUpperCase() + note.slice(1) : "" };
+}
+
 /** The rows by theme, in the themes' order; a theme with no rows is left out. */
 export function benchmarkGroups(rows) {
   const known = new Set(BENCHMARK_THEMES.flatMap((theme) => theme.ids));

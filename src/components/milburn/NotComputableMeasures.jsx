@@ -20,10 +20,11 @@ export function notComputableFromFile(listed) {
     return {
       id: measure.id,
       name: measure.name,
-      summary: measure.description || known?.summary || "",
+      // The card's own one-line wording where it has the measure
+      summary: known?.summary || measure.description || "",
       affects: known?.affects ?? "",
       category: known?.category ?? { label: "Benefits", icon: "piggy" },
-      notModelled: measure.reason || known?.notModelled || "",
+      notModelled: known?.notModelled || measure.reason || "",
       visual: known?.visual,
       kind: known?.kind,
     };

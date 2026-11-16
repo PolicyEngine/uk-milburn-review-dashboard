@@ -26,7 +26,7 @@ import { groupMilburnMeasures, milburnDefaultMeasure, milburnDisplayName, milbur
 import { loadLocalBuildParts } from "./localBuild";
 import { dashboardFromParts } from "../loadDashboard";
 import { MeasureCatalogueProvider } from "../measureCatalogue";
-import KeyFigures, { REPLACEMENT_NOT_MODELLED_NOTE, keyFigureTiles, packageRange } from "../../components/milburn/KeyFigures";
+import KeyFigures, { REPLACEMENT_NOT_MODELLED_NOTE, REPLACEMENT_PARTS_NOTE, keyFigureTiles, packageRange } from "../../components/milburn/KeyFigures";
 import { FinancesHeadline, PovertyHeadline, barShare } from "../../components/milburn/HeadlineTiles";
 import { BreakEven, EntryComparison, SAME_GAIN_SENTENCE, SMALL_FISCAL_EFFECT_POINTS } from "../../components/milburn/BehaviouralScenarios";
 
@@ -116,12 +116,12 @@ describe("key figure tiles", () => {
     const byKey = Object.fromEntries(tiles.map((tile) => [tile.key, tile]));
     expect(byKey.saving.label).toBe("Exchequer saving, 2027-28");
     expect(byKey.young.label).toContain("households that lose");
-    expect(byKey.young.definition).toContain("including siblings and partners, not only claimants");
+    expect(byKey.young.definition).toContain("Includes siblings, partners");
     expect(byKey.loss.label).toBe("Their average household loss");
     // Absolute poverty after housing costs only: relative poverty is a
     // footnote, and there is no child poverty tile
     expect(tiles.map((tile) => tile.key)).toEqual(["saving", "young", "loss", "poverty-abs"]);
-    expect(byKey["poverty-abs"].label).toBe("People moved into absolute poverty after housing costs");
+    expect(byKey["poverty-abs"].label).toBe("People into absolute poverty");
     expect(byKey["poverty-abs"].value).toBe("300,000");
   });
 
@@ -133,7 +133,7 @@ describe("key figure tiles", () => {
     expect(byKey.young.label).toContain("households that gain");
     expect(byKey.loss.label).toBe("Their average household gain");
     expect(byKey.loss.value).toBe("£1,100");
-    expect(byKey["poverty-abs"].label).toBe("People moved out of absolute poverty after housing costs");
+    expect(byKey["poverty-abs"].label).toBe("People out of absolute poverty");
     expect(byKey["poverty-abs"].extra).toBe("−0.16pp");
   });
 });
@@ -153,8 +153,9 @@ describe("KeyFigures", () => {
     const region = screen.getByRole("region", { name: "Key figures" });
     expect(region.textContent).toContain("Full abolition, no replacement (upper bound)");
     expect(region.textContent).toContain(RELATIVE_LINE_NOTE);
-    expect(region.textContent).toContain("On the relative line (60% of median income after housing costs), 150,000 people move into poverty (+0.20pp).");
+    expect(region.textContent).toContain("Relative poverty (60% of median, after housing costs): 150,000 people move into it (+0.20pp).");
     expect(region.textContent).toContain(REPLACEMENT_NOT_MODELLED_NOTE);
+    expect(region.textContent).toContain(REPLACEMENT_PARTS_NOTE);
   });
 
   it("shows the packages' range strip whatever run is selected", async () => {

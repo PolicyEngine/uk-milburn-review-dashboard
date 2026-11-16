@@ -19,7 +19,11 @@ import "./milburn.css";
 
 /** The replacement support briefed for the review, which no run models. */
 export const REPLACEMENT_NOT_MODELLED_NOTE =
-  "Replacement support is not modelled (local fund, extra-costs allowance, higher payment for those who can never work, conditionality), so the full package is an upper bound on losses.";
+  "Replacement support is not modelled, so the full package is an upper bound on losses.";
+
+/** What that replacement support is, as briefed for the review. */
+export const REPLACEMENT_PARTS_NOTE =
+  "Left out: local fund, extra-costs allowance, payment for those who can never work, conditionality.";
 
 /** The range strip's short names for the packages, by position in PACKAGE_IDS. */
 const RANGE_NAMES = ["Upper bound", "Central", "Phased"];
@@ -75,7 +79,7 @@ export function relativePovertySentence(run) {
   const count = run?.peopleIntoPovertyRelAhc;
   if (count === null || count === undefined) return null;
   const pp = run.povertyPp.rel_ahc;
-  return `On the relative line (60% of median income after housing costs), ${formatPeople(count)} people move ${count >= 0 ? "into" : "out of"} poverty${pp !== null ? ` (${formatSignedPp(pp)})` : ""}.`;
+  return `Relative poverty (60% of median, after housing costs): ${formatPeople(count)} people move ${count >= 0 ? "into" : "out of"} it${pp !== null ? ` (${formatSignedPp(pp)})` : ""}.`;
 }
 
 /**
@@ -95,7 +99,7 @@ export function keyFigureTiles(run, year) {
       icon: "landmark",
       value: formatBn(Math.abs(saving)),
       label: `${saving >= 0 ? "Exchequer saving" : "Exchequer cost"}, ${yearLabel}`,
-      definition: "Static: nobody changes their work or claims.",
+      definition: "Static: no behaviour change.",
     });
   }
   if (run.youngPeopleLosing !== null) {
@@ -105,7 +109,7 @@ export function keyFigureTiles(run, year) {
       value: formatPeople(run.youngPeopleLosing),
       extra: run.youngShareLosingPct !== null ? `${formatPct(run.youngShareLosingPct)} of 16–24s` : null,
       label: `16–24s in households that ${gain ? "gain" : "lose"}`,
-      definition: "Everyone aged 16–24 in the household, including siblings and partners, not only claimants.",
+      definition: "Includes siblings, partners.",
     });
   }
   if (run.averageLossYoung !== null) {
@@ -115,7 +119,7 @@ export function keyFigureTiles(run, year) {
       value: formatPounds(Math.abs(run.averageLossYoung)),
       extra: "a year",
       label: `Their average household ${gain ? "gain" : "loss"}`,
-      definition: `Whole-household ${gain ? "gain" : "loss"}, for those young people only. The charts below average per person over all 16–24s, so their figure is smaller.`,
+      definition: "Per household, not per person.",
     });
   }
   // Absolute poverty first: its line is fixed in real terms, while the
@@ -127,7 +131,7 @@ export function keyFigureTiles(run, year) {
       icon: "percent",
       value: formatPeople(count),
       extra: pp !== null ? formatSignedPp(pp) : null,
-      label: `People moved ${count >= 0 ? "into" : "out of"} ${basis} poverty after housing costs`,
+      label: `People ${count >= 0 ? "into" : "out of"} ${basis} poverty`,
       definition,
     });
   };
@@ -136,7 +140,7 @@ export function keyFigureTiles(run, year) {
     run.peopleIntoPovertyAbsAhc,
     run.povertyPp.abs_ahc,
     "absolute",
-    "All ages. The absolute line is fixed in real terms.",
+    "After housing costs, all ages.",
   );
   return tiles;
 }
@@ -216,14 +220,22 @@ export default function KeyFigures({ runId, nameShownAbove = false }) {
         {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
           <li data-poverty-note="">
             <TitleIcon name="percent" bare size={14} />
-            <span>
-              {relativePovertySentence(summaryRun(summary, id))} {RELATIVE_LINE_NOTE}
-            </span>
+            <span>{relativePovertySentence(summaryRun(summary, id))}</span>
+          </li>
+        )}
+        {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
+          <li>
+            <TitleIcon name="scale" bare size={14} />
+            <span>{RELATIVE_LINE_NOTE}</span>
           </li>
         )}
         <li data-replacement-note="">
           <TitleIcon name="alert" bare size={14} />
           <span>{REPLACEMENT_NOT_MODELLED_NOTE}</span>
+        </li>
+        <li>
+          <TitleIcon name="lifebuoy" bare size={14} />
+          <span>{REPLACEMENT_PARTS_NOTE}</span>
         </li>
         <li>
           <TitleIcon name="calendar" bare size={14} />

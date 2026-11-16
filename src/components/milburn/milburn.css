@@ -776,3 +776,140 @@ a.milburn-source-chip:focus-visible {
   text-align: right;
   white-space: nowrap;
 }
+
+/* Polish: headline cards tinted at the top, white tiles on them */
+.milburn-key {
+  margin-bottom: 24px;
+  background-image: linear-gradient(180deg, var(--c-highlight-band), var(--c-surface) 140px);
+}
+
+.milburn-key-tile {
+  background: var(--c-surface);
+}
+
+.milburn-key-definition,
+.milburn-points li > span:last-child {
+  overflow-wrap: anywhere;
+}
+
+.milburn-benchmarks > .report-section > .milburn-label,
+.milburn-scenarios > .milburn-label {
+  margin-bottom: 24px;
+}
+
+.milburn-benchmarks .milburn-points {
+  margin-top: 0;
+}
+
+/* The folded-away set-up of the entry case: prose, not bullets */
+.milburn-details p {
+  margin: 12px 0 0;
+  max-width: 90ch;
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: var(--c-axis-title);
+}
+
+/* Benchmark cards: one line for each of title, note and source; two
+   figures side by side; equal heights across a row */
+.milburn-bench-grid.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .milburn-bench-grid.cols-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.milburn-bench-card {
+  gap: 12px;
+}
+
+.milburn-bench-card h4,
+.milburn-bench-notes li > span:last-child,
+.milburn-source-chip > span:not(.visually-hidden):not([aria-hidden]) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.milburn-bench-figures {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+
+/* An odd card out takes the whole row, so no row is half empty */
+.milburn-bench-grid.cols-2 > li:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.milburn-bench-figure {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--c-row-band);
+}
+
+.milburn-bench-value {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.milburn-bench-notes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+  color: var(--c-axis-title);
+}
+
+.milburn-bench-notes li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.milburn-bench-notes li > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  color: var(--c-gain-text);
+}
+
+.milburn-bench-meta {
+  flex-wrap: nowrap;
+  min-width: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--c-grid);
+}
+
+.milburn-bench-meta > * {
+  flex: none;
+}
+
+.milburn-bench-meta > .milburn-source-chip {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* The PolicyEngine figure names its build and year on one line, so its box is the wider */
+.milburn-bench-figures {
+  display: flex;
+}
+
+.milburn-bench-figure {
+  flex: 1 1 0;
+}
+
+.milburn-bench-figure.is-estimate {
+  flex: 1.5 1 0;
+}
+
+.milburn-bench-kicker {
+  white-space: nowrap;
+}

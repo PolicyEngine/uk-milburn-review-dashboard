@@ -430,7 +430,7 @@ export function PolicyCard({ policy, onShowEffect, parameters: given }) {
               </p>
             </div>
           )}
-          <h3 className="policy-card-name">{policy.label ?? policy.name}</h3>
+          <h3 className="policy-card-name">{policy.cardTitle ?? policy.label ?? policy.name}</h3>
         </div>
       </div>
 

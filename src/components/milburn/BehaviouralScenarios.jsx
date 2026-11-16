@@ -25,7 +25,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 /** The label the sub-tab carries. */
 export const SCENARIOS_LABEL =
-  "Assumption: a quarter of the young people the package leaves worse off move into work, microsimulated. Other tabs are static.";
+  "Assumption: 25% of young people who lose move into work, microsimulated. Other tabs: static.";
 
 const pounds = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const penceExact = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -53,11 +53,11 @@ function useScenariosFile() {
 
 /** The gain from work is the same with and without the package: said wherever the arithmetic is. */
 export const SAME_GAIN_SENTENCE =
-  "The gain from work is the same under current law and the package: this is arithmetic, not an incentive the reform creates.";
+  "Same gain from work under current law and the package: arithmetic, not a new incentive.";
 
 /** Why the move into work changes the public finances so little, a point each. */
 export const SMALL_FISCAL_EFFECT_POINTS = [
-  "Many young PIP recipients are not on Universal Credit: they live with their parents or already work.",
+  "Many young PIP recipients are not on Universal Credit: they live with parents or work.",
   "Losing households include siblings and partners, not only claimants.",
   "So work recovers little benefit spending, and the effect on the public finances is small.",
 ];
@@ -71,14 +71,6 @@ function Point({ icon = "pin", children, ...rest }) {
     </li>
   );
 }
-
-/** A file's long basis paragraph as its sentences, one bullet each. */
-export const basisPoints = (basis) =>
-  String(basis || "")
-    .replace(/\.\s+(?=[A-Z])/g, ".\n")
-    .split("\n")
-    .map((sentence) => sentence.trim())
-    .filter(Boolean);
 
 /** "+0.59pp (about 410,000 people)": the change and its count, either left out when missing. */
 function povertyText(run) {
@@ -178,7 +170,8 @@ function EntryCases({ data }) {
       entry.net_income_gain_current_law === entry.net_income_gain_package &&
       entry.exchequer_gain_current_law === entry.exchequer_gain_package,
   );
-  const points = [...basisPoints(data.basis), ...data.notes];
+  // The file's own sentences, too long for one-line bullets: prose, folded away
+  const paragraphs = [data.basis, data.notes.join(" ")].filter(Boolean);
   return (
     <section className="report-section milburn-notes milburn-card" aria-labelledby="milburn-cases-heading">
       <h3 id="milburn-cases-heading">
@@ -218,17 +211,15 @@ function EntryCases({ data }) {
           <Point icon="scale">The same under current law and under the package.</Point>
         </ul>
       )}
-      {points.length > 0 && (
+      {paragraphs.length > 0 && (
         <details className="milburn-details">
           <summary>
             <TitleIcon name="list" bare size={14} />
-            How the case is set up ({points.length} points)
+            How the case is set up
           </summary>
-          <ul className="milburn-points">
-            {points.map((point) => (
-              <Point key={point}>{point}</Point>
-            ))}
-          </ul>
+          {paragraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
         </details>
       )}
     </section>
@@ -312,8 +303,7 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
           <ul className="milburn-points">
             <Point icon="scale">{SAME_GAIN_SENTENCE}</Point>
             <Point icon="alert">
-              <strong>Above 100%.</strong> {NO_ENTRY_RATE_RESTORES}, even if every young person in a losing
-              household moved into work.
+              <strong>Above 100%.</strong> {NO_ENTRY_RATE_RESTORES}, even if all moved into work.
             </Point>
             <Point icon="calculator">Counts rounded to the nearest thousand.</Point>
           </ul>
