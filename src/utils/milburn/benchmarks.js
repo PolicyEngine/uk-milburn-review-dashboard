@@ -9,6 +9,42 @@ import { youngPeopleWorseOff } from "./youngPeople";
 
 export const BENCHMARKS_FILE = "milburn_benchmarks.json";
 
+/**
+ * The themes the Benchmarks cards are grouped under, in order, each with its
+ * icon (TitleIcon) and the rows it holds; a row no theme lists goes under
+ * the last, "Other figures".
+ */
+export const BENCHMARK_THEMES = [
+  {
+    key: "people",
+    title: "People and caseloads",
+    icon: "usersRound",
+    ids: ["neet_16_24", "uc_health_no_work_requirements", "uc_lcwra_16_24", "package_young_people_affected"],
+  },
+  {
+    key: "spending",
+    title: "Spending and costs",
+    icon: "landmark",
+    ids: ["incapacity_spending_18_24", "young_benefits_spend", "employer_nics_under_25"],
+  },
+  {
+    key: "poverty",
+    title: "Poverty and extra costs",
+    icon: "percent",
+    ids: ["kept_out_of_poverty", "pip_no_extra_costs"],
+  },
+  { key: "other", title: "Other figures", icon: "list", ids: [] },
+];
+
+/** The rows by theme, in the themes' order; a theme with no rows is left out. */
+export function benchmarkGroups(rows) {
+  const known = new Set(BENCHMARK_THEMES.flatMap((theme) => theme.ids));
+  return BENCHMARK_THEMES.map((theme) => ({
+    ...theme,
+    rows: theme.key === "other" ? rows.filter((row) => !known.has(row.id)) : rows.filter((row) => theme.ids.includes(row.id)),
+  })).filter((group) => group.rows.length > 0);
+}
+
 const text = (value) => (typeof value === "string" ? value : "");
 
 /** The file, checked: null without a list of rows. */

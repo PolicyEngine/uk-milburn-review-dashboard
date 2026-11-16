@@ -82,7 +82,7 @@ describe("Benchmarks", () => {
     expect(await screen.findByText("260,000")).toBeInTheDocument();
     expect(screen.getByText("62,570")).toBeInTheDocument();
     expect(screen.getAllByText("Press report").length).toBeGreaterThan(0);
-    for (const link of within(screen.getByRole("table")).getAllByRole("link")) {
+    for (const link of within(screen.getByRole("region", { name: "Benchmarks" })).getAllByRole("link")) {
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");
     }
@@ -91,15 +91,15 @@ describe("Benchmarks", () => {
     expect(screen.queryByText("30,000")).toBeNull();
     // Fixed PolicyEngine figures beside the published ones, each labelled with its build and year
     for (const [published, estimate] of [["260,000", "232,000"]]) {
-      const row = screen.getByText(published).closest("tr");
+      const row = screen.getByText(published).closest("li");
       expect(row.textContent).toContain(estimate);
       expect(row.textContent).toContain("PolicyEngine, build 6f918b81, 2027-28");
     }
-    expect(screen.getByText("£4.43bn a year").closest("tr").textContent).toContain("£5.1bn a year");
+    expect(screen.getByText("£4.43bn a year").closest("li").textContent).toContain("£5.1bn a year");
     // Rows without a source are gone, and no link carries a stray %20 or points elsewhere than its label
     expect(screen.queryByText(/465,000/)).toBeNull();
     expect(screen.queryByText(/440,000 by 2036/)).toBeNull();
-    for (const link of within(screen.getByRole("table")).getAllByRole("link")) {
+    for (const link of within(screen.getByRole("region", { name: "Benchmarks" })).getAllByRole("link")) {
       expect(link.getAttribute("href")).not.toContain("%20");
       expect(link.getAttribute("href")).not.toContain("aol.");
     }

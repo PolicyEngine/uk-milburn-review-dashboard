@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import SectionHeading from "../SectionHeading";
+import TitleIcon from "../TitleIcon";
 import { fiscalYearTick } from "../../utils/chartTheme";
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { HOURS_CASES, SCENARIOS_FILE, parseScenarios } from "../../utils/milburn/scenarios";
@@ -7,6 +8,7 @@ import {
   BREAK_EVEN_HOURS,
   DEFAULT_SUMMARY_RUN,
   ENTRY_RUN,
+  NO_ENTRY_RATE_RESTORES,
   breakEvenText,
   formatBn,
   formatPeople,
@@ -23,7 +25,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 /** The label the sub-tab carries. */
 export const SCENARIOS_LABEL =
-  "The move into work is an assumption: a quarter of the young people the package leaves worse off, microsimulated. The figures elsewhere are static.";
+  "Assumption: a quarter of the young people the package leaves worse off move into work, microsimulated. Other tabs are static.";
 
 const pounds = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const penceExact = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -51,11 +53,32 @@ function useScenariosFile() {
 
 /** The gain from work is the same with and without the package: said wherever the arithmetic is. */
 export const SAME_GAIN_SENTENCE =
-  "The gain from moving into work is the same under current law and under the package, so this is arithmetic about how far work could offset the loss, not an incentive the reform creates.";
+  "The gain from work is the same under current law and the package: this is arithmetic, not an incentive the reform creates.";
 
-/** Why the move into work changes the public finances so little. */
-export const SMALL_FISCAL_EFFECT_SENTENCE =
-  "Many young PIP recipients are not on Universal Credit, because they live with their parents or already work, and the young people in losing households include siblings and partners. So moving into work recovers little benefit spending, and the effect on the public finances is small.";
+/** Why the move into work changes the public finances so little, a point each. */
+export const SMALL_FISCAL_EFFECT_POINTS = [
+  "Many young PIP recipients are not on Universal Credit: they live with their parents or already work.",
+  "Losing households include siblings and partners, not only claimants.",
+  "So work recovers little benefit spending, and the effect on the public finances is small.",
+];
+
+/** A bullet with an icon (the caveats and reading notes). */
+function Point({ icon = "pin", children, ...rest }) {
+  return (
+    <li {...rest}>
+      <TitleIcon name={icon} bare size={14} />
+      <span>{children}</span>
+    </li>
+  );
+}
+
+/** A file's long basis paragraph as its sentences, one bullet each. */
+export const basisPoints = (basis) =>
+  String(basis || "")
+    .replace(/\.\s+(?=[A-Z])/g, ".\n")
+    .split("\n")
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
 
 /** "+0.59pp (about 410,000 people)": the change and its count, either left out when missing. */
 function povertyText(run) {
@@ -84,10 +107,11 @@ export function EntryComparison({ summary, catalogue }) {
   const fullSaving = savingInYear(full, summary.year);
   const entrySaving = savingInYear(entry, summary.year);
   const rows = [
-    { key: "saving", label: `Exchequer saving, ${yearLabel}`, full: formatBn(fullSaving), entry: formatBn(entrySaving) },
-    { key: "poverty", label: "Absolute poverty after housing costs, all ages", full: povertyText(full), entry: povertyText(entry) },
+    { key: "saving", icon: "landmark", label: `Exchequer saving, ${yearLabel}`, full: formatBn(fullSaving), entry: formatBn(entrySaving) },
+    { key: "poverty", icon: "percent", label: "Absolute poverty after housing costs, all ages", full: povertyText(full), entry: povertyText(entry) },
     {
       key: "loss",
+      icon: "wallet",
       label: "Average loss, young people in losing households (£ a year)",
       full: formatPounds(full.averageLossYoung),
       entry: formatPounds(entry.averageLossYoung),
@@ -95,24 +119,29 @@ export function EntryComparison({ summary, catalogue }) {
   ];
   return (
     <section className="report-section milburn-entry" aria-labelledby="milburn-entry-heading">
-      <h3 id="milburn-entry-heading">With a quarter moving into work</h3>
-      <p>
-        {fullName}, {yearLabel}: the static run, and the same package with 25% of the young people aged 16 to 24 it
-        leaves worse off moving into work, microsimulated.
+      <h3 id="milburn-entry-heading">
+        <TitleIcon name="briefcase" />
+        With a quarter moving into work
+      </h3>
+      <p className="milburn-sub">
+        {fullName}, {yearLabel}: static, against 25% of the 16 to 24-year-olds it leaves worse off moving into work.
       </p>
       <div className="milburn-table-wrap">
         <table className="milburn-table">
           <thead>
             <tr>
               <th scope="col">Figure</th>
-              <th scope="col">Static package</th>
-              <th scope="col">With 25% moving into work</th>
+              <th scope="col">Static</th>
+              <th scope="col">25% move into work</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.key} data-row={row.key}>
-                <th scope="row">{row.label}</th>
+                <th scope="row">
+                  <TitleIcon name={row.icon} bare size={14} className="milburn-row-icon" />
+                  {row.label}
+                </th>
                 <td>{row.full || "Not in the summary"}</td>
                 <td>{row.entry || "Not in the summary"}</td>
               </tr>
@@ -121,10 +150,19 @@ export function EntryComparison({ summary, catalogue }) {
         </table>
       </div>
       {fullSaving !== null && entrySaving !== null && (
-        <p data-entry-run-comparison="">
-          The move into work {entrySaving >= fullSaving ? "adds" : "takes"} {formatBn(Math.abs(entrySaving - fullSaving))}{" "}
-          {entrySaving >= fullSaving ? "to" : "from"} the Exchequer. {SMALL_FISCAL_EFFECT_SENTENCE}
-        </p>
+        <ul className="milburn-points" data-entry-run-comparison="">
+          <Point icon="landmark">
+            <strong>
+              The move into work {entrySaving >= fullSaving ? "adds" : "takes"} {formatBn(Math.abs(entrySaving - fullSaving))}{" "}
+              {entrySaving >= fullSaving ? "to" : "from"} the Exchequer.
+            </strong>
+          </Point>
+          {SMALL_FISCAL_EFFECT_POINTS.map((point, index) => (
+            <Point key={point} icon={["wallet", "usersRound", "scale"][index]}>
+              {point}
+            </Point>
+          ))}
+        </ul>
       )}
     </section>
   );
@@ -133,17 +171,28 @@ export function EntryComparison({ summary, catalogue }) {
 /** The household entry cases from milburn_scenarios.json, one row per hours case. */
 function EntryCases({ data }) {
   const cases = HOURS_CASES.map((option) => data.entryCases.find((entry) => entry.id === option.id)).filter(Boolean);
+  // The same gains with and without the package: one column each, and a
+  // line saying so; both figures side by side only where they differ
+  const same = cases.length > 0 && cases.every(
+    (entry) =>
+      entry.net_income_gain_current_law === entry.net_income_gain_package &&
+      entry.exchequer_gain_current_law === entry.exchequer_gain_package,
+  );
+  const points = [...basisPoints(data.basis), ...data.notes];
   return (
-    <section className="report-section milburn-notes" aria-labelledby="milburn-cases-heading">
-      <h3 id="milburn-cases-heading">One young person moving into work</h3>
+    <section className="report-section milburn-notes milburn-card" aria-labelledby="milburn-cases-heading">
+      <h3 id="milburn-cases-heading">
+        <TitleIcon name="user" />
+        One young person moving into work
+      </h3>
       <div className="milburn-table-wrap">
         <table className="milburn-table">
           <thead>
             <tr>
               <th scope="col">Hours a week</th>
               <th scope="col">Hourly wage</th>
-              <th scope="col">Net income gain, £ a year (current law; package)</th>
-              <th scope="col">Exchequer gain, £ a year (current law; package)</th>
+              <th scope="col">Net income gain, £ a year{same ? "" : " (current law; package)"}</th>
+              <th scope="col">Exchequer gain, £ a year{same ? "" : " (current law; package)"}</th>
             </tr>
           </thead>
           <tbody>
@@ -152,22 +201,36 @@ function EntryCases({ data }) {
                 <th scope="row">{entry.hours} hours</th>
                 <td>{penceExact.format(entry.hourly_wage)}</td>
                 <td>
-                  {pounds.format(entry.net_income_gain_current_law)}; {pounds.format(entry.net_income_gain_package)}
+                  {pounds.format(entry.net_income_gain_current_law)}
+                  {!same && `; ${pounds.format(entry.net_income_gain_package)}`}
                 </td>
                 <td>
-                  {pounds.format(entry.exchequer_gain_current_law)}; {pounds.format(entry.exchequer_gain_package)}
+                  {pounds.format(entry.exchequer_gain_current_law)}
+                  {!same && `; ${pounds.format(entry.exchequer_gain_package)}`}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <ul>
-        {data.basis && <li>{data.basis}</li>}
-        {data.notes.map((note) => (
-          <li key={note}>{note}</li>
-        ))}
-      </ul>
+      {same && (
+        <ul className="milburn-points" data-same-gain="">
+          <Point icon="scale">The same under current law and under the package.</Point>
+        </ul>
+      )}
+      {points.length > 0 && (
+        <details className="milburn-details">
+          <summary>
+            <TitleIcon name="list" bare size={14} />
+            How the case is set up ({points.length} points)
+          </summary>
+          <ul className="milburn-points">
+            {points.map((point) => (
+              <Point key={point}>{point}</Point>
+            ))}
+          </ul>
+        </details>
+      )}
     </section>
   );
 }
@@ -209,17 +272,17 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
     } else {
       body = (
         <>
-          <p>
-            For {name}, {yearLabel}: how many of the young people aged 16 to 24 in losing households would need to move
-            into work for the gain to make up the loss. {SAME_GAIN_SENTENCE}
+          <p className="milburn-sub">
+            {name}, {yearLabel}: how many 16 to 24-year-olds in losing households would need to move into work to
+            make up the loss.
           </p>
           <div className="milburn-table-wrap">
             <table className="milburn-table">
               <thead>
                 <tr>
                   <th scope="col">Hours a week</th>
-                  <th scope="col">Share who would need to move into work for their average income to recover</th>
-                  <th scope="col">Entrants whose gains would match the total income loss</th>
+                  <th scope="col">Share needed to recover the average loss</th>
+                  <th scope="col">Entrants to match the total loss</th>
                   <th scope="col">Exchequer gain per entrant, £ a year</th>
                 </tr>
               </thead>
@@ -227,7 +290,18 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
                 {BREAK_EVEN_HOURS.map(({ id: hoursId, hours }) => (
                   <tr key={hoursId} data-hours={hours}>
                     <th scope="row">{hours} hours</th>
-                    <td>{breakEvenText(run.breakEvenSharePct[hoursId]) || "Not in the summary"}</td>
+                    <td>
+                      {run.breakEvenSharePct[hoursId] > 100 ? (
+                        <>
+                          {run.breakEvenSharePct[hoursId].toFixed(1)}%{" "}
+                          <span className="milburn-tag" title={`${NO_ENTRY_RATE_RESTORES}.`}>
+                            Above 100%: not reachable
+                          </span>
+                        </>
+                      ) : (
+                        breakEvenText(run.breakEvenSharePct[hoursId]) || "Not in the summary"
+                      )}
+                    </td>
                     <td>{run.entrantsToMatch[hoursId] !== null ? formatPeople(run.entrantsToMatch[hoursId]) : "Not in the summary"}</td>
                     <td>{run.exchequerGainPerEntrant[hoursId] !== null ? formatPounds(run.exchequerGainPerEntrant[hoursId]) : "Not in the summary"}</td>
                   </tr>
@@ -235,17 +309,24 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
               </tbody>
             </table>
           </div>
-          <p>
-            A share above 100% means that even if every young person in a losing household moved into work at those
-            hours, the average gain would not restore the average loss. Counts are rounded to the nearest thousand.
-          </p>
+          <ul className="milburn-points">
+            <Point icon="scale">{SAME_GAIN_SENTENCE}</Point>
+            <Point icon="alert">
+              <strong>Above 100%.</strong> {NO_ENTRY_RATE_RESTORES}, even if every young person in a losing
+              household moved into work.
+            </Point>
+            <Point icon="calculator">Counts rounded to the nearest thousand.</Point>
+          </ul>
         </>
       );
     }
   }
   return (
     <section className="report-section milburn-breakeven" aria-labelledby="milburn-breakeven-heading">
-      <h3 id="milburn-breakeven-heading">Break-even arithmetic</h3>
+      <h3 id="milburn-breakeven-heading">
+        <TitleIcon name="calculator" />
+        Break-even arithmetic
+      </h3>
       {body}
     </section>
   );
@@ -303,10 +384,11 @@ export default function BehaviouralScenarios({ selectedRun } = {}) {
       <SectionHeading
         icon="sliders"
         title="Return to work"
-        subtitle="How much the package's saving, poverty and losses change if some of the young people it leaves worse off move into work."
+        subtitle="What changes if some of the young people who lose move into work."
       />
       <p className="milburn-label" role="note">
-        {SCENARIOS_LABEL}
+        <TitleIcon name="alert" bare size={14} />
+        <span>{SCENARIOS_LABEL}</span>
       </p>
       {lead}
       {cases}

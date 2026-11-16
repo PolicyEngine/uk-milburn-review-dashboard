@@ -59,13 +59,11 @@ describe("the view tabs", () => {
     expect(screen.getByRole("tabpanel", { name: "Impact" })).toBeInTheDocument();
   });
 
-  it("shows the candidate banner on every view, once", async () => {
+  it("shows no candidate banner on any view", async () => {
     const { container } = await renderApp();
     VIEWS.forEach((view, index) => {
       fireEvent.click(tabs()[index]);
-      const banners = container.querySelectorAll(".milburn-banner");
-      expect(banners).toHaveLength(1);
-      expect(banners[0]).toHaveTextContent("Candidate measures modelled before the review is published. These are not announced policy.");
+      expect(container.querySelectorAll(".milburn-banner")).toHaveLength(0);
     });
   });
 

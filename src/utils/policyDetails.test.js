@@ -144,6 +144,13 @@ it("describes each Milburn candidate measure in one neutral line, applied whatev
     "pip_removed_under_25",
     "youth_allowance_at_25_plus_rate",
     "employer_nics_zero_under_25",
+    "milburn_package",
+    "milburn_package_central",
+    "milburn_package_phased",
+    "uc_health_element_removed_under_22",
+    "uc_health_element_removed_under_25_severe_kept",
+    "pip_halved_under_25",
+    "pip_removed_16_to_24",
   ];
   expect(MILBURN_POLICY_DETAILS.map((entry) => entry.id)).toEqual(ids);
   for (const entry of MILBURN_POLICY_DETAILS) {

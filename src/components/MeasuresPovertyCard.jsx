@@ -439,7 +439,10 @@ export function PovertyMeasuresRow({ rows, policies, selectedPolicies, selectedY
           it (usePovertyChoice, ?poverty=), so choosing in one changes both */}
       {/* Full width, one below the other: which measures first */}
       <div className="charts-stack">
-        <MeasuresPovertyCard {...props} />
+        {/* Milburn local build: with one policy selected, the per-policy
+            chart is a single bar repeating the headline tiles above it, so
+            it is shown only when there is something to compare */}
+        {(!catalogue.localBuild || (selectedPolicies?.length ?? 0) > 1) && <MeasuresPovertyCard {...props} />}
         <SummaryMetricChart metric={SUMMARY_METRICS.poverty} {...props} />
       </div>
     </>

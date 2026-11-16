@@ -1,5 +1,6 @@
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { NOT_YET_RUN } from "../../utils/milburn/localBuild";
+import TitleIcon from "../TitleIcon";
 import "./milburn.css";
 
 /**
@@ -16,8 +17,11 @@ export default function LocalBuildLabel() {
   const pending = catalogue.measures.filter((measure) => measure.availability?.reason === NOT_YET_RUN);
   return (
     <p className="milburn-label milburn-build-label" role="note" data-local-build="">
+      <TitleIcon name="alert" bare size={14} />
+      <span>
       Figures from {local.label}: not certified.
       {pending.length > 0 && ` ${NOT_YET_RUN}: ${pending.map((measure) => measure.name).join(", ")}.`}
+      </span>
     </p>
   );
 }

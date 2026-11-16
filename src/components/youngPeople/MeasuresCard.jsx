@@ -40,9 +40,6 @@ export const groupsFor = (band) => [
   { key: "all", label: "All ages", color: CHART_COLOURS.reference },
 ];
 
-/** £ a year with a sign, the minus a true minus: "+£6", "−£4". */
-const signed = (value) => (value < 0 ? `\u2212${pounds(-value)}` : `+${pounds(value)}`);
-
 /** £ a year, the minus a true minus and no plus: "£22", "−£196". */
 export const money = (value) => (Math.round(value) < 0 ? `\u2212${pounds(-value)}` : pounds(value));
 
@@ -137,7 +134,7 @@ export function MeasureDumbbell({ rows, domain, ticks: allTicks, groupName, year
               {hasGroup && <strong className="row-band-value">{money(row.group)}</strong>}
               {!single && !half && (
                 <span className={`measure-dumbbell-gap ${tone}`}>
-                  {close ? `≈ ${compareName.toLowerCase()}` : `${gap > 0 ? "▲" : "▼"} ${signed(gap)} vs ${compareName.toLowerCase()}`}
+                  {close ? `≈ ${compareName.toLowerCase()}` : `${gap > 0 ? "▲" : "▼"} ${pounds(Math.abs(gap))} ${gap > 0 ? "higher" : "lower"} than ${compareName.toLowerCase()}`}
                 </span>
               )}
               {!hasGroup && hasAll && (

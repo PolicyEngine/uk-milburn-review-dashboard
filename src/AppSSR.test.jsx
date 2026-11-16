@@ -7,7 +7,7 @@ it("prerenders the shell without a browser or any Budget figures", () => {
   expect(typeof window).toBe("undefined");
   const html = renderToString(<App />);
   expect(html).toContain("Milburn review: young people and work");
-  expect(html).toContain("Candidate measures modelled before the review is published. These are not announced policy.");
+  expect(html).not.toContain("These are not announced policy.");
   for (const label of [">Impact<", ">Measures<", ">Methodology<"]) {
     expect(html).toContain(label);
   }

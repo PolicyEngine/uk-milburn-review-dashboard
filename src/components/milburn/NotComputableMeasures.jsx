@@ -3,6 +3,7 @@ import { PolicyCard } from "../PolicyCards";
 import { NOT_COMPUTABLE_MEASURES } from "../../utils/milburn/notComputable";
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { NOT_YET_RUN } from "../../utils/milburn/localBuild";
+import UnmodelledVisual from "../policies/UnmodelledVisual";
 import "./milburn.css";
 
 export const NOT_COMPUTABLE_TITLE = "Candidate measures we cannot compute";
@@ -23,6 +24,8 @@ export function notComputableFromFile(listed) {
       affects: known?.affects ?? "",
       category: known?.category ?? { label: "Benefits", icon: "piggy" },
       notModelled: measure.reason || known?.notModelled || "",
+      visual: known?.visual,
+      kind: known?.kind,
     };
   });
 }
@@ -87,8 +90,15 @@ export default function NotComputableMeasures({ measures: given }) {
                 label: measure.name,
                 summary: measure.summary,
                 affects: measure.affects,
+                // Itemised, each with its icon: who it would reach, what sort of measure it is
+                points: [
+                  measure.affects && { label: "Who", icon: "users", text: measure.affects },
+                  measure.kind && { label: "Kind", icon: "shapes", text: measure.kind },
+                ].filter(Boolean),
                 category: measure.category,
                 notModelled: measure.notModelled,
+                // A picture in words (no figure), where the measure has one
+                visual: measure.visual ? <UnmodelledVisual measure={measure} visuals={{ [measure.id]: measure.visual }} /> : undefined,
                 timeline: false,
                 direction: "neutral",
               }}

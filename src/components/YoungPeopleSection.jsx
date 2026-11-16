@@ -412,7 +412,14 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
   // which are not one band)
   const youngLabel = AGE_BANDS.find((band) => band.key === group)?.label ?? null;
   const suppressed = data.filter((point) => point.suppressed);
-  const description = single ? SINGLE_AGE_DESCRIPTION : netOnly ? PACKAGE_DESCRIPTION : MEAN_DESCRIPTION;
+  // "Bars add each policy's own effect" only with more than one policy drawn
+  const description = single
+    ? SINGLE_AGE_DESCRIPTION
+    : netOnly
+    ? PACKAGE_DESCRIPTION
+    : activeNames.length > 1
+    ? MEAN_DESCRIPTION
+    : MEAN_DESCRIPTION.replace(/;.*$/, ".");
   // A selected policy with no results by age at all this year (never one
   // that withholds some groups: that one is left out, with no note)
   const incomplete =

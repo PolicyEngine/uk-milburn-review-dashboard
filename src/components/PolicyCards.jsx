@@ -1,5 +1,27 @@
 import { isValidElement, useState } from "react";
-import { ArrowRightLeft, CalendarCheck, CalendarX, ChartColumn, CircleSlash, ExternalLink, Flag, FlaskConical, Lightbulb, Users } from "lucide-react";
+import {
+  ArrowRightLeft,
+  Boxes,
+  CalendarCheck,
+  CalendarX,
+  ChartColumn,
+  CircleSlash,
+  Clock,
+  Coins,
+  ExternalLink,
+  FileText,
+  Flag,
+  FlaskConical,
+  GitBranch,
+  Layers,
+  Lightbulb,
+  MapPin,
+  Scale,
+  ShieldCheck,
+  Shapes,
+  Target,
+  Users,
+} from "lucide-react";
 import "./MeasureRowLabel.css";
 import "./PolicyCards.css";
 import { measureCategoryOf } from "../utils/measureCategory";
@@ -90,9 +112,29 @@ export function modellingInfo(policy) {
 export function cardPoints(points) {
   const list = Array.isArray(points) ? points : points ? [points] : [];
   return list
-    .map((point) => (typeof point === "string" ? { label: null, text: point } : { label: point?.label ?? null, text: point?.text ?? "" }))
+    .map((point) =>
+      typeof point === "string"
+        ? { label: null, text: point }
+        : { label: point?.label ?? null, text: point?.text ?? "", ...(point?.icon ? { icon: point.icon } : {}) },
+    )
     .filter((point) => point.text);
 }
+
+/** A point's optional icon before its label (`icon` in policyDetails.js), by name. */
+const POINT_ICONS = {
+  users: Users,
+  file: FileText,
+  "map-pin": MapPin,
+  coins: Coins,
+  shield: ShieldCheck,
+  layers: Layers,
+  clock: Clock,
+  scale: Scale,
+  shapes: Shapes,
+};
+
+/** Each Milburn group's icon beside its heading (utils/milburn/measureGroups.js ids). */
+const GROUP_ICONS = { packages: Boxes, single: Target, variants: GitBranch, comparators: Scale };
 
 const pointText = (point) => (point.label ? `${point.label}: ${point.text}` : point.text);
 
@@ -110,13 +152,21 @@ export function CardPoints({ points, name }) {
   const labelled = items.every((point) => point.label);
   return (
     <ul className={`policy-card-points${labelled ? " is-labelled" : ""}`} aria-label={name ? `Key points: ${name}` : "Key points"}>
-      {items.map((point) => (
+      {items.map((point) => {
+        const Icon = point.label && Object.hasOwn(POINT_ICONS, point.icon ?? "") ? POINT_ICONS[point.icon] : null;
+        return (
         <li key={pointText(point)}>
-          {point.label && <strong className="policy-card-point-label">{point.label}</strong>}
+          {point.label && (
+            <strong className="policy-card-point-label">
+              {Icon && <Icon size={13} aria-hidden="true" className="policy-card-point-icon" />}
+              {point.label}
+            </strong>
+          )}
           {point.label && !labelled && " "}
           <span className="policy-card-point-text">{point.text}</span>
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }
@@ -430,7 +480,7 @@ export function PolicyCard({ policy, onShowEffect, parameters: given }) {
       </div>
       )}
 
-      {(parameters || drawn || example || policy.changesText || points) && (
+      {(parameters || drawn || (place === "change" && !given) || example || policy.changesText || points) && (
         <div className="policy-card-spec">
           {/* A card's own picture of what changes, where it brings one
               (the Budget policies we do not model) */}
@@ -443,6 +493,18 @@ export function PolicyCard({ policy, onShowEffect, parameters: given }) {
               lead={policy.changesText}
               figure={place === "change" ? figure : null}
             />
+          ) : place === "change" && !given ? (
+            // A visual with no published parameters (the Milburn measures'):
+            // the same block, the picture alone
+            <section className="pchg" aria-label={`What changes: ${policy.label ?? policy.name}`}>
+              <div className="pchg-head">
+                <p className="pchg-title">
+                  <ArrowRightLeft size={14} aria-hidden="true" />
+                  What changes
+                </p>
+              </div>
+              {figure}
+            </section>
           ) : (
             policy.changesText && (
               <section className="pchg" aria-label={`What changes: ${policy.label ?? policy.name}`}>
@@ -644,14 +706,21 @@ function PolicyCards({ policies, selectedPolicies, onShowEffect, parameterTables
   if (localBuild) {
     return (
       <>
-        {groupMilburnMeasures(items).map((group) => (
+        {groupMilburnMeasures(items).map((group) => {
+          const GroupIcon = Object.hasOwn(GROUP_ICONS, group.id) ? GROUP_ICONS[group.id] : Layers;
+          return (
           <section key={group.id} className="policy-card-group" aria-labelledby={`policy-card-group-${group.id}`}>
             <h3 id={`policy-card-group-${group.id}`} className="policy-card-group-heading">
+              <span className="policy-card-group-icon" aria-hidden="true">
+                <GroupIcon size={15} />
+              </span>
               {group.label}
+              <span className="policy-card-group-count" aria-hidden="true">{group.measures.length}</span>
             </h3>
             {list(group.measures)}
           </section>
-        ))}
+          );
+        })}
       </>
     );
   }

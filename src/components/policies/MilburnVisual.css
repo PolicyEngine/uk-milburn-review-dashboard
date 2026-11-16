@@ -1,0 +1,277 @@
+/* The Milburn measures' card visuals (MilburnVisual.jsx). Tokens only
+   (docs/COLOURS.md): grey for current law, the measure's colour
+   (--policy-accent) under the measure, amber for a loss. No motion. */
+
+.mviz {
+  --mviz-accent: var(--policy-accent, var(--c-after));
+  --mviz-soft: color-mix(in srgb, var(--mviz-accent) 45%, var(--c-surface));
+  --mviz-hatch: repeating-linear-gradient(135deg, var(--mviz-accent) 0 3px, var(--c-surface) 3px 6px);
+  gap: 10px;
+}
+
+.mviz-key {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: var(--fs-micro);
+  color: var(--pe-gray-500);
+}
+
+.mviz-key-item::before {
+  content: "";
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 5px;
+  vertical-align: -1px;
+  border-radius: 2px;
+}
+
+.mviz-key-item.is-before::before {
+  background: var(--c-before);
+}
+
+.mviz-key-item.is-after::before {
+  background: var(--mviz-accent);
+}
+
+.mviz-key-item.is-soft::before {
+  background: var(--mviz-soft);
+}
+
+.mviz-key-item.is-ghost::before {
+  background: var(--c-muted-fill);
+  box-shadow: inset 0 0 0 1px var(--c-before);
+}
+
+.mviz-key-item.is-some::before {
+  background: var(--mviz-hatch);
+  box-shadow: inset 0 0 0 1px var(--mviz-accent);
+}
+
+/* --- An amount by age ------------------------------------------------------ */
+
+.mviz-ages {
+  display: grid;
+  column-gap: 2px;
+  row-gap: 3px;
+}
+
+.mviz-age {
+  position: relative;
+  grid-row: 1;
+  border-bottom: 1px solid var(--c-axis);
+}
+
+.mviz-age-ghost,
+.mviz-age-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 2px 2px 0 0;
+}
+
+.mviz-age-ghost {
+  background: var(--c-muted-fill);
+  border: 1px dashed var(--c-before);
+  border-bottom: 0;
+}
+
+.mviz-age-bar {
+  background: var(--mviz-accent);
+}
+
+.mviz-age-bar.is-some {
+  background: var(--mviz-hatch);
+  box-shadow: inset 0 0 0 1px var(--mviz-accent);
+}
+
+.mviz-age-bar.is-nil {
+  border-radius: 0;
+}
+
+.mviz-age-tick {
+  grid-row: 2;
+  font-size: 0.625rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--c-tick);
+}
+
+.mviz-band {
+  display: flex;
+  grid-row: 3;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  margin-top: 2px;
+  padding: 4px 4px 5px;
+  font-size: var(--fs-micro);
+  line-height: 1.3;
+  text-align: center;
+  color: var(--pe-gray-600);
+  border-top: 2px solid var(--c-before);
+}
+
+.mviz-band.is-cut {
+  background: color-mix(in srgb, var(--mviz-accent) 8%, var(--c-surface));
+  border-top-color: var(--mviz-accent);
+}
+
+.mviz-band-text {
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+/* --- Chips: a rate and whose it is ---------------------------------------- */
+
+.mviz-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 6px;
+}
+
+.mviz-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--c-row-band);
+  border: 1px solid var(--c-grid);
+  border-radius: 8px;
+}
+
+.mviz-chip-when {
+  font-size: var(--fs-micro);
+  color: var(--pe-gray-600);
+}
+
+.mviz-chip-value {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink);
+}
+
+/* --- Columns ------------------------------------------------------------------ */
+
+.mviz-groups {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px 16px;
+}
+
+.mviz-group {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+.mviz-columns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.mviz-column {
+  display: flex;
+  flex: 0 1 5.5em;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mviz-column-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  border-bottom: 1px solid var(--c-axis);
+}
+
+.mviz-column-value {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink);
+}
+
+.mviz-column-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: min(100%, 48px);
+}
+
+.mviz-column-ghost {
+  position: absolute;
+  inset: 0;
+  background: var(--c-muted-fill);
+  border: 1px dashed var(--c-before);
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+}
+
+.mviz-column-part {
+  position: relative;
+  flex: none;
+}
+
+.mviz-column-part:first-of-type {
+  border-radius: 4px 4px 0 0;
+}
+
+.mviz-column-part.is-before {
+  background: var(--c-before);
+}
+
+.mviz-column-part.is-after {
+  background: var(--mviz-accent);
+}
+
+.mviz-column-part.is-soft {
+  background: var(--mviz-soft);
+}
+
+.mviz-column-label,
+.mviz-group-label {
+  font-size: var(--fs-micro);
+  line-height: 1.3;
+  text-align: center;
+  color: var(--pe-gray-600);
+}
+
+.mviz-group-label {
+  font-weight: 600;
+}
+
+.mviz-group-note {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.mviz-group-note.is-gain {
+  color: var(--c-gain-text);
+}
+
+.mviz-group-note.is-loss {
+  color: var(--c-loss-text);
+}
+
+.mviz-chip-icon {
+  display: inline-block;
+  margin-right: 5px;
+  vertical-align: -2px;
+  color: color-mix(in srgb, var(--mviz-accent) 70%, var(--pe-gray-700));
+}

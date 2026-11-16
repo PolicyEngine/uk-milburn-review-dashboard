@@ -678,7 +678,11 @@ export const POLICY_DETAILS = [
  * neutral line each, with no `writtenFor`, so an entry applies whatever
  * description the publication carries for its id. The Autumn Budget
  * entries above stay for the components' fixtures; their ids are never
- * published by this build.
+ * published by this build. A point may name an `icon` (PolicyCards.jsx,
+ * POINT_ICONS). Each `visual` is drawn from its own static spec
+ * (utils/milburn/measureVisuals.js), with no policy_parameters.json entry.
+ * The packages and variants carry card fields only: their names on the
+ * page stay measureGroups.js's and the publication's.
  */
 export const MILBURN_POLICY_DETAILS = [
   {
@@ -688,16 +692,18 @@ export const MILBURN_POLICY_DETAILS = [
     sentence: "removing the Universal Credit health element for claimants under 25",
     summary: "Removes the Universal Credit health element for claimants aged under 25.",
     points: [
-      { label: "Who", text: "Universal Credit claimants under 25 with the health element." },
-      { label: "Claims", text: "Applies to existing and new claims alike." },
+      { label: "Claims", icon: "file", text: "Existing and new claims alike." },
+      { label: "Couples", icon: "shield", text: "Kept where a partner aged 25 or over qualifies." },
     ],
     affects: "UC claimants under 25 with limited capability for work",
     starts: "Apr 2027",
     inForce: { from: "2027-04" },
     type: "Benefit",
+    visual: { kind: "milburn-health-element", place: "change", limit: 25 },
     details: [
       "Static: claimants do not change their work or claims in response.",
       "The health element is the LCWRA element in policyengine-uk.",
+      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
     ],
   },
   {
@@ -726,16 +732,18 @@ export const MILBURN_POLICY_DETAILS = [
     sentence: "removing Personal Independence Payment for people aged 18 to 24",
     summary: "Removes Personal Independence Payment for people aged 18 to 24.",
     points: [
-      { label: "Who", text: "PIP recipients aged 18 to 24; 16 and 17-year-olds keep it." },
-      { label: "Scotland", text: "Adult Disability Payment records are held as PIP in the data." },
+      { label: "Kept", icon: "shield", text: "16 and 17-year-olds keep it." },
+      { label: "Scotland", icon: "map-pin", text: "Adult Disability Payment counts as PIP in the data." },
     ],
     affects: "PIP recipients aged 18 to 24",
     starts: "Apr 2027",
     inForce: { from: "2027-04" },
     type: "Benefit",
+    visual: { kind: "milburn-pip", place: "change", from: 18, share: 0 },
     details: [
       "Static: recipients do not change their work or claims in response.",
       "Benefits that depend on PIP receipt change with it, as the model's rules set out.",
+      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
     ],
   },
   {
@@ -745,16 +753,18 @@ export const MILBURN_POLICY_DETAILS = [
     sentence: "paying under-25s the Universal Credit standard allowance at the 25-and-over rate",
     summary: "Pays Universal Credit claimants under 25 the standard allowance for those 25 and over.",
     points: [
-      { label: "Who", text: "Universal Credit claimants under 25." },
-      { label: "Couples", text: "Couples both under 25 get the 25-and-over couple rate." },
+      { label: "Gain", icon: "coins", text: "The gap between the two rates, each month." },
+      { label: "Couples", icon: "scale", text: "Both under 25: the 25-and-over couple rate." },
     ],
     affects: "UC claimants under 25",
     starts: "Apr 2027",
     inForce: { from: "2027-04" },
     type: "Benefit",
+    visual: { kind: "milburn-standard-allowance", place: "change" },
     details: [
       "Static: claimants do not change their work or claims in response.",
       "The protected health element is held at its current-law amount.",
+      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
     ],
   },
   {
@@ -764,17 +774,146 @@ export const MILBURN_POLICY_DETAILS = [
     sentence: "setting employer National Insurance to zero for employees under 25",
     summary: "Sets employer National Insurance contributions to zero for employees aged under 25.",
     points: [
-      { label: "Who", text: "Employers of people under 25, and those employees." },
-      { label: "Earnings", text: "Zero rate up to the upper secondary threshold, as for under-21s." },
+      { label: "Today", icon: "clock", text: "Under-21s and apprentices under 25 are already at zero." },
+      { label: "Earnings", icon: "coins", text: "Zero rate up to the upper secondary threshold." },
     ],
     affects: "Employees under 25 and their employers",
     starts: "Apr 2027",
     inForce: { from: "2027-04" },
     type: "National Insurance",
+    visual: { kind: "milburn-employer-nics", place: "change", limit: 25 },
     details: [
       "Static: employment and hours do not change in response.",
       "The model passes employer National Insurance through to wages, so the saving shows as higher pay.",
     ],
+  },
+  {
+    id: "milburn_package",
+    summary: "Removes both the health element under 25 and PIP for 18 to 24-year-olds.",
+    points: [
+      { label: "Combines", icon: "layers", text: "The two removals, run together with their interactions." },
+      { label: "Replacement", icon: "scale", text: "None: an upper bound on the saving." },
+    ],
+    affects: "Under-25s with the UC health element or PIP",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "The two measures are simulated together, so the total is not the sum of each alone.",
+      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-package", place: "change", pipShare: 0 },
+  },
+  {
+    id: "milburn_package_central",
+    summary: "Removes the health element under 25, keeping severe cases, and halves PIP.",
+    points: [
+      { label: "Severe cases", icon: "shield", text: "24 or more PIP daily living points keep the element." },
+      { label: "PIP", icon: "coins", text: "Half rate for 18 to 24-year-olds." },
+      { label: "Stands for", icon: "scale", text: "A smaller additional cost allowance, not yet set out." },
+    ],
+    affects: "Under-25s with the UC health element or PIP",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "The points threshold and the half rate are illustrative stand-ins for rules not yet known.",
+      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-package", place: "change", pipShare: 0.5, severeKept: true },
+  },
+  {
+    id: "milburn_package_phased",
+    summary: "Applies both removals to new entrants at once and others as reassessed.",
+    points: [
+      { label: "New entrants", icon: "users", text: "People turning 18 from April 2026: reached at once." },
+      { label: "Existing", icon: "clock", text: "A quarter of the remaining caseload each year." },
+    ],
+    affects: "Under-25s with the UC health element or PIP",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "Who is reassessed each year is a random draw: the data hold no reassessment dates.",
+      "The chart's shares assume equal numbers at each age from 18 to 24.",
+    ],
+    visual: { kind: "milburn-phased", place: "change" },
+  },
+  {
+    id: "uc_health_element_removed_under_22",
+    summary: "Removes the Universal Credit health element for claimants aged under 22.",
+    points: [
+      { label: "Claims", icon: "file", text: "Existing and new claims alike." },
+      { label: "Age limit", icon: "scale", text: "The 2025 Pathways to Work green paper's." },
+    ],
+    affects: "UC claimants under 22 with limited capability for work",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "The health element is the LCWRA element in policyengine-uk.",
+      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-health-element", place: "change", limit: 22 },
+  },
+  {
+    id: "uc_health_element_removed_under_25_severe_kept",
+    summary: "Removes the health element under 25, except for the most severe cases.",
+    points: [
+      { label: "Kept", icon: "shield", text: "With 24 or more PIP daily living points." },
+      { label: "Reach", icon: "scale", text: "About a fifth of young PIP recipients score that." },
+    ],
+    affects: "UC claimants under 25 with limited capability for work",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "The points stand in for the trailed higher-rate benefit, whose eligibility rules are not yet known.",
+      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-health-element", place: "change", limit: 25, severeKept: true },
+  },
+  {
+    id: "pip_halved_under_25",
+    summary: "Halves Personal Independence Payment for people aged 18 to 24.",
+    points: [
+      { label: "Stands for", icon: "scale", text: "A smaller additional cost allowance, not yet set out." },
+      { label: "Knock-on", icon: "coins", text: "Carer's Allowance and disability premia can be lost." },
+    ],
+    affects: "PIP recipients aged 18 to 24",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: recipients do not change their work or claims in response.",
+      "Half an award can fall below the amounts that qualify a carer or a household for other help.",
+      "Scottish Adult Disability Payment, recorded as PIP, is included.",
+      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-pip", place: "change", from: 18, share: 0.5 },
+  },
+  {
+    id: "pip_removed_16_to_24",
+    summary: "Removes Personal Independence Payment for people aged 16 to 24.",
+    points: [
+      { label: "Reading", icon: "scale", text: "'Under 25' taken literally, so from 16." },
+      { label: "Unchanged", icon: "shield", text: "Disability Living Allowance for children under 16." },
+    ],
+    affects: "PIP recipients aged 16 to 24",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "Benefit",
+    details: [
+      "Static: recipients do not change their work or claims in response.",
+      "Benefits that depend on PIP receipt change with it, as the model's rules set out.",
+      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-pip", place: "change", from: 16, share: 0 },
   },
 ];
 

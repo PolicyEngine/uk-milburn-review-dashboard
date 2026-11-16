@@ -97,7 +97,7 @@ const LOADED = {
   // Impact's other sub-tabs, by ?sub=
   // Return to work: led by the microsimulated run from milburn_summary.json
   scenarios: (panel) => within(panel).findAllByRole("heading", { name: "With a quarter moving into work" }),
-  benchmarks: (panel) => within(panel).findAllByRole("table"),
+  benchmarks: (panel) => within(panel).findAllByRole("listitem"),
   // Population impact's Poverty while its figures are shown; while they are
   // withheld (povertyFigures.js), ?sub=poverty opens Public finances
   ...(POVERTY_FIGURES_SHOWN

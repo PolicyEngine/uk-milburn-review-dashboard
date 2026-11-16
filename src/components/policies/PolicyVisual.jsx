@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import "./PolicyVisual.css";
 import { useWidth } from "../../utils/useWidth";
+import { isMilburnVisualKind } from "../../utils/milburn/measureVisuals";
+import { milburnVisual } from "./MilburnVisual";
 import {
   busFareCapView,
   carersTaperView,
@@ -604,6 +606,9 @@ const VISUALS = {
  * data are missing or disagree (the card then shows what it did before).
  */
 export function policyVisual(policy, entry) {
+  // The Milburn measures' visuals carry their own rates (MilburnVisual.jsx):
+  // their runs publish no policy_parameters.json entry
+  if (isMilburnVisualKind(policy?.visual?.kind)) return milburnVisual(policy);
   const Visual = VISUALS[policy?.visual?.kind];
   if (!Visual || !entry) return null;
   const props = { entry, visual: policy.visual, name: policy.label ?? policy.name, example: policy.example };

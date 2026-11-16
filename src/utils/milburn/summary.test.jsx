@@ -27,7 +27,8 @@ import { loadLocalBuildParts } from "./localBuild";
 import { dashboardFromParts } from "../loadDashboard";
 import { MeasureCatalogueProvider } from "../measureCatalogue";
 import KeyFigures, { REPLACEMENT_NOT_MODELLED_NOTE, keyFigureTiles, packageRange } from "../../components/milburn/KeyFigures";
-import { BreakEven, EntryComparison, SAME_GAIN_SENTENCE, SMALL_FISCAL_EFFECT_SENTENCE } from "../../components/milburn/BehaviouralScenarios";
+import { FinancesHeadline, PovertyHeadline, barShare } from "../../components/milburn/HeadlineTiles";
+import { BreakEven, EntryComparison, SAME_GAIN_SENTENCE, SMALL_FISCAL_EFFECT_POINTS } from "../../components/milburn/BehaviouralScenarios";
 
 const FIXTURES = join(__dirname, "..", "..", "test", "fixtures", "milburn");
 const SUMMARY_TEXT = readFileSync(join(FIXTURES, "summary", "milburn_summary.json"), "utf8");
@@ -146,7 +147,7 @@ describe("KeyFigures", () => {
         <KeyFigures runId="milburn_package" />
       </MeasureCatalogueProvider>,
     );
-    const panel = await screen.findByRole("list");
+    const panel = await screen.findByRole("list", { name: "Figures" });
     expect(panel.textContent).toContain("£4.00bn");
     expect(panel.textContent).toContain("500,000");
     const region = screen.getByRole("region", { name: "Key figures" });
@@ -195,6 +196,38 @@ describe("KeyFigures", () => {
   });
 });
 
+describe("headline tiles", () => {
+  it("give poverty's and the public finances' figures from the summary file, unchanged", async () => {
+    vi.stubGlobal("fetch", fixtureFetch());
+    const catalogue = await localCatalogue();
+    const { unmount } = render(
+      <MeasureCatalogueProvider catalogue={catalogue}>
+        <PovertyHeadline runId="milburn_package" />
+      </MeasureCatalogueProvider>,
+    );
+    const poverty = await screen.findByRole("region", { name: "Poverty headline" });
+    expect(poverty.textContent).toContain("300,000");
+    expect(poverty.textContent).toContain("+0.50pp");
+    expect(poverty.textContent).toContain("150,000");
+    expect(poverty.textContent).toContain("Static");
+    unmount();
+    render(
+      <MeasureCatalogueProvider catalogue={catalogue}>
+        <FinancesHeadline runId="milburn_package" selectedYear={2027} />
+      </MeasureCatalogueProvider>,
+    );
+    const finances = await screen.findByRole("region", { name: "Public finances headline" });
+    expect(finances.textContent).toContain("£4.00bn");
+    expect(finances.textContent).toContain("Exchequer saving, 2027-28");
+  });
+
+  it("scale a bar to the largest figure in its list", () => {
+    expect(barShare(2, [4, 2])).toBe("50%");
+    expect(barShare(-4, [-4, 2])).toBe("100%");
+    expect(barShare(null, [null])).toBe("0%");
+  });
+});
+
 describe("BreakEven", () => {
   it("gives the arithmetic and the >100% wording", async () => {
     vi.stubGlobal("fetch", fixtureFetch());
@@ -202,12 +235,13 @@ describe("BreakEven", () => {
     render(<BreakEven runId="milburn_package" catalogue={catalogue} />);
     const table = await screen.findByRole("table");
     const rows = within(table).getAllByRole("row");
-    expect(rows[1].textContent).toContain(NO_ENTRY_RATE_RESTORES);
+    expect(rows[1].textContent).toContain("Above 100%: not reachable");
     expect(rows[1].textContent).toContain("550,000");
     expect(rows[1].textContent).toContain("£4,000");
     expect(rows[2].textContent).toContain("95.5%");
     const section = screen.getByRole("region", { name: "Break-even arithmetic" });
     expect(section.textContent).toContain(SAME_GAIN_SENTENCE);
+    expect(section.textContent).toContain(NO_ENTRY_RATE_RESTORES);
   });
 
   it("omits the arithmetic for a gain run, and says when a run has not yet run", async () => {
@@ -281,7 +315,8 @@ describe("EntryComparison", () => {
     expect(rows[2].textContent).toContain("Not in the summary");
     expect(rows[3].textContent).toContain("£12,000");
     expect(rows[3].textContent).toContain("£9,000");
-    expect(section.textContent).toContain(`The move into work takes £1.00bn from the Exchequer. ${SMALL_FISCAL_EFFECT_SENTENCE}`);
+    expect(section.textContent).toContain("The move into work takes £1.00bn from the Exchequer.");
+    for (const point of SMALL_FISCAL_EFFECT_POINTS) expect(section.textContent).toContain(point);
   });
 
   it("says when either run has not yet run", () => {

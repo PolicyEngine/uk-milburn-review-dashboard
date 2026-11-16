@@ -11,7 +11,7 @@ import { SUB_TAB_PARAM } from "./components/SubTabs";
 import SectionHeading from "./components/SectionHeading";
 import { YOUNG_PEOPLE_ANCHOR } from "./utils/viewAnchors";
 import PopulationImpactView from "./components/PopulationImpactView";
-import MilburnBanner from "./components/MilburnBanner";
+import TitleIcon from "./components/TitleIcon";
 import { DEFAULT_DISPLAY_YEAR, DisplayYearsContext, EARLY_YEAR, selectableYearOr, yearsForSelection } from "./utils/displayYears";
 import { opensLanding } from "./utils/landing";
 import { useNarrowViewport } from "./utils/chartTheme";
@@ -53,6 +53,9 @@ const MethodologyTab = lazyView(() => import("./components/MethodologyTab"));
 const BehaviouralScenarios = lazyView(chartViews, (m) => m.BehaviouralScenarios);
 const BenchmarksTable = lazyView(() => import("./components/milburn/BenchmarksTable"));
 const KeyFigures = lazyView(() => import("./components/milburn/KeyFigures"));
+const headlineTiles = () => import("./components/milburn/HeadlineTiles");
+const PovertyHeadline = lazyView(headlineTiles, (m) => m.PovertyHeadline);
+const FinancesHeadline = lazyView(headlineTiles, (m) => m.FinancesHeadline);
 
 // The code each view ("tab" or "tab:sub", as bootView names them) needs
 const VIEW_CODE = {
@@ -931,12 +934,12 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   // impact's sub-tabs)
   const showingLine = selectedPolicies.length > 0 &&
     selectedPolicies.length < POLICIES.length && (
-      <p className="showing-line">
+      <p className="showing-line milburn-status-chip">
+        <TitleIcon name="layers" bare size={14} />
+        <span className="visually-hidden">Showing: </span>
         {selectedPolicies.length === 1
-          ? `Showing: ${
-              POLICIES.find((policy) => policy.id === selectedPolicies[0])?.name
-            }`
-          : `Showing ${selectedPolicies.length} of ${POLICIES.length} policies`}
+          ? POLICIES.find((policy) => policy.id === selectedPolicies[0])?.name
+          : `${selectedPolicies.length} of ${POLICIES.length} policies`}
       </p>
     );
 
@@ -986,8 +989,9 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           <SectionHeading
             icon="lifebuoy"
             title="How the policies change poverty"
-            subtitle="With the selected policies: the change in poverty rates, static (no change in behaviour)."
+            subtitle="Change in poverty rates with the selected policies. Static."
           />
+          <PovertyHeadline runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} />
           {/* The change by year beside which measures move it */}
           <section id="poverty" className="report-section">
             <PovertyMeasuresRow
@@ -1009,7 +1013,10 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         <>
           {catalogue.localBuild && (
             <div className="results-container milburn-key-wrap">
-              <KeyFigures runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} />
+              <KeyFigures
+                runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined}
+                nameShownAbove={selectedPolicies.length === 1 && selectedPolicies.length < POLICIES.length}
+              />
             </div>
           )}
           <AgeSection
@@ -1027,8 +1034,9 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           <SectionHeading
             icon="banknote"
             title="Public finances"
-            subtitle="Net effect of the selected policies on government revenue and spending, by year."
+            subtitle="Net effect on revenue and spending, by year."
           />
+          <FinancesHeadline runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} selectedYear={distributionalYear} />
           <section id="revenue" className="report-section hero-chart">
             <BudgetaryImpactChart data={results.budgetData} selectedYear={distributionalYear} selectedPolicies={selectedPolicies} />
           </section>
@@ -1052,8 +1060,6 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
       {/* A div, not <main>: the PolicyEngine shell around the page is the
           main landmark, and a second one inside it is a landmark error */}
       <div className="main-content" ref={mainRef}>
-        {/* Always on: the measures are candidates, not announced policy */}
-        <MilburnBanner />
         {/* The title row is the page's sticky header: it docks at the top
             once the reader scrolls past it, compact, with the policy
             selector still in reach. The sentinel tells it when it is stuck. */}
@@ -1192,7 +1198,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         ) : (
           // Impact and its sub-tabs (populationPanel)
           // Hidden under the landing page, it leaves the address alone
-          <PopulationImpactView note={<>{showingLine}<LocalBuildLabel /></>} active={activeTab === value && !landing}>
+          <PopulationImpactView note={<div className="milburn-status">{showingLine}<LocalBuildLabel /></div>} active={activeTab === value && !landing}>
             {populationPanel}
           </PopulationImpactView>
         )}

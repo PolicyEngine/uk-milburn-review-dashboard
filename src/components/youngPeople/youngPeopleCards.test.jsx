@@ -218,7 +218,7 @@ describe("young people cards", () => {
     expect(expectStandardDownloads(document.body)).toBe(1);
     // A row per policy: the group's value and its gap to all ages
     expect(screen.getAllByRole("row").length).toBeGreaterThan(1);
-    expect(screen.getAllByText(/vs all ages|≈ all ages/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/than all ages|≈ all ages/).length).toBeGreaterThan(0);
     // No effect: in the card's More info row, closed at first
     const more = screen.getByRole("button", { name: "About this chart" });
     expect(more).toHaveAttribute("aria-expanded", "false");
