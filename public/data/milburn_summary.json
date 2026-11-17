@@ -218,6 +218,44 @@
       }
     },
     {
+      "id": "milburn_report_pip",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": 0.0,
+        "2028": 0.0,
+        "2029": 3.643,
+        "2030": 3.733,
+        "2031": 3.816
+      },
+      "direction": "loss",
+      "young_people_in_losing_households": 557321,
+      "share_of_16_24_in_losing_households_pct": 7.45,
+      "average_loss_young_person_in_losing_household": 10497,
+      "everyone_in_losing_households_pct": 1.96,
+      "poverty_change_pp": {
+        "rel_bhc": 0.247,
+        "rel_ahc": 0.311,
+        "abs_bhc": 0.361,
+        "abs_ahc": 0.461
+      },
+      "people_into_poverty_abs_ahc": 322209,
+      "people_into_poverty_rel_ahc": 217258,
+      "child_poverty_change_pp_rel_ahc": 0.592,
+      "people_directly_affected": 0,
+      "break_even_share_in_work_pct": {
+        "h16": 83.1,
+        "h25": 64.9
+      },
+      "entrants_to_match_income_loss": {
+        "h16": 463314,
+        "h25": 361946
+      },
+      "exchequer_gain_per_entrant": {
+        "h16": 4026.67,
+        "h25": 8934.25
+      }
+    },
+    {
       "id": "milburn_report_uc_health",
       "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
       "saving_bn": {

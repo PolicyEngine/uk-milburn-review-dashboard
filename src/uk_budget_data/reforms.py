@@ -1769,6 +1769,9 @@ MILBURN_PROMOTED_IDS: tuple[str, ...] = (
     "milburn_report_uc_health",
     "milburn_report_pip",
     "milburn_report_employer_nics_threshold",
+    "milburn_report_youth_allowance_independent",
+    "milburn_report_package_phased",
+    "milburn_report_employer_nics_threshold_glide_path",
 )
 
 _SCOTLAND_INCLUDED = (
@@ -2113,6 +2116,55 @@ def _create_milburn_report_employer_nics_threshold() -> Reform:
     )
 
 
+# The report's Youth Allowance at the review's own modelling (annex section
+# 8): the 25-and-over standard allowance for under-25 claims with a UC
+# housing costs element, the annex's proxy for living independently (para
+# 748); from April 2029; no work allowance change (the report gives no
+# amount). milburn_youth_allowance_report.py
+from uk_budget_data.budget_measures.milburn_youth_allowance_report import (  # noqa: E402
+    milburn_report_youth_allowance as _youth_allowance_independent,
+)
+from uk_budget_data.budget_measures.milburn_employer_nics_report import (  # noqa: E402
+    milburn_employer_nics_report_glide_path,
+)
+
+MILBURN_REPORT_YOUTH_ALLOWANCE_INDEPENDENT_ID = "milburn_report_youth_allowance_independent"
+MILBURN_REPORT_EMPLOYER_NICS_GLIDE_PATH_ID = "milburn_report_employer_nics_threshold_glide_path"
+
+
+def _create_milburn_report_youth_allowance_independent() -> Reform:
+    return Reform(
+        id=MILBURN_REPORT_YOUTH_ALLOWANCE_INDEPENDENT_ID,
+        name="Higher Youth Allowance for under-25s living independently",
+        description=(
+            "From April 2029 Universal Credit claims in which every adult is "
+            "under 25 and that include a housing costs element are paid the "
+            "standard allowance for those aged 25 and over, the review's own "
+            "proxy for living independently (analytical annex, section 8). "
+            "Other young claims keep the under-25 rate, which the report sets "
+            "as the Youth Allowance's base level. The report gives no amount "
+            "for its work allowance, so none is modelled."
+        ),
+        simulation_modifier=_youth_allowance_independent,
+    )
+
+
+def _create_milburn_report_employer_nics_threshold_glide_path() -> Reform:
+    return Reform(
+        id=MILBURN_REPORT_EMPLOYER_NICS_GLIDE_PATH_ID,
+        name="Employer NI threshold for 21 to 24s in retail and hospitality, phased in",
+        description=(
+            "The report's five-year glide path, in assumed equal steps from "
+            "April 2027: the employer National Insurance threshold for "
+            "employees aged 21 to 24 whose main job is in retail (SIC 47) or "
+            "hospitality (SIC 55 and 56) is £6,000 in 2027-28, rising £1,000 "
+            "a year to £10,000 in 2031-32. The report gives no start date or "
+            "steps. The 15% rate is unchanged; the saving passes to pay."
+        ),
+        simulation_modifier=milburn_employer_nics_report_glide_path,
+    )
+
+
 _RESERVED_IDS = frozenset(
     {
         MILBURN_REPORT_PACKAGE_ID,
@@ -2126,6 +2178,8 @@ _RESERVED_IDS = frozenset(
         PIP_UNDER_25_EXCLUDING_SCOTLAND_ID,
         PIP_16_TO_24_EXCLUDING_SCOTLAND_ID,
         MILBURN_REPORT_EMPLOYER_NICS_THRESHOLD_ID,
+        MILBURN_REPORT_YOUTH_ALLOWANCE_INDEPENDENT_ID,
+        MILBURN_REPORT_EMPLOYER_NICS_GLIDE_PATH_ID,
     }
 )
 
@@ -2139,6 +2193,8 @@ _RESERVED_FACTORIES = (
     _create_pip_removed_under_25_excluding_scotland,
     _create_pip_removed_16_to_24_excluding_scotland,
     _create_milburn_report_employer_nics_threshold,
+    _create_milburn_report_youth_allowance_independent,
+    _create_milburn_report_employer_nics_threshold_glide_path,
 )
 
 

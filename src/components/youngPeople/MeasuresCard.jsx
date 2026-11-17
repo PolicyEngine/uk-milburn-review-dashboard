@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AgeHouseholdNote } from "../milburn/SourceChip";
 import { groupSubject } from "../../utils/ageGroups";
 import MeasureRowLabel, { measureCategory } from "../MeasureRowLabel";
 import { CHART_LOGO } from "../../utils/chartLogo";
@@ -346,7 +347,10 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
               <NoBreakYear text={title} />
             </span>
           </h3>
-          <p className="chart-description">{description}</p>
+          <p className="chart-description">
+            {description}
+            <AgeHouseholdNote />
+          </p>
         </div>
         <ChartDownloadMenu download={download} chartTitle={title} />
       </div>

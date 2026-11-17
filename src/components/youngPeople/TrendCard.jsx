@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { AgeHouseholdNote } from "../milburn/SourceChip";
 import { Bar, CartesianGrid, ComposedChart, Customized, Line, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Tooltip } from "../ViewportTooltip";
 import { CHART_LOGO } from "../../utils/chartLogo";
@@ -726,6 +727,7 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
                 when there is no headline */}
             {headline ? <span className="trend-headline">{headline}</span> : description}
             {stepsLine ? ` ${stepsLine}` : null}
+            <AgeHouseholdNote />
           </p>
         </div>
         <ChartDownloadMenu download={download} chartTitle={title} />

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AgeHouseholdNote } from "./milburn/SourceChip";
 import LoadingSkeleton from "./publication/LoadingSkeleton";
 import SwapTransition from "./SwapTransition";
 import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Customized, Line, ReferenceArea, ReferenceLine, ResponsiveContainer, XAxis, YAxis, Scatter } from "recharts";
@@ -499,7 +500,10 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
               <NoBreakYear text={title} />
             </span>
           </h3>
-          <p className="chart-description">{description}</p>
+          <p className="chart-description">
+            {description}
+            <AgeHouseholdNote />
+          </p>
         </div>
         <ChartDownloadMenu download={download} chartTitle={title} />
       </div>
@@ -816,7 +820,10 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
               <NoBreakYear text={title} />
             </span>
           </h3>
-          <p className="chart-description">{description}</p>
+          <p className="chart-description">
+            {description}
+            <AgeHouseholdNote />
+          </p>
         </div>
         <ChartDownloadMenu
           download={download}

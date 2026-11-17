@@ -16,6 +16,7 @@ import {
 import { PACKAGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGroups";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
+import SourceChip from "./SourceChip";
 import { buildChartCsv } from "../../utils/chartCsv";
 import { CHART_COLOURS } from "../../utils/chartTheme";
 import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, YearOnlyChip } from "./MilburnCharts";
@@ -226,6 +227,7 @@ export default function KeyFigures({ runId, nameShownAbove = false }) {
         <TitleIcon name="sparkle" />
         Key figures
       </h3>
+      <SourceChip plural />
       {/* Already in the status line above when it is the one policy chosen */}
       {nameShownAbove ? (
         <p className="visually-hidden">{name}</p>

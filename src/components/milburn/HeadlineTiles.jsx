@@ -12,6 +12,7 @@ import {
 } from "../../utils/milburn/summary";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
+import SourceChip from "./SourceChip";
 import { packageRange } from "./KeyFigures";
 import { YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
@@ -64,6 +65,7 @@ function Heading({ title, name, named, onlyYear }) {
         <TitleIcon name="sparkle" />
         {title}
       </h3>
+      <SourceChip plural />
       {named ? (
         <p className="visually-hidden">{name}</p>
       ) : (

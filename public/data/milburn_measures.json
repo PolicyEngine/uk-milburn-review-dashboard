@@ -125,6 +125,27 @@
       "first_year": 2027
     },
     {
+      "id": "milburn_report_youth_allowance_independent",
+      "name": "Higher Youth Allowance for under-25s living independently",
+      "description": "From April 2029 Universal Credit claims in which every adult is under 25 and that include a housing costs element are paid the standard allowance for those aged 25 and over, the review's own proxy for living independently (analytical annex, section 8). Other young claims keep the under-25 rate, which the report sets as the Youth Allowance's base level. The report gives no amount for its work allowance, so none is modelled.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "milburn_report_package_phased",
+      "name": "Milburn report package, phased as claimants are reassessed",
+      "description": "The report's health element and PIP changes for young people, reaching people who turned 18 since April 2028 at once, and existing claimants as they are reassessed, at an assumed 45% of those remaining each year. Who is reassessed is a random draw, as the data hold no reassessment dates.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "milburn_report_employer_nics_threshold_glide_path",
+      "name": "Employer NI threshold for 21 to 24s in retail and hospitality, phased in",
+      "description": "The report's five-year glide path, in assumed equal steps from April 2027: the employer National Insurance threshold for employees aged 21 to 24 whose main job is in retail (SIC 47) or hospitality (SIC 55 and 56) is \u00a36,000 in 2027-28, rising \u00a31,000 a year to \u00a310,000 in 2031-32. The report gives no start date or steps. The 15% rate is unchanged; the saving passes to pay.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
       "id": "severe_conditions_higher_rate",
       "name": "Higher health element for severe conditions",
       "description": "A higher Universal Credit health element for claimants who meet the severe conditions criteria.",

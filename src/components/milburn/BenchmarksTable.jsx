@@ -183,7 +183,7 @@ function ComparePanel({ row, comparison }) {
         <div className="bm-pair-figure is-estimate">
           <dt>
             <span className="bm-swatch is-estimate" aria-hidden="true" />
-            PolicyEngine
+            PolicyEngine estimate
           </dt>
           <dd>{row.estimate.fixed}</dd>
         </div>
@@ -288,7 +288,7 @@ function StatTile({ row, estimate, yearLabel }) {
           <p className="bm-figure is-estimate">
             <span className="bm-kicker">
               <TitleIcon name="calculator" bare size={12} />{" "}
-              {row.estimate.fixed ? "PolicyEngine" : `PolicyEngine${yearLabel ? `, ${yearLabel}` : ""}`}
+              {row.estimate.fixed ? "PolicyEngine estimate" : `PolicyEngine estimate${yearLabel ? `, ${yearLabel}` : ""}`}
             </span>
             <span className="bm-value">{row.estimate.fixed || thousands(estimate)}</span>
           </p>

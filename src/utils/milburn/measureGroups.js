@@ -20,6 +20,9 @@ export const MILBURN_DISPLAY_NAMES = Object.freeze({
   uc_health_element_removed_under_25: "UC health element removed under 25 (from April 2027)",
   pip_removed_under_25: "PIP removed for 18 to 24-year-olds (from April 2027)",
   milburn_report_employer_nics_threshold: "Employer NI threshold £10,000 for 21 to 24s in retail and hospitality",
+  milburn_report_youth_allowance_independent: "Higher Youth Allowance for under-25s living independently",
+  milburn_report_package_phased: "The report's benefit changes, phased in over five years",
+  milburn_report_employer_nics_threshold_glide_path: "Employer NI threshold for 21 to 24s, phased in over five years",
   milburn_package: "Full abolition, no replacements (upper bound)",
   milburn_package_central: "Central variant: severe cases kept, PIP at half rate",
   milburn_package_phased: "Full abolition, phased as claimants are reassessed",
@@ -45,7 +48,15 @@ export const MILBURN_GROUPS = Object.freeze([
   {
     id: REPORT_GROUP,
     label: "The report's measures",
-    ids: ["milburn_report_package", "milburn_report_uc_health", "milburn_report_pip", "milburn_report_employer_nics_threshold"],
+    ids: [
+      "milburn_report_package",
+      "milburn_report_package_phased",
+      "milburn_report_uc_health",
+      "milburn_report_pip",
+      "milburn_report_youth_allowance_independent",
+      "milburn_report_employer_nics_threshold",
+      "milburn_report_employer_nics_threshold_glide_path",
+    ],
   },
   // Two runs from before the report, kept as comparators (Vahid, 17 Nov):
   // PIP at half rate stands in for the Additional Cost Allowance, whose rates

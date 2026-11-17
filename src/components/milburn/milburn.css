@@ -775,3 +775,141 @@
 .milburn-review .milburn-review-source a {
   color: var(--c-gain-text);
 }
+
+/* Whose figure: PolicyEngine's estimate (teal) or someone else's published one (neutral) (SourceChip.jsx) */
+.source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  padding: 2px 9px;
+  border: 1px solid var(--c-grid);
+  border-radius: 999px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.source-chip > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+}
+
+.source-chip.is-estimate {
+  border-color: var(--c-gain);
+  background: var(--c-hover);
+  color: var(--c-gain-text);
+}
+
+.source-chip.is-published {
+  background: var(--c-muted-fill);
+  color: var(--c-axis-title);
+}
+
+/* Under a sub-tab's heading: its charts are PolicyEngine estimates */
+.source-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0 0 16px;
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+}
+
+/* The age charts' line on why other ages change */
+.age-household-note {
+  display: flex;
+  color: var(--c-axis-title);
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.age-household-note > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  margin-top: 3px;
+  color: var(--c-gain-text);
+}
+
+/* Return to work: the two exercises as cards side by side, stacked on a phone (ReviewComparison) */
+.milburn-versus {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin: 12px 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 700px) {
+  .milburn-versus {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.milburn-versus-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--c-grid);
+  border-top: 3px solid var(--c-reference);
+  border-radius: 8px;
+  background: var(--c-row-band);
+}
+
+.milburn-versus-card.is-estimate {
+  border-top-color: var(--c-gain);
+}
+
+.milburn-versus-card h4 {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.milburn-versus .milburn-versus-card p.milburn-versus-figure {
+  margin: 8px 0 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+
+.milburn-versus .milburn-versus-card p.milburn-versus-caption {
+  margin: 0 0 12px;
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+}
+
+.milburn-versus-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.milburn-versus-rows li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  color: var(--c-text);
+}
+
+.milburn-versus-rows li > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  margin-top: 3px;
+  color: var(--c-axis-title);
+}
+
+.milburn-versus-rows strong {
+  font-weight: 600;
+  color: var(--c-axis-title);
+}

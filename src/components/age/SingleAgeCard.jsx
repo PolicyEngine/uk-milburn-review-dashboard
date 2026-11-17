@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { AgeHouseholdNote } from "../milburn/SourceChip";
 import { Bar, CartesianGrid, Cell, ComposedChart, Customized, Line, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Tooltip } from "../ViewportTooltip";
 import { CHART_LOGO } from "../../utils/chartLogo";
@@ -286,7 +287,10 @@ export default function SingleAgeCard({ catalogue, rows, policies, selectedPolic
               <NoBreakYear text={title} />
             </span>
           </h3>
-          <p className="chart-description">{description}</p>
+          <p className="chart-description">
+            {description}
+            <AgeHouseholdNote />
+          </p>
         </div>
         <ChartDownloadMenu download={download} chartTitle={title} />
       </div>

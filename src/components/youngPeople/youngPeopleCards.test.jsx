@@ -283,8 +283,10 @@ describe("young people cards", () => {
     const description = document.querySelector(".young-people-trend .chart-description");
     expect(description.querySelector("strong")).toBeNull();
     expect(description).toHaveTextContent(
-      /^16 to 24-year-olds gain about £30 a person in 2028-29( and lose about £230 from 2029-30, when the [\w ]+ applies)?\.$/,
+      /^16 to 24-year-olds gain about £30 a person in 2028-29( and lose about £230 from 2029-30, when the [\w ]+ applies)?\.Only people in the targeted ages lose the benefit; other ages change because they share a household with someone who does\.$/,
     );
+    // Then, on its own line, why ages no measure targets change
+    expect(description.querySelector("[data-age-household-note]")).not.toBeNull();
     expect(description).not.toHaveTextContent(/£ a year/);
   });
 

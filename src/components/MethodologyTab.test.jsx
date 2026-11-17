@@ -93,6 +93,13 @@ describe("MethodologyTab", () => {
     expect(card).not.toHaveTextContent("Hidden entry run");
   });
 
+  it("says why ages no measure targets change, under Results by age", () => {
+    const { container } = renderTab();
+    expect(container.querySelector(`#${METHOD_SECTIONS.young}`).textContent).toContain(
+      "Other agesOnly people in the targeted ages lose the benefit; other ages change because they share a household with someone who does.",
+    );
+  });
+
   it("describes the move into work by the group that moves", () => {
     const { container } = renderTab();
     expect(container).toHaveTextContent("25% of non-working 18 to 24-year-olds with PIP or the health element move into 16 hours' work a week");

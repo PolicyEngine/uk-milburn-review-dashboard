@@ -233,6 +233,8 @@ describe("KeyFigures", () => {
     expect(panel.textContent).toContain("£4.00bn");
     expect(panel.textContent).toContain("500,000");
     const region = screen.getByRole("region", { name: "Key figures" });
+    // Whose figures: ours, said in the heading
+    expect(region.querySelector(".milburn-key-heading [data-source-kind=estimate]").textContent).toBe("PolicyEngine estimates");
     expect(region.textContent).toContain("Full abolition, no replacements (upper bound)");
     expect(region.textContent).toContain(RELATIVE_LINE_NOTE);
     expect(region.textContent).toContain("Relative poverty (60% of median, after housing costs): 150,000 people move into it (+0.20pp).");
@@ -304,6 +306,7 @@ describe("headline tiles", () => {
     expect(poverty.textContent).toContain("+0.50pp");
     expect(poverty.textContent).toContain("150,000");
     expect(poverty.textContent).toContain("Static");
+    expect(poverty.querySelector(".milburn-key-heading [data-source-kind=estimate]").textContent).toBe("PolicyEngine estimates");
     // Its figures are for the summary's year whatever year is chosen: said
     expect(poverty.querySelector("[data-year-only]").textContent).toBe(yearOnlyText(2027));
     expect(yearOnlyText(2027)).toBe("2027-28 only: the year selector does not change these figures.");
@@ -316,6 +319,7 @@ describe("headline tiles", () => {
     const finances = await screen.findByRole("region", { name: "Public finances headline" });
     expect(finances.textContent).toContain("£4.00bn");
     expect(finances.textContent).toContain("Exchequer saving, 2027-28");
+    expect(finances.querySelector(".milburn-key-heading [data-source-kind=estimate]").textContent).toBe("PolicyEngine estimates");
   });
 
   it("scale a bar to the largest figure in its list", () => {

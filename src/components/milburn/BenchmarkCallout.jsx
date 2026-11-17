@@ -3,6 +3,7 @@ import TitleIcon from "../TitleIcon";
 import { BENCHMARKS_FILE, BENCHMARK_ICON, BENCHMARK_SHORT, parseBenchmarks, splitValue } from "../../utils/milburn/benchmarks";
 import { openPopulationSub, populationSubHref } from "../../utils/populationSub";
 import { REPORT_DAY, subShownOnReportDay } from "../../utils/milburn/reportDay";
+import { distinctSources } from "./SourceChip";
 import "./BenchmarkCallout.css";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -108,6 +109,8 @@ export default function BenchmarkCallout({ place, reportDay = REPORT_DAY }) {
   if (!subShownOnReportDay("benchmarks", reportDay)) return null;
   const items = calloutItems(place, data?.rows);
   if (!items.length) return null;
+  // Whose figures they are, in the order shown: "the review, Resolution Foundation"
+  const sources = distinctSources(items.map((item) => item.row.source));
   return (
     <aside className="bm-callout" aria-label="Published figures" data-place={place}>
       {/* Folded at first (Vahid, 17 Nov): one line with the count; open for
@@ -117,7 +120,9 @@ export default function BenchmarkCallout({ place, reportDay = REPORT_DAY }) {
           <TitleIcon name="fileText" bare size={14} />
           <span className="bm-callout-title">Published figures</span>
           <span className="bm-callout-count">{items.length}</span>
-          <span className="bm-callout-hint">As published, for comparison; not PolicyEngine estimates</span>
+          <span className="bm-callout-hint" data-published-by="">
+            {sources.length ? `${sources.join(", ")}: not PolicyEngine estimates` : "As published; not PolicyEngine estimates"}
+          </span>
         </summary>
         <ul className="bm-callout-items" aria-label="Published figures, with sources">
           {items.map(({ id, row, value, label, icon, differs }) => (

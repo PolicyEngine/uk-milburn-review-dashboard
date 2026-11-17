@@ -1,6 +1,7 @@
 'use client';
 
 import { DISCLOSURE_OPEN_EVENT, openDisclosuresAround } from "./components/Disclosure";
+import { ChartsSourceNote } from "./components/milburn/SourceChip";
 import { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback, Suspense } from "react";
 import PolicySelector from "./components/PolicySelector";
 import YearSlider from "./components/YearSlider";
@@ -993,6 +994,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
             title="How the policies change poverty"
             subtitle="Change in poverty rates with the selected policies. Static."
           />
+          <ChartsSourceNote />
           <PovertyHeadline runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} />
           {/* The change by year beside which measures move it */}
           <section id="poverty" className="report-section">
@@ -1038,6 +1040,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
             title="Public finances"
             subtitle="Net effect on revenue and spending, by year."
           />
+          <ChartsSourceNote />
           <FinancesHeadline runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} selectedYear={distributionalYear} />
           <section id="revenue" className="report-section hero-chart">
             <BudgetaryImpactChart data={results.budgetData} selectedYear={distributionalYear} selectedPolicies={selectedPolicies} />

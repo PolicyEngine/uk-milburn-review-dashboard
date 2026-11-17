@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { AGE_HOUSEHOLD_NOTE } from "./milburn/SourceChip";
 import FactList from "./methodology/FactList";
 import MethodGlossary from "./methodology/MethodGlossary";
 import SectionHeading from "./SectionHeading";
@@ -430,6 +431,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
                     net income falls by more than 0.01%.
                   </>,
                 ],
+                ["Other ages", AGE_HOUSEHOLD_NOTE],
                 [
                   "Under 25",
                   "Most measures apply to people under 25, and the PIP measure to those aged 18 to 24; the 16 to 24 band covers both.",

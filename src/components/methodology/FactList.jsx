@@ -32,6 +32,7 @@ const TERM_ICONS = {
   "Age bands": Users,
   "Single year of age": Cake,
   "Who counts": UserCheck,
+  "Other ages": Users,
   Pensioners: Users,
   "Change by year": CalendarRange,
   "Engine and policies": Cpu,

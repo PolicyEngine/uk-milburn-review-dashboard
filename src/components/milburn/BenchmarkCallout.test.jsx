@@ -77,6 +77,17 @@ describe("BenchmarkCallout", () => {
     expect(items[1]).toHaveTextContent("13 November 2026");
   });
 
+  it.each([
+    ["finances", "the review: not PolicyEngine estimates"],
+    ["poverty", "the review, Resolution Foundation: not PolicyEngine estimates"],
+    ["young", "Resolution Foundation, ONS: not PolicyEngine estimates"],
+  ])("%s: the folded line says whose figures they are", async (place, line) => {
+    vi.stubGlobal("fetch", serve(text));
+    render(<BenchmarkCallout place={place} reportDay={false} />);
+    const strip = await screen.findByRole("complementary", { name: "Published figures" });
+    expect(strip.querySelector("summary [data-published-by]").textContent).toBe(line);
+  });
+
   it("links to the Benchmarks sub-tab without leaving the page", async () => {
     vi.stubGlobal("fetch", serve(text));
     const opened = vi.fn();

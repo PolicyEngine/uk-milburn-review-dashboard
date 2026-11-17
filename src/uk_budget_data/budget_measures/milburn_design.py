@@ -100,7 +100,7 @@ REPORT_PIP_SHARE_KEYS = (
     "mobility_standard",
 )
 
-REPORT_REASSESSED_EACH_YEAR = 0.25  # 0: transitional protection (new
+REPORT_REASSESSED_EACH_YEAR = 0.45  # ~95% reached in 5 years (report para 773: "no more than 5 years"); our assumption. Was 0.25. # 0: transitional protection (new
 #                                     entrants only)
 REPORT_NEW_ENTRANT_AGE = 18
 

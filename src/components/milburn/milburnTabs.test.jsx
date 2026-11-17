@@ -91,6 +91,33 @@ describe("Return to work", () => {
     expect(row("method")[2]).toBe(published.employment.method);
     expect(row("work")[2]).toBe(published.employment.hours);
     expect(row("neet")).toEqual(["NEET rate, 16 to 24-year-olds", "Not modelled", "13.1% in 2026/27 to 6.8% in 2036/37; 13.4% in 2036/37 without the reforms"]);
+    // Two cards say whose figure each is: ours an estimate, the review's published
+    const card = (side) => section.querySelector(`.milburn-versus-card[data-side="${side}"]`);
+    expect(card("ours").querySelector("h4").textContent).toBe("PolicyEngine: illustrative scenario");
+    expect(card("ours").querySelector("[data-source-kind]").textContent).toBe("PolicyEngine estimate");
+    expect(card("ours").querySelector(".milburn-versus-figure").textContent).toBe("About 70,000");
+    expect(card("theirs").querySelector("h4").textContent).toBe("The review’s modelling");
+    expect(card("theirs").querySelector("[data-source-kind]").textContent).toBe("Published: the review");
+    expect(card("theirs").querySelector(".milburn-versus-figure").textContent).toBe("About 440,000");
+    for (const side of ["ours", "theirs"]) {
+      const lines = [...card(side).querySelectorAll("[data-card-row]")];
+      expect(lines.map((line) => line.dataset.cardRow)).toEqual(["when", "who", "measures", "method", "work", "neet"]);
+      // One short line each, with an icon; the full wording is in the table
+      for (const line of lines) {
+        expect(line.querySelector("svg")).not.toBeNull();
+        expect(line.textContent.split(/\s+/).length, line.textContent).toBeLessThanOrEqual(13);
+      }
+    }
+    expect(card("theirs").querySelector('[data-card-row="neet"]').textContent).toBe("NEET rate: 13.1% to 6.8% by 2036/37");
+    // The bars say whose each is
+    expect(section.querySelector("[data-single-chart] [role=img]").getAttribute("aria-label")).toMatch(/PolicyEngine estimate, 2027-28: about 70,000\. The review \(published\), by 2036: about 440,000/);
+    // One short source line in view; the table and the full citation are folded away
+    expect(section.querySelector("[data-review-source-short]").textContent).toBe("Source: the review (17 November 2026)");
+    expect(within(section.querySelector("[data-review-source-short]")).getByRole("link")).toHaveAttribute("href", published.report.url);
+    expect(section.querySelector("details[data-full-comparison] > summary").textContent).toBe("Full comparison");
+    expect(section.querySelector("details[data-full-comparison] table")).not.toBeNull();
+    expect(section.querySelector("details[data-review-more] > summary").textContent).toBe("More info");
+    expect(section.querySelector("details[data-review-more] [data-review-source]").textContent).toMatch(/^Source for the review’s figures: /);
     // Two exercises, neither called right
     expect(section.textContent).toContain(DIFFERENT_EXERCISES_SENTENCE);
     expect(section.textContent).not.toMatch(/overstat|understat|too high|too low|optimistic|pessimistic|more accurate|unrealistic|correct/i);
@@ -157,6 +184,9 @@ describe("Benchmarks", () => {
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");
     }
+    // Each figure says whose it is: "Published", or "PolicyEngine estimate"
+    const kinds = new Set([...document.querySelectorAll(".bm-pair dt, .bm-kicker")].map((label) => label.textContent.trim().replace(/, \d{4}-\d{2}$/, "")));
+    expect([...kinds].sort()).toEqual(["PolicyEngine estimate", "Published"]);
     // The package's estimate from its own run
     expect(screen.getByText("100,000")).toBeInTheDocument();
     expect(screen.queryByText("30,000")).toBeNull();

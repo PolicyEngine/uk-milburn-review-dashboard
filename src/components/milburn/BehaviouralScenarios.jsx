@@ -5,6 +5,7 @@ import { Bar, BarChart, CartesianGrid, LabelList, Legend, ResponsiveContainer, T
 import { TOOLTIP_PROPS } from "../ChartTooltip";
 import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, yearOnlyText } from "./MilburnCharts";
 import { MethodLink } from "../../utils/methodLink";
+import SourceChip from "./SourceChip";
 
 /** The Methodology passage on the move into work: the share, who, and why. */
 export const ENTRY_METHOD_ANCHOR = "method-behavioural-scenarios";
@@ -291,6 +292,10 @@ function SourceLink({ href, children }) {
 /** The heading over the two exercises side by side. */
 export const REVIEW_COMPARISON_TITLE = "Beside the review's own estimate";
 
+/** The two exercises' names, on their cards and over the full table's columns. */
+export const OUR_SCENARIO_TITLE = "PolicyEngine: illustrative scenario";
+export const REVIEW_MODELLING_TITLE = "The review’s modelling";
+
 /** Said wherever the two figures meet: they are not the same exercise. */
 export const DIFFERENT_EXERCISES_SENTENCE =
   "The two are different exercises, for different years, groups and measures: neither figure is a check on the other.";
@@ -311,15 +316,68 @@ function neetRateText(rate) {
  * measures and method, and the report cited. Neither is said to be right.
  */
 export function ReviewComparison({ summary, review, catalogue }) {
+  // On a phone the bars' names wrap, leaving the plot its room
+  const narrow = useNarrowViewport();
   const entry = summaryRun(summary, ENTRY_RUN);
   const movers = entryMovers(entry);
   const yearLabel = fiscalYearTick(summary.year);
   const fullMeasure = catalogue?.byId?.get(DEFAULT_SUMMARY_RUN);
   const fullName = fullMeasure ? shortNameOf(fullMeasure) : DEFAULT_SUMMARY_RUN;
   const { employment, report, neetRate } = review;
-  const ours = { name: `This dashboard, ${yearLabel}`, column: "This dashboard's illustrative scenario" };
-  const theirs = { name: `The review, by ${employment.byYear}`, column: "The review's modelling" };
+  const ours = { name: `PolicyEngine estimate, ${yearLabel}`, column: OUR_SCENARIO_TITLE };
+  const theirs = { name: `The review (published), by ${employment.byYear}`, column: REVIEW_MODELLING_TITLE };
   const notRun = "Not yet run";
+  // The cards' one-line versions; the full wording is in the table under "Full comparison"
+  const last = neetRate ? neetRate.years.length - 1 : -1;
+  const cardRows = [
+    { key: "when", icon: "calendar", label: "When", ours: yearLabel, theirs: `By ${employment.byYear}` },
+    {
+      key: "who",
+      icon: "usersRound",
+      label: "Who",
+      ours: `${ENTRY_ASSUMPTION.share} of non-working 18–24s with PIP or the health element`,
+      theirs: employment.who && "16–24s who would otherwise be NEET",
+    },
+    { key: "measures", icon: "layers", label: "Measures", ours: fullName, theirs: employment.measures && "The review’s whole package" },
+    {
+      key: "method",
+      icon: "calculator",
+      label: "Method",
+      ours: "Static microsimulation; entry rate assumed, not estimated",
+      theirs: employment.method && "Evidence from past programmes, summed and adjusted for overlap",
+    },
+    {
+      key: "work",
+      icon: "briefcase",
+      label: "Work assumed",
+      // "16 hours a week at the minimum wage": the assumption's own words, shortened
+      ours: ENTRY_ASSUMPTION.work.replace("’ work", "").replace("' work", "").replace(" for their age", ""),
+      theirs: employment.hours && "Full-time and part-time mix; hours not published",
+    },
+    {
+      key: "neet",
+      icon: "percent",
+      label: "NEET rate",
+      ours: "Not modelled",
+      theirs: neetRate && `${onePlace(neetRate.withReformsPct[0])} to ${onePlace(neetRate.withReformsPct[last])} by ${neetRate.years[last]}`,
+    },
+  ].filter((row) => row.theirs);
+  const cards = [
+    {
+      key: "ours",
+      title: OUR_SCENARIO_TITLE,
+      chip: <SourceChip />,
+      figure: movers !== null ? `About ${formatPeople(movers)}` : notRun,
+      side: "ours",
+    },
+    {
+      key: "theirs",
+      title: REVIEW_MODELLING_TITLE,
+      chip: <SourceChip kind="published" source="the review" />,
+      figure: `About ${formatPeople(employment.people)}`,
+      side: "theirs",
+    },
+  ];
   const rows = [
     {
       key: "people",
@@ -361,11 +419,40 @@ export function ReviewComparison({ summary, review, catalogue }) {
         id="milburn-review-heading"
         icon="scale"
         title={REVIEW_COMPARISON_TITLE}
-        description={`People moving into work: this dashboard's illustrative scenario for ${yearLabel}, and the review's own modelling for ${employment.byYear}. ${DIFFERENT_EXERCISES_SENTENCE}`}
+        description={`People moving into work: PolicyEngine's illustrative scenario for ${yearLabel} (our estimate), and the review's own modelling for ${employment.byYear} (published). ${DIFFERENT_EXERCISES_SENTENCE}`}
         name="beside-the-reviews-own-estimate"
         csv={csv}
         after={
           <>
+            <ul className="milburn-versus" aria-label="The two exercises side by side">
+              {cards.map((card) => (
+                <li key={card.key} className={`milburn-versus-card${card.side === "ours" ? " is-estimate" : ""}`} data-side={card.side}>
+                  {card.chip}
+                  <h4>{card.title}</h4>
+                  <p className="milburn-versus-figure">{card.figure}</p>
+                  <p className="milburn-versus-caption">people moving into work</p>
+                  <ul className="milburn-versus-rows">
+                    {cardRows.map((row) => (
+                      <li key={row.key} data-card-row={row.key}>
+                        <TitleIcon name={row.icon} bare size={14} />
+                        <span>
+                          <strong>{row.label}:</strong> {row[card.side]}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+            <p className="milburn-review-source" data-review-source-short="">
+              Source: <SourceLink href={report.url}>the review</SourceLink>
+              {report.published ? ` (${report.published})` : ""}
+            </p>
+            <details className="milburn-details" data-full-comparison="">
+              <summary>
+                <TitleIcon name="list" bare size={14} />
+                Full comparison
+              </summary>
             <div className="milburn-table-wrap">
               <table className="milburn-table milburn-review-table">
                 <thead>
@@ -374,7 +461,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
                       <span className="visually-hidden">Figure</span>
                     </th>
                     <th scope="col">{ours.column}</th>
-                    <th scope="col">{theirs.column}</th>
+                    <th scope="col">{theirs.column} (published)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -388,6 +475,12 @@ export function ReviewComparison({ summary, review, catalogue }) {
                 </tbody>
               </table>
             </div>
+            </details>
+            <details className="milburn-details" data-review-more="">
+              <summary>
+                <TitleIcon name="info" bare size={14} />
+                More info
+              </summary>
             <p className="milburn-review-source" data-review-source="">
               Source for the review&rsquo;s figures: <SourceLink href={report.url}>{report.title}</SourceLink>
               {report.published ? ` (${report.published})` : ""}
@@ -403,6 +496,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
               )}
               .
             </p>
+            </details>
             {annex && annex.moreInWork !== null && (
               <details className="milburn-details" data-review-annex="">
                 <summary>
@@ -435,7 +529,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
           <HorizontalBars
             ariaLabel={`People moving into work. ${ours.name}: ${movers !== null ? `about ${formatPeople(movers)}` : "not yet run"}. ${theirs.name}: about ${formatPeople(employment.people)}. ${DIFFERENT_EXERCISES_SENTENCE}`}
             format={(value) => (value >= 1000 ? `${value / 1000}k` : String(value))}
-            labelWidth={168}
+            labelWidth={narrow ? 120 : 196}
             rows={bars}
           />
         </div>
