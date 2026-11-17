@@ -1,17 +1,7 @@
-.PHONY: dev api frontend install format test build deploy
+.PHONY: dev install format test
 
-# Run both frontend and backend for local development
+# Run the dashboard (http://localhost:3000/uk/milburn-review)
 dev:
-	@echo "Starting backend (Docker) and frontend (bun)..."
-	docker compose up -d
-	bun run dev
-
-# Run just the API in Docker
-api:
-	docker compose up
-
-# Run just the frontend
-frontend:
 	bun run dev
 
 # Install dependencies
@@ -27,11 +17,3 @@ format:
 # Run tests
 test:
 	uv run pytest
-
-# Build Docker image
-build:
-	docker build -t uk-budget-api-2026 .
-
-# Stop Docker services
-stop:
-	docker compose down
