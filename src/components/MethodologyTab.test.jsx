@@ -138,6 +138,7 @@ describe("MethodologyTab", () => {
     expect(container.textContent).toContain("About nine in ten young claimants with limited capability for work and work-related activity (LCWRA) in the data also get PIP");
     expect(container.textContent).toContain("sits 1.5% above DWP's figure");
     expect(container.textContent).not.toContain("23% above");
+    expect(container.textContent).toContain("too few aged 20 to 24. The proposal starts at 18");
     expect(container.textContent).toContain("the young average award is lower than the published figures");
   });
 
