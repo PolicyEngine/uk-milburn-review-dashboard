@@ -53,13 +53,6 @@ export function resolveExampleId(value, examples) {
   return null;
 }
 
-/** What each kind of run is, in a few words beside its name. */
-export const KIND_LABELS = {
-  package: "Health element and PIP removals, run together",
-  separate: "Separate run, not in the package",
-  illustrative: "Separate run; amount is our assumption",
-};
-
 export const PIP_OPTIONS = [
   { value: "NONE", label: "None" },
   { value: "STANDARD", label: "Standard" },
@@ -276,29 +269,6 @@ export function summarise(results) {
   };
 }
 
-/**
- * The programme rows a run moves or the household has: each row and child
- * with a non-zero amount under current law or the run, in the API's order.
- */
-// Rows shown whether or not the run changes them (with each child the
-// household has): Universal Credit's elements, PIP and pay. Any other row
-// is shown only when the run changes it (a tax on the extra pay, say), so
-// an unchanged TV licence or income tax is left out.
-export const ALWAYS_SHOWN_ROWS = ["universal_credit", "pip", "employment_income"];
-
-export function programmeRows(result) {
-  const has = (row) => Math.round(row.baseline) !== 0 || Math.round(row.reform) !== 0;
-  const changes = (row) => Math.round(row.change) !== 0;
-  return (result?.programmes ?? [])
-    .filter((row) => has(row) && (ALWAYS_SHOWN_ROWS.includes(row.id) || changes(row)))
-    .map((row) => {
-      const always = ALWAYS_SHOWN_ROWS.includes(row.id) && row.id !== "employment_income";
-      const children = (row.children ?? []).filter((child) => has(child) && (always || changes(child)));
-      if (row.id === "universal_credit" && children.length) children.push(ucWithdrawn(row));
-      return { ...row, children: children.filter(has) };
-    });
-}
-
 /** "+£1,158 Youth Allowance · +£3,076 work allowance (illustrative)": the separate runs that change a household. */
 export function separateRunsLine(summary, formatSigned) {
   return (summary?.runs ?? [])
@@ -308,15 +278,21 @@ export function separateRunsLine(summary, formatSigned) {
 }
 
 /**
- * Universal Credit's elements less the award: what is withdrawn against
- * income (the 55% taper on earnings, and other income), shown as a
- * negative line under the elements, so the lines add up to the award.
+ * The programmes (normaliseHouseholdImpact's rows) with Universal Credit's
+ * elements less the award as one more line under the elements: what is
+ * withdrawn against income (the 55% taper on earnings, and other income),
+ * so the lines add up to the award under current law and under the run.
  */
-function ucWithdrawn(row) {
-  const sum = (side) => (row.children ?? []).reduce((total, child) => total + child[side], 0);
-  const baseline = row.baseline - sum("baseline");
-  const reform = row.reform - sum("reform");
-  return { id: "uc_withdrawn", label: "Less: withdrawn against income", baseline, reform, change: reform - baseline, signed: true };
+export function withUcWithdrawn(programmes) {
+  return (programmes ?? []).map((row) => {
+    if (row.id !== "universal_credit" || !row.children?.length) return row;
+    const sum = (side) => row.children.reduce((total, child) => total + child[side], 0);
+    const before = row.before - sum("before");
+    const after = row.after - sum("after");
+    if (Math.round(before) === 0 && Math.round(after) === 0) return row;
+    const withdrawn = { id: "uc_withdrawn", label: "Less: withdrawn against income", note: null, before, after, change: after - before, children: [] };
+    return { ...row, children: [...row.children, withdrawn] };
+  });
 }
 
 /** Whether custom households can be calculated on this build. */

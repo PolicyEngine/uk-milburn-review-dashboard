@@ -40,6 +40,7 @@ import {
   separateRunsLine,
   storedExampleFor,
   summarise,
+  withUcWithdrawn,
   writeExampleToLocation,
 } from "../../utils/milburn/householdCalculator";
 import "../HouseholdCalculator.css";
@@ -568,11 +569,13 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
     } else if (id === "tenure") {
       const config = CHOICES.tenure;
       const hint = config.hint(answers);
+      // Four choices: a select on a phone, where four tiles do not fit
+      const Control = narrow ? SelectField : ChoiceTiles;
       field = (
-        <ChoiceTiles
+        <Control
           id="tenure"
           label={config.label}
-          layout="segmented"
+          {...(narrow ? {} : { layout: "segmented" })}
           options={config.options}
           value={isRentingTenure(answers.tenure) ? RENTING : answers.tenure}
           hint={hint}
@@ -796,7 +799,7 @@ function ResultDetails({ views, presets }) {
       </section>
       <section className="report-section" id="household-breakdown">
         <ProgrammeTable
-          programmes={view.programmes ?? []}
+          programmes={withUcWithdrawn(view.programmes)}
           totals={headlineTotals(view.net)}
           yearLabel={FISCAL_YEAR}
           year={YEAR}
@@ -804,6 +807,10 @@ function ResultDetails({ views, presets }) {
           parameterTables={null}
           afterLabel={`Under the ${chosen.kind === "package" ? "removals" : "run"}`}
           runTabs={{ tabs: RUNS.map((item) => ({ id: item.key, label: item.tab })), value: run, onChange: setRun, label: "Run" }}
+          // Universal Credit's elements and PIP's parts in view at first
+          openRows={["universal_credit", "pip"]}
+          // The Milburn Methodology has no household calculation section
+          method={null}
         />
       </section>
       <Disclosure title="About these figures" preview="How they are calculated · What each run is" className="milburn-household-about">

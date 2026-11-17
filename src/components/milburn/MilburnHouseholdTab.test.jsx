@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import MilburnHouseholdTab, { MILBURN_STEPS, formatSignedPounds, milburnStepSummary, resetSavedMilburnForm } from "./MilburnHouseholdTab";
+import { normaliseHouseholdImpact } from "../../utils/householdImpactApi";
 import {
   DEFAULT_ANSWERS,
   PRESETS_FILE,
@@ -11,7 +12,7 @@ import {
   calculateHousehold,
   householdRequest,
   parsePresets,
-  programmeRows,
+  withUcWithdrawn,
   storedExampleFor,
   summarise,
 } from "../../utils/milburn/householdCalculator";
@@ -109,10 +110,11 @@ describe("householdCalculator", () => {
   });
 
   it("adds Universal Credit's withdrawal so its lines add up to the award", () => {
-    const result = example("retail_part_time").results.employer_ni;
-    const uc = programmeRows(result).find((row) => row.id === "universal_credit");
-    const lines = uc.children.reduce((total, child) => total + child.reform, 0);
-    expect(lines).toBeCloseTo(uc.reform, 1);
+    const programmes = withUcWithdrawn(normaliseHouseholdImpact(example("retail_part_time").results.employer_ni).programmes);
+    const uc = programmes.find((row) => row.id === "universal_credit");
+    for (const side of ["before", "after"]) {
+      expect(uc.children.reduce((total, child) => total + child[side], 0)).toBeCloseTo(uc[side], 1);
+    }
     expect(uc.children.at(-1).id).toBe("uc_withdrawn");
   });
 
@@ -187,6 +189,9 @@ describe("MilburnHouseholdTab", () => {
     const table = screen.getByRole("table", { name: /Your income, taxes and benefits, 2029-30/ });
     expect(within(table).getByText("Net income")).toBeTruthy();
     expect(within(table).getByText("Under the run")).toBeTruthy();
+    // Universal Credit's elements in view at first, with the withdrawal
+    expect(within(table).getByText("Less: withdrawn against income")).toBeTruthy();
+    expect(within(table).getByText("Health element (LCWRA)")).toBeTruthy();
   });
 
   it("asks the form's questions in numbered steps, the Milburn ones included", () => {

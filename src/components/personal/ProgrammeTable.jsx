@@ -62,6 +62,9 @@ const changeClass = (value) => {
  * @param {Object} [props.runTabs] - Separate calculations to switch
  *   between, as tabs over the table: { tabs: [{ id, label }], value,
  *   onChange, label } (the Milburn review's runs)
+ * @param {string[]} [props.openRows] - Programmes whose parts show at first
+ * @param {{anchor: string, label: string}|null} [props.method] - The
+ *   Methodology section the footer links to (null for none)
  */
 // Each group in words: what "up" means for it (taxes are negative amounts,
 // so a rise in the amount is a fall in what you pay). Market income, taxes
@@ -134,6 +137,8 @@ export default function ProgrammeTable({
   parameterTables,
   afterLabel = "With the policies",
   runTabs = null,
+  openRows = [],
+  method = { anchor: METHOD_ANCHORS.householdCalc, label: "How the household calculation works" },
 }) {
   const narrow = useNarrowViewport();
   // The VAT row named by what moves it: VAT on fuel duty when only the fuel
@@ -172,7 +177,12 @@ export default function ProgrammeTable({
   const activePolicy = policyTabList.find((item) => item.id === tab) ?? null;
   // Open at first: each group shows its taxes or benefits
   const [open, setOpen] = useState(
-    () => new Set(groups.filter((group) => (group.rows ?? []).length > 0).map((group) => group.id)),
+    () =>
+      new Set([
+        ...groups.filter((group) => (group.rows ?? []).length > 0).map((group) => group.id),
+        // Programmes asked to show their parts at first (`openRows`)
+        ...groups.flatMap((group) => (group.rows ?? []).filter((row) => openRows.includes(row.id)).map((row) => `${group.id}/${row.id}`)),
+      ]),
   );
   const notes = programmeNotes(groups);
   const title = `Your income, taxes and benefits, ${yearLabel}`;
@@ -440,7 +450,7 @@ export default function ProgrammeTable({
                 <strong>{item.label}</strong>: {plainNote(item.note)}
               </span>
             )),
-            method: { anchor: METHOD_ANCHORS.householdCalc, label: "How the household calculation works" },
+            method,
           }}
         />
       </div>
