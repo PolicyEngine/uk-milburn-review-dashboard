@@ -1,5 +1,6 @@
 import { beforeAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { subShownOnReportDay } from "./utils/milburn/reportDay";
+import { reportCopy } from "./utils/milburn/reportStatus";
 const RETURN_TO_WORK_SHOWN = subShownOnReportDay("scenarios");
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import App, { preloadAllViews } from "./App";
@@ -12,8 +13,14 @@ import { BASE_PATH, fixtureFetch, fixtureJson } from "./test/publicationFixture"
 // Every view's code is in before a test renders it (App.jsx lazyView)
 beforeAll(preloadAllViews, 60_000);
 
-const INTRO =
-  /^Estimates from PolicyEngine UK( \(opens in a new tab\))? of candidate measures for the young people and work review, by age\. Modelled before the final report on 17 November 2026; not announced policy\. Static: no change in behaviour\.$/;
+// The wording in the report-status switch's state (utils/milburn/reportStatus.js);
+// reportStatus.test.jsx pins each state's words. Before the final report:
+// "Estimates from PolicyEngine UK of candidate measures for the young people
+// and work review, by age. Modelled before the final report on 17 November
+// 2026; not announced policy."
+const COPY = reportCopy();
+const literal = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const INTRO = new RegExp(`^${literal(COPY.landingIntroLead)}PolicyEngine UK( \\(opens in a new tab\\))? ${literal(COPY.landingIntroRest)}$`);
 
 const BOXES = {
   society: /^Young people/,
@@ -40,7 +47,7 @@ async function renderApp() {
   return rendered;
 }
 
-const HEADING = "Young people and work: candidate measures modelled";
+const HEADING = COPY.landingHeading;
 const landing = () => screen.queryByRole("region", { name: HEADING });
 const box = (name) => screen.getByRole("link", { name: BOXES[name] });
 const tabBar = () => screen.queryByRole("tablist", { name: "Views" });
@@ -58,13 +65,13 @@ describe("the landing page", () => {
     expect(page).not.toBeNull();
     expect(page.querySelector(".landing-eyebrow")).toBeNull();
     expect(within(page).getByRole("heading", { level: 2 })).toHaveTextContent(HEADING);
-    expect(within(page).getByText(/^Estimates from/)).toHaveTextContent(INTRO);
+    expect(page.querySelector(".landing-intro")).toHaveTextContent(INTRO);
     expect(container).not.toHaveTextContent("Choose a year and policies");
     // Each box: a title, one short line and "Explore", and no figure
     expect(within(page).getAllByRole("link", { name: /Explore$/ }).map((link) => [link.getAttribute("href"), link.textContent])).toEqual([
       ["?tab=dashboard&sub=age", "Young peopleWho gains or loses, and the costExplore→"],
       ...(RETURN_TO_WORK_SHOWN ? [["?tab=dashboard&sub=scenarios", "Return to workThe package if some young people move into workExplore→"]] : []),
-      ["?tab=policies", "The measures modelledEvery candidate measure, and how we model itExplore→"],
+      ["?tab=policies", `The measures modelled${COPY.measuresBoxLine}Explore→`],
     ]);
     expect(page.querySelector(".landing-box-figure")).toBeNull();
     expect(page.querySelector(".landing-boxes")).not.toHaveTextContent(/£|\d/);
@@ -112,7 +119,7 @@ describe("the landing page", () => {
     expect(notes()).toHaveLength(0);
     // The Policies view's subtitle says the measures are provisional
     expect(
-      screen.getByText(`${provisionalLabel(manifest)}. Candidate measures for the Milburn review: what each changes, and how we model it.`),
+      screen.getByText(`${provisionalLabel(manifest)}. ${COPY.measuresSubtitle}`),
     ).toBeInTheDocument();
   });
 
@@ -120,7 +127,7 @@ describe("the landing page", () => {
     const { container } = await renderApp();
     expect(container.querySelectorAll(".publication-provisional")).toHaveLength(0);
     fireEvent.click(box("policies"));
-    expect(screen.getByText("Candidate measures for the Milburn review: what each changes, and how we model it.")).toBeInTheDocument();
+    expect(screen.getByText(COPY.measuresSubtitle)).toBeInTheDocument();
   });
 
   it("draws a silhouette of Public finances behind it, with no view mounted", async () => {
@@ -288,7 +295,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
     const dialog = drawer();
     expect(dialog).toHaveAttribute("aria-modal", "true");
     expect(edge()).toHaveAttribute("aria-expanded", "true");
-    expect(within(dialog).getByText(/^Estimates from/)).toBeInTheDocument();
+    expect(dialog.querySelector(".landing-intro")).toHaveTextContent(INTRO);
     // The header: PolicyEngine's wordmark, a link home, centred between an
     // empty cell and the close button, sticky; below it,
     // "About this dashboard" as an eyebrow, then the title
@@ -314,7 +321,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
     expect(rows.map((row) => row.textContent)).toEqual([
       "Young peopleWho gains or loses, and the cost",
       ...(RETURN_TO_WORK_SHOWN ? ["Return to workThe package if some young people move into work"] : []),
-      "The measures modelledEvery candidate measure, and how we model it",
+      `The measures modelled${COPY.measuresBoxLine}`,
     ]);
     const site = within(within(nav).getByRole("region", { name: "More from PolicyEngine" })).getByRole("link");
     expect(site).toHaveTextContent("policyengine.orgResearch, the model and the API (opens in a new tab)");
@@ -370,9 +377,10 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
   it("names what it is built with, its links as chips that open a new tab", async () => {
     await openDrawer();
     const built = within(drawer()).getByRole("list", { name: "Built with" });
-    expect(built).toHaveTextContent("Microcosm UK build fcfac709");
+    // Only the policyengine.py release: its bundle pins the model and the data
+    expect(built).not.toHaveTextContent("Microcosm UK build");
     const [model] = within(built).getAllByRole("link");
-    expect(model).toHaveTextContent(/^policyengine-uk 2\.177\.7 \(opens in a new tab\)$/);
+    expect(model).toHaveTextContent(/^policyengine 6\.20\.2 \(opens in a new tab\)$/);
     expect(model).toHaveAttribute("target", "_blank");
   });
 

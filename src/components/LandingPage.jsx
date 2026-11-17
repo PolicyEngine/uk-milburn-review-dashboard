@@ -2,6 +2,7 @@ import SourceLink from "./SourceLink";
 import { ChevronRight } from "lucide-react";
 import TitleIcon from "./TitleIcon";
 import { REPORT_DAY, subShownOnReportDay } from "../utils/milburn/reportDay";
+import { REPORT_PUBLISHED, reportCopy } from "../utils/milburn/reportStatus";
 import "./LandingPage.css";
 
 /** One of the three boxes: a link that opens its view in place. */
@@ -38,27 +39,29 @@ function LandingBox({ tab, sub, icon, title, description, onOpen }) {
  * measures are provisional, the policies box names them as modelled
  * measures, not the Budget's contents. A box whose sub-tab the report-day
  * switch hides (utils/milburn/reportDay.js: Return to work) goes with it.
+ * The measures box's line is the report-status switch's
+ * (utils/milburn/reportStatus.js).
  */
-export const landingBoxes = ({ reportDay = REPORT_DAY } = {}) => [
+export const landingBoxes = ({ reportDay = REPORT_DAY, published = REPORT_PUBLISHED } = {}) => [
   ["dashboard", "age", "usersRound", "Young people", "Who gains or loses, and the cost"],
   ["dashboard", "scenarios", "sliders", "Return to work", "The package if some young people move into work"],
-  ["policies", undefined, "list", "The measures modelled", "Every candidate measure, and how we model it"],
+  ["policies", undefined, "list", "The measures modelled", reportCopy(published).measuresBoxLine],
 ].filter(([, sub]) => subShownOnReportDay(sub, reportDay));
 
 /**
  * What the dashboard is: the heading (its id given, as the
  * landing page and the overview drawer each name themselves by it), the
- * paragraph and the provisional notice. One source for both.
+ * paragraph and the provisional notice. One source for both. The words
+ * are the report-status switch's (utils/milburn/reportStatus.js): `published`
+ * overrides it.
  */
-export function LandingIntro({ headingId, provisional, note = null, className = "landing-hero" }) {
+export function LandingIntro({ headingId, provisional, note = null, className = "landing-hero", published = REPORT_PUBLISHED }) {
+  const copy = reportCopy(published);
   return (
     <div className={className}>
-      <h2 id={headingId} className="landing-heading">Young people and work: candidate measures modelled</h2>
+      <h2 id={headingId} className="landing-heading">{copy.landingHeading}</h2>
       <p className="landing-intro">
-        Estimates from <SourceLink source="policyengine_uk_model" />{" "}of
-        candidate measures for the young people and work review, by age.
-        Modelled before the final report on 17 November 2026; not announced
-        policy. Static: no change in behaviour.
+        {copy.landingIntroLead}<SourceLink source="policyengine_uk_model" />{" "}{copy.landingIntroRest}
       </p>
       {note && <p className="landing-intro landing-intro-note">{note}</p>}
       {provisional}
@@ -96,8 +99,8 @@ function LandingRow({ tab, sub, icon, title, description, onOpen }) {
  * rows (`list`, the overview drawer's "In this dashboard" card), labelled
  * by `labelledBy`.
  */
-export function LandingBoxes({ onOpen, list = false, labelledBy, reportDay = REPORT_DAY }) {
-  const BOXES = landingBoxes({ reportDay });
+export function LandingBoxes({ onOpen, list = false, labelledBy, reportDay = REPORT_DAY, published = REPORT_PUBLISHED }) {
+  const BOXES = landingBoxes({ reportDay, published });
   if (list) {
     return (
       <ul className="landing-rows" aria-labelledby={labelledBy}>
@@ -125,12 +128,13 @@ export function LandingBoxes({ onOpen, list = false, labelledBy, reportDay = REP
  * @param {(tab: string, sub?: string) => void} props.onOpen - Open a view (App's handleTabChange)
  * @param {React.ReactNode} [props.provisional] - The provisional notice, when it applies
  * @param {boolean} [props.provisionalWording] - Whether the measures are provisional (the boxes' wording)
+ * @param {boolean} [props.published] - Whether the final report is published (the report-status switch's state unless given)
  */
-export default function LandingPage({ onOpen, provisional, provisionalWording = false }) {
+export default function LandingPage({ onOpen, provisional, provisionalWording = false, published = REPORT_PUBLISHED }) {
   return (
     <section className="landing" aria-labelledby="landing-heading">
-      <LandingIntro headingId="landing-heading" provisional={provisional} />
-      <LandingBoxes onOpen={onOpen} provisional={provisionalWording} />
+      <LandingIntro headingId="landing-heading" provisional={provisional} published={published} />
+      <LandingBoxes onOpen={onOpen} provisional={provisionalWording} published={published} />
     </section>
   );
 }

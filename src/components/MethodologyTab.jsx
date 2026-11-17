@@ -18,6 +18,7 @@ import { MICROCOSM_BUILD, POLICYENGINE_UK_VERSION, POLICYENGINE_VERSION, REPLICA
 import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
 import { ENTRY_ASSUMPTION_TEXT } from "../utils/milburn/summary";
 import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
+import { REPORT_PUBLISHED, reportCopy } from "../utils/milburn/reportStatus";
 
 /** The policyengine-core version this build runs, beside policyengine-uk. */
 export const POLICYENGINE_CORE_VERSION = "3.34.10";
@@ -56,9 +57,10 @@ const SECTION_ICONS = Object.fromEntries(METHOD_CONTENTS.map(({ id, titleIcon })
 
 /**
  * The limits of the figures, said once: the model is static, and the data
- * have gaps that bear on young people.
+ * have gaps that bear on young people. The last two are the report-status
+ * switch's words (utils/milburn/reportStatus.js).
  */
-export const MILBURN_LIMITATIONS = [
+export const milburnLimitations = (published = REPORT_PUBLISHED) => [
   ["Static", "The main figures hold behaviour fixed: nobody changes their work, hours, claims or education because of a measure. The Return to work sub-tab shows the package with a move into work separately."],
   ["No NEET variable", "The data have no variable for being not in education, employment or training (NEET), so no figure here is for NEETs as such."],
   ["PIP in Scotland", "Adult Disability Payment records in Scotland are held as PIP in the data, so PIP figures for Scotland use ADP records."],
@@ -68,9 +70,12 @@ export const MILBURN_LIMITATIONS = [
   ["Caseloads against DWP", "The all-age LCWRA stock in the data is about 23% above DWP's figure. The PIP caseload aged 18 to 24 is low but its award mix is high (more enhanced awards), which roughly offsets in cost."],
   ["No replacement in the upper bound", "The full abolition package (upper bound) includes no replacement fund, cost allowance or insurance payment. The central variant stands in for a smaller allowance with PIP at half rate."],
   ["Small samples at 16 and 17", "Few survey households include people aged 16 or 17, so figures for those ages rest on small samples."],
-  ["Not computable", "Some candidate measures cannot be computed with these data and this model; they are listed with the reason, and never shown as £0."],
-  ["Not announced policy", "The measures are candidates modelled before the review's final report. They may differ from anything the review recommends or the government adopts."],
+  ["Not computable", reportCopy(published).notComputableLimit],
+  [reportCopy(published).policyLimitTerm, reportCopy(published).policyLimit],
 ];
+
+/** The limits in the switch's own state. */
+export const MILBURN_LIMITATIONS = milburnLimitations();
 
 /**
  * A section of the view, laid out as the other views' sections are: a
@@ -156,8 +161,12 @@ function useRevealLinkedAnchor() {
  *
  * @param {Object} props
  * @param {(tab: string, sub?: string) => void} props.onShowTab - Switch to another view (at a sub-tab)
+ * @param {boolean} [props.published] - Whether the final report is published (the report-status switch's state unless given)
  */
-function MethodologyTab({ onShowTab }) {
+function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
+  // The words that depend on the final report (utils/milburn/reportStatus.js)
+  const copy = reportCopy(published);
+  const limitations = milburnLimitations(published);
   const catalogue = useMeasureCatalogue();
   const UNAVAILABLE = unavailableMeasures(catalogue);
   // The measures the page offers, as the Measures tab and the selector group
@@ -177,19 +186,14 @@ function MethodologyTab({ onShowTab }) {
           title="At a glance"
           summary={
             <>
-              We run <SourceLink id="policyengine_uk_model">PolicyEngine UK</SourceLink>{" "}on a
-              survey of UK households with and without each candidate measure for the Milburn review of
-              young people and work; weights scale the survey to the UK. The figures are static.
+              We run <SourceLink id="policyengine_uk_model">PolicyEngine UK</SourceLink>{" "}{copy.methodSummary}
             </>
           }
         >
-          <Topic id="method-about-review" title="The review and these measures" preview="Candidates · Not announced policy · Final report 17 November 2026">
-            <p className="method-more">
-              The independent review of young people and work published an interim report on 28 May 2026; its
-              final report is expected on Tuesday 17 November 2026. The measures here are candidates drawn from
-              public discussion of the review, modelled before it is published. They are not announced policy,
-              and the review may recommend something different.
-            </p>
+          <Topic id="method-about-review" title="The review and these measures" preview={copy.reviewTopicPreview}>
+            {copy.reviewTopicBody.map((paragraph) => (
+              <p key={paragraph} className="method-more">{paragraph}</p>
+            ))}
           </Topic>
           <Topic
             id={METHOD_ANCHORS.glossary}
@@ -367,6 +371,14 @@ function MethodologyTab({ onShowTab }) {
                   `The full abolition package is run again on the assumption that ${ENTRY_ASSUMPTION_TEXT}, chosen at random, and set beside the static package: the saving, poverty and average loss.`,
                 ],
                 [
+                  "Why 25%",
+                  "An illustrative share, not an estimate: no published study gives the share of young PIP or health element claimants who would move into work if these benefits were removed. A quarter is large enough to show the direction and rough size of the effect; the break-even chart shows the share that would be needed to match the Exchequer saving.",
+                ],
+                [
+                  "Who moves",
+                  "Only people aged 18 to 24 with no earnings who themselves receive PIP or the health element, picked at random with a fixed seed; each moves into 16 hours a week at the minimum wage for their age for the whole year. Nobody else changes behaviour.",
+                ],
+                [
                   "Entry cases",
                   "One young person moving into work for 16 or 25 hours a week at a given wage: their household's gain and the gain to the Exchequer, from household calculations.",
                 ],
@@ -391,8 +403,8 @@ function MethodologyTab({ onShowTab }) {
           title="Limitations"
           summary="What the figures leave out, and where the data are thin."
         >
-          <Topic title="Limits of these figures" preview={MILBURN_LIMITATIONS.map(([term]) => term).join(" · ")}>
-            <FactList items={MILBURN_LIMITATIONS} />
+          <Topic title="Limits of these figures" preview={limitations.map(([term]) => term).join(" · ")}>
+            <FactList items={limitations} />
           </Topic>
           <Topic id="method-replication" title="Reproducing the figures" preview="Model · Data · Versions">
             <p className="method-more">

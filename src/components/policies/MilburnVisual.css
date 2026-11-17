@@ -275,3 +275,382 @@
   vertical-align: -2px;
   color: color-mix(in srgb, var(--mviz-accent) 70%, var(--pe-gray-700));
 }
+
+/* --- The measures we cannot compute (NotComputableVisual) -------------------
+   Diagrams, never a figure. Grey for what there is today, teal for what a
+   measure adds, amber for a loss; dashed for what is unknown or not
+   modelled. The diagram answers to its own width (a card is narrow on a
+   phone and in two columns alike). */
+
+.mnc-section {
+  margin-bottom: 16px;
+}
+
+.mnc {
+  gap: 10px;
+  font-size: var(--fs-micro);
+  line-height: 1.3;
+  color: var(--c-text);
+  container-type: inline-size;
+}
+
+.mnc .is-before { --mnc-tone: var(--c-before); --mnc-ink: var(--pe-gray-700); --mnc-soft: var(--c-muted-fill); }
+.mnc .is-gain { --mnc-tone: var(--c-gain); --mnc-ink: var(--c-gain-text); --mnc-soft: color-mix(in srgb, var(--c-gain) 12%, var(--c-surface)); }
+.mnc .is-loss { --mnc-tone: var(--c-loss); --mnc-ink: var(--c-loss-text); --mnc-soft: var(--c-loss-soft); }
+
+.mnc-glyph,
+.mnc-arrow,
+.mnc-icon-plus {
+  display: inline-flex;
+  flex: none;
+}
+
+.mnc-arrow {
+  color: var(--pe-gray-400);
+}
+
+/* A step: its icon in a tinted chip, then its label */
+.mnc-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px 10px 4px 4px;
+  font-weight: 600;
+  color: var(--mnc-ink);
+  background: var(--c-surface);
+  border: 1px solid var(--mnc-tone);
+  border-radius: 999px;
+}
+
+.mnc-icon {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  color: var(--mnc-ink);
+  background: var(--mnc-soft);
+  border-radius: 50%;
+}
+
+/* A plus on the icon: more of it */
+.mnc-icon-plus {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  color: var(--c-surface);
+  background: var(--mnc-tone);
+  border-radius: 50%;
+}
+
+/* The same step as a tile: the icon over the label */
+.mnc-node.is-tile {
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 6px;
+  text-align: center;
+  background: var(--mnc-soft);
+  border-radius: 8px;
+}
+
+.mnc-node.is-tile .mnc-icon {
+  background: var(--c-surface);
+}
+
+/* Unknown, or not in the data: dashed */
+.mnc-node.is-unknown {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  padding-right: 10px;
+  border-style: dashed;
+  border-radius: 14px;
+}
+
+.mnc-node.is-unknown .mnc-chip {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+.mnc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px 2px 5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--pe-gray-700);
+  background: var(--c-muted-fill);
+  border: 1px solid transparent;
+  border-radius: 999px;
+}
+
+/* A caveat, not a loss: the notice colours, dashed */
+.mnc-chip.is-unknown {
+  color: var(--c-notice-text);
+  background: var(--c-notice-bg);
+  border: 1px dashed var(--c-notice-text);
+}
+
+/* A split: the trunk, a fork, a branch each way */
+.mnc-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.mnc-body > * {
+  flex: 1;
+}
+
+/* Two cards to a row: every diagram as tall as the tallest, so the facts
+   under them stay level */
+@media (min-width: 769px) {
+  .mnc {
+    min-height: 232px;
+  }
+}
+
+.mnc-split {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.mnc-trunk {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+
+.mnc-trunk-root {
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  gap: 6px;
+}
+
+.mnc-trunk-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mnc-trunk .mnc-label {
+  white-space: nowrap;
+}
+
+/* The fork: a stem from the test, then a drop to each branch's middle */
+.mnc-fork {
+  position: relative;
+  height: 12px;
+  margin: 10px calc(25% - 2px) 0;
+  border: 1.5px solid var(--c-axis);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+}
+
+.mnc-fork::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  height: 10px;
+  border-left: 1.5px solid var(--c-axis);
+}
+
+.mnc-branches {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mnc-branch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mnc-branch .mnc-node {
+  align-self: stretch;
+  flex: 1;
+}
+
+.mnc-answer {
+  padding: 1px 8px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--mnc-ink);
+  background: var(--c-surface);
+  border: 1px solid var(--mnc-tone);
+  border-radius: 999px;
+}
+
+/* What the diagram leaves out, said on it */
+.mnc-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 8px 0 0;
+  padding: 3px 8px;
+  font-weight: 600;
+  color: var(--pe-gray-600);
+  border: 1px dashed var(--c-before);
+  border-radius: 6px;
+}
+
+/* A swap: today's benefit, an arrow, the proposed one */
+.mnc-swap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.25fr);
+  align-items: stretch;
+  gap: 8px;
+}
+
+.mnc-swap > .mnc-arrow {
+  align-self: center;
+}
+
+.mnc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+  min-width: 0;
+  padding: 8px 10px;
+  background: var(--mnc-soft);
+  border: 1px solid var(--mnc-tone);
+  border-radius: 8px;
+}
+
+.mnc-card.is-unknown {
+  background: var(--c-surface);
+  border-style: dashed;
+  border-width: 1.5px;
+}
+
+.mnc-when {
+  font-weight: 500;
+  color: var(--pe-gray-600);
+}
+
+.mnc-card-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--mnc-ink);
+}
+
+.mnc-card.is-before .mnc-icon {
+  background: var(--c-surface);
+}
+
+.mnc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.mnc-card.is-before .mnc-chip {
+  background: var(--c-surface);
+}
+
+/* Offers: a tile each, over the places */
+.mnc-offers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mnc-tiles {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.mnc-places {
+  display: flex;
+  gap: 3px;
+  font-weight: 600;
+}
+
+.mnc-places-today,
+.mnc-places-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 5px 6px;
+  white-space: nowrap;
+}
+
+.mnc-places-today {
+  flex: 3 1 0;
+  color: var(--pe-gray-700);
+  background: var(--pe-gray-200);
+  border-radius: 6px 0 0 6px;
+}
+
+.mnc-places-more {
+  flex: 2 1 0;
+  color: var(--c-gain-text);
+  background: color-mix(in srgb, var(--c-gain) 10%, var(--c-surface));
+  border: 1.5px dashed var(--c-gain);
+  border-radius: 0 6px 6px 0;
+}
+
+.mnc-scale {
+  margin: -4px 0 0;
+  text-align: right;
+  color: var(--pe-gray-500);
+}
+
+/* A narrow card: the trunk runs down, its arrows with it */
+@container (max-width: 440px) {
+  .mnc-trunk,
+  .mnc-trunk-root,
+  .mnc-trunk-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mnc-trunk .mnc-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+/* Narrower still: the swap runs down too */
+@container (max-width: 300px) {
+  .mnc-swap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mnc-swap > .mnc-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .mnc-places-today,
+  .mnc-places-more {
+    flex: 1 1 0;
+    padding-inline: 3px;
+  }
+}

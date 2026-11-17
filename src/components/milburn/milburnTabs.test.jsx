@@ -63,6 +63,8 @@ describe("Return to work", () => {
       "Assumption: 25% of non-working 18 to 24-year-olds with PIP or the health element move into 16 hours' work a week at the minimum wage for their age, microsimulated.",
     );
     expect(tab.querySelector("[data-year-only]").textContent).toBe("2027-28 only: the year selector does not change this tab.");
+    // The assumption links to the Methodology passage that explains the 25%
+    expect(screen.getByRole("link", { name: "Why 25%, and how it is run" })).toHaveAttribute("href", "?tab=methodology#method-behavioural-scenarios");
     expect(tab.textContent).not.toMatch(/young people who lose|leaves worse off|Why the effect is small|not a new incentive|not reachable/);
     // The entry cases from the file: 16 hours at £10 an hour
     const cases = screen.getByRole("region", { name: "One young person moving into work" });
@@ -118,6 +120,7 @@ describe("Benchmarks", () => {
       "package_young_people_affected",
       "incapacity_spending_18_24",
       "young_benefits_spend",
+      "milburn_welfare_saving_10y",
       "kept_out_of_poverty",
       "pip_no_extra_costs",
     ]);

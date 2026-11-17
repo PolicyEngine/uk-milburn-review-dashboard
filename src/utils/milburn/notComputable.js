@@ -1,12 +1,19 @@
+import { reportCopy } from "./reportStatus";
+
+// What is said of rules not yet set out: the report-status switch's words
+const COPY = reportCopy();
+
 /**
  * Candidate measures the dashboard lists but cannot compute, each with the
  * reason: the pipeline's registry
  * (uk_budget_data.reforms.NOT_COMPUTABLE_MEASURES), each line shortened to
  * fit one line of a card. They have no figures
  * anywhere on the page: never £0, which would read as an estimate of no
- * effect. `kind` says in a line what sort of measure it is. Each `visual` is its card's "What changes" picture, in
- * UnmodelledVisual's shapes (components/policies/UnmodelledVisual.jsx):
- * words only, as no figure is shown for these measures.
+ * effect. `kind` says in a line what sort of measure it is. Each `visual` is its card's "What changes" diagram, in
+ * NotComputableVisual's shapes (components/policies/MilburnVisual.jsx): a
+ * decision split, a swap of one benefit for another, or offers with more
+ * places. Icons are TitleIcon names. Words only, as no figure is shown
+ * for these measures.
  */
 export const NOT_COMPUTABLE_MEASURES = [
   {
@@ -18,13 +25,15 @@ export const NOT_COMPUTABLE_MEASURES = [
     kind: "A higher rate of an existing benefit.",
     notModelled: "The data hold no severe conditions flag.",
     visual: {
-      kind: "flow",
+      kind: "split",
       caption: "Which health element a claimant gets",
-      lanes: [
-        { label: "Other claimants", steps: ["Health element"] },
-        { label: "Severe conditions", steps: ["Meets the criteria", "Higher health element"], tone: "gain" },
+      root: [{ icon: "user", label: "A claimant" }],
+      test: { icon: "clipboard", label: "Severe conditions criteria", unknown: "No flag in the data" },
+      branches: [
+        { answer: "Not met", icon: "heartPulse", label: "Health element" },
+        { answer: "Met", icon: "heartPulse", label: "Higher health element", tone: "gain", plus: true },
       ],
-      alt: "A claimant who meets the severe conditions criteria would get a higher health element; other claimants the health element. The higher amount is not set out.",
+      alt: `A claimant who meets the severe conditions criteria would get a higher health element; other claimants the health element.${COPY.higherAmountAltTail}`,
     },
   },
   {
@@ -34,15 +43,13 @@ export const NOT_COMPUTABLE_MEASURES = [
     affects: "Young disabled people",
     category: { label: "Benefits", icon: "piggy" },
     kind: "A new benefit in place of PIP.",
-    notModelled: "Its rules (eligibility, rates) have not been set out.",
+    notModelled: COPY.rulesNotSetOut,
     visual: {
-      kind: "flow",
+      kind: "swap",
       caption: "Help with the extra costs of disability for young people",
-      lanes: [
-        { label: "Today", steps: ["PIP"] },
-        { label: "Proposed", steps: ["Additional cost allowance"], tone: "gain" },
-      ],
-      alt: "Today young disabled people can get PIP; the proposal replaces it with an additional cost allowance, whose rules are not set out.",
+      before: { when: "Today", icon: "wallet", label: "PIP", facts: ["Eligibility", "Rates"] },
+      after: { when: "Proposed", icon: "sparkle", label: "Additional cost allowance", unknowns: ["Eligibility", "Rates"] },
+      alt: `Today young disabled people can get PIP; the proposal replaces it with an additional cost allowance${COPY.newBenefitAltTail}`,
     },
   },
   {
@@ -54,10 +61,16 @@ export const NOT_COMPUTABLE_MEASURES = [
     kind: "Rules on what claimants must do.",
     notModelled: "It works through behaviour, which a static model omits.",
     visual: {
-      kind: "flow",
+      kind: "split",
       caption: "How conditionality works",
-      lanes: [{ label: "A claimant", steps: ["Requirements", "Not met", "Sanction"] }],
-      alt: "A young Universal Credit claimant has work-related requirements; where they are not met, a sanction reduces the award.",
+      root: [{ icon: "user", label: "A claimant" }],
+      test: { icon: "clipboard", label: "Requirements" },
+      branches: [
+        { answer: "Met", icon: "check", label: "Award continues" },
+        { answer: "Not met", icon: "alert", label: "Sanction", tone: "loss" },
+      ],
+      marker: "Behavioural, not modelled",
+      alt: "A young Universal Credit claimant has work-related requirements; where they are met the award continues, and where they are not met a sanction reduces the award. How claimants respond is behavioural and not modelled.",
     },
   },
   {
@@ -69,10 +82,16 @@ export const NOT_COMPUTABLE_MEASURES = [
     kind: "A spending programme.",
     notModelled: "A spending programme, not a tax or benefit rule.",
     visual: {
-      kind: "highest",
+      kind: "offers",
       caption: "What the Youth Guarantee offers",
-      inputs: [{ label: "Training" }, { label: "A job" }, { label: "Work experience" }],
-      result: "More places",
+      offers: [
+        { icon: "cap", label: "Training" },
+        { icon: "briefcase", label: "A job" },
+        { icon: "compass", label: "Work experience" },
+      ],
+      today: "Places today",
+      more: "More places",
+      scale: "Not to scale",
       alt: "The Youth Guarantee offers training, a job or work experience; the expansion adds places for young people.",
     },
   },

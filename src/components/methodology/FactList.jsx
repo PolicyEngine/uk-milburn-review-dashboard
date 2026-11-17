@@ -1,41 +1,4 @@
-import {
-  ArrowUpDown,
-  Banknote,
-  BookOpen,
-  CalendarDays,
-  CalendarRange,
-  ChartColumnBig,
-  ChartScatter,
-  Info,
-  ClipboardList,
-  Cpu,
-  Database,
-  FileCheck,
-  Gavel,
-  GitCompare,
-  HeartPulse,
-  Map as MapIcon,
-  Pause,
-  Percent,
-  PoundSterling,
-  Scale,
-  ShieldCheck,
-  Sigma,
-  TrendingUp,
-  UserCheck,
-  Users,
-  Workflow,
-  Cake,
-  Accessibility,
-  Briefcase,
-  CircleSlash,
-  Dice5,
-  Landmark,
-  Layers,
-  Megaphone,
-  Package,
-  Sliders,
-} from "lucide-react";
+import { Accessibility, ArrowUpDown, Banknote, BookOpen, Briefcase, Cake, CalendarDays, CalendarRange, ChartColumnBig, ChartScatter, CircleSlash, ClipboardList, Cpu, Database, Dice5, FileCheck, Gavel, GitCompare, HeartPulse, HelpCircle, Info, Landmark, Layers, Map as MapIcon, Megaphone, Package, Pause, Percent, PoundSterling, Scale, ShieldCheck, Sigma, Sliders, TrendingUp, UserCheck, Users, Workflow } from "lucide-react";
 
 // An icon for each term the Methodology view defines, by its text
 const TERM_ICONS = {
@@ -101,6 +64,8 @@ const TERM_ICONS = {
   "Cash terms": PoundSterling,
   "Under 25": Users,
   Microsimulated: Sliders,
+  "Why 25%": HelpCircle,
+  "Who moves": Users,
   "Entry cases": Briefcase,
   "Break-even": Landmark,
   "No NEET variable": CircleSlash,
@@ -113,6 +78,8 @@ const TERM_ICONS = {
   "No replacement in the upper bound": CircleSlash,
   "Not computable": CircleSlash,
   "Not announced policy": Megaphone,
+  // The same limit once the final report is published (utils/milburn/reportStatus.js)
+  "Not government policy": Megaphone,
 };
 
 /**

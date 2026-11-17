@@ -697,3 +697,56 @@
   font-weight: 600;
   color: var(--c-text);
 }
+
+/* Return to work: the assumption, its Methodology link and the year it
+   covers, in one quiet panel set apart from the cards below */
+.milburn-assumption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 24px;
+  padding: 12px 16px;
+  border: 1px solid var(--c-grid);
+  border-left: 3px solid var(--c-notice-text);
+  border-radius: 8px;
+  background: var(--c-surface);
+}
+
+.milburn-assumption-icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--c-notice-text);
+}
+
+.milburn-assumption-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.milburn-assumption-text {
+  margin: 0;
+  color: var(--c-text);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.milburn-assumption-text .method-link {
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.milburn-assumption-year {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--c-subtab-muted);
+  font-size: var(--fs-caption);
+}
+
+/* The 2027-28-only chip elsewhere: room above the cards it sits over */
+.milburn-year-only {
+  margin: 4px 0 20px;
+}

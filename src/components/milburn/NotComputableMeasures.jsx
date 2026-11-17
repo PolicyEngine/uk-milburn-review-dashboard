@@ -3,11 +3,13 @@ import { PolicyCard } from "../PolicyCards";
 import { NOT_COMPUTABLE_MEASURES } from "../../utils/milburn/notComputable";
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { NOT_YET_RUN } from "../../utils/milburn/localBuild";
-import UnmodelledVisual from "../policies/UnmodelledVisual";
+import { NotComputableVisual } from "../policies/MilburnVisual";
+import { reportCopy } from "../../utils/milburn/reportStatus";
 import "./milburn.css";
 
-export const NOT_COMPUTABLE_TITLE = "Candidate measures we cannot compute";
-export const NOT_YET_RUN_TITLE = "Candidate measures not yet run";
+// The headings, in the report-status switch's words (utils/milburn/reportStatus.js)
+export const NOT_COMPUTABLE_TITLE = reportCopy().notComputableTitle;
+export const NOT_YET_RUN_TITLE = reportCopy().notYetRunTitle;
 
 /**
  * The not-computable measures as the local build route lists them
@@ -98,8 +100,8 @@ export default function NotComputableMeasures({ measures: given }) {
                 ].filter(Boolean),
                 category: measure.category,
                 notModelled: measure.notModelled,
-                // A picture in words (no figure), where the measure has one
-                visual: measure.visual ? <UnmodelledVisual measure={measure} visuals={{ [measure.id]: measure.visual }} /> : undefined,
+                // A diagram (no figure), where the measure has one
+                visual: measure.visual ? <NotComputableVisual measure={measure} /> : undefined,
                 timeline: false,
                 direction: "neutral",
               }}

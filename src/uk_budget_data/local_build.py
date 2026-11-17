@@ -42,8 +42,16 @@ DATASET_SHA256 = (
     "301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90"
 )
 ENGINE = {"policyengine-uk": "2.177.7", "policyengine-core": "3.34.10"}
-# The policyengine.py release whose bundle certifies this build
-POLICYENGINE_RELEASE = "6.20.1"
+# The installed policyengine.py release (6.20.1 and later certify this build;
+# bundle_certifies checks the installed one)
+def _installed_policyengine() -> str:
+    try:
+        return metadata.version("policyengine")
+    except metadata.PackageNotFoundError:
+        return "unknown"
+
+
+POLICYENGINE_RELEASE = _installed_policyengine()
 LABEL = (
     f"build {BUILD_SHORT}, policyengine-uk {ENGINE['policyengine-uk']}, "
     f"certified in policyengine {POLICYENGINE_RELEASE}"

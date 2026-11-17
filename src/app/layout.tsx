@@ -19,14 +19,16 @@ import { earlyManifestScript } from '@/utils/publication/early';
 import { BOOT_VIEW_SCRIPT } from '@/utils/bootView';
 import { publicationBoot } from './publicationBoot';
 import { isLocalBuildRoute } from '@/utils/milburn/localBuild';
+import { reportCopy } from '@/utils/milburn/reportStatus';
 import { GA_INIT_SCRIPT, GA_MEASUREMENT_ID } from '@/utils/analytics';
 import { chartChunkFiles, chartChunkScript } from '@/utils/chartChunk';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const TITLE = 'Milburn review: young people and work';
-const DESCRIPTION =
-  'PolicyEngine UK estimates of candidate measures for the Milburn review of young people and work, modelled before the review is published: the public finances, households by age, and the package if some young people move into work. These are not announced policy.';
+// The meta description, in the report-status switch's words
+// (utils/milburn/reportStatus.js)
+const DESCRIPTION: string = reportCopy().metaDescription;
 
 // Inter, committed with the page (fonts/: the variable face, every weight,
 // Latin subset; SIL Open Font License in fonts/OFL.txt): the

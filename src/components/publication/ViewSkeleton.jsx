@@ -4,6 +4,7 @@ import { TAB_ICONS } from "../ViewTabs";
 import { BOOT_SUBS, BOOT_TABS } from "../../utils/bootView";
 import { POVERTY_FIGURES_SHOWN } from "../../utils/povertyFigures";
 import { subShownOnReportDay } from "../../utils/milburn/reportDay";
+import { reportCopy } from "../../utils/milburn/reportStatus";
 import "./publication.css";
 
 /**
@@ -50,7 +51,7 @@ const LAYOUTS = {
     { icon: "lifebuoy", title: "How the policies change poverty", subtitle: "With the selected policies.", cards: [["bars"], ["bars"]] },
   ],
   policies: [
-    { icon: "fileText", title: "Measures we model", subtitle: "What each candidate measure changes, and how we model it.", cards: [["text", "wide"], ["text", "wide"], ["text", "wide"]] },
+    { icon: "fileText", title: "Measures we model", subtitle: reportCopy().measuresPlaceholderSubtitle, cards: [["text", "wide"], ["text", "wide"], ["text", "wide"]] },
   ],
   methodology: [
     { icon: "book", title: "Methodology", cards: [["text", "wide"], ["text", "wide"]] },

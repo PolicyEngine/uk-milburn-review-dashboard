@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import App, { POLICIES_INACTIVE, VIEWS, YEAR_INACTIVE, opensYoungPeople, viewFromLocation, preloadAllViews } from "./App";
 import { BASE_PATH, fixtureFetch, fixtureJson } from "./test/publicationFixture";
 import { POVERTY_FIGURES_SHOWN } from "./utils/povertyFigures";
+import { reportCopy } from "./utils/milburn/reportStatus";
 
 // Every view's code is in before a test renders it (App.jsx lazyView)
 beforeAll(preloadAllViews, 60_000);
@@ -168,7 +169,7 @@ describe("the view tabs", () => {
     // measures the dashboard cannot compute follow, each with its reason
     const modelled = panel.querySelector("#policy-details");
     expect(within(modelled).getAllByRole("listitem")).toHaveLength(1);
-    const notComputable = within(panel).getByRole("region", { name: "Candidate measures we cannot compute" });
+    const notComputable = within(panel).getByRole("region", { name: reportCopy().notComputableTitle });
     expect(within(notComputable).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual([
       "Higher health element for severe conditions",
       "Additional cost allowance",

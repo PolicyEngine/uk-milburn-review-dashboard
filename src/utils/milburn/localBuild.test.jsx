@@ -24,7 +24,7 @@ import { youngPeopleWorseOff } from "./youngPeople";
 import { packageStaticBn } from "./scenarios";
 import { MeasureCatalogueProvider } from "../measureCatalogue";
 import LocalBuildLabel from "../../components/milburn/LocalBuildLabel";
-import NotComputableMeasures, { NOT_YET_RUN_TITLE } from "../../components/milburn/NotComputableMeasures";
+import NotComputableMeasures, { NOT_COMPUTABLE_TITLE, NOT_YET_RUN_TITLE } from "../../components/milburn/NotComputableMeasures";
 
 const FIXTURE = join(__dirname, "..", "..", "test", "fixtures", "milburn", "local-build");
 const LABEL = "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release";
@@ -235,7 +235,7 @@ describe("the page's figures from the local build", () => {
 });
 
 describe("the label and the Policies lists", () => {
-  it("say the build and that it is not certified", async () => {
+  it("say an uncertified build in the notice, and list only runs not yet made", async () => {
     const { catalogue } = dashboardFromParts(await loadParts());
     expect(localBuildNotice(catalogue.localBuild)).toBe("Local build 6f918b81 · policyengine-uk 2.177.7 · not certified");
     render(
@@ -244,13 +244,14 @@ describe("the label and the Policies lists", () => {
         <NotComputableMeasures />
       </MeasureCatalogueProvider>,
     );
-    expect(screen.getByRole("note").textContent).toContain(`Figures from ${LABEL}: not certified.`);
+    // The build and versions are in About and Methodology, not on this line
+    expect(screen.getByRole("note").textContent).not.toContain(LABEL);
     expect(screen.getByRole("note").textContent).toContain("Not yet run: ");
     const pending = screen.getByRole("region", { name: NOT_YET_RUN_TITLE });
     expect(pending.textContent).toContain("Employer NICs zero rate extended to under-25s");
     expect(pending.textContent).not.toContain("PIP removed for 18 to 24-year-olds");
     expect(pending.textContent).not.toMatch(/£0/);
-    const notComputable = screen.getByRole("region", { name: "Candidate measures we cannot compute" });
+    const notComputable = screen.getByRole("region", { name: NOT_COMPUTABLE_TITLE });
     expect(notComputable.textContent).toContain("The data hold no severe conditions flag");
   });
 });

@@ -295,5 +295,6 @@ export function localBuildNotice(localBuild) {
     .replace(/,?\s*not in a policyengine\.py release$/i, "")
     .split(/,\s*/)
     .join(" · ");
-  return localBuild.certified ? `Build ${short}` : `Local build ${short} · not certified`;
+  // A certified build needs no notice: its versions are in About and Methodology
+  return localBuild.certified ? "" : `Local build ${short} · not certified`;
 }

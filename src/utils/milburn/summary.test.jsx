@@ -41,6 +41,7 @@ import KeyFigures, {
 } from "../../components/milburn/KeyFigures";
 import { yearOnlyText } from "../../components/milburn/MilburnCharts";
 import { FinancesHeadline, PovertyHeadline, barShare } from "../../components/milburn/HeadlineTiles";
+import { reportCopy } from "./reportStatus";
 import {
   BreakEven,
   ENTRY_RUN_HEADING,
@@ -437,7 +438,7 @@ describe("measure groups", () => {
       { id: "milburn_package_phased" },
       { id: "milburn_package" },
     ]);
-    expect(groups.map((group) => group.label)).toEqual(["Packages", "Single measures", "Variants", "Comparators, not review proposals"]);
+    expect(groups.map((group) => group.label)).toEqual(["Packages", "Single measures", "Variants", reportCopy().comparatorsLabel]);
     expect(groups[0].measures.map((measure) => measure.id)).toEqual(["milburn_package", "milburn_package_phased"]);
     // The 25% entry run and the new-claims run stay loadable but are not offered
     expect(groups.flatMap((group) => group.measures.map((measure) => measure.id))).not.toContain("milburn_package_entry_25pct");

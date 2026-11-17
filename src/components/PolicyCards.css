@@ -118,10 +118,28 @@
   text-underline-offset: 3px;
 }
 
+/* Why a measure is not modelled: a badge (icon and title), then the reason */
 .policy-card-why {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 6px;
+  padding: 10px 12px;
+  background: var(--c-muted-fill);
+  border-left: 3px solid var(--c-before);
+  border-radius: 6px;
+}
+
+.policy-card-why .policy-card-example-title {
+  padding: 2px 9px 2px 6px;
+  font-size: var(--fs-micro);
+  background: var(--c-surface);
+  border: 1px solid var(--c-axis);
+  border-radius: 999px;
+}
+
+.policy-card-why .policy-card-example-text {
+  color: var(--pe-gray-700);
 }
 
 /* Who it reaches, in full: a row of its own under Starts and Ends */

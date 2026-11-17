@@ -3,7 +3,11 @@ import SectionHeading from "../SectionHeading";
 import TitleIcon from "../TitleIcon";
 import { Bar, BarChart, CartesianGrid, LabelList, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { TOOLTIP_PROPS } from "../ChartTooltip";
-import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, YearOnlyChip } from "./MilburnCharts";
+import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, yearOnlyText } from "./MilburnCharts";
+import { MethodLink } from "../../utils/methodLink";
+
+/** The Methodology passage on the move into work: the share, who, and why. */
+export const ENTRY_METHOD_ANCHOR = "method-behavioural-scenarios";
 import { buildChartCsv } from "../../utils/chartCsv";
 import {
   AXIS_LINE,
@@ -626,11 +630,22 @@ export default function BehaviouralScenarios({ selectedRun } = {}) {
         title="Return to work"
         subtitle="What changes if some non-working young people with PIP or the health element move into work."
       />
-      <p className="milburn-label" role="note">
-        <TitleIcon name="alert" bare size={14} />
-        <span>{SCENARIOS_LABEL}</span>
-      </p>
-      {summaryState.status === "ready" && <YearOnlyChip year={summaryState.summary.year} what="this tab" />}
+      {/* The assumption, the link to how it was chosen, and the year it covers, in one panel */}
+      <div className="milburn-assumption" role="note">
+        <TitleIcon name="info" bare size={16} className="milburn-assumption-icon" />
+        <div className="milburn-assumption-body">
+          <p className="milburn-assumption-text">
+            <span>{SCENARIOS_LABEL}</span>{" "}
+            <MethodLink anchor={ENTRY_METHOD_ANCHOR}>Why 25%, and how it is run</MethodLink>
+          </p>
+          {summaryState.status === "ready" && Number.isInteger(summaryState.summary.year) && (
+            <p className="milburn-assumption-year" data-year-only="">
+              <TitleIcon name="calendar" bare size={13} />
+              {yearOnlyText(summaryState.summary.year, "this tab")}
+            </p>
+          )}
+        </div>
+      </div>
       {lead}
       {cases}
       <BreakEvenSection runId={selectedRun} catalogue={catalogue} summaryState={summaryState} />

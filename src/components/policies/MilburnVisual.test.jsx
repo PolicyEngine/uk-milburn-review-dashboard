@@ -127,11 +127,102 @@ describe("MilburnVisual", () => {
   });
 });
 
-it("the measures we cannot compute: a picture in words, never a figure", async () => {
-  const { NOT_COMPUTABLE_MEASURES } = await import("../../utils/milburn/notComputable");
-  const { UNMODELLED_VISUAL_KINDS } = await import("./UnmodelledVisual");
-  for (const measure of NOT_COMPUTABLE_MEASURES) {
-    expect(Object.keys(UNMODELLED_VISUAL_KINDS), measure.id).toContain(measure.visual.kind);
-    expect(JSON.stringify(measure.visual), measure.id).not.toMatch(/[£%\d]/);
-  }
+describe("the measures we cannot compute (NotComputableVisual)", () => {
+  const load = async () => {
+    const { NOT_COMPUTABLE_MEASURES } = await import("../../utils/milburn/notComputable");
+    const { NotComputableVisual, NOT_COMPUTABLE_KINDS } = await import("./MilburnVisual");
+    const byId = Object.fromEntries(NOT_COMPUTABLE_MEASURES.map((measure) => [measure.id, measure]));
+    return { NOT_COMPUTABLE_MEASURES, NotComputableVisual, NOT_COMPUTABLE_KINDS, byId };
+  };
+
+  it("gives each a diagram of a known kind, in words and icons, never a figure", async () => {
+    const { NOT_COMPUTABLE_MEASURES, NotComputableVisual, NOT_COMPUTABLE_KINDS } = await load();
+    expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.visual.kind)).toEqual(["split", "swap", "split", "offers"]);
+    for (const measure of NOT_COMPUTABLE_MEASURES) {
+      expect(Object.keys(NOT_COMPUTABLE_KINDS), measure.id).toContain(measure.visual.kind);
+      expect(JSON.stringify(measure.visual), measure.id).not.toMatch(/[£%\d]/);
+      const { unmount } = render(<NotComputableVisual measure={measure} />);
+      const block = screen.getByRole("region", { name: `What changes: ${measure.name}` });
+      // One image, named by the measure's sentence; its drawing hidden from screen readers
+      const figure = screen.getByRole("img");
+      expect(block).toContainElement(figure);
+      expect(figure).toHaveAccessibleName(measure.visual.alt);
+      expect(figure.querySelector(".mnc-body")).toHaveAttribute("aria-hidden", "true");
+      expect(figure.textContent, measure.id).not.toMatch(/[£%\d]/);
+      // Icons drawn, each with a label beside it
+      expect(figure.querySelectorAll(".mnc-icon svg").length, measure.id).toBeGreaterThanOrEqual(2);
+      unmount();
+    }
+  });
+
+  it("draws nothing for a measure with no diagram, or one of an unknown kind", async () => {
+    const { NotComputableVisual } = await load();
+    const { container } = render(
+      <>
+        <NotComputableVisual measure={{ id: "a", name: "A" }} />
+        <NotComputableVisual measure={{ id: "b", name: "B", visual: { kind: "toString", alt: "B." } }} />
+      </>,
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("severe conditions: a split on the criteria, the higher element where they are met, the missing flag dashed", async () => {
+    const { NotComputableVisual, byId } = await load();
+    const { container } = render(<NotComputableVisual measure={byId.severe_conditions_higher_rate} />);
+    expect(container.querySelector(".mnc-trunk").textContent).toBe("A claimantSevere conditions criteriaNo flag in the data");
+    expect(container.querySelector(".mnc-trunk .mnc-node.is-unknown .mnc-chip.is-unknown")).toHaveTextContent("No flag in the data");
+    const branches = [...container.querySelectorAll(".mnc-branch")];
+    expect(branches.map((branch) => branch.textContent)).toEqual(["Not metHealth element", "MetHigher health element"]);
+    expect(branches[1]).toHaveClass("is-gain");
+    expect(branches[1].querySelector(".mnc-icon-plus")).not.toBeNull();
+    expect(container.querySelector(".mnc-marker")).toBeNull();
+  });
+
+  it("additional cost allowance: PIP swapped for the allowance, its eligibility and rates unknown", async () => {
+    const { NotComputableVisual, byId } = await load();
+    const { container } = render(<NotComputableVisual measure={byId.additional_cost_allowance} />);
+    const [today, proposed] = container.querySelectorAll(".mnc-card");
+    expect(today).toHaveTextContent("TodayPIPEligibilityRates");
+    expect(today.querySelectorAll(".mnc-chip.is-unknown")).toHaveLength(0);
+    expect(proposed).toHaveClass("is-unknown");
+    expect(proposed).toHaveTextContent("ProposedAdditional cost allowance");
+    expect([...proposed.querySelectorAll(".mnc-chip.is-unknown")].map((chip) => chip.textContent)).toEqual(["Eligibility", "Rates"]);
+    expect(container.querySelector(".mnc-swap > .mnc-arrow")).not.toBeNull();
+  });
+
+  it("conditionality: requirements, met or not met, a sanction in the loss colour, marked behavioural", async () => {
+    const { NotComputableVisual, byId } = await load();
+    const { container } = render(<NotComputableVisual measure={byId.youth_conditionality} />);
+    expect(container.querySelector(".mnc-trunk").textContent).toBe("A claimantRequirements");
+    const branches = [...container.querySelectorAll(".mnc-branch")];
+    expect(branches.map((branch) => branch.textContent)).toEqual(["MetAward continues", "Not metSanction"]);
+    expect(branches[1]).toHaveClass("is-loss");
+    expect(container.querySelector(".mnc-marker")).toHaveTextContent("Behavioural, not modelled");
+    expect(screen.getByRole("img")).toHaveAccessibleName(/not modelled\.$/);
+  });
+
+  it("Youth Guarantee: three offers, then today's places and more of them, not to scale", async () => {
+    const { NotComputableVisual, byId } = await load();
+    const { container } = render(<NotComputableVisual measure={byId.youth_guarantee_expansion} />);
+    expect([...container.querySelectorAll(".mnc-tiles .mnc-node")].map((tile) => tile.textContent)).toEqual(["Training", "A job", "Work experience"]);
+    expect(container.querySelector(".mnc-places").textContent).toBe("Places todayMore places");
+    expect(container.querySelector(".mnc-scale")).toHaveTextContent("Not to scale");
+  });
+
+  it("each card keeps its Who and Kind facts, and badges why it is not modelled", async () => {
+    const { NOT_COMPUTABLE_MEASURES } = await load();
+    const { default: NotComputableMeasures } = await import("../milburn/NotComputableMeasures");
+    const { WHY_NOT_MODELLED } = await import("../PolicyCards");
+    const { container } = render(<NotComputableMeasures measures={NOT_COMPUTABLE_MEASURES} />);
+    const cards = [...container.querySelectorAll(".policy-card")];
+    expect(cards).toHaveLength(NOT_COMPUTABLE_MEASURES.length);
+    cards.forEach((card, index) => {
+      const measure = NOT_COMPUTABLE_MEASURES[index];
+      expect(card.querySelector(".mnc[role=img]"), measure.id).not.toBeNull();
+      expect(card.querySelector(".policy-card-points").textContent, measure.id).toBe(`Who${measure.affects}Kind${measure.kind}`);
+      const why = card.querySelector(".policy-card-why");
+      expect(why.querySelector(".policy-card-example-title svg"), measure.id).not.toBeNull();
+      expect(why.textContent, measure.id).toBe(`${WHY_NOT_MODELLED}${measure.notModelled}`);
+    });
+  });
 });

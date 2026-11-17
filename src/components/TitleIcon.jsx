@@ -331,6 +331,29 @@ const ICONS = {
     </>
   ),
   equal: <path d="M5 9h14M5 15h14" />,
+  // The not-computable measures' diagrams (policies/MilburnVisual.jsx)
+  check: <path d="M20 6 9 17l-5-5" />,
+  plus: <path d="M5 12h14M12 5v14" />,
+  arrowRight: <path d="M5 12h14M13 6l6 6-6 6" />,
+  help: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" />
+    </>
+  ),
+  clipboard: (
+    <>
+      <rect x="8" y="2" width="8" height="4" rx="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="m9 14 2 2 4-4" />
+    </>
+  ),
+  ban: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m5.6 5.6 12.8 12.8" />
+    </>
+  ),
 };
 
 /**

@@ -14,14 +14,14 @@ export default function LocalBuildLabel() {
   const catalogue = useMeasureCatalogue();
   const local = catalogue.localBuild;
   if (!local) return null;
+  // The build and versions are in About this dashboard and Methodology; this
+  // line shows only runs not yet made, which have no figures (Vahid, 17 Nov)
   const pending = catalogue.measures.filter((measure) => measure.availability?.reason === NOT_YET_RUN);
+  if (!pending.length) return null;
   return (
     <p className="milburn-label milburn-build-label" role="note" data-local-build="">
-      <TitleIcon name={local.certified ? "shield" : "alert"} bare size={14} />
-      <span>
-      Figures from {local.label}{local.certified ? "." : ": not certified."}
-      {pending.length > 0 && ` ${NOT_YET_RUN}: ${pending.map((measure) => measure.name).join(", ")}.`}
-      </span>
+      <TitleIcon name="alert" bare size={14} />
+      <span>{`${NOT_YET_RUN}: ${pending.map((measure) => measure.name).join(", ")}.`}</span>
     </p>
   );
 }

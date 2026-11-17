@@ -25,7 +25,7 @@ export const BENCHMARK_THEMES = [
     key: "spending",
     title: "Spending and costs",
     icon: "landmark",
-    ids: ["incapacity_spending_18_24", "young_benefits_spend", "employer_nics_under_25"],
+    ids: ["incapacity_spending_18_24", "young_benefits_spend", "milburn_welfare_saving_10y", "employer_nics_under_25"],
   },
   {
     key: "poverty",
@@ -62,6 +62,11 @@ export const BENCHMARK_SHORT = {
   },
   incapacity_spending_18_24: { label: "Incapacity benefit spending, ages 18 to 24", icon: "trend" },
   young_benefits_spend: { label: "PIP and UC health spending on young people", icon: "banknote" },
+  milburn_welfare_saving_10y: {
+    label: "Welfare savings Milburn expects over ten years",
+    icon: "coins",
+    basis: "Said before the report; if changes come quickly, initial costs met by the government",
+  },
   employer_nics_under_25: {
     label: "Cost of zero employer NICs for under-25s",
     icon: "building",

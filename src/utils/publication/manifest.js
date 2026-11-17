@@ -8,6 +8,7 @@
  */
 
 import contract from "./contract.json";
+import { reportCopy } from "../milburn/reportStatus";
 
 export const MANIFEST_SCHEMA = contract.manifest_schema;
 export const MANIFEST_FILE = contract.manifest_file;
@@ -23,9 +24,12 @@ export const NOT_COMPUTABLE = "not_computable";
 export const PROVISIONAL_LABEL =
   "Provisional: figures awaiting review";
 
-/** The provisional label before the Budget: the entries are candidates. */
-export const CANDIDATE_PROVISIONAL_LABEL =
-  "Provisional: candidate measures modelled before the review is published, not announced policy";
+/**
+ * The provisional label before the Budget: the entries are candidates. Its
+ * words are the report-status switch's (milburn/reportStatus.js): once the
+ * final report is published it names the report's measures instead.
+ */
+export const CANDIDATE_PROVISIONAL_LABEL = reportCopy().provisionalLabel;
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}/;
 

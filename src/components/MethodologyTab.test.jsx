@@ -237,7 +237,7 @@ describe("MethodologyTab", () => {
 
   it("names the build, the model and that the figures are static", () => {
     const { container } = renderTab();
-    expect(container).toHaveTextContent("Microcosm UK build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1");
+    expect(container).toHaveTextContent("Microcosm UK build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2");
     expect(container).toHaveTextContent("policyengine-core 3.34.10");
     expect(container).toHaveTextContent("uk-frs-calibration-attempt-20261115T104657Z-fcfac709");
     expect(container).toHaveTextContent("no behavioural response in the main figures");

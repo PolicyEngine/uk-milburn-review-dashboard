@@ -6,12 +6,12 @@
     {
       "id": "neet_16_24",
       "figure": "Young people aged 16 to 24 not in education, employment or training (NEET)",
-      "value": "About 1.0 million",
-      "basis": "Labour Force Survey estimate, UK",
-      "source": "ONS Labour Force Survey, via the review's interim report",
-      "url": "https://gov.uk/government/publications/young-people-and-work-interim-report",
-      "date": "28 May 2026",
-      "press_report": false,
+      "value": "981,000",
+      "basis": "Labour Force Survey estimate, three months to June 2026, UK (about one in eight 16 to 24-year-olds)",
+      "source": "ONS figures, as reported by BBC News",
+      "url": "https://www.bbc.co.uk/news/live/cq20xlrd044lt",
+      "date": "17 November 2026",
+      "press_report": true,
       "policyengine_estimate": null
     },
     {
@@ -85,6 +85,17 @@
       "source": "Benefits and Work, reporting the interim report",
       "url": "https://benefitsandwork.co.uk/news/milburn-proposes-abolition-of-pip-and-uc-health-for-under-25s",
       "date": "1 June 2026",
+      "press_report": true,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "milburn_welfare_saving_10y",
+      "figure": "Welfare savings the review's author expects over ten years",
+      "value": "£13.8bn over 10 years",
+      "basis": "Alan Milburn, before the report: if changes come quickly, with initial costs met by the government",
+      "source": "BBC News live page",
+      "url": "https://www.bbc.co.uk/news/live/cq20xlrd044lt",
+      "date": "17 November 2026",
       "press_report": true,
       "policyengine_estimate": null
     },

@@ -1,5 +1,6 @@
 'use client';
 
+import { DISCLOSURE_OPEN_EVENT, openDisclosuresAround } from "./components/Disclosure";
 import { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback, Suspense } from "react";
 import PolicySelector from "./components/PolicySelector";
 import YearSlider from "./components/YearSlider";
@@ -30,6 +31,7 @@ import { bootView } from "./utils/bootView";
 import { POVERTY_FIGURES_SHOWN } from "./utils/povertyFigures";
 import UpdateToast from "./components/publication/UpdateToast";
 import { provisionalNotice } from "./utils/publication/manifest";
+import { reportCopy } from "./utils/milburn/reportStatus";
 import { isLocalBuildRoute, localBuildNotice } from "./utils/milburn/localBuild";
 import LocalBuildLabel from "./components/milburn/LocalBuildLabel";
 import { milburnDefaultMeasure } from "./utils/milburn/measureGroups";
@@ -836,12 +838,12 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           if ((tries += 1) < 30) setTimeout(find, 100);
           return;
         }
-        let folded = target.closest("details");
-        while (folded) {
-          folded.open = true;
-          folded = folded.parentElement?.closest("details");
-        }
+        // Opens folded details and the Methodology topics (Disclosure) it
+        // sits in, the target itself included, then scrolls once they open
+        openDisclosuresAround(target);
+        target.dispatchEvent(new CustomEvent(DISCLOSURE_OPEN_EVENT));
         scrollBelowBars(target);
+        setTimeout(() => scrollBelowBars(target), 350);
       };
       setTimeout(find, 100);
     };
@@ -1161,7 +1163,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           <UnavailableNotice reason={viewUnavailable(value).reason}>
             {viewUnavailable(value).detail && <p>{viewUnavailable(value).detail}</p>}
             {unavailable ? (
-              unavailable.empty && <p>Figures appear here once the candidate measures&rsquo; results are published.</p>
+              unavailable.empty && <p>{reportCopy().measuresEmptyLine}</p>
             ) : (
               <>
                 <p>No figures are shown for a selection while any of it is unavailable.</p>
@@ -1178,7 +1180,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
             <SectionHeading
               icon="fileText"
               title="Measures we model"
-              subtitle={`${notice ? `${notice}. ` : ""}Candidate measures for the Milburn review: what each changes, and how we model it.`}
+              subtitle={`${notice ? `${notice}. ` : ""}${reportCopy().measuresSubtitle}`}
             />
             <section id="policy-details" className="report-section policy-details-content">
               <PolicyCards

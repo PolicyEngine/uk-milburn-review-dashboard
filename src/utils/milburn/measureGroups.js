@@ -6,6 +6,11 @@
  * replaced, with a plain statement of what each package assumes.
  */
 
+import { reportCopy } from "./reportStatus";
+
+// The comparators' heading: the report-status switch's words
+const COMPARATORS_LABEL = reportCopy().comparatorsLabel;
+
 /** The packages' names on the page, by run id. */
 export const MILBURN_DISPLAY_NAMES = Object.freeze({
   milburn_package: "Full abolition, no replacement (upper bound)",
@@ -40,7 +45,7 @@ export const MILBURN_GROUPS = Object.freeze([
   },
   {
     id: COMPARATORS_GROUP,
-    label: "Comparators, not review proposals",
+    label: COMPARATORS_LABEL,
     ids: ["youth_allowance_at_25_plus_rate", "employer_nics_zero_under_25"],
   },
   { id: HIDDEN_GROUP, label: null, hidden: true, ids: ["milburn_package_entry_25pct", "uc_health_element_removed_under_25_new_claims"] },

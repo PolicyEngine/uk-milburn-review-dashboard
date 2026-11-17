@@ -2,6 +2,7 @@
 import { renderToString } from "react-dom/server";
 import { expect, it } from "vitest";
 import App from "./App";
+import { reportCopy } from "./utils/milburn/reportStatus";
 
 it("prerenders the shell without a browser or any Budget figures", () => {
   expect(typeof window).toBe("undefined");
@@ -13,7 +14,8 @@ it("prerenders the shell without a browser or any Budget figures", () => {
   }
   expect(html).not.toContain("Household calculator");
   // The landing page, whole, with no view mounted under it
-  expect(html).toContain("Young people and work: candidate measures modelled");
+  // The heading in the report-status switch's state (reportStatus.test.jsx pins both)
+  expect(html).toContain(reportCopy().landingHeading);
   expect(html).not.toContain("Pre-measures forecast");
   expect(html).toContain('class="landing-backdrop"');
   expect(html).not.toContain('role="tabpanel"');
