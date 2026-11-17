@@ -1,5 +1,12 @@
 # Morning report, 17 November 2026
 
+## Update, early 17 Nov: certified build done
+
+- Upgraded to **policyengine 6.20.1** (approved by Vahid): `pyproject.toml` depends on the bundle with no engine override; `local_build.py` runs on certified build **fcfac709** (SHA-256 `301d2fe5…`, same file the bundle pins, checked by `bundle_certifies()`); the page says "Figures from build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1." with no "not certified".
+- **All 13 runs re-ran on fcfac709** (lock freed at about 23:50; done 01:27). Every results table is **byte-identical** to the 6f918b81 runs: the two builds differ only in `main_residence_value` for 131 of 78,164 households (same mean), which no Milburn measure uses. So every figure on the page stands, now on certified data; only labels changed.
+- Commits `318e3189` (upgrade) and `3c6a34a5` (re-run); `main` is 5 ahead of origin, not pushed.
+- **The shared artifact was not refreshed**: updating a link-shared artifact was refused by the permission system. The rebuilt export is staged in `artifact-export/publish/` (144 files); it still shows version 3 (6f918b81 labels, same figures) until you allow the update.
+
 What happened overnight on the Milburn dashboard, and what to do first. Nothing was pushed, posted or deployed. `main` is 2 commits ahead of `origin` (`0287c2d7` artifact export, `d4854826` report-day prep).
 
 ## Do first (needs you)
