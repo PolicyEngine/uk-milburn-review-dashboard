@@ -50,8 +50,9 @@ export const LOCAL_TABLES = Object.freeze({
 export const OPTIONAL_LOCAL_TABLES = Object.freeze({});
 
 // Read as flat files: metrics.csv carries the poverty and inequality
-// columns after its contract columns (csv.js FLAT_EXTRA_COLUMNS)
-const FLAT_PARSED = new Set(["metrics"]);
+// columns after its contract columns, and age_impact.csv the mean change
+// among people in losing and gaining households (csv.js FLAT_EXTRA_COLUMNS)
+const FLAT_PARSED = new Set(["metrics", "age_impact"]);
 
 /**
  * Whether this build reads the local build route: NEXT_PUBLIC_DATA_ROUTE,

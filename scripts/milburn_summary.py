@@ -24,6 +24,59 @@ def rows(path):
         return list(csv.DictReader(f))
 
 
+# The run's direction's conditional mean in age_impact.csv
+# (calculators.AGE_CONDITIONAL_COLUMNS): the mean change among the people
+# in losing (or gaining) households only.
+CONDITIONAL_COLUMN = {
+    False: "mean_change_worse_off",
+    True: "mean_change_better_off",
+}
+# Without that column, a run whose 16-24s both gain and lose by more than
+# this share (%) has no average: the netted mean would misstate it.
+MIXED_SHARE_PCT = 0.05
+
+
+def average_loss(young: dict, gains: bool):
+    """The average change in household net income for a 16-24-year-old in
+    a losing household (positive: a loss), or in a gaining household for a
+    gain run (negative: a gain), with how it was found.
+
+    Read from the row's conditional mean for the run's direction. A file
+    from before that column falls back to the netted mean over all 16-24s
+    divided by the share on the run's side, which is exact only when no
+    16-24 is on the other side: when both shares are over MIXED_SHARE_PCT,
+    the average is None. Returns (average or None, basis)."""
+    column = CONDITIONAL_COLUMN[gains]
+    if column in young:
+        value = young[column]
+        if value in (None, ""):
+            return None, (
+                "not available: too few survey records in "
+                + ("gaining" if gains else "losing")
+                + " households"
+            )
+        return -float(value), (
+            "mean change among 16-24s in "
+            + ("gaining" if gains else "losing")
+            + " households"
+        )
+    better = float(young["pct_better_off"])
+    worse = float(young["pct_worse_off"])
+    if min(better, worse) > MIXED_SHARE_PCT:
+        return None, (
+            "not available: 16-24s both gain and lose and the file has no"
+            " conditional mean, so the netted mean would misstate it"
+        )
+    share = (better if gains else worse) / 100
+    if not share:
+        return None, "not available: no 16-24s affected"
+    return -float(young["mean_change"]) / share, (
+        "netted mean over all 16-24s divided by the share affected"
+        " (file without the conditional mean; under "
+        f"{MIXED_SHARE_PCT}% on the other side)"
+    )
+
+
 def summarise(run_dir: Path, scenarios: dict) -> dict:
     build = json.loads((run_dir / "model_build.json").read_text())
     rid = run_dir.name
@@ -46,11 +99,8 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     gains = better > worse
     if gains:
         worse = better
-    mean_change = float(young["mean_change"])
     affected = people * worse
-    # Average change in household net income for a young person in an
-    # affected household (household-level loss attributed to the person).
-    loss_affected = (-mean_change / worse if worse else None)
+    loss_affected, loss_basis = average_loss(young, gains)
     out = {
         "id": rid,
         "label": build["label"],
@@ -61,6 +111,7 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
         "average_loss_young_person_in_losing_household": (
             round(loss_affected) if loss_affected is not None else None
         ),
+        "average_loss_basis": loss_basis,
         "everyone_in_losing_households_pct": round(
             float(ages["all"]["pct_worse_off"]), 2
         ),
@@ -109,7 +160,9 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     # (a single 22-year-old renter with LCWRA); a household with PIP or a
     # partner gains differently, so this is an order of magnitude, not an
     # estimate.
-    if loss_affected and loss_affected > 0 and not gains and scenarios:
+    # The break-even uses the saving and the count of young people in
+    # losing households, not the average loss, so it does not wait on it.
+    if not gains and affected > 0 and scenarios:
         cases = scenarios.get("entry_cases", [])
         saving = budget.get(YEAR, 0) * 1e9
         entrants = {
@@ -129,6 +182,10 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
             c["id"]: c["exchequer_gain_package"] for c in cases
         }
     return out
+
+
+def loss_text(value):
+    return "–" if value is None else f"£{value:,}"
 
 
 def main():
@@ -155,7 +212,7 @@ def main():
             f"| {r['id']} | £{r['saving_bn'][str(YEAR)]:.2f}bn |"
             f" {r['young_people_in_losing_households']/1000:.0f}k"
             f" ({r['share_of_16_24_in_losing_households_pct']:.1f}%) |"
-            f" £{r['average_loss_young_person_in_losing_household'] or 0:,} |"
+            f" {loss_text(r['average_loss_young_person_in_losing_household'])} |"
             f" {r['poverty_change_pp']['abs_ahc']:+.2f}pp"
             f" ({r['people_into_poverty_abs_ahc']/1000:.0f}k) |"
             f" {be.get('h16', '–')}% / {be.get('h25', '–')}% |\n"

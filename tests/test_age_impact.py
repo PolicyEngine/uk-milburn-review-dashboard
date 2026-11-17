@@ -12,6 +12,7 @@ import pytest
 
 from uk_budget_data.calculators import (
     AGE_BANDS,
+    AGE_CONDITIONAL_COLUMNS,
     SINGLE_AGE_MIN_RECORDS,
     AgeImpactCalculator,
     single_age_of,
@@ -258,7 +259,10 @@ def test_the_table_is_optional_in_artifacts():
     rows = AgeImpactCalculator().calculate_from_dataframe(
         "m", "Measure", 2027, PEOPLE
     )
-    assert set(rows[0]) == set(spec.column_names)
+    # The two conditional means are flat-file columns only
+    assert set(rows[0]) == set(spec.column_names) | set(
+        AGE_CONDITIONAL_COLUMNS
+    )
 
 
 def test_result_tables_carry_it():
@@ -275,3 +279,100 @@ def test_result_tables_carry_it():
         official_basis=[],
     )
     assert result_tables(result)["age_impact"] == [{"age_band": "16-24"}]
+
+
+def test_artifacts_leave_out_the_conditional_means():
+    """A receipted artifact's age_impact.csv keeps the publication table's
+    columns, so artifacts written before the conditional means stay valid."""
+    from uk_budget_data.publication.generate import result_tables
+    from uk_budget_data.publication.tables import TABLES, canonical_csv
+
+    rows = AgeImpactCalculator().calculate_from_dataframe(
+        "m", "Measure", 2027, PEOPLE
+    )
+    result = SimpleNamespace(
+        budgetary_impact=[],
+        distributional_impact=[],
+        winners_losers=[],
+        metrics=[],
+        income_curve=[],
+        household_scatter=[],
+        age_impact=rows,
+        official_basis=[],
+    )
+    cut = result_tables(result)["age_impact"]
+    assert all(set(row) == set(TABLES["age_impact"].column_names) for row in cut)
+    canonical_csv("age_impact", cut)
+
+
+# Young people in a gaining and in a losing household, so their mean change
+# nets the two: G (21) gains £300 on £20,000, L (23) loses £1,200 on
+# £40,000, U (19) is unchanged.
+MIXED = pd.DataFrame(
+    [
+        (21, 100, 3, 20_000, 20_300, 10_000, 10_150, 0.0),
+        (23, 300, 6, 40_000, 38_800, 20_000, 19_400, 0.0),
+        (19, 200, 5, 30_000, 30_000, 15_000, 15_000, 0.0),
+    ],
+    columns=PEOPLE.columns,
+)
+
+
+def _mixed(monkeypatch, floor=1):
+    from uk_budget_data import calculators
+
+    monkeypatch.setattr(calculators, "AGE_CONDITIONAL_MIN_RECORDS", floor)
+    rows = AgeImpactCalculator().calculate_from_dataframe(
+        "m", "Measure", 2029, MIXED
+    )
+    return {row["age_band"]: row for row in rows}["16-24"]
+
+
+def test_mean_change_among_losers_and_gainers_by_hand(monkeypatch):
+    young = _mixed(monkeypatch)
+    # Unchanged columns: (100 x 300 + 300 x -1,200 + 0) / 600
+    assert young["mean_change"] == pytest.approx(-550.0)
+    assert young["pct_better_off"] == pytest.approx(100 / 6)
+    assert young["pct_worse_off"] == pytest.approx(50.0)
+    # Among the losers only (L): -1,200, not -550 / 50% = -1,100
+    assert young["mean_change_worse_off"] == pytest.approx(-1_200.0)
+    assert -young["mean_change"] / 0.5 == pytest.approx(1_100.0)
+    # Among the gainers only (G): +300
+    assert young["mean_change_better_off"] == pytest.approx(300.0)
+    # Weighted: the two conditional means give back the netted mean
+    assert (
+        young["mean_change_worse_off"] * young["pct_worse_off"]
+        + young["mean_change_better_off"] * young["pct_better_off"]
+    ) / 100 == pytest.approx(young["mean_change"])
+
+
+def test_conditional_means_use_the_weights(monkeypatch):
+    from uk_budget_data import calculators
+
+    monkeypatch.setattr(calculators, "AGE_CONDITIONAL_MIN_RECORDS", 1)
+    # Two losers: 100 x -£400 and 300 x -£800, mean -£700
+    frame = pd.DataFrame(
+        [
+            (20, 100, 3, 20_000, 19_600, 10_000, 9_800, 0.0),
+            (22, 300, 3, 20_000, 19_200, 10_000, 9_600, 0.0),
+        ],
+        columns=PEOPLE.columns,
+    )
+    rows = AgeImpactCalculator().calculate_from_dataframe(
+        "m", "Measure", 2029, frame
+    )
+    young = {row["age_band"]: row for row in rows}["16-24"]
+    assert young["mean_change_worse_off"] == pytest.approx(-700.0)
+    assert young["mean_change_better_off"] is None
+
+
+def test_conditional_means_are_empty_below_the_floor(monkeypatch):
+    # One survey record on each side, under a floor of two
+    young = _mixed(monkeypatch, floor=2)
+    assert young["mean_change_worse_off"] is None
+    assert young["mean_change_better_off"] is None
+    # The published floor is the single-age floor
+    from uk_budget_data import calculators
+
+    monkeypatch.undo()
+    assert calculators.AGE_CONDITIONAL_MIN_RECORDS == SINGLE_AGE_MIN_RECORDS

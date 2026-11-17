@@ -1125,6 +1125,14 @@ SINGLE_AGE_MIN_RECORDS = 100
 # A change smaller than this share of household net income counts as no
 # change: the test MetricsCalculator uses for people affected.
 AGE_CHANGE_THRESHOLD = 0.0001
+# The mean change among the people in losing (or gaining) households is
+# left empty when fewer survey records than this are in them: a reliability
+# floor, not disclosure control (the empty side can be worked out from
+# mean_change, the two shares and the other side's mean).
+AGE_CONDITIONAL_MIN_RECORDS = SINGLE_AGE_MIN_RECORDS
+# The two columns after the publication table's own (flat files only; a
+# receipted artifact's age_impact.csv keeps TABLES["age_impact"]).
+AGE_CONDITIONAL_COLUMNS = ("mean_change_worse_off", "mean_change_better_off")
 # A change in a person's own taxes or earnings smaller than this, in £ a
 # year, does not make them directly affected.
 DIRECT_EFFECT_MIN_GBP = 1.0
@@ -1173,6 +1181,14 @@ class AgeImpactCalculator(BaseCalculator):
     DIRECT_EFFECT_MIN_GBP or more a year. Benefits are paid to benefit
     units, not people, so a change only in benefits (or in prices) is not
     counted as direct.
+
+    ``mean_change_worse_off`` and ``mean_change_better_off`` are the
+    weighted mean change among the people who are worse off (better off)
+    under that test, so not netted against the other side: the average loss
+    of someone in a losing household. Each is None (an empty cell) when
+    fewer than AGE_CONDITIONAL_MIN_RECORDS survey records are in that group.
+    They come after the publication table's columns; a receipted artifact
+    leaves them out (publication.generate.result_tables).
 
     After the AGE_BANDS rows and the ``all`` row come rows by single year
     of age (``age_band`` "0" to "89", then "90+"), with the same columns.
@@ -1268,6 +1284,15 @@ class AgeImpactCalculator(BaseCalculator):
             def share(flags):
                 return float(w[flags[members]].sum()) / people * 100
 
+            def mean_among(flags):
+                chosen = flags[members]
+                weight_in = float(w[chosen].sum())
+                if chosen.sum() < AGE_CONDITIONAL_MIN_RECORDS or weight_in <= 0:
+                    return None
+                return float((w[chosen] * change[members][chosen]).sum()) / (
+                    weight_in
+                )
+
             rows.append(
                 {
                     "reform_id": reform_id,
@@ -1287,6 +1312,8 @@ class AgeImpactCalculator(BaseCalculator):
                     "people_directly_affected": float(
                         w[direct[members]].sum()
                     ),
+                    "mean_change_worse_off": mean_among(worse),
+                    "mean_change_better_off": mean_among(better),
                 }
             )
         return rows

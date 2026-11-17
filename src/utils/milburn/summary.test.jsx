@@ -485,7 +485,36 @@ describe("the published summary", () => {
     expect(rows[2].textContent).toContain("+0.49pp (about 342,000 people)");
     expect(rows[2].textContent).toContain("+0.25pp (about 176,000 people)");
     expect(rows[3].textContent).toContain("£12,962");
-    expect(rows[3].textContent).toContain("£11,586");
+    expect(rows[3].textContent).toContain("£11,694");
+  });
+});
+
+describe("a run without an average loss", () => {
+  const raw = JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8"));
+  const withNull = {
+    ...raw,
+    runs: raw.runs.map((run) => (run.id === "milburn_package_entry_25pct" ? { ...run, average_loss_young_person_in_losing_household: null } : run)),
+  };
+  const summary = parseSummary(withNull);
+
+  it("reads null, not zero, and keeps the run's direction", () => {
+    const entry = summaryRun(summary, "milburn_package_entry_25pct");
+    expect(entry.averageLossYoung).toBeNull();
+    expect(entry.direction).toBe("loss");
+  });
+
+  it("says the figure is not available in the comparison, draws no bar for it and no difference", () => {
+    render(<EntryComparison summary={summary} catalogue={null} />);
+    const rows = within(screen.getByRole("table")).getAllByRole("row");
+    expect(rows[3].textContent).toContain("Not available");
+    expect(rows[3].textContent).not.toContain("£0");
+    expect(rows[3].textContent).not.toContain("Not in the summary");
+  });
+
+  it("leaves the average loss out of the key figures", () => {
+    const tiles = keyFigureTiles(summaryRun(summary, "milburn_package_entry_25pct"), summary.year);
+    expect(tiles.map((tile) => tile.key)).not.toContain("loss");
+    expect(tiles.map((tile) => tile.key)).toContain("young");
   });
 });
 

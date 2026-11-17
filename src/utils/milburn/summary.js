@@ -6,7 +6,7 @@
  *   { year, runs: [{ id, label, saving_bn: { "2027": … },
  *     young_people_in_losing_households,
  *     share_of_16_24_in_losing_households_pct,
- *     average_loss_young_person_in_losing_household,
+ *     average_loss_young_person_in_losing_household, average_loss_basis,
  *     everyone_in_losing_households_pct,
  *     poverty_change_pp: { rel_bhc, rel_ahc, abs_bhc, abs_ahc },
  *     people_into_poverty_abs_bhc, people_into_poverty_rel_bhc,
@@ -29,6 +29,11 @@
  * (an average gain), its saving is negative (a cost), and it has no
  * break-even arithmetic. Without a direction, a negative average loss marks
  * a gain run.
+ *
+ * The average loss is the mean change among the 16-24s in losing (gaining)
+ * households only, from age_impact.csv's conditional columns; null when it
+ * cannot be found without netting gains against losses, with
+ * average_loss_basis saying why (scripts/milburn_summary.py).
  *
  * The file is rewritten as national runs finish, so it is fetched afresh
  * (no cache). A run it does not list is "not yet run"; a figure it does not

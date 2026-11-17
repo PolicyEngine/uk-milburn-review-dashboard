@@ -133,4 +133,20 @@ describe("parseFlatTable", () => {
     const wide = `${[...contract, ...extras].join(",")}\n${row(contract.length + extras.length)}\n`;
     expect(() => parseTable("metrics", wide)).toThrow(TableError);
   });
+
+  it("reads an age_impact file with the conditional means, empty ones as null", () => {
+    const columns = TABLES.age_impact.columns.map(([column]) => column);
+    const extras = FLAT_EXTRA_COLUMNS.age_impact.map(([column]) => column);
+    expect(extras).toEqual(["mean_change_worse_off", "mean_change_better_off"]);
+    const base = "m,M,2029,16-24,1000,200,-550,-300,16.6,50,33.4,0";
+    const wide = parseFlatTable("age_impact", `${[...columns, ...extras].join(",")}\n${base},-1200,\n`);
+    expect(wide[0].mean_change_worse_off).toBe(-1200);
+    expect(wide[0].mean_change_better_off).toBeNull();
+    const narrow = parseFlatTable("age_impact", `${columns.join(",")}\n${base}\n`);
+    expect(Object.keys(narrow[0])).toEqual(columns);
+    // An artifact's age_impact.csv keeps the contract's columns
+    expect(() => parseTable("age_impact", `${[...columns, ...extras].join(",")}\n${base},-1200,300\n`)).toThrow(TableError);
+    // The contract's own columns are never empty
+    expect(() => parseFlatTable("age_impact", `${[...columns, ...extras].join(",")}\n${base.replace("-550", "")},-1200,300\n`)).toThrow(TableError);
+  });
 });

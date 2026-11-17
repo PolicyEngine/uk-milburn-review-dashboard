@@ -55,6 +55,9 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 /** The label the sub-tab carries. */
 export const SCENARIOS_LABEL = `Assumes ${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group} take 16 hours’ work at their minimum wage`;
 
+/** Said in place of a figure the run's summary carries as null. */
+export const FIGURE_NOT_AVAILABLE = "Not available";
+
 /** The lead card's one line: the year, what is removed, and the two runs compared. */
 export const entryDescription = (yearLabel, movers) =>
   `${yearLabel}: the report’s two benefit removals, static and with ${
@@ -190,8 +193,9 @@ export function EntryComparison({ summary, catalogue }) {
       icon: "wallet",
       label: "Average loss, young people in losing households (£ a year)",
       short: "Average household loss (£ a year)",
-      full: formatPounds(full.averageLossYoung),
-      entry: formatPounds(entry.averageLossYoung),
+      // Null when the summary could not find it (milburn_summary.py): said, not drawn
+      full: formatPounds(full.averageLossYoung) || FIGURE_NOT_AVAILABLE,
+      entry: formatPounds(entry.averageLossYoung) || FIGURE_NOT_AVAILABLE,
       values: [full.averageLossYoung, entry.averageLossYoung],
       format: (value) => `£${value.toLocaleString("en-GB")}`,
       delta: lossDelta === null ? null : signedPounds(lossDelta),

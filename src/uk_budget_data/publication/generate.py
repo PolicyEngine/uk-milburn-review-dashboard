@@ -133,7 +133,11 @@ def result_tables(
         "poverty_inequality": _columns(result.metrics, "poverty_inequality"),
         "income_curve": result.income_curve,
         "household_scatter_binned": bin_scatter(result.household_scatter),
-        "age_impact": result.age_impact,
+        # The flat age_impact.csv adds the mean change among people in
+        # losing and gaining households (calculators.AGE_CONDITIONAL_COLUMNS);
+        # a receipted artifact keeps TABLES["age_impact"], so older
+        # artifacts stay valid.
+        "age_impact": _columns(result.age_impact, "age_impact"),
     }
 
 

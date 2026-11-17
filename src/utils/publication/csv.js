@@ -170,6 +170,21 @@ const METRICS_KEY_COLUMNS = new Set(["reform_id", "reform_name", "year"]);
  */
 export const FLAT_EXTRA_COLUMNS = {
   metrics: TABLES.poverty_inequality.columns.filter(([column]) => !METRICS_KEY_COLUMNS.has(column)),
+  // The mean change among people in losing and in gaining households
+  // (calculators.AGE_CONDITIONAL_COLUMNS): flat files only, so receipted
+  // artifacts keep the contract's age_impact columns.
+  age_impact: [
+    ["mean_change_worse_off", "float"],
+    ["mean_change_better_off", "float"],
+  ],
+};
+
+/**
+ * Extra columns that may be empty (null): a mean over too few survey
+ * records to be reliable is left out (calculators.AGE_CONDITIONAL_MIN_RECORDS).
+ */
+export const FLAT_EXTRA_NULLABLE = {
+  age_impact: ["mean_change_worse_off", "mean_change_better_off"],
 };
 
 /**
@@ -205,8 +220,9 @@ export function withPovertyInequality(metrics, extras) {
 
 /**
  * Parse a flat file under public/data: the contract's columns, then either
- * none or all of the table's FLAT_EXTRA_COLUMNS, in order and typed. An
- * older file without the extras still parses.
+ * none or all of the table's FLAT_EXTRA_COLUMNS, in order and typed (empty
+ * only where FLAT_EXTRA_NULLABLE allows, read as null). An older file
+ * without the extras still parses.
  *
  * @param {string} name - A table name from the publication format.
  * @param {string} text - The file's text.
@@ -220,7 +236,7 @@ export function parseFlatTable(name, text) {
   if (!extras.length || !header || header.length === contracted) {
     return parseTable(name, text, TABLES[name]?.columns, []);
   }
-  return parseTable(name, text, [...TABLES[name].columns, ...extras], []);
+  return parseTable(name, text, [...TABLES[name].columns, ...extras], FLAT_EXTRA_NULLABLE[name] ?? []);
 }
 
 /** The table name for a published file name, or null. */
