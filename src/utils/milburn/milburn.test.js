@@ -87,18 +87,36 @@ describe("the benchmarks file", () => {
       expect(row.figure, row.id).toBeTruthy();
       if (row.url) expect(row.url, row.id).toMatch(/^https:\/\//);
     }
-    // Rows without a usable source (including the unsourced ~430k PIP 16-24 caseload) are gone, and no URL carries a stray %20
-    for (const id of ["pip_young_2025_26", "pip_16_24", "pip_16_24_caseload", "opportunities_claim"]) expect(parsed.rows.find((row) => row.id === id), id).toBeUndefined();
+    // Rows without a usable source (including the unsourced ~430k PIP 16-24 caseload, and the pre-report
+    // LCWRA subgroup whose page is gone) are not in the file, and no URL carries a stray %20
+    for (const id of ["pip_young_2025_26", "pip_16_24", "pip_16_24_caseload", "opportunities_claim", "uc_lcwra_16_24"]) expect(parsed.rows.find((row) => row.id === id), id).toBeUndefined();
+    // Every published figure names its source, its link and its date; none is a press report now the review is out
+    for (const row of parsed.rows.filter((each) => each.id !== "package_young_people_affected")) {
+      for (const field of ["value", "basis", "source", "url", "date"]) expect(row[field], `${row.id} ${field}`).toBeTruthy();
+      expect(row.pressReport, row.id).toBe(false);
+    }
+    // The review's own figures cite the review: the cumulative saving is its £13.7bn, not the £13.8bn reported beforehand
+    const saving = parsed.rows.find((row) => row.id === "milburn_welfare_saving_10y");
+    expect(saving.value).toBe("£13.7bn by 2036-37");
+    expect(saving.url).toContain("gov.uk/government/publications/from-a-welfare-state-to-a-working-state");
+    expect(parsed.rows.filter((row) => /gov\.uk/.test(row.url ?? "")).length).toBeGreaterThanOrEqual(8);
     for (const row of parsed.rows) if (row.url) expect(row.url, row.id).not.toContain("%20");
   });
 
   it("fills a PolicyEngine estimate only where the verified results have one", () => {
-    // The package's figure is worked out from the results; two rows carry a
+    // The package's figure is worked out from the results; nine rows carry a
     // fixed figure from the named build; every other row is blank
     expect(parsed.rows.filter((row) => row.estimate).map((row) => row.id)).toEqual([
       "uc_health_no_work_requirements",
+      "uc_health_element_16_24",
+      "young_pip_recipients",
       "package_young_people_affected",
+      "young_benefits_spend",
+      "pip_spend_16_24",
+      "uc_health_spend_16_24",
+      "review_welfare_saving_2036",
       "employer_nics_under_25",
+      "relative_poverty_review",
     ]);
     for (const row of parsed.rows.filter((each) => each.estimate?.fixed)) {
       expect(row.estimate.label, row.id).toBe("PolicyEngine, build fcfac709, 2027-28");
@@ -106,6 +124,8 @@ describe("the benchmarks file", () => {
     }
     expect(parsed.rows.find((row) => row.id === "uc_health_no_work_requirements").estimate.fixed).toBe("232,000");
     expect(parsed.rows.find((row) => row.id === "employer_nics_under_25").estimate.fixed).toBe("£4.43bn a year");
+    expect(parsed.rows.find((row) => row.id === "young_benefits_spend").estimate.fixed).toBe("£4.49bn a year");
+    expect(parsed.rows.find((row) => row.id === "review_welfare_saving_2036").estimate.fixed).toBe("£2.54bn to £4.49bn a year");
     const ucRow = { id: "x", estimate: { package: false, reformId: "uc_health_element_removed_under_25", metric: "young_people_worse_off" } };
     const neetRow = parsed.rows.find((row) => row.id === "neet_16_24");
     const packageRow = parsed.rows.find((row) => row.id === "package_young_people_affected");
@@ -127,7 +147,18 @@ describe("the benchmark charts", () => {
   it("read a figure as a number only where it is one plain number", () => {
     expect(figureNumber("260,000")).toEqual({ number: 260000, unit: "count", text: "260,000" });
     expect(figureNumber("£4.43bn a year")).toEqual({ number: 4.43, unit: "bn", text: "£4.43bn" });
-    for (const wording of ["About 1.0 million", "About £8bn a year", "£1.3bn (2022) to £2.0bn (2025)", "About 1 in 5", ""]) {
+    expect(figureNumber("£0.92bn a year")).toEqual({ number: 0.92, unit: "bn", text: "£0.92bn" });
+    for (const wording of [
+      "About 1.0 million",
+      "About £8bn a year",
+      "£1.3bn (2022) to £2.0bn (2025)",
+      "About 1 in 5",
+      "£3.6bn in 2036-37",
+      "£2.54bn to £4.49bn a year",
+      "Approximately 250,000",
+      "50,000 fewer",
+      "",
+    ]) {
       expect(figureNumber(wording), wording).toBeNull();
     }
   });
@@ -135,6 +166,10 @@ describe("the benchmark charts", () => {
   it("pair a published figure with a fixed estimate in the same unit, with the gap as a % of the published figure", () => {
     expect(parsed.rows.filter((each) => comparisonFor(each)).map((each) => each.id)).toEqual([
       "uc_health_no_work_requirements",
+      "uc_health_element_16_24",
+      "young_pip_recipients",
+      "pip_spend_16_24",
+      "uc_health_spend_16_24",
       "employer_nics_under_25",
     ]);
     const health = comparisonFor(row("uc_health_no_work_requirements"));
@@ -143,6 +178,18 @@ describe("the benchmark charts", () => {
     const nics = comparisonFor(row("employer_nics_under_25"));
     expect(nics).toMatchObject({ unit: "bn", published: 5.1, estimate: 4.43, publishedText: "£5.1bn", estimateText: "£4.43bn" });
     expect(nics.gapPct).toBeCloseTo(((4.43 - 5.1) / 5.1) * 100, 10);
+    // The review's spending by benefit, ages 16 to 24, beside the static saving from removing each
+    const pip = comparisonFor(row("pip_spend_16_24"));
+    expect(pip).toMatchObject({ unit: "bn", published: 3.8, estimate: 4.42 });
+    expect(pip.gapPct).toBeCloseTo(((4.42 - 3.8) / 3.8) * 100, 10);
+    expect(comparisonFor(row("uc_health_spend_16_24"))).toMatchObject({ unit: "bn", published: 0.92, estimate: 1.15, publishedText: "£0.92bn" });
+    expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 232000 });
+    expect(comparisonFor(row("young_pip_recipients"))).toMatchObject({ unit: "count", published: 450000, estimate: 347000 });
+    // A figure for another year, price base or policy design stays a tile: its wording is not one plain number
+    for (const id of ["young_benefits_spend", "review_welfare_saving_2036", "relative_poverty_review"]) {
+      expect(row(id).estimate.fixed, id).toBeTruthy();
+      expect(comparisonFor(row(id)), id).toBeNull();
+    }
     // Different units, or no fixed estimate, are never paired
     expect(comparisonFor({ value: "260,000", estimate: { fixed: "£4.43bn a year" } })).toBeNull();
     expect(comparisonFor(row("package_young_people_affected"))).toBeNull();
@@ -168,15 +215,23 @@ describe("the benchmark charts", () => {
 });
 
 describe("the measures we cannot compute", () => {
-  it("lists the four, each with a reason and no figure", () => {
+  it("lists the final report's, each with a reason and no estimate", () => {
     expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.id)).toEqual([
-      "severe_conditions_higher_rate",
       "additional_cost_allowance",
+      "severe_complex_needs_insurance",
+      "health_and_disability_fund",
       "youth_conditionality",
-      "youth_guarantee_expansion",
+      "care_leaver_transition_allowance",
+      "opportunity_guarantee",
+      "employer_hiring_payments",
+      "apprenticeship_target",
+      "further_education_places",
     ]);
     for (const measure of NOT_COMPUTABLE_MEASURES) {
       expect(measure.notModelled, measure.id).toBeTruthy();
+      // One line each, and the reason itself carries no figure
+      expect(measure.notModelled, measure.id).not.toMatch(/[£%\d\n]/);
+      expect(measure.summary.trim().split(/\s+/).length, measure.id).toBeLessThanOrEqual(15);
       expect(JSON.stringify(measure), measure.id).not.toMatch(/£0/);
     }
   });

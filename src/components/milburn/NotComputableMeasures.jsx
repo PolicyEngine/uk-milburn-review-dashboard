@@ -12,28 +12,6 @@ export const NOT_COMPUTABLE_TITLE = reportCopy().notComputableTitle;
 export const NOT_YET_RUN_TITLE = reportCopy().notYetRunTitle;
 
 /**
- * The not-computable measures as the local build route lists them
- * (milburn_measures.json), in the cards' shape; the static list's
- * audience and category where it has the measure.
- */
-export function notComputableFromFile(listed) {
-  return listed.map((measure) => {
-    const known = NOT_COMPUTABLE_MEASURES.find((item) => item.id === measure.id);
-    return {
-      id: measure.id,
-      name: measure.name,
-      // The card's own one-line wording where it has the measure
-      summary: known?.summary || measure.description || "",
-      affects: known?.affects ?? "",
-      category: known?.category ?? { label: "Benefits", icon: "piggy" },
-      notModelled: known?.notModelled || measure.reason || "",
-      visual: known?.visual,
-      kind: known?.kind,
-    };
-  });
-}
-
-/**
  * On the local build route, the computable measures whose national run has
  * not finished (no folder under public/data/milburn/) or could not be read:
  * named with the reason, no figure.
@@ -64,14 +42,14 @@ function PendingMeasures() {
 }
 
 /**
- * The candidate measures the dashboard lists but cannot compute, as cards
- * of the modelled cards' kind, each with the reason. No figure is shown
- * for any of them.
+ * The report's measures the dashboard lists but cannot compute, as cards
+ * of the modelled cards' kind, each with the reason. No estimate is shown
+ * for any of them; a summary may state the report's own amount.
  */
 export default function NotComputableMeasures({ measures: given }) {
-  const catalogue = useMeasureCatalogue();
-  // The local build route's list (milburn_measures.json), else the static one
-  const measures = given ?? (catalogue.localBuild ? notComputableFromFile(catalogue.localBuild.notComputable) : NOT_COMPUTABLE_MEASURES);
+  // The final report's list (utils/milburn/notComputable.js) on every data
+  // route: milburn_measures.json still lists the pre-report four
+  const measures = given ?? NOT_COMPUTABLE_MEASURES;
   return (
     <>
     <PendingMeasures />
@@ -79,7 +57,7 @@ export default function NotComputableMeasures({ measures: given }) {
       <SectionHeading
         icon="list"
         title={NOT_COMPUTABLE_TITLE}
-        subtitle="Listed with the reason; no figure is shown for them anywhere on this dashboard."
+        subtitle="Listed with the reason; no estimate is shown for them anywhere on this dashboard."
       />
       <div className="report-section policy-details-content">
         <ul className="policy-cards">

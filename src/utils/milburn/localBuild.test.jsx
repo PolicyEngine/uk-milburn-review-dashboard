@@ -252,6 +252,8 @@ describe("the label and the Policies lists", () => {
     expect(pending.textContent).not.toContain("PIP removed for 18 to 24-year-olds");
     expect(pending.textContent).not.toMatch(/£0/);
     const notComputable = screen.getByRole("region", { name: NOT_COMPUTABLE_TITLE });
-    expect(notComputable.textContent).toContain("The data hold no severe conditions flag");
+    // The final report's list, not the file's pre-report four
+    expect(notComputable.textContent).toContain("Severe and Complex Needs Insurance");
+    expect(notComputable.textContent).not.toContain("The data hold no severe conditions flag");
   });
 });

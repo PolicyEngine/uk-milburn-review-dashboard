@@ -18,7 +18,7 @@ import { MICROCOSM_BUILD, POLICYENGINE_UK_VERSION, POLICYENGINE_VERSION, REPLICA
 import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
 import { ENTRY_ASSUMPTION_TEXT } from "../utils/milburn/summary";
 import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
-import { REPORT_PUBLISHED, reportCopy } from "../utils/milburn/reportStatus";
+import { FINAL_REPORT, REPORT_PUBLISHED, reportCopy } from "../utils/milburn/reportStatus";
 
 /** The policyengine-core version this build runs, beside policyengine-uk. */
 export const POLICYENGINE_CORE_VERSION = "3.34.10";
@@ -55,10 +55,57 @@ export const METHOD_CONTENTS = [
 
 const SECTION_ICONS = Object.fromEntries(METHOD_CONTENTS.map(({ id, titleIcon }) => [id, titleIcon]));
 
+/** The final report and its analytical annex, cited by paragraph or section. */
+const ReportLink = ({ children = "report" }) => <ExternalLink href={FINAL_REPORT.reportUrl}>{children}</ExternalLink>;
+const AnnexLink = ({ children = "analytical annex" }) => <ExternalLink href={FINAL_REPORT.annexUrl}>{children}</ExternalLink>;
+
+/**
+ * What the final report proposes on benefits and employer costs, one line
+ * each, in its own terms (executive summary, paragraphs 50, 101, 102 and
+ * 107; chapter 6, paragraphs 748 to 756).
+ */
+export const REPORT_PROPOSALS = [
+  "A single Youth Allowance at the under-25 rate of Universal Credit, higher for young people living independently.",
+  "The Universal Credit health element and the Work Capability Assessment abolished for under-25s.",
+  "An Additional Cost Allowance in place of PIP, for extra costs that are significant, established and ongoing.",
+  "A local Health and Disability Fund for extra costs that are immediate, one-off or may change.",
+  "Severe and Complex Needs Insurance, paid above today’s maximum benefit rates, for the few unlikely ever to work.",
+  "A work allowance for everyone on the Youth Allowance who works, and a duty to engage, with loss of the allowance as a last resort.",
+  "Child Disability Living Allowance extended from age 16 to 18.",
+  "The employer National Insurance threshold raised from £5,000 to £10,000 for 21 to 24-year-olds in retail and hospitality, over five years, when fiscal conditions allow.",
+  "Opportunity and Support Guarantees through a Youth Opportunity Service, including a £3,000 subsidy for hiring a young person.",
+];
+
+/**
+ * Which of those the page models, and how closely. Worded by kind, not by
+ * run: the runs published are listed under "Measures modelled".
+ */
+export const REPORT_MODELLED = [
+  "Modelled: the health element removed for under-25s and PIP removed for 18 to 24-year-olds, each alone and together, with variants by age, by severity and phased as claimants are reassessed.",
+  "Stand-in: PIP at half rate, in place of the Additional Cost Allowance, for which the report gives no rates.",
+  "Wider than the report: the 25-and-over standard allowance for every under-25, and no employer National Insurance for any under-25.",
+  "Not modelled: the Health and Disability Fund, Severe and Complex Needs Insurance, the duty to engage, the Disability Living Allowance extension and the Guarantees.",
+];
+
+/**
+ * The limits of the figures against the report's design, once it is
+ * published: its replacements, its Youth Allowance and employer relief,
+ * its timing and where it applies.
+ */
+const REPORT_DESIGN_LIMITATIONS = [
+  ["Replacements not modelled", "The report replaces PIP for young people with an Additional Cost Allowance for ongoing costs and a local Health and Disability Fund for one-off or changing costs, and adds Severe and Complex Needs Insurance. The full abolition package (upper bound) includes none of them. The central variant stands in with PIP at half rate and the health element kept for severe cases."],
+  ["Youth Allowance", "The report sets its Youth Allowance at the under-25 rate, higher for those living independently, and adds a work allowance. The report gives no amount for the work allowance. Our comparator gives every under-25 the 25-and-over rate, which is wider."],
+  ["Employer National Insurance", "The report raises the employer threshold to £10,000 for 21 to 24-year-olds in retail and hospitality. It gives no start date or yearly steps. Our comparator removes employer National Insurance for all under-25s on earnings up to £50,270, which is wider."],
+  ["Timing", "Our measures apply in full from April 2027. The report moves new claims first and existing claimants at their scheduled reassessment, with welfare savings from 2029-30; the phased package approximates this with an assumed 25% reassessed each year."],
+  ["Geography", "Unless a measure says otherwise, our figures apply it across the UK, including Scotland, where Adult Disability Payment has replaced PIP, and Northern Ireland, which runs its own social security system. The report’s welfare estimates also cover PIP and Universal Credit across the UK, but its support costs cover Great Britain and its delivery proposals are most specific to England."],
+];
+
 /**
  * The limits of the figures, said once: the model is static, and the data
  * have gaps that bear on young people. The last two are the report-status
- * switch's words (utils/milburn/reportStatus.js).
+ * switch's words (utils/milburn/reportStatus.js). Once the report is
+ * published, the limit on replacements gives way to the limits against
+ * the report's design.
  */
 export const milburnLimitations = (published = REPORT_PUBLISHED) => [
   ["Static", "The main figures hold behaviour fixed: nobody changes their work, hours, claims or education because of a measure. The Return to work sub-tab shows the package with a move into work separately."],
@@ -68,7 +115,9 @@ export const milburnLimitations = (published = REPORT_PUBLISHED) => [
   ["Few young claimant records", "The results rest on roughly 500 to 650 survey records of young claimants, so the pattern across individual income deciles and single years of age is noisy; national totals are steadier than any one decile or age."],
   ["Overlapping losses", "About nine in ten young claimants with limited capability for work and work-related activity (LCWRA) in the data also get PIP, so the package stacks both losses on largely the same people. Per-person losses are an upper bound and headcounts a lower bound."],
   ["Caseloads against DWP", "The all-age LCWRA stock in the data is about 23% above DWP's figure. The PIP caseload aged 18 to 24 is low but its award mix is high (more enhanced awards), which roughly offsets in cost."],
-  ["No replacement in the upper bound", "The full abolition package (upper bound) includes no replacement fund, cost allowance or insurance payment. The central variant stands in for a smaller allowance with PIP at half rate."],
+  ...(published
+    ? REPORT_DESIGN_LIMITATIONS
+    : [["No replacement in the upper bound", "The full abolition package (upper bound) includes no replacement fund, cost allowance or insurance payment. The central variant stands in for a smaller allowance with PIP at half rate."]]),
   ["Small samples at 16 and 17", "Few survey households include people aged 16 or 17, so figures for those ages rest on small samples."],
   ["Not computable", reportCopy(published).notComputableLimit],
   [reportCopy(published).policyLimitTerm, reportCopy(published).policyLimit],
@@ -191,6 +240,30 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
           }
         >
           <Topic id="method-about-review" title="The review and these measures" preview={copy.reviewTopicPreview}>
+            {published && (
+              <>
+                <p className="method-more">
+                  <ExternalLink href={FINAL_REPORT.url}>{FINAL_REPORT.title}</ExternalLink>, the final report of the
+                  independent review of young people and work led by Alan Milburn, was published by the{" "}
+                  {FINAL_REPORT.publisher} on {FINAL_REPORT.date}. The interim report was published on 28 May 2026.
+                </p>
+                <p className="method-lead">
+                  What the <ReportLink />{" "}
+                  proposes on benefits and employer costs (paragraphs 50, 101 to 107 and 748 to 756):
+                </p>
+                <ul className="method-list" data-report-proposals="">
+                  {REPORT_PROPOSALS.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+                <p className="method-lead">What this page models:</p>
+                <ul className="method-list" data-report-modelled="">
+                  {REPORT_MODELLED.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </>
+            )}
             {copy.reviewTopicBody.map((paragraph) => (
               <p key={paragraph} className="method-more">{paragraph}</p>
             ))}
@@ -306,8 +379,16 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
           <Topic id={METHOD_ANCHORS.publicFinances} title="Public finances" preview="Net effect on revenue and spending, by year">
             <p className="method-more">
               The change in government revenue less the change in spending on benefits, from the static model, by
-              fiscal year. A positive figure is a gain to the Exchequer. There is no official costing to compare
-              with.
+              fiscal year. A positive figure is a gain to the Exchequer.{" "}
+              {published ? (
+                <>
+                  The review&apos;s <AnnexLink />{" "}
+                  (section 1) estimates welfare savings of £3.6 billion in 2036-37, in 2026-27 prices, for its whole benefit design, with replacements and an employment effect; that is not comparable
+                  with these static figures.
+                </>
+              ) : (
+                "There is no official costing to compare with."
+              )}
             </p>
           </Topic>
           <Topic id={METHOD_ANCHORS.poverty} title="Poverty and inequality" preview="Absolute and relative poverty · Gini">
@@ -378,6 +459,21 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
                   "Who moves",
                   "Only people aged 18 to 24 with no earnings who themselves receive PIP or the health element, picked at random with a fixed seed; each moves into 16 hours a week at the minimum wage for their age for the whole year. Nobody else changes behaviour.",
                 ],
+                ...(published
+                  ? [
+                      [
+                        "The report’s assumption",
+                        <>
+                          The review&apos;s own modelling expects its reforms together to help around 440,000 young
+                          people into sustained work by 2036 (<ReportLink />, paragraph 111). Its{" "}
+                          <AnnexLink />{" "}
+                          assumes 440,000 more young people in work, in a mix of full-time and part-time jobs, and a 9% employment effect for Universal Credit health claimants (sections 1 and 8).
+                          That figure covers the whole package, including employment support and job guarantees, so it
+                          is not comparable with our 25% of affected claimants.
+                        </>,
+                      ],
+                    ]
+                  : []),
                 [
                   "Entry cases",
                   "One young person moving into work for 16 or 25 hours a week at a given wage: their household's gain and the gain to the Exchequer, from household calculations.",

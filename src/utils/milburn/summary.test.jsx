@@ -20,6 +20,7 @@ import {
   formatBn,
   formatPeople,
   formatSignedPp,
+  parseReviewFigures,
   parseSummary,
   savingInYear,
   savingShare,
@@ -117,6 +118,51 @@ describe("parseSummary", () => {
   });
 });
 
+describe("the review's own figures", () => {
+  const published = JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_review_figures.json"), "utf8"));
+
+  it("reads the published file: the people into work, their year, the NEET rate path and each source", () => {
+    const review = parseReviewFigures(published);
+    expect(review.employment.people).toBe(440000);
+    expect(review.employment.byYear).toBe(2036);
+    expect(review.employment.annex).toMatchObject({ moreInWork: 400000, moreInWorkOrEducation: 500000, roundedTo: 100000 });
+    expect(review.neetRate.years).toHaveLength(11);
+    expect(review.neetRate.withReformsPct.at(0)).toBe(13.1);
+    expect(review.neetRate.withReformsPct.at(-1)).toBe(6.8);
+    expect(review.neetRate.baselinePct.at(-1)).toBe(13.4);
+    expect(review.neetRate.ambitionPct).toBe(5);
+    expect(review.report.url).toBe("https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation");
+    for (const source of [review.employment.source, review.employment.annex.source, review.neetRate.source]) {
+      expect(source.label).toBeTruthy();
+      expect(source.url).toMatch(/^https:\/\/(www\.gov\.uk|assets\.publishing\.service\.gov\.uk)\//);
+    }
+  });
+
+  it("gives every published figure a source with a section and a link, and lists what the report does not give", () => {
+    for (const block of [published.employment, published.employment.annex, published.neet_rate, published.fiscal]) {
+      expect(block.source.label).toMatch(/annex|report|tables/i);
+      expect(block.source.url).toMatch(/^https:\/\//);
+    }
+    // Welfare savings to 2036/37, as the annex gives them: £13.7bn over eight years
+    expect(published.fiscal.cumulative_welfare_savings_gbp_bn).toBe(13.7);
+    expect(published.fiscal.annual_gbp_m.fiscal_offsets).toBe(-2400);
+    expect(published.not_published.length).toBeGreaterThan(0);
+  });
+
+  it("rejects a file without the report's link, the people into work or their year, and keeps a missing figure null", () => {
+    expect(parseReviewFigures(null)).toBeNull();
+    expect(parseReviewFigures({ ...published, report: { ...published.report, url: "javascript:alert(1)" } })).toBeNull();
+    expect(parseReviewFigures({ ...published, employment: { ...published.employment, people: "440,000" } })).toBeNull();
+    expect(parseReviewFigures({ ...published, employment: { ...published.employment, by_year: undefined } })).toBeNull();
+    const bare = parseReviewFigures({ report: published.report, employment: { people: 440000, by_year: 2036 } });
+    expect(bare.neetRate).toBeNull();
+    expect(bare.employment.annex).toBeNull();
+    expect(bare.employment.source).toBeNull();
+    // A rate path whose series differ in length is dropped whole
+    expect(parseReviewFigures({ ...published, neet_rate: { ...published.neet_rate, baseline_pct: [13.1] } }).neetRate).toBeNull();
+  });
+});
+
 describe("formatting", () => {
   it("says, above 100%, that the entrants needed outnumber the group", () => {
     expect(breakEvenText(150)).toBe(`150.0% (${MORE_ENTRANTS_THAN_GROUP.toLowerCase()})`);
@@ -187,7 +233,7 @@ describe("KeyFigures", () => {
     expect(panel.textContent).toContain("£4.00bn");
     expect(panel.textContent).toContain("500,000");
     const region = screen.getByRole("region", { name: "Key figures" });
-    expect(region.textContent).toContain("Full abolition, no replacement (upper bound)");
+    expect(region.textContent).toContain("Full abolition, no replacements (upper bound)");
     expect(region.textContent).toContain(RELATIVE_LINE_NOTE);
     expect(region.textContent).toContain("Relative poverty (60% of median, after housing costs): 150,000 people move into it (+0.20pp).");
     expect(region.textContent).toContain(REPLACEMENT_NOT_MODELLED_NOTE);
@@ -424,7 +470,7 @@ describe("EntryComparison", () => {
 
 describe("measure groups", () => {
   it("names the packages and groups packages, single measures, variants and comparators", () => {
-    expect(milburnDisplayName("milburn_package", "Milburn package (combined)")).toBe("Full abolition, no replacement (upper bound)");
+    expect(milburnDisplayName("milburn_package", "Milburn package (combined)")).toBe("Full abolition, no replacements (upper bound)");
     expect(milburnDisplayName("pip_halved_under_25", "PIP at half rate")).toBe("PIP at half rate");
     expect(milburnGroupOf({ id: "employer_nics_zero_under_25" })).toBe("comparators");
     expect(milburnGroupOf({ id: "uc_health_element_removed_under_25" })).toBe("single");
@@ -438,7 +484,7 @@ describe("measure groups", () => {
       { id: "milburn_package_phased" },
       { id: "milburn_package" },
     ]);
-    expect(groups.map((group) => group.label)).toEqual(["Packages", "Single measures", "Variants", reportCopy().comparatorsLabel]);
+    expect(groups.map((group) => group.label)).toEqual(["Pre-report variants (modelled before the report)", "Single measures", "Variants", reportCopy().comparatorsLabel]);
     expect(groups[0].measures.map((measure) => measure.id)).toEqual(["milburn_package", "milburn_package_phased"]);
     // The 25% entry run and the new-claims run stay loadable but are not offered
     expect(groups.flatMap((group) => group.measures.map((measure) => measure.id))).not.toContain("milburn_package_entry_25pct");

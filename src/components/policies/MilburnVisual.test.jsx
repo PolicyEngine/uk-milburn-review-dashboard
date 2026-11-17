@@ -137,7 +137,7 @@ describe("the measures we cannot compute (NotComputableVisual)", () => {
 
   it("gives each a diagram of a known kind, in words and icons, never a figure", async () => {
     const { NOT_COMPUTABLE_MEASURES, NotComputableVisual, NOT_COMPUTABLE_KINDS } = await load();
-    expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.visual.kind)).toEqual(["split", "swap", "split", "offers"]);
+    expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.visual.kind)).toEqual(["swap", "split", "split", "split", "split", "offers", "split", "offers", "offers"]);
     for (const measure of NOT_COMPUTABLE_MEASURES) {
       expect(Object.keys(NOT_COMPUTABLE_KINDS), measure.id).toContain(measure.visual.kind);
       expect(JSON.stringify(measure.visual), measure.id).not.toMatch(/[£%\d]/);
@@ -166,47 +166,71 @@ describe("the measures we cannot compute (NotComputableVisual)", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("severe conditions: a split on the criteria, the higher element where they are met, the missing flag dashed", async () => {
+  it("Severe and Complex Needs Insurance: a split on whether paid work is possible, the missing flag dashed", async () => {
     const { NotComputableVisual, byId } = await load();
-    const { container } = render(<NotComputableVisual measure={byId.severe_conditions_higher_rate} />);
-    expect(container.querySelector(".mnc-trunk").textContent).toBe("A claimantSevere conditions criteriaNo flag in the data");
+    const { container } = render(<NotComputableVisual measure={byId.severe_complex_needs_insurance} />);
+    expect(container.querySelector(".mnc-trunk").textContent).toBe("A young personPaid work realistically possibleNo flag in the data");
     expect(container.querySelector(".mnc-trunk .mnc-node.is-unknown .mnc-chip.is-unknown")).toHaveTextContent("No flag in the data");
     const branches = [...container.querySelectorAll(".mnc-branch")];
-    expect(branches.map((branch) => branch.textContent)).toEqual(["Not metHealth element", "MetHigher health element"]);
+    expect(branches.map((branch) => branch.textContent)).toEqual(["YesYouth Allowance and support", "NoSevere and Complex Needs Insurance"]);
     expect(branches[1]).toHaveClass("is-gain");
     expect(branches[1].querySelector(".mnc-icon-plus")).not.toBeNull();
     expect(container.querySelector(".mnc-marker")).toBeNull();
   });
 
-  it("additional cost allowance: PIP swapped for the allowance, its eligibility and rates unknown", async () => {
+  it("Additional Cost Allowance: PIP swapped for the allowance, its eligibility and rates unknown", async () => {
     const { NotComputableVisual, byId } = await load();
     const { container } = render(<NotComputableVisual measure={byId.additional_cost_allowance} />);
     const [today, proposed] = container.querySelectorAll(".mnc-card");
     expect(today).toHaveTextContent("TodayPIPEligibilityRates");
     expect(today.querySelectorAll(".mnc-chip.is-unknown")).toHaveLength(0);
     expect(proposed).toHaveClass("is-unknown");
-    expect(proposed).toHaveTextContent("ProposedAdditional cost allowance");
+    expect(proposed).toHaveTextContent("ProposedAdditional Cost AllowanceNot means-tested");
     expect([...proposed.querySelectorAll(".mnc-chip.is-unknown")].map((chip) => chip.textContent)).toEqual(["Eligibility", "Rates"]);
     expect(container.querySelector(".mnc-swap > .mnc-arrow")).not.toBeNull();
   });
 
-  it("conditionality: requirements, met or not met, a sanction in the loss colour, marked behavioural", async () => {
+  it("duty to engage: met or refused, the lost allowance in the loss colour, marked behavioural", async () => {
     const { NotComputableVisual, byId } = await load();
     const { container } = render(<NotComputableVisual measure={byId.youth_conditionality} />);
-    expect(container.querySelector(".mnc-trunk").textContent).toBe("A claimantRequirements");
+    expect(container.querySelector(".mnc-trunk").textContent).toBe("A claimantDuty to engage");
     const branches = [...container.querySelectorAll(".mnc-branch")];
-    expect(branches.map((branch) => branch.textContent)).toEqual(["MetAward continues", "Not metSanction"]);
+    expect(branches.map((branch) => branch.textContent)).toEqual(["MetAllowance continues", "RefusedAllowance lost"]);
     expect(branches[1]).toHaveClass("is-loss");
     expect(container.querySelector(".mnc-marker")).toHaveTextContent("Behavioural, not modelled");
     expect(screen.getByRole("img")).toHaveAccessibleName(/not modelled\.$/);
   });
 
-  it("Youth Guarantee: three offers, then today's places and more of them, not to scale", async () => {
+  it("hiring payments: a split on six months out of work or study, the hiring response not modelled", async () => {
     const { NotComputableVisual, byId } = await load();
-    const { container } = render(<NotComputableVisual measure={byId.youth_guarantee_expansion} />);
-    expect([...container.querySelectorAll(".mnc-tiles .mnc-node")].map((tile) => tile.textContent)).toEqual(["Training", "A job", "Work experience"]);
-    expect(container.querySelector(".mnc-places").textContent).toBe("Places todayMore places");
+    const { container } = render(<NotComputableVisual measure={byId.employer_hiring_payments} />);
+    expect(container.querySelector(".mnc-trunk").textContent).toBe("An employer hires a young personSix months out of work or study");
+    const branches = [...container.querySelectorAll(".mnc-branch")];
+    expect(branches.map((branch) => branch.textContent)).toEqual(["NoNo payment", "YesHiring payment"]);
+    expect(branches[1]).toHaveClass("is-gain");
+    expect(container.querySelector(".mnc-marker")).toHaveTextContent("Hiring response, not modelled");
+  });
+
+  it("Opportunity Guarantee: three offers, then today's guarantee and the wider one, not to scale", async () => {
+    const { NotComputableVisual, byId } = await load();
+    const { container } = render(<NotComputableVisual measure={byId.opportunity_guarantee} />);
+    expect([...container.querySelectorAll(".mnc-tiles .mnc-node")].map((tile) => tile.textContent)).toEqual([
+      "A job",
+      "Education or training",
+      "A placement or civic service",
+    ]);
+    expect(container.querySelector(".mnc-places").textContent).toBe("Youth Guarantee todayWider, and in law");
     expect(container.querySelector(".mnc-scale")).toHaveTextContent("Not to scale");
+  });
+
+  it("apprenticeships and further education: what each adds, over today's and more, not to scale", async () => {
+    const { NotComputableVisual, byId } = await load();
+    const { container, unmount } = render(<NotComputableVisual measure={byId.apprenticeship_target} />);
+    expect([...container.querySelectorAll(".mnc-tiles .mnc-node")].map((tile) => tile.textContent)).toEqual(["Pre-apprenticeships", "Apprenticeships"]);
+    expect(container.querySelector(".mnc-places").textContent).toBe("Starts todayMore starts");
+    unmount();
+    const further = render(<NotComputableVisual measure={byId.further_education_places} />);
+    expect(further.container.querySelector(".mnc-places").textContent).toBe("Learners todayMore learners");
   });
 
   it("each card keeps its Who and Kind facts, and badges why it is not modelled", async () => {

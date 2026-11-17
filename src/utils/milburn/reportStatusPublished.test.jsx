@@ -41,13 +41,19 @@ describe("with the final report published", () => {
     expect(provisionalNotice(candidate)).toBe(CANDIDATE_PROVISIONAL_LABEL);
     expect(provisionalLabel(candidate)).toBe(CANDIDATE_PROVISIONAL_LABEL);
     expect(CANDIDATE_PROVISIONAL_LABEL).toBe(REPORT_COPY.after.provisionalLabel);
-    expect(CANDIDATE_PROVISIONAL_LABEL).toBe("Provisional: estimates of measures in the review’s final report");
+    expect(CANDIDATE_PROVISIONAL_LABEL).toBe("Provisional: estimates of measures drawn from the review’s final report");
     expect(CANDIDATE_PROVISIONAL_LABEL).not.toBe(PROVISIONAL_LABEL);
   });
 
-  it("keeps the comparators labelled as not in the report, and the other groups as they were", () => {
+  it("labels the comparators as wider than the report proposes, and keeps the other groups as they were", () => {
     const labels = MILBURN_GROUPS.filter((group) => !group.hidden).map((group) => group.label);
-    expect(labels).toEqual(["Packages", "Single measures", "Variants", "Comparators, not in the report"]);
+    expect(labels).toEqual([
+      "The report's measures",
+      "Pre-report variants (modelled before the report)",
+      "Single measures",
+      "Variants",
+      "Comparators, wider than the report proposes",
+    ]);
     expect(MILBURN_GROUPS.find((group) => group.id === COMPARATORS_GROUP).label).toBe(REPORT_COPY.after.comparatorsLabel);
   });
 
@@ -76,7 +82,8 @@ describe("with the final report published", () => {
   it("leaves nothing on the landing page or in Methodology that says the report is still to come", () => {
     expect(MILBURN_LIMITATIONS.at(-1)[0]).toBe("Not government policy");
     const landing = render(<LandingPage onOpen={() => {}} />);
-    expect(landing.container.textContent).toContain("(final report, 17 November 2026)");
+    expect(landing.container.textContent).toContain("From a Welfare State to a Working State");
+    expect(landing.container.textContent).toContain("(17 November 2026)");
     expect(landing.container.textContent).not.toMatch(STALE);
     landing.unmount();
     const methodology = render(within(<MethodologyTab onShowTab={() => {}} />));

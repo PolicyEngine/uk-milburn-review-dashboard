@@ -44,6 +44,7 @@ import {
   savingInYear,
   summaryRun,
   useMilburnSummary,
+  useReviewFigures,
 } from "../../utils/milburn/summary";
 import { shortNameOf } from "../../utils/policyDetails";
 import "./milburn.css";
@@ -278,6 +279,171 @@ export function EntryComparison({ summary, catalogue }) {
   );
 }
 
+/** A link that leaves the site: a new tab, no opener. */
+function SourceLink({ href, children }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  );
+}
+
+/** The heading over the two exercises side by side. */
+export const REVIEW_COMPARISON_TITLE = "Beside the review's own estimate";
+
+/** Said wherever the two figures meet: they are not the same exercise. */
+export const DIFFERENT_EXERCISES_SENTENCE =
+  "The two are different exercises, for different years, groups and measures: neither figure is a check on the other.";
+
+const onePlace = (value) => `${value.toFixed(1)}%`;
+
+/** "13.1% in 2026/27 to 6.8% in 2036/37; 13.4% without the reforms", from the review's own path. */
+function neetRateText(rate) {
+  if (!rate) return "";
+  const last = rate.years.length - 1;
+  return `${onePlace(rate.withReformsPct[0])} in ${rate.years[0]} to ${onePlace(rate.withReformsPct[last])} in ${rate.years[last]}; ${onePlace(rate.baselinePct[last])} in ${rate.years[last]} without the reforms`;
+}
+
+/**
+ * This dashboard's illustrative run (the movers in milburn_summary.json)
+ * beside the review's own employment estimate
+ * (milburn_review_figures.json): two exercises, each with its year, group,
+ * measures and method, and the report cited. Neither is said to be right.
+ */
+export function ReviewComparison({ summary, review, catalogue }) {
+  const entry = summaryRun(summary, ENTRY_RUN);
+  const movers = entryMovers(entry);
+  const yearLabel = fiscalYearTick(summary.year);
+  const fullMeasure = catalogue?.byId?.get(DEFAULT_SUMMARY_RUN);
+  const fullName = fullMeasure ? shortNameOf(fullMeasure) : DEFAULT_SUMMARY_RUN;
+  const { employment, report, neetRate } = review;
+  const ours = { name: `This dashboard, ${yearLabel}`, column: "This dashboard's illustrative scenario" };
+  const theirs = { name: `The review, by ${employment.byYear}`, column: "The review's modelling" };
+  const notRun = "Not yet run";
+  const rows = [
+    {
+      key: "people",
+      label: "People moving into work",
+      ours: movers !== null ? `About ${formatPeople(movers)}` : notRun,
+      theirs: `About ${formatPeople(employment.people)}`,
+    },
+    { key: "when", label: "When", ours: yearLabel, theirs: `By ${employment.byYear}` },
+    { key: "who", label: "Who", ours: `${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group}, chosen at random`, theirs: employment.who },
+    { key: "measures", label: "Measures covered", ours: `${fullName}, as this dashboard models it`, theirs: employment.measures },
+    {
+      key: "method",
+      label: "Method",
+      ours: "Static microsimulation, with an entry rate that is assumed for illustration, not estimated",
+      theirs: employment.method,
+    },
+    { key: "work", label: "Work assumed", ours: `${ENTRY_ASSUMPTION.work[0].toUpperCase()}${ENTRY_ASSUMPTION.work.slice(1)}`, theirs: employment.hours },
+    { key: "neet", label: "NEET rate, 16 to 24-year-olds", ours: "Not modelled", theirs: neetRateText(neetRate) },
+  ].filter((row) => row.theirs);
+  const bars = [
+    { name: ours.name, value: movers, label: movers !== null ? formatPeople(movers) : "", color: CHART_COLOURS.after },
+    { name: theirs.name, value: employment.people, label: formatPeople(employment.people), color: CHART_COLOURS.reference },
+  ];
+  const csv = () =>
+    buildChartCsv({
+      title: `${REVIEW_COMPARISON_TITLE}: people moving into work`,
+      units: `As each row says. ${DIFFERENT_EXERCISES_SENTENCE} Source for the review's figures: ${report.title} (${report.published}), ${report.url}`,
+      columns: [
+        { key: "label", label: "Figure" },
+        { key: "ours", label: ours.column },
+        { key: "theirs", label: theirs.column },
+      ],
+      rows,
+    });
+  const annex = employment.annex;
+  return (
+    <section className="report-section milburn-entry milburn-review" aria-labelledby="milburn-review-heading">
+      <MilburnChartCard
+        id="milburn-review-heading"
+        icon="scale"
+        title={REVIEW_COMPARISON_TITLE}
+        description={`People moving into work: this dashboard's illustrative scenario for ${yearLabel}, and the review's own modelling for ${employment.byYear}. ${DIFFERENT_EXERCISES_SENTENCE}`}
+        name="beside-the-reviews-own-estimate"
+        csv={csv}
+        after={
+          <>
+            <div className="milburn-table-wrap">
+              <table className="milburn-table milburn-review-table">
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <span className="visually-hidden">Figure</span>
+                    </th>
+                    <th scope="col">{ours.column}</th>
+                    <th scope="col">{theirs.column}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.key} data-row={row.key}>
+                      <th scope="row">{row.label}</th>
+                      <td>{row.ours}</td>
+                      <td>{row.theirs}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="milburn-review-source" data-review-source="">
+              Source for the review&rsquo;s figures: <SourceLink href={report.url}>{report.title}</SourceLink>
+              {report.published ? ` (${report.published})` : ""}
+              {employment.source && (
+                <>
+                  ; <SourceLink href={employment.source.url}>{employment.source.label.toLowerCase()}</SourceLink>
+                </>
+              )}
+              {neetRate?.source && (
+                <>
+                  ; NEET rate: <SourceLink href={neetRate.source.url}>{neetRate.source.label.toLowerCase()}</SourceLink>
+                </>
+              )}
+              .
+            </p>
+            {annex && annex.moreInWork !== null && (
+              <details className="milburn-details" data-review-annex="">
+                <summary>
+                  <TitleIcon name="alert" bare size={14} />
+                  How the review states its figure
+                </summary>
+                <ul className="milburn-points">
+                  <Point icon="usersRound">
+                    The report gives about {formatPeople(employment.people)} into sustained work by {employment.byYear}. Its annex gives around{" "}
+                    {formatPeople(annex.moreInWork)} more 16 to 24-year-olds in work in {employment.byYear}
+                    {annex.moreInWorkOrEducation !== null ? `, and around ${formatPeople(annex.moreInWorkOrEducation)} more in employment and education` : ""}
+                    {annex.roundedTo !== null ? `, rounded to the nearest ${formatPeople(annex.roundedTo)}` : ""}
+                    {annex.source && (
+                      <>
+                        {" "}
+                        (<SourceLink href={annex.source.url}>{annex.source.label.toLowerCase()}</SourceLink>)
+                      </>
+                    )}
+                    .
+                  </Point>
+                  <Point icon="calendar">The review publishes its NEET rate year by year, but not its employment effect by year, by measure, or the hours and wages assumed.</Point>
+                  <Point icon="scale">The annex says its analysis is not official government analysis.</Point>
+                </ul>
+              </details>
+            )}
+          </>
+        }
+      >
+        <div data-single-chart="">
+          <HorizontalBars
+            ariaLabel={`People moving into work. ${ours.name}: ${movers !== null ? `about ${formatPeople(movers)}` : "not yet run"}. ${theirs.name}: about ${formatPeople(employment.people)}. ${DIFFERENT_EXERCISES_SENTENCE}`}
+            format={(value) => (value >= 1000 ? `${value / 1000}k` : String(value))}
+            labelWidth={168}
+            rows={bars}
+          />
+        </div>
+      </MilburnChartCard>
+    </section>
+  );
+}
+
 /** The household entry cases from milburn_scenarios.json, one row per hours case. */
 function EntryCases({ data }) {
   const cases = HOURS_CASES.map((option) => data.entryCases.find((entry) => entry.id === option.id)).filter(Boolean);
@@ -413,6 +579,9 @@ function EntryCases({ data }) {
   );
 }
 
+/** The review's line on the entrants chart: whose figure, for when, and the figure. */
+export const reviewBreakEvenLabel = (employment) => `Review's own estimate, into work by ${employment.byYear}: ${formatPeople(employment.people)}`;
+
 /**
  * Break-even arithmetic for one run, from milburn_summary.json: the
  * entrants whose gains from work would match the total income loss (the
@@ -426,8 +595,10 @@ export function BreakEven({ runId, catalogue }) {
 }
 
 /** BreakEven with the summary already read. */
-function BreakEvenSection({ runId, catalogue, summaryState }) {
+function BreakEvenSection({ runId, catalogue, summaryState, review = null }) {
   const id = runId || DEFAULT_SUMMARY_RUN;
+  // The review's estimate is for its whole package: drawn only beside the package runs
+  const reviewLine = review && (id === DEFAULT_SUMMARY_RUN || id === ENTRY_RUN) ? review.employment : null;
   const { status, summary } = summaryState;
   const measure = catalogue?.byId?.get(id);
   const name = measure ? shortNameOf(measure) : id;
@@ -489,10 +660,13 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
           </ChartPanel>
           <ChartPanel icon="usersRound" title="Entrants needed to match the Exchequer saving">
             <HorizontalBars
-              ariaLabel={`Entrants needed to match the Exchequer saving: ${hoursRows.map((row) => `${row.name} ${formatPeople(row.entrants)}`).join(", ")}`}
+              ariaLabel={`Entrants needed to match the Exchequer saving: ${hoursRows.map((row) => `${row.name} ${formatPeople(row.entrants)}`).join(", ")}${reviewLine ? `. For scale, ${reviewBreakEvenLabel(reviewLine)}, a different exercise` : ""}`}
               format={(value) => (value >= 1000 ? `${value / 1000}k` : String(value))}
               labelWidth={76}
-              references={run.youngPeopleLosing !== null ? [{ value: run.youngPeopleLosing, label: `16–24s in losing households: ${formatPeople(run.youngPeopleLosing)}` }] : []}
+              references={[
+                ...(run.youngPeopleLosing !== null ? [{ value: run.youngPeopleLosing, label: `16–24s in losing households: ${formatPeople(run.youngPeopleLosing)}` }] : []),
+                ...(reviewLine ? [{ value: reviewLine.people, label: reviewBreakEvenLabel(reviewLine) }] : []),
+              ]}
               rows={hoursRows.map((row) => ({
                 name: row.name,
                 value: row.entrants,
@@ -551,6 +725,19 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
               </Point>
               <Point icon="scale">{SAME_GAIN_SENTENCE}</Point>
               <Point icon="user">The gain from work is one household case, set out above; other households gain differently.</Point>
+              {reviewLine && (
+                <Point icon="info" data-review-line="">
+                  The dashed line marked &ldquo;{reviewBreakEvenLabel(reviewLine)}&rdquo; is the review&rsquo;s own modelled figure for its whole package, with a mixture of
+                  full-time and part-time work
+                  {review.employment.source && (
+                    <>
+                      {" "}
+                      (<SourceLink href={review.report.url}>{review.report.shortTitle}</SourceLink>, {review.employment.source.label.toLowerCase()})
+                    </>
+                  )}
+                  . It is drawn for scale: the entrants needed are for {yearLabel}, at fixed hours, for the measures modelled here.
+                </Point>
+              )}
               <Point icon="calculator">Counts rounded to the nearest thousand.</Point>
             </ul>
           </details>
@@ -579,7 +766,8 @@ function BreakEvenSection({ runId, catalogue, summaryState }) {
  * Impact's Return to work sub-tab (?sub=scenarios): the full abolition
  * package beside the same package with a quarter of non-working 18 to
  * 24-year-olds with PIP or the health element moving into work,
- * microsimulated (milburn_summary.json);
+ * microsimulated (milburn_summary.json); that run beside the review's own
+ * employment estimate (milburn_review_figures.json);
  * then the household entry cases (milburn_scenarios.json) and the
  * break-even arithmetic for the selected run. Anything missing shows an
  * unavailable state, never zeros.
@@ -588,6 +776,8 @@ export default function BehaviouralScenarios({ selectedRun } = {}) {
   const catalogue = useMeasureCatalogue();
   const file = useScenariosFile();
   const summaryState = useMilburnSummary(catalogue?.manifest?.snapshotSha256 ?? null);
+  const reviewState = useReviewFigures();
+  const review = reviewState.status === "ready" ? reviewState.review : null;
 
   let lead;
   if (summaryState.status === "loading") {
@@ -647,8 +837,14 @@ export default function BehaviouralScenarios({ selectedRun } = {}) {
         </div>
       </div>
       {lead}
+      {summaryState.status === "ready" && review && <ReviewComparison summary={summaryState.summary} review={review} catalogue={catalogue} />}
+      {summaryState.status === "ready" && reviewState.status === "unavailable" && (
+        <div className="milburn-unavailable" role="status">
+          <p>The review&rsquo;s own figures are not available: their data file has not been published.</p>
+        </div>
+      )}
       {cases}
-      <BreakEvenSection runId={selectedRun} catalogue={catalogue} summaryState={summaryState} />
+      <BreakEvenSection runId={selectedRun} catalogue={catalogue} summaryState={summaryState} review={review} />
     </div>
   );
 }

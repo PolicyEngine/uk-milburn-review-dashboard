@@ -244,3 +244,104 @@ export function summaryPovertyCount(summary) {
 /** Said beside the two poverty measures: why they can point different ways. */
 export const RELATIVE_LINE_NOTE =
   "The relative line moves with the median; the absolute line is fixed in real terms.";
+
+/**
+ * The review's own modelled figures, as published, read from
+ * public/data/milburn_review_figures.json: each with the section of the
+ * report, annex or data tables it comes from. Typed into that file by hand
+ * from the publication, never into a component. Its shape (the fields read
+ * here):
+ *
+ *   { report: { title, short_title, published, url, report_url, annex_url },
+ *     employment: { people, by_year, who, measures, method, hours,
+ *       source: { label, url },
+ *       annex: { more_16_to_24_in_work, more_16_to_24_in_employment_and_education,
+ *         rounded_to, source: { label, url } } },
+ *     neet_rate: { years: [], baseline_pct: [], with_recommendations_pct: [],
+ *       ambition_pct, source: { label, url } } }
+ */
+export const REVIEW_FIGURES_FILE = "milburn_review_figures.json";
+
+const text = (value) => (typeof value === "string" ? value.trim() : "");
+
+/** An https address, or "": a link is never built from anything else. */
+const httpsUrl = (value) => (/^https:\/\/\S+$/.test(text(value)) ? text(value) : "");
+
+/** { label, url }, or null without both. */
+const sourceOf = (value) => {
+  const label = text(value?.label);
+  const url = httpsUrl(value?.url);
+  return label && url ? { label, url } : null;
+};
+
+/**
+ * The review's figures, checked: null unless the file names the report with
+ * a link and gives the people into work and their year. A figure it does
+ * not carry is null, never zero.
+ */
+export function parseReviewFigures(json) {
+  if (!json || typeof json !== "object") return null;
+  const url = httpsUrl(json.report?.url);
+  const title = text(json.report?.title);
+  const employment = json.employment;
+  const people = finite(employment?.people);
+  if (!url || !title || people === null || people <= 0 || !Number.isInteger(employment?.by_year)) return null;
+  const rate = json.neet_rate;
+  const series = (values) => (Array.isArray(values) && values.length > 0 && values.every((value) => finite(value) !== null) ? values : null);
+  const baseline = series(rate?.baseline_pct);
+  const withReforms = series(rate?.with_recommendations_pct);
+  const years = Array.isArray(rate?.years) && rate.years.every((year) => typeof year === "string") ? rate.years : null;
+  const sameLength = years && baseline && withReforms && years.length === baseline.length && years.length === withReforms.length;
+  return {
+    report: {
+      title,
+      shortTitle: text(json.report.short_title) || title,
+      published: text(json.report.published),
+      url,
+      reportUrl: httpsUrl(json.report.report_url),
+      annexUrl: httpsUrl(json.report.annex_url),
+    },
+    employment: {
+      people,
+      byYear: employment.by_year,
+      who: text(employment.who),
+      measures: text(employment.measures),
+      method: text(employment.method),
+      hours: text(employment.hours),
+      source: sourceOf(employment.source),
+      annex: employment.annex
+        ? {
+            moreInWork: finite(employment.annex.more_16_to_24_in_work),
+            moreInWorkOrEducation: finite(employment.annex.more_16_to_24_in_employment_and_education),
+            roundedTo: finite(employment.annex.rounded_to),
+            source: sourceOf(employment.annex.source),
+          }
+        : null,
+    },
+    neetRate: sameLength
+      ? { years, baselinePct: baseline, withReformsPct: withReforms, ambitionPct: finite(rate.ambition_pct), source: sourceOf(rate.source) }
+      : null,
+  };
+}
+
+/** The review's figures file: { status: "loading"|"ready"|"unavailable", review }. */
+export function useReviewFigures({ basePath = process.env.NEXT_PUBLIC_BASE_PATH || "" } = {}) {
+  const [state, setState] = useState({ status: "loading", review: null });
+  useEffect(() => {
+    let cancelled = false;
+    Promise.resolve()
+      .then(() => fetch(`${basePath}/data/${REVIEW_FIGURES_FILE}`, { cache: "no-cache" }))
+      .then((response) => (response?.ok ? response.json() : null))
+      .then((json) => {
+        const review = parseReviewFigures(json);
+        if (!cancelled) setState({ status: review ? "ready" : "unavailable", review });
+      })
+      .catch(() => {
+        if (!cancelled) setState({ status: "unavailable", review: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [basePath]);
+  return state;
+}

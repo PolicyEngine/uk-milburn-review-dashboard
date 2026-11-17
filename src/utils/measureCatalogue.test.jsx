@@ -283,7 +283,12 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
   // Comments are not scanned: they show nothing. Anything else in these
   // files, and every other file, still fails.
   const allowed = {
-    "utils/policyDetails.js": [/export const POLICY_DETAILS = \[[\s\S]*?\n\];/, /export const MILBURN_POLICY_DETAILS = \[[\s\S]*?\n\];/],
+    "utils/policyDetails.js": [
+      /export const POLICY_DETAILS = \[[\s\S]*?\n\];/,
+      /export const MILBURN_POLICY_DETAILS = \[[\s\S]*?\n\];/,
+      // The report's runs, each mapped to its 15 November counterpart's card
+      /const REPORT_RUN_OF = \{[\s\S]*?\n\};/,
+    ],
     // The Milburn review: the measures listed as not computable, in the
     // registry's own words
     "utils/milburn/notComputable.js": [/export const NOT_COMPUTABLE_MEASURES = \[[\s\S]*?\n\];/],
@@ -295,6 +300,11 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
       /export const PACKAGE_PARTS = Object\.freeze\(\{[\s\S]*?\n\}\);/,
     ],
     "utils/milburn/summary.js": [/^export const (?:DEFAULT_SUMMARY_RUN|ENTRY_RUN) = "[a-z0-9_]+";$/gm],
+    // The final report's proposals in its own names (Methodology's account
+    // of the report and the limits against its design; Key figures' note on
+    // the replacements left out): prose only, deciding nothing about any run
+    "components/MethodologyTab.jsx": [/export const REPORT_PROPOSALS = \[[\s\S]*?\n\];/, /export const REPORT_MODELLED = \[[\s\S]*?\n\];/, /const REPORT_DESIGN_LIMITATIONS = \[[\s\S]*?\n\];/],
+    "components/milburn/KeyFigures.jsx": [/export const REPLACEMENT_PARTS_NOTE =\n.*;/],
     "utils/householdExamples.js": [/^\s*(?:measure|measures|tag): .*$/gm],
     "components/personal/SingleYearResults.jsx": [/export const SPENDING_MEASURES = \[.*\];/],
     "utils/measureModelling.js": [/export const MODELLING_NOTE = \{[\s\S]*?\n\};/],

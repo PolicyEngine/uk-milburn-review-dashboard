@@ -165,10 +165,9 @@ export function milburnVisual(policy) {
 /*
  * The measures we cannot compute (utils/milburn/notComputable.js): a
  * diagram each, never a figure. Three shapes: a decision split (a test,
- * then what follows where it is met and where it is not), a swap of one
- * benefit for another whose rules are unknown, and offers with more
- * places. Icons are TitleIcon's; what is unknown or not modelled is
- * dashed. Each is one image, named by its `alt` sentence.
+ * then what follows each way), a swap of one benefit or rule for another
+ * whose rules are not in the model, and offers with more places. Icons
+ * are TitleIcon's; what is unknown or not modelled is dashed. Each is one image, named by its `alt` sentence.
  */
 
 const Glyph = ({ name, size = 16 }) => <TitleIcon bare name={name} size={size} className="mnc-glyph" />;

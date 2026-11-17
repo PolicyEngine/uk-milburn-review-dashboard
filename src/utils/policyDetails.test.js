@@ -151,6 +151,10 @@ it("describes each Milburn candidate measure in one neutral line, applied whatev
     "uc_health_element_removed_under_25_severe_kept",
     "pip_halved_under_25",
     "pip_removed_16_to_24",
+    // The final report's runs, from April 2029
+    "milburn_report_package",
+    "milburn_report_uc_health",
+    "milburn_report_pip",
   ];
   expect(MILBURN_POLICY_DETAILS.map((entry) => entry.id)).toEqual(ids);
   for (const entry of MILBURN_POLICY_DETAILS) {

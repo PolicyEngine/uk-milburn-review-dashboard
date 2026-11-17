@@ -7,7 +7,7 @@
  * Every passage that says the report is still to come reads its words from
  * reportCopy(): the landing intro and box, the page's meta description,
  * Methodology ("At a glance", "The review and these measures" and two
- * limits), the provisional label, the Measures tab's subtitle, its
+ * limits; its account of the report itself is its own), the provisional label, the Measures tab's subtitle, its
  * placeholder and empty line, the not-computable headings and reason, and
  * the comparators' group heading.
  *
@@ -21,7 +21,25 @@
  */
 
 // Flip this one line: true once the final report is published
-export const REPORT_PUBLISHED = false;
+export const REPORT_PUBLISHED = true;
+
+const PUBLICATION_URL =
+  "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation";
+
+/**
+ * The final report as published: its title, publisher, date and addresses
+ * (GOV.UK, Department for Work and Pensions, 17 November 2026). The
+ * passages that link to it (the landing intro, Methodology) read these.
+ */
+export const FINAL_REPORT = Object.freeze({
+  title: "From a Welfare State to a Working State: a new settlement for the next generation",
+  shortTitle: "From a Welfare State to a Working State",
+  publisher: "Department for Work and Pensions",
+  date: "17 November 2026",
+  url: PUBLICATION_URL,
+  reportUrl: `${PUBLICATION_URL}/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation`,
+  annexUrl: `${PUBLICATION_URL}/from-a-welfare-state-to-a-working-state-analytical-annex`,
+});
 
 /** The wording in each state, by passage. */
 export const REPORT_COPY = Object.freeze({
@@ -33,6 +51,8 @@ export const REPORT_COPY = Object.freeze({
     landingIntroLead: "Estimates from ",
     landingIntroRest:
       "of candidate measures for the young people and work review, by age. Modelled before the final report on 17 November 2026; not announced policy.",
+    // After the report's link, once there is one (the after state)
+    landingIntroTail: "",
     measuresBoxLine: "Every candidate measure, and how we model it",
     // The page's meta description (app/layout.tsx)
     metaDescription:
@@ -64,26 +84,28 @@ export const REPORT_COPY = Object.freeze({
   }),
   // Once the final report is published: the measures follow its proposals
   after: Object.freeze({
-    landingHeading: "Young people and work: the review’s measures modelled",
+    landingHeading: "Young people and work: measures from the final report modelled",
     landingIntroLead: "",
+    // The intro is: the PolicyEngine UK link, a space, rest, the report's link (FINAL_REPORT), tail
     landingIntroRest:
-      "estimates of measures in the independent review of young people and work (final report, 17 November 2026), by age.",
+      "estimates, by age, of benefit measures drawn from the final report of the independent review of young people and work,",
+    landingIntroTail: " (17 November 2026). The report’s replacement payments are not modelled.",
     measuresBoxLine: "Every measure, and how we model it",
     metaDescription:
-      "PolicyEngine UK estimates of measures in the independent review of young people and work (the Milburn review; final report, 17 November 2026): the public finances and households by age. The report’s proposals are not government policy unless the government adopts them.",
+      "PolicyEngine UK estimates of benefit measures drawn from From a Welfare State to a Working State, the final report of the independent review of young people and work (the Milburn review, 17 November 2026): the public finances and households by age. The report’s proposals are not government policy unless the government adopts them.",
     methodSummary:
-      "on a survey of UK households with and without each measure modelled from the final report of the Milburn review of young people and work; weights scale the survey to the UK. The figures are static.",
-    reviewTopicPreview: "Final report 17 November 2026 · As far as the model can represent · Not government policy",
+      "on a survey of UK households with and without each measure drawn from the final report of the Milburn review of young people and work; weights scale the survey to the UK. The figures are static.",
+    reviewTopicPreview: "Final report 17 November 2026 · What it proposes · What we model · Not government policy",
+    // The closing paragraphs; the report's link, its proposals and what we model are Methodology's own (MethodologyTab.jsx)
     reviewTopicBody: Object.freeze([
-      "The independent review of young people and work published an interim report on 28 May 2026 and its final report on Tuesday 17 November 2026. The measures here follow the report’s proposals as far as the model can represent them.",
-      "Some proposals cannot be modelled. They are listed with the reason under “Measures we cannot compute”.",
-      "The report’s proposals are not government policy unless the government adopts them. Comparators are labelled as not in the report.",
+      "Proposals we do not model are listed with the reason under “Measures we cannot compute”.",
+      "The report’s proposals are not government policy unless the government adopts them.",
     ]),
     notComputableLimit: "Some measures cannot be computed with these data and this model; they are listed with the reason, and never shown as £0.",
     policyLimitTerm: "Not government policy",
-    policyLimit: "The measures follow the report’s proposals as far as the model can represent them. The report’s proposals are not government policy unless the government adopts them.",
-    provisionalLabel: "Provisional: estimates of measures in the review’s final report",
-    measuresSubtitle: "Measures in the Milburn review’s final report, and comparators: what each changes, and how we model it.",
+    policyLimit: "The measures follow the report’s proposals as far as the model can represent them, without its replacement payments. The report’s proposals are not government policy unless the government adopts them.",
+    provisionalLabel: "Provisional: estimates of measures drawn from the review’s final report",
+    measuresSubtitle: "Measures drawn from the Milburn review’s final report, and comparators: what each changes, and how we model it.",
     measuresPlaceholderSubtitle: "What each measure changes, and how we model it.",
     measuresEmptyLine: "Figures appear here once the measures’ results are published.",
     notComputableTitle: "Measures we cannot compute",
@@ -92,7 +114,10 @@ export const REPORT_COPY = Object.freeze({
     rulesNotSetOut: "Its eligibility and rates are not in the model.",
     higherAmountAltTail: "",
     newBenefitAltTail: ".",
-    comparatorsLabel: "Comparators, not in the report",
+    // Both comparators are wider forms of a proposal in the report (a
+    // Youth Allowance; an employer NICs relief for 21 to 24-year-olds in
+    // retail and hospitality), so neither is "not in the report"
+    comparatorsLabel: "Comparators, wider than the report proposes",
   }),
 });
 

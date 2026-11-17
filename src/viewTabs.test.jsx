@@ -171,12 +171,18 @@ describe("the view tabs", () => {
     expect(within(modelled).getAllByRole("listitem")).toHaveLength(1);
     const notComputable = within(panel).getByRole("region", { name: reportCopy().notComputableTitle });
     expect(within(notComputable).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual([
-      "Higher health element for severe conditions",
-      "Additional cost allowance",
-      "Conditionality for young people",
-      "Youth Guarantee expansion",
+      "Additional Cost Allowance",
+      "Severe and Complex Needs Insurance",
+      "Local Health and Disability Fund",
+      "Duty to engage",
+      "Care Leaver Transition Allowance",
+      "Opportunity Guarantee",
+      "Hiring payments to employers",
+      "Apprenticeship target",
+      "Further education places",
     ]);
-    expect(notComputable.textContent).not.toMatch(/£/);
+    // The report's own amounts may be stated; never an estimate of no effect
+    expect(notComputable.textContent).not.toMatch(/£0/);
     expect(new URLSearchParams(window.location.search).get("tab")).toBe("policies");
   });
 

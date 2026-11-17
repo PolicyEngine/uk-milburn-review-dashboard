@@ -1,17 +1,28 @@
 {
   "title": "Benchmarks: published figures on young people, work and health-related benefits",
-  "note": "Reference figures from other sources, as published, each with its own definitions, coverage and date. Where PolicyEngine has a comparable figure, it is shown beside the published one with its build and year.",
+  "note": "Reference figures from the review (From a Welfare State to a Working State, 17 November 2026) and other sources, as published, each with its own definitions, coverage and date. Where PolicyEngine has a comparable figure, it is shown beside the published one with its build and year.",
   "policyengine_estimate_year": 2027,
   "rows": [
     {
       "id": "neet_16_24",
       "figure": "Young people aged 16 to 24 not in education, employment or training (NEET)",
       "value": "981,000",
-      "basis": "Labour Force Survey estimate, three months to June 2026, UK (about one in eight 16 to 24-year-olds)",
-      "source": "ONS figures, as reported by BBC News",
-      "url": "https://www.bbc.co.uk/news/live/cq20xlrd044lt",
+      "basis": "Labour Force Survey estimate, April to June 2026, UK: 13.0% of people aged 16 to 24. The review describes the number as nearly one million young people, 1 in 8",
+      "source": "Office for National Statistics",
+      "url": "https://www.ons.gov.uk/employmentandlabourmarket/peoplenotinwork/unemployment/bulletins/youngpeoplenotineducationemploymentortrainingneet/august2026",
+      "date": "27 August 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "neet_rate_projection_2036",
+      "figure": "NEET rate the review projects for 2036-37 with its recommendations",
+      "value": "6.8% in 2036-37; 13.4% without the recommendations",
+      "basis": "Share of people aged 16 to 24 not in education, employment or training, UK, from 13.1% in 2026-27: the review's internal modelling (data tables, table 3)",
+      "source": "From a Welfare State to a Working State: data tables",
+      "url": "https://assets.publishing.service.gov.uk/media/6af74c9b9be17c68c69ca838/from-a-welfare-state-to-a-working-state-accompanying-data-tables.ods",
       "date": "17 November 2026",
-      "press_report": true,
+      "press_report": false,
       "policyengine_estimate": null
     },
     {
@@ -30,35 +41,65 @@
       }
     },
     {
-      "id": "kept_out_of_poverty",
-      "figure": "Young people kept out of poverty by UC health and/or PIP",
-      "value": "120,000",
-      "basis": "Resolution Foundation analysis",
+      "id": "uc_health_element_16_24",
+      "figure": "Young people aged 16 to 24 receiving the Universal Credit health element",
+      "value": "176,000; 110,000 of them also receive PIP",
+      "basis": "Resolution Foundation response to the review: people aged 16 to 24 currently receiving the health element of Universal Credit",
       "source": "Resolution Foundation",
-      "url": "https://www.resolutionfoundation.org/comment/youve-got-mail-finally-your-milburn-cram-sheet-inside/",
-      "date": "13 November 2026",
+      "url": "https://www.resolutionfoundation.org/press-releases/government-must-match-milburns-ambition-to-properly-invest-in-young-people/",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "232,000",
+        "basis": "Benefit units with the LCWRA element in which every adult is under 25, UK: benefit units, not people",
+        "label": "PolicyEngine, build fcfac709, 2027-28"
+      }
+    },
+    {
+      "id": "incapacity_benefits_young",
+      "figure": "Young people receiving incapacity benefits, as stated in the review",
+      "value": "Approximately 250,000",
+      "basis": "The review's own count (paragraph 633): more than double the number in 2012",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": null
     },
     {
-      "id": "uc_lcwra_16_24",
-      "figure": "Young people aged 16 to 24 in a Universal Credit LCWRA subgroup, as reported",
-      "value": "62,570",
-      "basis": "DWP statistics as reported by Benefits and Work; the report describes a subgroup at substantial risk if required to prepare for work, so this is not the full LCWRA caseload",
-      "source": "DWP, via Benefits and Work",
-      "url": "https://benefitsandwork.co.uk/news/milburn-proposes-abolition-of-pip-and-uc-health-for-under-25s",
-      "date": "May 2026",
-      "press_report": true,
+      "id": "young_pip_recipients",
+      "figure": "Young people receiving Personal Independence Payment (PIP)",
+      "value": "450,000; worth around £8,400 a year on average",
+      "basis": "Resolution Foundation response to the review: young people currently receiving PIP",
+      "source": "Resolution Foundation",
+      "url": "https://www.resolutionfoundation.org/press-releases/government-must-match-milburns-ambition-to-properly-invest-in-young-people/",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "347,000",
+        "basis": "PIP recipients aged 18 to 24, UK; 16 and 17-year-olds are not counted",
+        "label": "PolicyEngine, build fcfac709, 2027-28"
+      }
+    },
+    {
+      "id": "dla_pip_16_24",
+      "figure": "Young people aged 16 to 24 receiving Disability Living Allowance or PIP, as stated in the review",
+      "value": "Over 400,000; 820,000 expected to receive PIP in ten years",
+      "basis": "The review's own count from DWP Stat-Xplore (paragraph 633): double the number in 2012. The projection is 1 in 9 young people in the UK",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
       "policyengine_estimate": null
     },
     {
-      "id": "incapacity_spending_18_24",
-      "figure": "Incapacity benefit spending on people aged 18 to 24",
-      "value": "£1.3bn (2022) to £2.0bn (2025)",
-      "basis": "IFS analysis",
-      "source": "Institute for Fiscal Studies",
-      "url": "https://ifs.org.uk/articles/challenges-milburn-review",
-      "date": "",
+      "id": "into_sustained_work_2036",
+      "figure": "Young people the review expects its recommendations to help into sustained work by 2036",
+      "value": "440,000",
+      "basis": "Modelling carried out for the review: the whole set of recommendations, not the benefit changes alone",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": null
     },
@@ -80,23 +121,146 @@
     {
       "id": "young_benefits_spend",
       "figure": "Spending on PIP and Universal Credit health for young people",
-      "value": "About £8bn a year; PIP for young people projected at £6.5bn by 2031-32",
-      "basis": "Interim report estimates, as reported",
-      "source": "Benefits and Work, reporting the interim report",
-      "url": "https://benefitsandwork.co.uk/news/milburn-proposes-abolition-of-pip-and-uc-health-for-under-25s",
-      "date": "1 June 2026",
-      "press_report": true,
-      "policyengine_estimate": null
+      "value": "£4.7bn in 2025-26; £1.7bn in 2019-20, forecast at £8.8bn in 2036-37",
+      "basis": "The review's figures for ages 16 to 24 (paragraph 114): PIP of £3.8bn and the Universal Credit LCWRA element of £0.92bn in 2025-26",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "£4.49bn a year",
+        "basis": "Static saving from removing the UC health element for under-25s and PIP for ages 18 to 24, UK: the spending the modelled package removes, without PIP at 16 and 17",
+        "label": "PolicyEngine, build fcfac709, 2027-28"
+      }
+    },
+    {
+      "id": "pip_spend_16_24",
+      "figure": "PIP spending on people aged 16 to 24",
+      "value": "£3.8bn a year; £1.3bn in 2019-20, forecast at £8.1bn in 2036-37",
+      "basis": "The review's figure for 2025-26, ages 16 to 24 (footnote to paragraph 114)",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "£4.42bn a year",
+        "basis": "Static saving from removing PIP for ages 16 to 24 in 2027-28, UK; £3.44bn for ages 18 to 24",
+        "label": "PolicyEngine, build fcfac709, 2027-28"
+      }
+    },
+    {
+      "id": "uc_health_spend_16_24",
+      "figure": "Universal Credit LCWRA element spending on people aged 16 to 24",
+      "value": "£0.92bn a year; £0.42bn in 2019-20, forecast at £0.68bn in 2036-37",
+      "basis": "The review's figure for 2025-26, ages 16 to 24 (footnote to paragraph 114)",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "£1.15bn a year",
+        "basis": "Static saving from removing the UC health element for under-25s in 2027-28, UK",
+        "label": "PolicyEngine, build fcfac709, 2027-28"
+      }
+    },
+    {
+      "id": "review_welfare_saving_2036",
+      "figure": "Annual welfare saving the review estimates for 2036-37",
+      "value": "£3.6bn in 2036-37",
+      "basis": "PIP and Universal Credit spending, UK, in 2026-27 prices, against the baseline forecast: replacement awards for some claimants, the cost of a Youth Allowance and a work allowance, and an assumed employment effect. Savings begin in 2029-30",
+      "source": "From a Welfare State to a Working State: analytical annex",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-analytical-annex",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "£2.54bn to £4.49bn a year",
+        "basis": "Static saving in 2027-28, UK: from the central variant (severe cases kept, PIP at half rate) to full removal of the UC health element for under-25s and PIP for ages 18 to 24",
+        "label": "PolicyEngine, build fcfac709, 2027-28"
+      }
     },
     {
       "id": "milburn_welfare_saving_10y",
-      "figure": "Welfare savings the review's author expects over ten years",
-      "value": "£13.8bn over 10 years",
-      "basis": "Alan Milburn, before the report: if changes come quickly, with initial costs met by the government",
-      "source": "BBC News live page",
-      "url": "https://www.bbc.co.uk/news/live/cq20xlrd044lt",
+      "figure": "Cumulative welfare savings the review estimates by 2036-37",
+      "value": "£13.7bn by 2036-37",
+      "basis": "Sum of annual savings over the eight years from 2029-30 to 2036-37, UK, in 2026-27 prices (paragraph 113 and the analytical annex). Reported before publication as £13.8bn over ten years",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
       "date": "17 November 2026",
-      "press_report": true,
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "review_investment_2036",
+      "figure": "Annual cost of the review's recommendations in 2036-37",
+      "value": "£5.8bn in 2036-37; a net saving of about £0.2bn after welfare savings and fiscal offsets",
+      "basis": "Gross cost in 2026-27 prices (data tables, table 2): education £2.1bn, Opportunity and Support Guarantees £1.9bn, youth hiring incentives £1.1bn, health £0.7bn; set against £3.6bn of welfare savings and £2.4bn of fiscal offsets",
+      "source": "From a Welfare State to a Working State: data tables",
+      "url": "https://assets.publishing.service.gov.uk/media/6af74c9b9be17c68c69ca838/from-a-welfare-state-to-a-working-state-accompanying-data-tables.ods",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "youth_hiring_incentives_cost",
+      "figure": "Cost of the review's youth hiring incentives in 2036-37",
+      "value": "£1.1bn in 2036-37",
+      "basis": "Gross cost in 2026-27 prices of expanding the Youth Jobs Grant by up to 40,000 places a year and of the apprenticeship recommendations. The annex gives no separate cost for the employer National Insurance change the review proposes",
+      "source": "From a Welfare State to a Working State: analytical annex",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-analytical-annex",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "incapacity_spending_18_24",
+      "figure": "Incapacity benefit spending on people aged 18 to 24",
+      "value": "£1.3bn (2022) to £2.0bn (2025)",
+      "basis": "IFS analysis",
+      "source": "Institute for Fiscal Studies",
+      "url": "https://ifs.org.uk/articles/challenges-milburn-review",
+      "date": "9 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "employer_nics_under_25",
+      "figure": "Cost of a zero employer National Insurance rate for under-25s",
+      "value": "£5.1bn a year; about £132,000 per extra job",
+      "basis": "Resolution Foundation estimate, based on 2026 data; not a recommendation of the review, which proposes a higher employer National Insurance threshold for workers aged 21 to 24 instead",
+      "source": "Resolution Foundation",
+      "url": "https://www.resolutionfoundation.org/comment/can-milburn-rise-to-the-scale-of-britains-neets-challenge/",
+      "date": "11 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "£4.43bn a year",
+        "basis": "Static cost of a zero employer National Insurance rate for under-25s, UK",
+        "label": "PolicyEngine, build fcfac709, 2027-28"
+      }
+    },
+    {
+      "id": "relative_poverty_review",
+      "figure": "Change in relative poverty after housing costs the review estimates",
+      "value": "50,000 fewer",
+      "basis": "People in relative low income after housing costs once the modelled measures are fully rolled out, to the nearest 50,000: benefit changes with replacement awards, a Health and Disability Fund, a Youth Allowance, a work allowance and 440,000 more young people in work",
+      "source": "From a Welfare State to a Working State: analytical annex",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-analytical-annex",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "156,000 more",
+        "basis": "People in relative poverty after housing costs in 2027-28, UK: static effect of removing the UC health element for under-25s and PIP for ages 18 to 24, with no replacement benefit and no one moving into work",
+        "label": "PolicyEngine, build fcfac709, 2027-28"
+      }
+    },
+    {
+      "id": "kept_out_of_poverty",
+      "figure": "Young people kept out of poverty by UC health and/or PIP",
+      "value": "120,000",
+      "basis": "Resolution Foundation analysis",
+      "source": "Resolution Foundation",
+      "url": "https://www.resolutionfoundation.org/comment/youve-got-mail-finally-your-milburn-cram-sheet-inside/",
+      "date": "13 November 2026",
+      "press_report": false,
       "policyengine_estimate": null
     },
     {
@@ -109,21 +273,6 @@
       "date": "11 November 2026",
       "press_report": false,
       "policyengine_estimate": null
-    },
-    {
-      "id": "employer_nics_under_25",
-      "figure": "Cost of a zero employer National Insurance rate for under-25s",
-      "value": "£5.1bn a year; about £132,000 per extra job",
-      "basis": "Resolution Foundation estimate; not a recommendation of the review",
-      "source": "Resolution Foundation",
-      "url": "https://www.resolutionfoundation.org/comment/can-milburn-rise-to-the-scale-of-britains-neets-challenge/",
-      "date": "11 November 2026",
-      "press_report": false,
-      "policyengine_estimate": {
-        "value": "£4.43bn a year",
-        "basis": "Static cost of a zero employer National Insurance rate for under-25s, UK",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
-      }
     }
   ]
 }

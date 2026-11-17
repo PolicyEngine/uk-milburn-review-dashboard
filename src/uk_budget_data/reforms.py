@@ -1764,7 +1764,11 @@ MILBURN_PACKAGE_16_TO_24_COMPONENTS = (UC_HEALTH_UNDER_25_ID, PIP_16_TO_24_ID)
 PIP_UNDER_25_EXCLUDING_SCOTLAND_ID = "pip_removed_under_25_excluding_scotland"
 PIP_16_TO_24_EXCLUDING_SCOTLAND_ID = "pip_removed_16_to_24_excluding_scotland"
 # Reserved ids to list on the page (empty until their runs exist).
-MILBURN_PROMOTED_IDS: tuple[str, ...] = ()
+MILBURN_PROMOTED_IDS: tuple[str, ...] = (
+    "milburn_report_package",
+    "milburn_report_uc_health",
+    "milburn_report_pip",
+)
 
 _SCOTLAND_INCLUDED = (
     "Scottish "

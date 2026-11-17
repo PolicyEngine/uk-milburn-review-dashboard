@@ -2,7 +2,7 @@ import SourceLink from "./SourceLink";
 import { ChevronRight } from "lucide-react";
 import TitleIcon from "./TitleIcon";
 import { REPORT_DAY, subShownOnReportDay } from "../utils/milburn/reportDay";
-import { REPORT_PUBLISHED, reportCopy } from "../utils/milburn/reportStatus";
+import { FINAL_REPORT, REPORT_PUBLISHED, reportCopy } from "../utils/milburn/reportStatus";
 import "./LandingPage.css";
 
 /** One of the three boxes: a link that opens its view in place. */
@@ -53,7 +53,7 @@ export const landingBoxes = ({ reportDay = REPORT_DAY, published = REPORT_PUBLIS
  * landing page and the overview drawer each name themselves by it), the
  * paragraph and the provisional notice. One source for both. The words
  * are the report-status switch's (utils/milburn/reportStatus.js): `published`
- * overrides it.
+ * overrides it. Once published, the paragraph links to the report itself.
  */
 export function LandingIntro({ headingId, provisional, note = null, className = "landing-hero", published = REPORT_PUBLISHED }) {
   const copy = reportCopy(published);
@@ -62,6 +62,16 @@ export function LandingIntro({ headingId, provisional, note = null, className = 
       <h2 id={headingId} className="landing-heading">{copy.landingHeading}</h2>
       <p className="landing-intro">
         {copy.landingIntroLead}<SourceLink source="policyengine_uk_model" />{" "}{copy.landingIntroRest}
+        {published && (
+          <>
+            {" "}
+            <a href={FINAL_REPORT.url} target="_blank" rel="noopener noreferrer">
+              {FINAL_REPORT.shortTitle}
+              <span className="policy-sr-only"> (opens in a new tab)</span>
+            </a>
+          </>
+        )}
+        {copy.landingIntroTail}
       </p>
       {note && <p className="landing-intro landing-intro-note">{note}</p>}
       {provisional}

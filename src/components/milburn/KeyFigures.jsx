@@ -20,13 +20,13 @@ import { CHART_COLOURS } from "../../utils/chartTheme";
 import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
-/** The replacement support briefed for the review, which no run models. */
+/** The report's replacements for the benefits removed, which no run models. */
 export const REPLACEMENT_NOT_MODELLED_NOTE =
-  "Replacement support is not modelled, so the full package is an upper bound on losses.";
+  "The report’s replacement payments are not modelled, so the full package is an upper bound on losses.";
 
-/** What that replacement support is, as briefed for the review. */
+/** What those replacements are, as the final report names them (paragraphs 107 and 752 to 756). */
 export const REPLACEMENT_PARTS_NOTE =
-  "Left out: local fund, extra-costs allowance, payment for those who can never work, conditionality.";
+  "Left out: Additional Cost Allowance (ongoing costs), local Health and Disability Fund (one-off or changing costs), Severe and Complex Needs Insurance.";
 
 /** The range strip's short names for the packages, by position in PACKAGE_IDS. */
 const RANGE_NAMES = ["Upper bound", "Central", "Phased"];

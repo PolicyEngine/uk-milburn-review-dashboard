@@ -22,6 +22,8 @@ import "./milburn.css";
 
 const LABEL_STYLE = { ...TICK_STYLE, fill: CHART_COLOURS.text, fontWeight: 600 };
 const REFERENCE_LABEL_STYLE = { ...TICK_STYLE, fill: CHART_COLOURS.axisTitle };
+/** The height a reference line's name takes over the plot (px). */
+const REFERENCE_LABEL_ROW = 16;
 
 /**
  * A chart card as the other tabs draw theirs: the title with its icon, one
@@ -116,11 +118,13 @@ export function HorizontalBars({ rows, format, references = [], color = CHART_CO
   if (!shown.length) return <p className="milburn-chart-empty" role="status">Not in the summary.</p>;
   const { domain, ticks } = zeroBasedAxis([...shown.map((row) => row.value), ...references.map((reference) => reference.value)]);
   const longest = Math.max(...shown.map((row) => String(row.label).length), 1);
-  const height = shown.length * rowHeight + 34 + (references.length ? 22 : 0);
+  // Each reference line's name sits on its own row over the plot, so two lines close together both read
+  const labelRows = references.length * REFERENCE_LABEL_ROW;
+  const height = shown.length * rowHeight + 34 + (references.length ? 6 + labelRows : 0);
   return (
     <div role="img" aria-label={ariaLabel}>
       <ResponsiveContainer width="100%" height={height}>
-        <BarChart data={shown} layout="vertical" margin={{ top: references.length ? 24 : 4, right: longest * 7 + 14, left: 0, bottom: 0 }} barCategoryGap="28%">
+        <BarChart data={shown} layout="vertical" margin={{ top: references.length ? 8 + labelRows : 4, right: longest * 7 + 14, left: 0, bottom: 0 }} barCategoryGap="28%">
           <CartesianGrid {...GRID_PROPS} vertical horizontal={false} />
           <XAxis type="number" domain={domain} ticks={ticks} tick={TICK_STYLE} axisLine={AXIS_LINE} tickLine={false} tickFormatter={format} />
           <YAxis
@@ -145,13 +149,13 @@ export function HorizontalBars({ rows, format, references = [], color = CHART_CO
             ))}
             <LabelList dataKey="label" content={EndLabel} />
           </Bar>
-          {references.map((reference) => (
+          {references.map((reference, index) => (
             <ReferenceLine
               key={reference.label}
               x={reference.value}
               stroke={CHART_COLOURS.reference}
               strokeDasharray={REFERENCE_DASH}
-              label={{ value: reference.label, position: "top", style: REFERENCE_LABEL_STYLE }}
+              label={{ value: reference.label, position: "top", offset: 5 + index * REFERENCE_LABEL_ROW, style: REFERENCE_LABEL_STYLE }}
             />
           ))}
         </BarChart>

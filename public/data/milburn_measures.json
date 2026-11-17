@@ -1,5 +1,5 @@
 {
-  "build": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1",
+  "build": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
   "measures": [
     {
       "id": "milburn_package",
@@ -93,6 +93,27 @@
       "id": "milburn_package_entry_25pct",
       "name": "Milburn package with an illustrative move into work",
       "description": "The full package, with a randomly chosen quarter of affected young people who do not work (aged 18 to 24, with PIP or limited capability for work and work-related activity) moving into 16 hours a week at their minimum wage. An illustrative scenario, not an estimate of how people would respond.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "milburn_report_package",
+      "name": "Milburn report package (combined)",
+      "description": "The report's design, simulated together with their interactions: UC health element removed for under-25s; PIP removed for 18 to 24-year-olds.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "milburn_report_uc_health",
+      "name": "UC health element removed for under-25s",
+      "description": "From April 2029 Universal Credit awards no longer include the health (LCWRA) element where the claimant with limited capability for work and work-related activity is under 25, for existing and new claimants alike; an award keeps it where a joint claimant aged 25 or over has that capability. The assessment itself is unchanged, so the work allowance still applies, but an award without the element loses the benefit cap exception that rests on it.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "milburn_report_pip",
+      "name": "PIP removed for 18 to 24-year-olds",
+      "description": "From April 2029 people aged 18 to 24 receive neither component of Personal Independence Payment; 16 and 17-year-olds keep it and Disability Living Allowance for children is unchanged. Entitlements that depend on receiving PIP go with it. Scottish recipients of Adult Disability Payment, which the data record as PIP, are included.",
       "status": "computable",
       "first_year": 2027
     },

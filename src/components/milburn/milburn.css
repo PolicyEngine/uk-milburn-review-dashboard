@@ -750,3 +750,28 @@
 .milburn-year-only {
   margin: 4px 0 20px;
 }
+
+/* Return to work: this dashboard's scenario beside the review's own estimate (ReviewComparison) */
+.milburn-review .milburn-review-table th,
+.milburn-review .milburn-review-table td {
+  white-space: normal;
+  vertical-align: top;
+}
+
+.milburn-review .milburn-review-table tbody th {
+  min-width: 120px;
+}
+
+.milburn-review .milburn-review-table td {
+  min-width: 200px;
+}
+
+.milburn-review .milburn-review-source {
+  margin: 12px 0 0;
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+}
+
+.milburn-review .milburn-review-source a {
+  color: var(--c-gain-text);
+}

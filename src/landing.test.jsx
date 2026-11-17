@@ -1,6 +1,6 @@
 import { beforeAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { subShownOnReportDay } from "./utils/milburn/reportDay";
-import { reportCopy } from "./utils/milburn/reportStatus";
+import { FINAL_REPORT, REPORT_PUBLISHED, reportCopy } from "./utils/milburn/reportStatus";
 const RETURN_TO_WORK_SHOWN = subShownOnReportDay("scenarios");
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import App, { preloadAllViews } from "./App";
@@ -20,7 +20,10 @@ beforeAll(preloadAllViews, 60_000);
 // 2026; not announced policy."
 const COPY = reportCopy();
 const literal = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const INTRO = new RegExp(`^${literal(COPY.landingIntroLead)}PolicyEngine UK( \\(opens in a new tab\\))? ${literal(COPY.landingIntroRest)}$`);
+// Once published, the report's own link follows, then the tail
+const NEW_TAB = "( \\(opens in a new tab\\))?";
+const REPORT_LINK = REPORT_PUBLISHED ? ` ${literal(FINAL_REPORT.shortTitle)}${NEW_TAB}` : "";
+const INTRO = new RegExp(`^${literal(COPY.landingIntroLead)}PolicyEngine UK${NEW_TAB} ${literal(COPY.landingIntroRest)}${REPORT_LINK}${literal(COPY.landingIntroTail)}$`);
 
 const BOXES = {
   society: /^Young people/,
@@ -85,6 +88,8 @@ describe("the landing page", () => {
     const order = [
       // A source link says it opens in a new tab, to a screen reader
       "PolicyEngine UK (opens in a new tab)",
+      // Once the final report is published, the paragraph links to it too
+      ...(REPORT_PUBLISHED ? [`${FINAL_REPORT.shortTitle} (opens in a new tab)`] : []),
       expect.stringMatching(BOXES.society),
       ...(RETURN_TO_WORK_SHOWN ? [expect.stringMatching(BOXES.scenarios)] : []),
       expect.stringMatching(BOXES.policies),

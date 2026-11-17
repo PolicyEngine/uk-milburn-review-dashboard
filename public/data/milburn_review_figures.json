@@ -1,0 +1,81 @@
+{
+  "title": "The review's own modelled figures, as published",
+  "note": "Figures from \"From a Welfare State to a Working State: a new settlement for the next generation\" (the young people and work report), its analytical annex and its data tables, as published on 17 November 2026. Each carries the section it comes from. The annex says its analysis is not official government analysis. A figure the report does not give is listed under not_published, not estimated here.",
+  "retrieved": "2026-11-17",
+  "report": {
+    "title": "From a Welfare State to a Working State: a new settlement for the next generation",
+    "short_title": "From a Welfare State to a Working State",
+    "publisher": "Department for Work and Pensions",
+    "published": "17 November 2026",
+    "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+    "report_url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+    "annex_url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-analytical-annex",
+    "tables_url": "https://assets.publishing.service.gov.uk/media/6af74c9b9be17c68c69ca838/from-a-welfare-state-to-a-working-state-accompanying-data-tables.ods"
+  },
+  "employment": {
+    "people": 440000,
+    "by_year": 2036,
+    "figure": "Young people the review's modelling expects its reforms to help into sustained work",
+    "who": "Young people aged 16 to 24 who would otherwise not be in education, employment or training (NEET); the annex's poverty modelling says the employment effects include work sustained beyond age 24",
+    "measures": "The review's whole package: the Opportunity and Support Guarantees, health, education, youth hiring incentives and welfare reform, with a system transformation effect on top",
+    "method": "Each policy's effect on NEET numbers, taken where possible from evaluations of similar past programmes, summed with an overlap reduction rising from 5% to 10%, plus a system transformation effect, against a baseline NEET forecast",
+    "hours": "A mixture of full-time and part-time work; the hours and wages assumed are not published",
+    "source": {
+      "label": "Report, chapter 1, paragraph 111, and chapter 6, paragraph 739",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation#chapter-1-introduction-and-executive-summary---from-a-welfare-state-to-a-working-state"
+    },
+    "annex": {
+      "year": 2036,
+      "more_16_to_24_in_work": 400000,
+      "more_16_to_24_in_employment_and_education": 500000,
+      "rounded_to": 100000,
+      "source": {
+        "label": "Analytical annex, section 2 (NEET impacts of the recommended policy package)",
+        "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-analytical-annex#neet-impacts-of-the-recommended-policy-package"
+      }
+    },
+    "used_as_assumption_in": "Analytical annex, sections 4 (GDP), 7 (net incomes) and 8 (relative poverty): each takes 440,000 additional young people in work as an input"
+  },
+  "neet_rate": {
+    "unit": "% of 16 to 24-year-olds, UK",
+    "years": ["2026/27", "2027/28", "2028/29", "2029/30", "2030/31", "2031/32", "2032/33", "2033/34", "2034/35", "2035/36", "2036/37"],
+    "baseline_pct": [13.1, 12.7, 12.7, 12.7, 12.8, 12.9, 13.0, 13.1, 13.2, 13.3, 13.4],
+    "with_recommendations_pct": [13.1, 12.4, 11.8, 11.0, 10.1, 9.2, 8.4, 7.8, 7.3, 7.0, 6.8],
+    "ambition_pct": 5,
+    "ambition_note": "The review's aim is a NEET rate consistently at around 5%; its modelling reaches around 6.8% by 2036, and the report expects growth and momentum in the youth labour market to close the rest (not modelled). Reaching 5% would mean approximately 600,000 more young people in education, employment or training each year.",
+    "source": {
+      "label": "Data tables, table 3; analytical annex, section 2; report, chapter 8, section 8.3, paragraph 938 and figure 3",
+      "url": "https://assets.publishing.service.gov.uk/media/6af74c9b9be17c68c69ca838/from-a-welfare-state-to-a-working-state-accompanying-data-tables.ods"
+    }
+  },
+  "fiscal": {
+    "prices": "2026/27",
+    "year": "2036/37",
+    "annual_gbp_m": {
+      "local_system_reform": null,
+      "opportunity_and_support_guarantees": 1900,
+      "health": 700,
+      "education": 2100,
+      "youth_hiring_incentives": 1100,
+      "welfare_savings": -3600,
+      "fiscal_offsets": -2400,
+      "total_net_cost": -200
+    },
+    "annual_note": "Rounded to the nearest £100 million; local system reform is published as negligible (rounds to zero). Fiscal offsets are tax, National Insurance and indirect tax from young people moving into work, plus lower benefit payments for those who were claiming; they exclude the welfare reforms' own benefit savings.",
+    "investment_gbp_bn": 5.8,
+    "cumulative_welfare_savings_gbp_bn": 13.7,
+    "cumulative_welfare_savings_period": "2029/30 to 2036/37",
+    "cumulative_note": "The cumulative figure is welfare savings on PIP and Universal Credit over the eight years from 2029/30, not the fiscal offsets from employment and not a ten-year total.",
+    "gdp_pct": 0.4,
+    "source": {
+      "label": "Data tables, table 2; analytical annex, sections 1 and 3; report, chapter 8, paragraphs 931 and 932 and figure 2",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-analytical-annex#fiscal-offsets-of-the-recommended-policy-package"
+    }
+  },
+  "not_published": [
+    "Employment effects year by year (only the NEET rate is given by year)",
+    "The employment effect of each measure or policy area",
+    "The hours, wages or earnings assumed for those moving into work",
+    "The fiscal offsets year by year, or cumulatively"
+  ]
+}

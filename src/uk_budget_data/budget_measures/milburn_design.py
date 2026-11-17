@@ -64,7 +64,7 @@ ENTRY_HOURS = 16
 #    milburn_report_* ids (docs/milburn-local-run.md, "Report day").
 # ---------------------------------------------------------------------------
 
-REPORT_START_YEAR = 2027  # first fiscal year the new rules apply in full
+REPORT_START_YEAR = 2029  # first fiscal year the new rules apply in full
 REPORT_START_MONTH = 4  # must be 4: a mid-year start is not modelled
 
 REPORT_UC_HEALTH_LOWER_AGE = 0  # e.g. 18 if 16 and 17-year-olds keep it

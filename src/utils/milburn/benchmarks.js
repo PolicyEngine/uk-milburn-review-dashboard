@@ -19,19 +19,39 @@ export const BENCHMARK_THEMES = [
     key: "people",
     title: "People and caseloads",
     icon: "usersRound",
-    ids: ["neet_16_24", "uc_health_no_work_requirements", "uc_lcwra_16_24", "package_young_people_affected"],
+    ids: [
+      "neet_16_24",
+      "neet_rate_projection_2036",
+      "into_sustained_work_2036",
+      "uc_health_no_work_requirements",
+      "uc_health_element_16_24",
+      "incapacity_benefits_young",
+      "young_pip_recipients",
+      "dla_pip_16_24",
+      "package_young_people_affected",
+    ],
   },
   {
     key: "spending",
     title: "Spending and costs",
     icon: "landmark",
-    ids: ["incapacity_spending_18_24", "young_benefits_spend", "milburn_welfare_saving_10y", "employer_nics_under_25"],
+    ids: [
+      "young_benefits_spend",
+      "pip_spend_16_24",
+      "uc_health_spend_16_24",
+      "incapacity_spending_18_24",
+      "review_welfare_saving_2036",
+      "milburn_welfare_saving_10y",
+      "review_investment_2036",
+      "youth_hiring_incentives_cost",
+      "employer_nics_under_25",
+    ],
   },
   {
     key: "poverty",
     title: "Poverty and extra costs",
     icon: "percent",
-    ids: ["kept_out_of_poverty", "pip_no_extra_costs"],
+    ids: ["relative_poverty_review", "kept_out_of_poverty", "pip_no_extra_costs"],
   },
   { key: "other", title: "Other figures", icon: "list", ids: [] },
 ];
@@ -43,16 +63,47 @@ export const BENCHMARK_THEMES = [
  * file's full wording stays as the line's tooltip.
  */
 export const BENCHMARK_SHORT = {
-  neet_16_24: { label: "16–24s not in education, employment or training", icon: "cap" },
+  neet_16_24: {
+    label: "16–24s not in education, employment or training",
+    icon: "cap",
+    basis: "Labour Force Survey, April to June 2026, UK: 13.0% of 16–24s",
+  },
+  neet_rate_projection_2036: {
+    label: "NEET rate the review projects for 2036-37",
+    icon: "arrowDown",
+    basis: "16–24s, UK, from 13.1% in 2026-27; the review's modelling",
+  },
+  into_sustained_work_2036: {
+    label: "Into sustained work by 2036, the review expects",
+    icon: "briefcase",
+    basis: "The review's modelling of all its recommendations",
+  },
   uc_health_no_work_requirements: {
     label: "On UC health with no work requirements",
     icon: "heartPulse",
     estimateBasis: "Benefit units with LCWRA, every adult under 25, UK",
   },
-  uc_lcwra_16_24: {
-    label: "16–24s in a UC LCWRA subgroup, as reported",
+  uc_health_element_16_24: {
+    label: "16–24s receiving the UC health element",
     icon: "activity",
-    basis: "DWP statistics via Benefits and Work; a subgroup, not the full LCWRA caseload",
+    basis: "Resolution Foundation response to the review",
+    estimateBasis: "Benefit units with LCWRA, every adult under 25, UK",
+  },
+  incapacity_benefits_young: {
+    label: "Young people on incapacity benefits, the review says",
+    icon: "lifebuoy",
+    basis: "The review's count; more than double 2012",
+  },
+  young_pip_recipients: {
+    label: "Young people receiving PIP",
+    icon: "clipboard",
+    basis: "Resolution Foundation response to the review",
+    estimateBasis: "PIP recipients aged 18 to 24, UK",
+  },
+  dla_pip_16_24: {
+    label: "16–24s receiving DLA or PIP, the review says",
+    icon: "layers",
+    basis: "The review's count from DWP Stat-Xplore; double 2012",
   },
   package_young_people_affected: {
     label: "Young people affected by the package",
@@ -60,17 +111,57 @@ export const BENCHMARK_SHORT = {
     basis: "No published figure",
     estimateBasis: "16–24s in households the package makes worse off",
   },
+  young_benefits_spend: {
+    label: "PIP and UC health spending on young people",
+    icon: "banknote",
+    basis: "The review's figures, ages 16 to 24: PIP £3.8bn, UC LCWRA £0.92bn",
+    estimateBasis: "Static saving from the modelled package, UK; PIP from age 18",
+  },
+  pip_spend_16_24: {
+    label: "PIP spending, ages 16 to 24",
+    icon: "wallet",
+    basis: "The review's figure for 2025-26",
+    estimateBasis: "Static saving from removing PIP at 16 to 24, 2027-28, UK",
+  },
+  uc_health_spend_16_24: {
+    label: "UC LCWRA element spending, ages 16 to 24",
+    icon: "piggy",
+    basis: "The review's figure for 2025-26",
+    estimateBasis: "Static saving from removing it for under-25s, 2027-28, UK",
+  },
   incapacity_spending_18_24: { label: "Incapacity benefit spending, ages 18 to 24", icon: "trend" },
-  young_benefits_spend: { label: "PIP and UC health spending on young people", icon: "banknote" },
+  review_welfare_saving_2036: {
+    label: "Annual welfare saving the review estimates",
+    icon: "scale",
+    basis: "2026-27 prices, UK; replacement awards, a Youth Allowance and a work allowance included",
+    estimateBasis: "Static, 2027-28: central variant to full removal",
+  },
   milburn_welfare_saving_10y: {
-    label: "Welfare savings Milburn expects over ten years",
+    label: "Cumulative welfare savings by 2036-37",
     icon: "coins",
-    basis: "Said before the report; if changes come quickly, initial costs met by the government",
+    basis: "Eight years, 2029-30 to 2036-37, 2026-27 prices; reported as £13.8bn before publication",
+  },
+  review_investment_2036: {
+    label: "Annual cost of the review's recommendations",
+    icon: "calculator",
+    basis: "Gross, 2026-27 prices; offset by £3.6bn welfare savings and £2.4bn fiscal offsets",
+  },
+  youth_hiring_incentives_cost: {
+    label: "Cost of the review's youth hiring incentives",
+    icon: "userPlus",
+    basis: "Youth Jobs Grant and apprenticeships; no separate employer NICs cost",
   },
   employer_nics_under_25: {
     label: "Cost of zero employer NICs for under-25s",
     icon: "building",
+    basis: "Resolution Foundation estimate; not a recommendation of the review",
     estimateBasis: "Static cost, UK",
+  },
+  relative_poverty_review: {
+    label: "Relative poverty after housing costs, the review estimates",
+    icon: "house",
+    basis: "Once fully rolled out, with 440,000 more young people in work",
+    estimateBasis: "Static, 2027-28: full removal, no replacement benefit or move into work",
   },
   kept_out_of_poverty: { label: "Kept out of poverty by UC health and/or PIP", icon: "shield" },
   pip_no_extra_costs: { label: "Young PIP claimants reporting no extra costs", icon: "receipt" },
@@ -83,7 +174,7 @@ export const BENCHMARK_ICON = "fileText";
  * A figure's number and unit from its wording, where it is one plain number:
  * "260,000" is a count, "£5.1bn a year" is £ billion (`text` is the number
  * as worded, without "a year"). Null for anything
- * else ("About 1.0 million", a range), which is never drawn as a bar.
+ * else ("About 1.0 million", "£3.6bn in 2036-37", a range), which is never drawn as a bar.
  */
 export function figureNumber(value) {
   const words = String(value || "").trim();

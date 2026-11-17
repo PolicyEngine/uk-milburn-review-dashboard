@@ -76,6 +76,13 @@ const TERM_ICONS = {
   "Overlapping losses": Layers,
   "Caseloads against DWP": Users,
   "No replacement in the upper bound": CircleSlash,
+  // The limits against the final report's design (MethodologyTab.jsx)
+  "The report’s assumption": BookOpen,
+  "Replacements not modelled": CircleSlash,
+  "Youth Allowance": Banknote,
+  "Employer National Insurance": Briefcase,
+  "Timing": CalendarDays,
+  "Geography": MapIcon,
   "Not computable": CircleSlash,
   "Not announced policy": Megaphone,
   // The same limit once the final report is published (utils/milburn/reportStatus.js)

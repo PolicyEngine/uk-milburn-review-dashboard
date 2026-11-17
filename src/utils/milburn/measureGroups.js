@@ -1,7 +1,7 @@
 /**
  * How the Milburn runs are named and grouped on the page (the policy
  * selector and the Measures tab): packages, single measures, variants,
- * and comparators that are not review proposals. Descriptions stay as
+ * and comparators, each a wider form of a proposal in the final report. Descriptions stay as
  * milburn_measures.json publishes them; only the packages' names are
  * replaced, with a plain statement of what each package assumes.
  */
@@ -13,12 +13,16 @@ const COMPARATORS_LABEL = reportCopy().comparatorsLabel;
 
 /** The packages' names on the page, by run id. */
 export const MILBURN_DISPLAY_NAMES = Object.freeze({
-  milburn_package: "Full abolition, no replacement (upper bound)",
+  milburn_report_package: "The report's benefit changes (no replacement modelled)",
+  milburn_report_uc_health: "UC health top-up removed for under-25s",
+  milburn_report_pip: "PIP removed for 18 to 24-year-olds",
+  milburn_package: "Full abolition, no replacements (upper bound)",
   milburn_package_central: "Central variant: severe cases kept, PIP at half rate",
   milburn_package_phased: "Full abolition, phased as claimants are reassessed",
   milburn_package_entry_25pct: "Full abolition with an illustrative move into work (25%)",
 });
 
+export const REPORT_GROUP = "report";
 export const PACKAGES_GROUP = "packages";
 export const SINGLE_GROUP = "single";
 export const VARIANTS_GROUP = "variants";
@@ -32,9 +36,16 @@ export const HIDDEN_GROUP = "hidden";
  * feeds Return to work only.
  */
 export const MILBURN_GROUPS = Object.freeze([
+  // The final report's benefit changes, run from April 2029, when its
+  // welfare savings start (annex section 1); first, so the page opens on them
+  {
+    id: REPORT_GROUP,
+    label: "The report's measures",
+    ids: ["milburn_report_package", "milburn_report_uc_health", "milburn_report_pip"],
+  },
   {
     id: PACKAGES_GROUP,
-    label: "Packages",
+    label: "Pre-report variants (modelled before the report)",
     ids: ["milburn_package", "milburn_package_central", "milburn_package_phased"],
   },
   { id: SINGLE_GROUP, label: "Single measures", ids: ["uc_health_element_removed_under_25", "pip_removed_under_25"] },
@@ -57,6 +68,7 @@ export const MILBURN_GROUPS = Object.freeze([
  * run on their own.
  */
 export const PACKAGE_PARTS = Object.freeze({
+  milburn_report_package: ["milburn_report_uc_health", "milburn_report_pip"],
   milburn_package: ["uc_health_element_removed_under_25", "pip_removed_under_25"],
   milburn_package_central: ["uc_health_element_removed_under_25_severe_kept", "pip_halved_under_25"],
 });
