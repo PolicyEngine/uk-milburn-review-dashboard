@@ -2,11 +2,12 @@
 
 PolicyEngine's dashboard for the independent review of young people and work led by Alan Milburn. Its final report, [From a Welfare State to a Working State: a new settlement for the next generation](https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation), was published by the Department for Work and Pensions on 17 November 2026. The dashboard estimates how the report's tax and benefit measures that a static model can represent would change the public finances and household incomes, by age.
 
-Private repository. Figures are PolicyEngine UK static microsimulation estimates on certified data; they are not for publication until the HMRC SPI licence condition is confirmed (see [Status](#status)).
+Private repository. Figures are PolicyEngine UK static microsimulation estimates on certified data; the HMRC SPI licence condition was confirmed as met on 17 November 2026; the public deploy is still open (see [Status](#status)).
 
 | | |
 |---|---|
-| Team test (Claude artifact, link-shared) | https://claude.ai/artifact/U2qwazGPbFJL6qS39AfFvT |
+| Team test (Claude artifact; share from its Share menu) | https://claude.ai/artifact/QfSsGU9tLmREcbgGFHmcUB |
+| Household API (Modal app `uk-milburn-household`) | https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact |
 | Local | `bun run dev`, then http://localhost:3000/uk/milburn-review |
 | Report-day runbook and reviews | [`docs/report-day/`](docs/report-day/) |
 | What the report proposes, and what we model | [`docs/report-day/05-report-measures.md`](docs/report-day/05-report-measures.md) |
@@ -83,14 +84,14 @@ HOUSEHOLD_WORKERS=2 PORT=8010 uv run uk-budget-api                  # a local AP
 NEXT_PUBLIC_HOUSEHOLD_API_URL=http://localhost:8010/api/household-impact bun run dev
 ```
 
-Custom households on a deployed page use the Modal app `uk-milburn-household` (no warm schedule, scales to zero, at most 10 workers; see the docstring of `src/uk_budget_data/modal_household.py`). Not deployed yet:
+Custom households on a deployed page use the Modal app `uk-milburn-household` (no warm schedule, scales to zero, at most 10 workers; see the docstring of `src/uk_budget_data/modal_household.py`). Deployed on 17 November 2026 from b8a7b490; redeploy after any change to the household code:
 
 ```bash
 HOUSEHOLD_MODAL_APP=uk-milburn-household uv run --with modal modal deploy src/uk_budget_data/modal_household.py
 uv run --with modal modal app stop -y uk-milburn-household          # stop it
 ```
 
-Then build the page with `NEXT_PUBLIC_HOUSEHOLD_API_URL=https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact` (the URL follows the production app's label pattern; check it in the deploy's output). Without the variable the build passes with a warning: the tab shows the stored examples only and says custom households are not available yet.
+Then build the page with `NEXT_PUBLIC_HOUSEHOLD_API_URL=https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact` (confirmed by the deploy). The first request after an idle spell takes one to two minutes while containers start; the page retries. Without the variable the build passes with a warning: the tab shows the stored examples only and says custom households are not available yet.
 
 Tests and lint: `bunx vitest run --pool=forks`, `bunx eslint src`, `.venv/bin/pytest tests/test_milburn_design.py tests/test_milburn_measures.py -n 2`.
 
@@ -106,7 +107,7 @@ Claude artifact build: `python3 scripts/artifact_export.py` stages a static copy
 
 ## Status
 
-- Not for publication: the HMRC SPI licence condition on the data is not yet confirmed with María, and the deploy target, disclosure floor and CI are open ([`docs/report-day/04-publication-readiness.md`](docs/report-day/04-publication-readiness.md)).
+- The HMRC SPI licence condition was confirmed as met on 17 November 2026. Still open before the public deploy: the deploy target, the disclosure floor review and CI (issue #2) ([`docs/report-day/04-publication-readiness.md`](docs/report-day/04-publication-readiness.md)).
 - The review's own figures (£3.6bn welfare saving in 2036-37, £13.7bn over 2029-30 to 2036-37, 50,000 fewer in relative poverty) include replacement payments and employment effects; ours are static, without replacements. The dashboard says so beside each one.
 
 ## Origin
