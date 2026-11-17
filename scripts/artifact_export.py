@@ -88,35 +88,18 @@ def relativise():
                     fh.write(text)
 
 
-# Files of the Autumn Budget dashboard still in public/ that the local build
-# route (src/utils/milburn/localBuild.js) never requests, by path under the
+# Files still in public/ that the local build route
+# (src/utils/milburn/localBuild.js) never requests, by path under the
 # export, "/"-separated: checked against the browser's network log on every
-# tab (16 November 2026). They stay in public/ (tests read them there) and
-# out of what is published. Not listed, because the page reads them:
+# tab (17 November 2026). Not listed, because the page reads them:
 # data/living_standards_outlook.json (Poverty), data/policy_parameters.json
 # (Measures), data/milburn_*.json and six files in each run's folder.
 SKIP_PUBLISHED = (
-    # The verified publication route: manifest, receipts and artifacts
-    "data/manifest.json",
-    "data/artifacts/*",
-    "data/release-index.json",
-    "data/official_costings.json",
-    # Geography
-    "data/constituency.csv",
-    "data/uk_constituencies_*",
-    "data/area-routing.json",
-    "data/area_provenance.json",
-    # Household impact and the Pre-measures forecast
+    # The Budget's household presets: a test of the household calculator
+    # reads them (src/components/personal/AcrossEarnings.test.jsx)
     "data/household_presets.json",
-    "data/income_distribution.csv",
-    "data/income_growth_with_measures.csv",
-    "data/income_mobility.csv",
-    "data/obr_price_categories*.json",
-    # Blog charts, the Budget explainer and a stray image
-    "data/blog_charts/*",
-    "reports/*.pdf",
-    "white.png",
-    # Written for every run, drawn nowhere on this route
+    # Written for every run, drawn nowhere on this route; no longer copied
+    # into public/ (scripts/milburn_rerun_all.sh), skipped if they are
     "data/milburn/*/income_curve.csv",
     "data/milburn/*/obr_comparison.csv",
     "data/milburn/*/household_scatter_binned.csv",

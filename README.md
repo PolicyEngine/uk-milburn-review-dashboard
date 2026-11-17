@@ -71,7 +71,8 @@ Re-running measures (about 8 minutes each; one heavy run at a time under `/tmp/p
 
 ```bash
 STAGE=~/milburn-runs/<date> bash scripts/milburn_rerun_all.sh <id> [<id> ...]   # stages outside the repo
-rsync -a --delete ~/milburn-runs/<date>/<id>/ public/data/milburn/<id>/          # copy in
+rsync -a --delete --exclude=income_curve.csv --exclude=household_scatter_binned.csv --exclude=obr_comparison.csv \
+  ~/milburn-runs/<date>/<id>/ public/data/milburn/<id>/                          # copy in (not the tables the page never reads)
 .venv/bin/python scripts/milburn_summary.py                                       # regenerate milburn_summary.json
 .venv/bin/uk-budget-data milburn-measures --output public/data/milburn_measures.json
 ```

@@ -79,11 +79,18 @@ for id in "${IDS[@]}"; do echo "    $id"; done
 echo "  then       : $STAGE/milburn_scenarios.json (household-only)"
 echo "  estimate   : about $(( ${#IDS[@]} * 8 )) minutes once the lock is free"
 
+# Written by `generate` for every run but read nowhere on the page
+# (src/utils/milburn/localBuild.js LOCAL_TABLES): left in staging, never
+# copied into public/
+UNREAD_TABLES=(income_curve.csv household_scatter_binned.csv obr_comparison.csv)
+
 copy_plan() {
+  local excludes=""
+  for file in "${UNREAD_TABLES[@]}"; do excludes="$excludes --exclude=$file"; done
   echo
   echo "Nothing was copied. After checking the staged folders, copy by hand:"
   for id in "${IDS[@]}"; do
-    echo "  rsync -a --delete \"$STAGE/$id/\" \"$ROOT/public/data/milburn/$id/\""
+    echo "  rsync -a --delete$excludes \"$STAGE/$id/\" \"$ROOT/public/data/milburn/$id/\""
   done
   echo "  cp \"$STAGE/milburn_scenarios.json\" \"$ROOT/public/data/milburn_scenarios.json\""
   echo "then (it reads the copied folders and writes public/data/milburn_summary.json):"
