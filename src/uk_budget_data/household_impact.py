@@ -1490,6 +1490,8 @@ def household_entities(
     if answers.lives_with_parents:
         # No tenure of their own: policyengine-uk's default, with no rent
         del household["tenure_type"]
+        # The parents hold the household's TV licence, not the young person
+        household["tv_licence_required"] = False
     if answers.brma is not None:
         household["brma"] = answers.brma
     household["local_authority"] = (

@@ -1,0 +1,21 @@
+{
+  "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+  "build": "uk-frs-calibration-attempt-20261115T104657Z-fcfac709",
+  "dataset_sha256": "301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90",
+  "engine": {
+    "policyengine-uk": "2.177.7",
+    "policyengine-core": "3.34.10"
+  },
+  "certified": true,
+  "policyengine": "6.20.2",
+  "measures": [
+    "milburn_report_package_with_youth_allowance"
+  ],
+  "years": [
+    2027,
+    2028,
+    2029,
+    2030,
+    2031
+  ]
+}

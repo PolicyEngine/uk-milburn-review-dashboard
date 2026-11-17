@@ -158,10 +158,11 @@ describe("Moves into work (illustrative)", () => {
     }
     // The annex's own rounding is said
     expect(section.querySelector("[data-review-annex]").textContent).toContain("around 400,000 more 16 to 24-year-olds in work in 2036");
-    // The break-even chart marks the review's figure, labelled as the review's and for 2036
+    // The break-even chart does not draw the review's figure (a different quantity); its notes name it, as the review's and for 2036
     const breakEven = screen.getByRole("region", { name: "Break-even arithmetic" });
-    expect(breakEven.textContent).toContain("Review's own estimate, into work by 2036: 440,000");
-    expect(breakEven.querySelector("[data-review-line]").textContent).toMatch(/drawn for scale: the entrants needed are for 2027-28/);
+    expect(breakEven.querySelector("[data-review-line]").textContent).toContain("Review's own estimate, into work by 2036: 440,000");
+    expect(breakEven.querySelector("[data-review-line]").textContent).toMatch(/not drawn on the chart: the entrants needed are for 2027-28/);
+    expect([...breakEven.querySelectorAll("svg text")].map((node) => node.textContent).join(" ")).not.toContain("440,000");
     expect(within(breakEven.querySelector("[data-review-line]")).getByRole("link")).toHaveAttribute("target", "_blank");
   });
 

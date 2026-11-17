@@ -1,26 +1,26 @@
 {
-  "year": 2027,
-  "basis": "Household calculation for 2027-28 (build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1), on the OBR October 2026 forecast. A single person aged 22, renting privately in the North West for \u00a36,000 a year, with limited capability for work and work-related activity, no PIP and no other income, on Universal Credit; moving from no work to 16 or 25 hours a week at the National Living Wage for 2027-28, all year. Gains are annual, in work minus out of work. The Exchequer gain is income tax plus employee and employer National Insurance plus the fall in benefits; employer National Insurance is counted. Package: milburn_package (health element removed for under-25s and PIP removed for 18 to 24-year-olds).",
+  "year": 2029,
+  "basis": "Household calculation for 2029-30 (build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2), on the OBR October 2026 forecast. A single person aged 22, renting privately in the North West for \u00a36,000 a year, with limited capability for work and work-related activity, no PIP and no other income, on Universal Credit; moving from no work to 16 or 25 hours a week at the National Living Wage for 2029-30, all year. Gains are annual, in work minus out of work. The Exchequer gain is income tax plus employee and employer National Insurance plus the fall in benefits; employer National Insurance is counted. Package: milburn_report_package (health element removed for under-25s and PIP removed for 18 to 24-year-olds, from April 2029).",
   "entry_cases": [
     {
       "id": "h16",
       "hours": 16,
-      "hourly_wage": 13.21,
-      "annual_earnings": 10990.72,
-      "net_income_gain_current_law": 7862.66,
-      "net_income_gain_package": 7862.66,
-      "exchequer_gain_current_law": 4026.67,
-      "exchequer_gain_package": 4026.67
+      "hourly_wage": 13.85,
+      "annual_earnings": 11523.2,
+      "net_income_gain_current_law": 8253.48,
+      "net_income_gain_package": 8253.48,
+      "exchequer_gain_current_law": 4227.0,
+      "exchequer_gain_package": 4227.0
     },
     {
       "id": "h25",
       "hours": 25,
-      "hourly_wage": 13.21,
-      "annual_earnings": 17173.0,
-      "net_income_gain_current_law": 10064.7,
-      "net_income_gain_package": 10064.7,
-      "exchequer_gain_current_law": 8934.25,
-      "exchequer_gain_package": 8934.25
+      "hourly_wage": 13.85,
+      "annual_earnings": 18005.0,
+      "net_income_gain_current_law": 10484.44,
+      "net_income_gain_package": 10484.44,
+      "exchequer_gain_current_law": 9438.18,
+      "exchequer_gain_package": 9438.18
     }
   ],
   "notes": [

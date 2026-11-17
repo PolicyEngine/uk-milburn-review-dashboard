@@ -1,19 +1,18 @@
 /**
- * Build-time check of the Personal impact tab's API URL, run by
+ * Build-time check of the Household impact tab's API URL, run by
  * next.config.ts.
  *
  * NEXT_PUBLIC_HOUSEHOLD_API_URL: the tab POSTs to the value itself, and the
  * API serves `/api/household-impact`, so the variable must be the service
  * URL followed by `/api/household-impact`, with no trailing slash.
  *
- * The value is baked into the bundle at build time: a wrong or missing one
- * gives a broken tab that only a rebuild can fix, so the build says so.
+ * The value is baked into the bundle at build time: a wrong one gives a
+ * broken tab that only a rebuild can fix, so the build says so.
  *
  * - A value set in the wrong form fails every build: it can never work.
- * - A missing value fails a Vercel production build (VERCEL_ENV=production),
- *   except a drill build (NEXT_PUBLIC_MOCK set), whose production target is
- *   a mock. Elsewhere (previews, CI, local builds) it is a loud warning, and
- *   the tab shows that the variable is not set.
+ * - A missing value is a loud warning in every build, production included:
+ *   the tab then shows its stored examples only, and says custom households
+ *   are not available yet (the Milburn household API is not deployed).
  */
 
 export const HOUSEHOLD_API_VAR = "NEXT_PUBLIC_HOUSEHOLD_API_URL";
@@ -53,14 +52,13 @@ export function householdApiUrlProblem(env) {
         `trailing slash, for example ${example}.`,
     };
   }
-  const production = env.VERCEL_ENV === "production";
-  const drill = Boolean(env.NEXT_PUBLIC_MOCK);
   return {
-    level: production && !drill ? "error" : "warning",
+    level: "warning",
     message:
-      `${variable} is not set, so the Personal impact tab cannot ` +
-      `calculate. Set it to the API's URL followed by ${suffix}, ` +
-      `for example ${example}, and rebuild.`,
+      `${variable} is not set, so the Household impact tab shows its ` +
+      `stored examples only (no custom households). To enable them, set ` +
+      `it to the API's URL followed by ${suffix}, for example ${example}, ` +
+      `and rebuild.`,
   };
 }
 

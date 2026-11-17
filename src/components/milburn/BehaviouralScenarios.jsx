@@ -771,12 +771,11 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null, gainY
           </ChartPanel>
           <ChartPanel icon="usersRound" title="Entrants needed to match the Exchequer saving">
             <HorizontalBars
-              ariaLabel={`Entrants needed to match the Exchequer saving: ${hoursRows.map((row) => `${row.name} ${formatPeople(row.entrants)}`).join(", ")}${reviewLine ? `. For scale, ${reviewBreakEvenLabel(reviewLine)}, a different exercise` : ""}`}
+              ariaLabel={`Entrants needed to match the Exchequer saving: ${hoursRows.map((row) => `${row.name} ${formatPeople(row.entrants)}`).join(", ")}`}
               format={(value) => (value >= 1000 ? `${value / 1000}k` : String(value))}
               labelWidth={76}
               references={[
                 ...(run.youngPeopleLosing !== null ? [{ value: run.youngPeopleLosing, label: `16–24s in losing households: ${formatPeople(run.youngPeopleLosing)}` }] : []),
-                ...(reviewLine ? [{ value: reviewLine.people, label: reviewBreakEvenLabel(reviewLine) }] : []),
               ]}
               rows={hoursRows.map((row) => ({
                 name: row.name,
@@ -837,15 +836,15 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null, gainY
               <Point icon="user">{SAME_GAIN_SENTENCE} Other households gain differently.</Point>
               {reviewLine && (
                 <Point icon="info" data-review-line="">
-                  The dashed line marked &ldquo;{reviewBreakEvenLabel(reviewLine)}&rdquo; is the review&rsquo;s own modelled figure for its whole package, with a mixture of
-                  full-time and part-time work
+                  {reviewBreakEvenLabel(reviewLine)}, the review&rsquo;s own modelled figure for its whole package, with a mixture of full-time and
+                  part-time work
                   {review.employment.source && (
                     <>
                       {" "}
                       (<SourceLink href={review.report.url}>{review.report.shortTitle}</SourceLink>, {review.employment.source.label.toLowerCase()})
                     </>
                   )}
-                  . It is drawn for scale: the entrants needed are for {yearLabel}, at fixed hours, for the measures modelled here.
+                  . It is a different quantity, so it is not drawn on the chart: the entrants needed are for {yearLabel}, at fixed hours, for the measures modelled here.
                 </Point>
               )}
               <Point icon="calculator">Counts rounded to the nearest thousand.</Point>

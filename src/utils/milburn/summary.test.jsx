@@ -460,9 +460,10 @@ describe("the published summary", () => {
       expect(run.breakEvenSharePct.h25).toBeLessThan(run.breakEvenSharePct.h16);
     }
     const full = summaryRun(published, "milburn_package");
-    expect(full.breakEvenSharePct).toEqual({ h16: 102.2, h25: 79.9 });
+    // The 2029-30 entry case (milburn_scenarios.json) against the 2029-30 saving
+    expect(full.breakEvenSharePct).toEqual({ h16: 97.4, h25: 76.7 });
     // Above 100% still occurs, so its wording is still shown
-    expect(summaryRun(published, "milburn_package_phased").breakEvenSharePct.h16).toBeGreaterThan(100);
+    expect(summaryRun(published, "milburn_package_entry_25pct").breakEvenSharePct.h16).toBeGreaterThan(100);
   });
 
   it("counts the entry run's movers from its own results, and none in a static run", () => {

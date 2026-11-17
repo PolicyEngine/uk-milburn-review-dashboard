@@ -134,7 +134,7 @@
       "policyengine_saving": {
         "value": "£4.67bn a year",
         "label": "Our saving from removing them, 2029-30, cash terms",
-        "basis": "Static Exchequer saving in 2029-30 from removing the UC health element for under-25s and PIP for ages 18 to 24, UK, cash terms, including knock-on effects on other benefits (such as carer benefits and the UC housing element): a saving, not spending; PIP at 16 and 17 is not removed"
+        "basis": "Static Exchequer saving in 2029-30 from removing the UC health element for under-25s and PIP for ages 18 to 24, UK, cash terms, including knock-on effects on other benefits, all within Universal Credit in the model (such as the disabled child element, entitlement while in education and the housing element's shared accommodation rate; Carer's Allowance does not change in the model): a saving, not spending; PIP at 16 and 17 is not removed"
       }
     },
     {
@@ -155,7 +155,7 @@
       "policyengine_saving": {
         "value": "£4.68bn a year",
         "label": "Our saving from removing PIP at 16 to 24, 2029-30, cash terms",
-        "basis": "Static Exchequer saving from removing PIP for ages 16 to 24 in 2029-30, UK, cash terms, including knock-on effects on other benefits (such as carer benefits and the UC housing element), so not the same as PIP spending; £3.64bn for ages 18 to 24"
+        "basis": "Static Exchequer saving from removing PIP for ages 16 to 24 in 2029-30, UK, cash terms, including knock-on effects on other benefits, all within Universal Credit in the model (such as the disabled child element, entitlement while in education and the housing element's shared accommodation rate; Carer's Allowance does not change in the model), so not the same as PIP spending; £3.64bn for ages 18 to 24"
       }
     },
     {

@@ -1427,9 +1427,10 @@ def _create_pip_removed_under_25() -> Reform:
             f"{_FROM} people aged {_PIP_BAND} receive neither component "
             "of Personal Independence Payment; 16 and 17-year-olds keep it "
             "and Disability Living Allowance for children is unchanged. "
-            "Entitlements that depend on receiving PIP go with it. Scottish "
-            "recipients of Adult Disability Payment, which the data record "
-            "as PIP, are included."
+            "Universal Credit amounts that depend on receiving PIP go with "
+            "it; Carer's Allowance is not linked to PIP in the model and "
+            "does not change. Scottish recipients of Adult Disability "
+            "Payment, which the data record as PIP, are included."
         ),
         simulation_modifier=pip_removed_ages_18_to_24,
     )
@@ -1658,9 +1659,11 @@ def _create_pip_halved_under_25() -> Reform:
             "for the report's Additional Cost Allowance, for which the report "
             "gives no rates; Scottish Adult "
             "Disability Payment, recorded as PIP, is included. Half an award "
-            "can fall below the amounts that qualify a carer for Carer's "
-            "Allowance or a household for disability premia, so those can be "
-            "lost too; a new allowance could carry its own qualifying rules."
+            "can fall below the amounts that some disability rules read, "
+            "such as severe disability status, so those can be lost too; a "
+            "new allowance could carry its own qualifying rules. Carer's "
+            "Allowance is not linked to PIP in the model and does not "
+            "change."
         ),
         simulation_modifier=pip_halved_ages_18_to_24,
     )
@@ -1820,6 +1823,9 @@ MILBURN_PACKAGE_16_TO_24_COMPONENTS = (UC_HEALTH_UNDER_25_ID, PIP_16_TO_24_ID)
 PIP_UNDER_25_EXCLUDING_SCOTLAND_ID = "pip_removed_under_25_excluding_scotland"
 PIP_16_TO_24_EXCLUDING_SCOTLAND_ID = "pip_removed_16_to_24_excluding_scotland"
 # Reserved ids to list on the page (empty until their runs exist).
+# milburn_report_child_dla_to_18 stays reserved but unlisted: its run is
+# all zeros (the paired rates are equal), so the page lists child DLA to 18
+# as not computable instead.
 MILBURN_PROMOTED_IDS: tuple[str, ...] = (
     "milburn_report_package",
     "milburn_report_uc_health",
@@ -1828,8 +1834,9 @@ MILBURN_PROMOTED_IDS: tuple[str, ...] = (
     "milburn_report_youth_allowance_independent",
     "milburn_report_package_phased",
     "milburn_report_employer_nics_threshold_glide_path",
-    "milburn_report_child_dla_to_18",
     "milburn_report_youth_allowance_work_allowance",
+    "milburn_report_youth_allowance_combined",
+    "milburn_report_package_with_youth_allowance",
 )
 
 _SCOTLAND_INCLUDED = (
@@ -1961,9 +1968,13 @@ def _report_pip_text() -> tuple[str, str]:
         f"{younger}Disability Living Allowance for children is unchanged. "
         + (
             "Entitlements that depend on receiving a component stay where "
-            "any of it is still paid and go where none is. "
+            "any of it is still paid and go where none is. Carer's "
+            "Allowance is not linked to PIP in the model and does not "
+            "change. "
             if shares is not None
-            else "Entitlements that depend on receiving PIP go with it. "
+            else "Universal Credit amounts that depend on receiving PIP go "
+            "with it; Carer's Allowance is not linked to PIP in the model "
+            "and does not change. "
         )
         + (
             _SCOTLAND_INCLUDED
@@ -2297,6 +2308,23 @@ def _create_milburn_report_youth_allowance_work_allowance() -> Reform:
     )
 
 
+# Our combined designs (not the report's package): the two Youth
+# Allowance changes together, and those with the health element and PIP
+# removal, each simulated as one run with their interactions.
+MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_ID = "milburn_report_youth_allowance_combined"
+MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_COMPONENTS = (
+    MILBURN_REPORT_YOUTH_ALLOWANCE_INDEPENDENT_ID,
+    MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_ID,
+)
+MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_ID = (
+    "milburn_report_package_with_youth_allowance"
+)
+MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_COMPONENTS = (
+    *MILBURN_REPORT_PACKAGE_COMPONENTS,
+    *MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_COMPONENTS,
+)
+
+
 _RESERVED_IDS = frozenset(
     {
         MILBURN_REPORT_PACKAGE_ID,
@@ -2314,6 +2342,8 @@ _RESERVED_IDS = frozenset(
         MILBURN_REPORT_EMPLOYER_NICS_GLIDE_PATH_ID,
         MILBURN_REPORT_CHILD_DLA_ID,
         MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_ID,
+        MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_ID,
+        MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_ID,
     }
 )
 
@@ -2415,9 +2445,47 @@ def _get_reserved() -> dict[str, Reform]:
                 "together, with their interactions."
             ),
         )
+        youth = _create_milburn_package(
+            [
+                reserved[i]
+                for i in MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_COMPONENTS
+            ],
+            package_id=MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_ID,
+            name="Higher Youth Allowance and work allowance (illustrative) for under-25s, from April 2029 (combined)",
+            description=(
+                "Our combination of two of the report's Youth Allowance "
+                "proposals, simulated together with their interactions: "
+                "the 25-and-over standard allowance for under-25 claims "
+                "with a housing costs element (the review's proxy for "
+                "living independently), and a work allowance for every "
+                "Universal Credit claim in which all claimants are under "
+                "25. The report gives no work allowance amount; the current "
+                "Universal Credit work allowance is our assumption, so the "
+                "run is illustrative."
+            ),
+        )
+        with_youth = _create_milburn_package(
+            [
+                reserved[i]
+                for i in MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_COMPONENTS
+            ],
+            package_id=MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_ID,
+            name="Health element and PIP removal with higher Youth Allowance and work allowance (illustrative), from April 2029 (combined)",
+            description=(
+                "Our combination, simulated together with their "
+                f"interactions: {name}; {pip_name}; the higher Youth "
+                "Allowance for under-25s living independently; and the "
+                "illustrative work allowance for under-25s (the current "
+                "Universal Credit work allowance, our assumption: the report "
+                "gives no amount). The report's replacement payments are "
+                "not modelled."
+            ),
+        )
         _RESERVED_CACHE = {
             report.id: report,
             from_16.id: from_16,
+            youth.id: youth,
+            with_youth.id: with_youth,
             **reserved,
         }
     return _RESERVED_CACHE

@@ -1,491 +1,491 @@
 reform_id,reform_name,year,age_band,people,sample_size,mean_change,mean_equivalised_change,pct_better_off,pct_worse_off,pct_unchanged,people_directly_affected
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,0-15,12379372.96375927,32504,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,16-24,7456566.933352301,14772,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,25-34,9217856.378450006,15643,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,35-49,13650188.481204446,35018,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,50-64,13364592.940182116,39985,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,65+,13500215.822747702,44376,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,all,69568793.51969585,182298,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,0,660650.3285442842,1394,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,1,682207.7109844796,1405,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,2,697618.286451472,1932,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,3,738999.6677187374,1802,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,4,726925.1780625358,1789,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,5,747836.9432965405,2270,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,6,764078.9566406049,2240,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,7,720515.2419836419,1854,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,8,845086.6227188352,2261,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,9,808049.5793069135,2262,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,10,713472.7622401398,2006,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,11,844168.9341359967,2033,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,12,975067.0924717113,2558,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,13,831364.4509011162,2201,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,14,785398.4484701045,2254,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,15,837932.7598321568,2243,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,16,832364.4867544705,2658,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,17,841198.902036103,1967,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,18,807929.5311746895,1666,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,19,798597.9592624949,1365,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,20,812308.9439469762,1582,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,21,817490.804576444,1367,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,22,831730.4420792237,1270,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,23,853194.1273259912,1412,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,24,861751.7361959075,1485,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,25,794142.8975443058,1343,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,26,992759.0899144476,1245,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,27,884157.9632103639,1357,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,28,954724.7557392288,1405,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,29,884946.0817798758,1490,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,30,917435.2758852905,1530,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,31,842721.1912947185,1532,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,32,970874.6253383234,1655,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,33,996460.4769524559,1954,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,34,979634.0207909951,2132,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,35,922760.859505902,2076,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,36,1048370.7684757933,2307,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,37,811386.8233325556,2346,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,38,1019062.7216609754,2273,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,39,1046040.3230032725,2516,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,40,945693.0807622513,2321,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,41,985835.5366079304,2075,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,42,944588.3423564741,2437,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,43,831171.897445973,2304,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,44,889717.1094759936,2384,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,45,794938.9998023417,2263,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,46,757117.6349671613,2546,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,47,861866.7364590643,2199,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,48,865220.2407969395,2415,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,49,926417.4065518179,2556,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,50,889354.0554271056,2476,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,51,824529.5106106764,2210,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,52,813369.4636416561,2423,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,53,945070.7319103638,2462,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,54,882588.5951230102,2634,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,55,857368.725968943,2402,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,56,989091.7364837611,2554,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,57,815339.9386954643,2457,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,58,882693.4118845006,2771,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,59,1066032.9483821401,3277,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,60,885350.2436780445,2684,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,61,847518.9818644663,2972,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,62,1046149.4087520139,3107,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,63,803481.3216074035,2664,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,64,816653.8661525669,2892,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,65,778288.5381094096,2981,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,66,789134.0377045758,2673,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,67,712726.8109709295,2361,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,68,689373.9656167785,2314,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,69,735819.1752974922,2191,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,70,523604.17780882027,2181,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,71,629272.0288403146,2326,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,72,621636.7948910659,2202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,73,642405.1716060583,2142,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,74,690830.5716413865,1936,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,75,612619.9222457381,2217,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,76,632477.2716668854,2353,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,77,660834.7438800451,2177,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,78,574032.8110498432,2024,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,79,492527.14929776825,1623,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,80,368717.85375757515,1348,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,81,423453.59888346493,1202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,82,425824.25149883516,1073,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,83,348293.9095409084,1122,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,84,361394.79716788325,1170,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,85,223910.0391966179,586,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,86,202095.37885141373,606,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,87,240148.38952431642,647,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,88,266563.81366145145,584,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,89,217092.664299272,618,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2027,90+,637137.9557388518,1719,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,0-15,12400417.90915456,32504,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,16-24,7469243.099581062,14772,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,25-34,9233526.739615269,15643,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,35-49,13673393.798069222,35018,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,50-64,13387312.760212213,39985,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,65+,13523166.185304144,44376,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,all,69687060.49193648,182298,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,0,661773.4326249659,1394,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,1,683367.4649520628,1405,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,2,698804.2416595947,1932,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,3,740255.9664128684,1802,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,4,728160.9527415857,1789,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,5,749108.2642148277,2270,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,6,765377.8901515584,2240,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,7,721740.1180805722,1854,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,8,846523.27271365,2261,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,9,809423.2646978162,2262,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,10,714685.6665849881,2006,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,11,845604.0221241573,2033,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,12,976724.7067529382,2558,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,13,832777.771735779,2201,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,14,786733.6257089777,2254,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,15,839357.2479982171,2243,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,16,833779.506278622,2658,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,17,842628.943367626,1967,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,18,809303.0132501423,1666,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,19,799955.5734254615,1365,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,20,813689.871617089,1582,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,21,818880.5401642439,1367,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,22,833144.3857810954,1270,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,23,854644.5540525224,1412,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,24,863216.7116442593,1485,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,25,795492.9419217566,1343,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,26,994446.7808264317,1245,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,27,885661.0332095008,1357,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,28,956347.7926936336,1405,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,29,886450.4932632819,1490,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,30,918994.9153852453,1530,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,31,844153.819045648,1532,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,32,972525.1099434104,1655,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,33,998154.4562648572,1954,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,34,981299.3970615044,2132,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,35,924329.5530430395,2076,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,36,1050152.9983947817,2307,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,37,812766.1783251045,2346,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,38,1020795.1296382826,2273,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,39,1047818.5990040898,2516,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,40,947300.7587374933,2321,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,41,987511.4546893779,2075,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,42,946194.1422664821,2437,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,43,832584.8892241251,2304,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,44,891229.6292509604,2384,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,45,796290.393882148,2263,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,46,758404.733933541,2546,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,47,863331.910218806,2199,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,48,866691.1157153184,2415,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,49,927992.3117456706,2556,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,50,890865.9564696085,2476,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,51,825931.210296263,2210,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,52,814752.1945608356,2423,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,53,946677.3546520919,2462,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,54,884088.9965658472,2634,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,55,858826.2506128708,2402,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,56,990773.1924757324,2554,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,57,816726.0200408278,2457,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,58,884193.9922040915,2771,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,59,1067845.2045150893,3277,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,60,886855.3417683681,2684,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,61,848959.7649640283,2972,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,62,1047927.8660995634,3107,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,63,804847.237239915,2664,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,64,818042.1777470792,2892,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,65,779611.62926572,2981,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,66,790475.5643141698,2673,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,67,713938.4466474354,2361,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,68,690545.9030417614,2314,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,69,737070.06460186,2191,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,70,524494.3070842987,2181,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,71,630341.7893005293,2326,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,72,622693.5755645009,2202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,73,643497.2619142402,2142,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,74,692004.9857306397,1936,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,75,613661.3762499923,2217,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,76,633552.4834617721,2353,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,77,661958.1641063807,2177,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,78,575008.6678495016,2024,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,79,493364.4443919575,1623,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,80,369344.671672293,1348,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,81,424173.4702139497,1202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,82,426548.1536595095,1073,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,83,348886.0084765591,1122,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,84,362009.1686945157,1170,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,85,224290.68615291268,586,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,86,202438.94025039114,606,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,87,240556.64090127684,647,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,88,267016.96936927363,584,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,89,217461.7219928261,618,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2028,90+,638221.0903958781,1719,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,0-15,12426458.781868676,32504,-160.56504678726657,-92.03111510114931,0.0,1.1506580811773315,98.84934191882266,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,16-24,7484928.509293001,14772,-579.1231604167943,-353.12197026103104,0.0,4.556282215213249,95.44371778478676,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,25-34,9252917.173685485,15643,-59.92925489399106,-35.1454028046066,0.0,0.4843822276537608,99.51561777234625,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,35-49,13702107.91923944,35018,-140.392449928814,-85.82706542176403,0.0,1.0300079482769953,98.969992051723,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,50-64,13415426.111205969,39985,-160.45385971083374,-95.87672654897587,0.0,1.3753316327583476,98.62466836724165,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,65+,13551564.833987022,44376,-36.79313451151461,-18.47106702875678,0.0,0.224811079977257,99.77518892002274,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,all,69833403.3292796,182298,-164.09489187066993,-97.72489171009201,0.0,1.2672228213019137,98.7327771786981,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,0,663163.1585514983,1394,-63.56910990630935,-41.00966414556248,0.0,0.5455229269573365,99.45447707304267,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,1,684802.537184028,1405,-10.590142120844536,-7.564392864082094,0.0,0.12718325332896427,99.87281674667103,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,2,700271.7301170658,1932,-92.85328496571077,-52.43121504724479,0.0,0.7303876377220406,99.26961236227795,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,3,741810.5066725342,1802,-122.04294594945686,-72.31066184075802,0.0,1.0126962948738236,98.98730370512617,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,4,729690.0912578581,1789,-38.21836557202911,-23.886480087863593,0.0,0.32937516688389173,99.67062483311611,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,5,750681.3934420189,2270,-302.0603039573712,-153.93371436004594,0.0,2.1750450204966696,97.82495497950333,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,6,766985.183116965,2240,-14.13138097340949,-8.168428259601837,0.0,0.09041352767377439,99.90958647232623,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,7,723255.7716970975,1854,-0.03692169971617327,-0.019850377735216734,0.0,0.00022274558871948857,99.99977725441128,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,8,848300.9684052942,2261,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,9,811123.0518897669,2262,-244.64373433883353,-156.46144568764467,0.0,1.5789264912246046,98.4210735087754,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,10,716186.5051731113,2006,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,11,847379.7891520336,2033,-247.34353557375815,-142.9730606297367,0.0,1.719501752172215,98.28049824782778,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,12,978775.8286819002,2558,-344.05926123677193,-190.9510537181847,0.0,2.2492529703141853,97.75074702968581,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,13,834526.6040103128,2201,-386.73565041914964,-223.84877770618036,0.0,2.7585831881725604,97.24141681182743,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,14,788385.7675878806,2254,-335.50427619381054,-176.6584534917416,0.0,2.406964232590524,97.59303576740948,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,15,841119.8949293103,2243,-229.16112602103829,-143.35697174199933,0.0,1.7897679365205894,98.21023206347941,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,16,835530.4438636545,2658,-195.4119607124256,-122.1290719237214,0.0,1.576328156835224,98.42367184316477,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,17,844398.4606348188,1967,-251.78170828530216,-125.17709410876391,0.0,2.1938036291552634,97.80619637084473,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,18,811002.5506070238,1666,-1347.1511186574926,-868.2527659067426,0.0,10.012943959834306,89.9870560401657,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,19,801635.4842682723,1365,-876.518470922619,-551.8154126743347,0.0,6.2031460419251445,93.79685395807485,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,20,815398.619888993,1582,-402.1324346519197,-198.80825903408405,0.0,3.3474226734179644,96.65257732658203,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,21,820600.1872781632,1367,-622.147721268741,-365.4422254623548,0.0,5.055188017470742,94.94481198252926,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,22,834893.987683367,1270,-369.26030431891553,-258.2437978380921,0.0,3.777032667991287,96.22296733200871,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,23,856439.3087733146,1412,-434.7147733352871,-337.4595408440969,0.0,4.167804401124608,95.83219559887539,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,24,865029.4662953946,1485,-745.1707147396786,-372.5087291507884,0.0,4.901661414244736,95.09833858575526,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,25,797163.4784682854,1343,-190.40007551366782,-114.28286517295822,0.0,1.5629080275324332,98.43709197246757,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,26,996535.1210458446,1245,-235.77231943992075,-136.10800388261742,0.0,1.682138501693601,98.3178614983064,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,27,887520.924682064,1357,-52.96104169788399,-29.081403337479237,0.0,0.6733275861756478,99.32667241382435,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,28,958356.122151142,1405,-6.921176138281414,-4.072217019873076,0.0,0.1717908330114654,99.82820916698853,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,29,888312.0423452733,1490,-45.315443705939735,-25.711040375991946,0.0,0.3601914889948364,99.63980851100517,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,30,920924.8086779676,1530,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,31,845926.5447541773,1532,-87.35251341969901,-54.26777790148968,0.0,0.5645333924383443,99.43546660756165,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,32,974567.4208624046,1655,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,33,1000250.5842152014,1954,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,34,983360.1264831247,2132,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,35,926270.644970593,2076,-22.671103471215563,-15.011733456467372,0.0,0.15519643279494102,99.84480356720505,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,36,1052358.3184064887,2307,-291.4953951595287,-169.40474102850382,0.0,2.147320020092734,97.85267997990726,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,37,814472.9860223923,2346,-135.13876924518095,-65.6015058458831,0.0,0.8646741261823611,99.13532587381764,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,38,1022938.7985752746,2273,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,39,1050019.0124899326,2516,-62.9441731701947,-32.63086197454029,0.0,0.5933129767187498,99.40668702328125,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,40,949290.0889223199,2321,-62.12597326549332,-49.04011939380457,0.0,0.7064190194602603,99.29358098053974,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,41,989585.2269956339,2075,-128.08486941107117,-84.0567169312046,0.0,1.05830871399298,98.94169128600701,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,42,948181.1510802573,2437,-317.81086010220275,-198.51638946342825,0.0,2.072467229853766,97.92753277014623,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,43,834333.3180580977,2304,-275.2149523064302,-143.90790859416205,0.0,1.8872090998571487,98.11279090014285,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,44,893101.2098776158,2384,-85.00480283543052,-58.3928712449658,0.0,0.5064913185100965,99.4935086814899,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,45,797962.6066722358,2263,-81.40595743723819,-51.26078220513489,0.0,0.6165203880416446,99.38347961195836,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,46,759997.3846349204,2546,-50.402464727838925,-37.896590351204296,0.0,0.35558231677151336,99.64441768322848,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,47,865144.9077679114,2199,-331.3190042399891,-240.92652884759255,0.0,2.7566803468734884,97.24331965312652,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,48,868511.1676551243,2415,-229.33967824837302,-112.63656732472752,0.0,1.3454254345422691,98.65457456545774,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,49,929941.0971106407,2556,-40.92792718421758,-32.247906249705395,0.0,0.3839152664916656,99.61608473350833,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,50,892736.7755159889,2476,-526.4433554804417,-284.52165174066573,0.0,3.8789635362526482,96.12103646374736,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,51,827665.6684209909,2210,-144.51664312546555,-92.42544367897607,0.0,1.1338560940054254,98.86614390599458,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,52,816463.1727441577,2423,-92.25806961588083,-57.480731773531375,0.0,0.8531694353879256,99.14683056461207,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,53,948665.3769270163,2462,-190.78133388767756,-114.46793767698777,0.0,1.7341532264012094,98.26584677359878,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,54,885945.5829012082,2634,-204.84590276551447,-98.91940044356888,0.0,1.561183461606631,98.43881653839337,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,55,860629.7886919109,2402,-200.38837999894767,-125.71873577892248,0.0,1.9678296880441772,98.03217031195582,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,56,992853.8145056493,2554,-116.3399411304358,-71.1428579833712,0.0,1.1588284978140726,98.84117150218593,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,57,818441.1405109409,2457,-162.0905213250751,-105.1794908679909,0.0,2.091275329350724,97.90872467064928,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,58,886050.7976086922,2771,-52.562552824542664,-37.596623931509534,0.0,0.7734529964824802,99.22654700351752,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,59,1070087.6787896613,3277,-209.6831126222654,-159.55737598997473,0.0,1.5142334186831186,98.48576658131688,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,60,888717.7356956908,2684,-91.35755285355809,-55.495015056210036,0.0,0.7495690022910235,99.25043099770897,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,61,850742.5780093698,2972,-111.18259678336292,-80.63229003581736,0.0,1.1004049255043915,98.89959507449561,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,62,1050128.515140175,3107,-115.08360638084,-51.43979141627852,0.0,0.9205016434577906,99.0794983565422,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,63,806537.4198394762,2664,-4.231195559894703,-3.181350843996416,0.0,0.020481158427237044,99.97951884157277,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,64,819760.0659050411,2892,-162.91113655750263,-84.29062664373507,0.0,1.0705682317615615,98.92943176823844,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,65,781248.8126165653,2981,-367.7102650804671,-165.37100181421857,0.0,1.964964189791012,98.035035810209,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,66,792135.5617015567,2673,-196.8236739758283,-100.60817294022411,0.0,1.2310308659412117,98.76896913405879,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,67,715437.7190184239,2361,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,68,691996.0477281725,2314,-1.2024665597667932,-0.7243766678874287,0.0,0.018188944000268225,99.98181105599974,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,69,738617.9137219954,2191,-53.86813491101777,-40.33396745114185,0.0,0.5643276140673965,99.4356723859326,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,70,525595.7434387607,2181,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,71,631665.508042099,2326,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,72,624001.2331350744,2202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,73,644848.6063001007,2142,-0.3918685646478567,-0.29463809616106595,0.0,0.005946055726697271,99.9940539442733,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,74,693458.1968962597,1936,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,75,614950.0637380341,2217,-5.188758938729167,-3.9013208581810415,0.0,0.04697379961710104,99.9530262003829,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,76,634882.9434514195,2353,-7.486841545767604,-5.629202780931215,0.0,0.04526391606023488,99.95473608393976,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,77,663348.2758219712,2177,-5.144533684790336,-3.8680714111174344,0.0,0.02490218377783289,99.97509781622217,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,78,576216.1839649584,2024,-5.53755296863866,-4.163571897430169,0.0,0.05013142961342198,99.94986857038658,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,79,494400.5101192286,1623,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,80,370120.2972694067,1348,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,81,425064.2350950595,1202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,82,427443.90535930544,1073,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,83,349618.6684307987,1122,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,84,362769.38674717024,1170,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,85,224761.69741120655,586,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,86,202864.06304369867,606,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,87,241061.8099803049,647,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,88,267577.7059172988,584,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,89,217918.39143753238,618,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2029,90+,639561.3536006194,1719,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,0-15,12457524.939504288,32504,-227.37363501098437,-129.34387447539305,0.0,1.544409978093378,98.45559002190663,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,16-24,7503640.831036154,14772,-854.634452521662,-525.8067057327979,0.0,6.396946258401363,93.60305374159864,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,25-34,9276049.44892494,15643,-105.00218661102538,-60.46603366658393,0.0,0.790665401632496,99.2093345983675,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,35-49,13736363.201355431,35018,-170.88416566770292,-103.61180821839578,0.0,1.2245240417170498,98.77547595828295,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,50-64,13448964.683635626,39985,-261.7555277959518,-156.08716071223313,0.0,2.0473400097645658,97.95265999023543,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,65+,13585443.761409868,44376,-38.591651100837765,-19.581085248465513,0.0,0.23321800126055361,99.76678199873945,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,all,70007986.8658663,182298,-237.27779416225215,-141.50004084141602,0.0,1.744053075933236,98.2559469240667,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,0,664821.0646332884,1394,-65.73058922722824,-42.455090474891946,0.0,0.5460303003023438,99.45396969969765,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,1,686514.5472785085,1405,-13.788221869055443,-10.01857337939262,0.0,0.14314902243297606,99.85685097756702,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,2,702022.4095008112,1932,-94.89629069871555,-53.584827449637196,0.0,0.7303876246625856,99.26961237533742,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,3,743665.0313415444,1802,-372.2554891392839,-216.98101951469965,0.0,2.5623687223302305,97.43763127766977,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,4,731514.316106745,1789,-41.1617776488074,-26.067555710627126,0.0,0.3442464425615578,99.65575355743844,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,5,752558.0992830247,2270,-553.3022855127981,-298.70557143680907,0.0,3.7062938345868197,96.29370616541318,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,6,768902.6471386533,2240,-16.44256943911929,-9.923162606538751,0.0,0.1045616640020453,99.89543833599795,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,7,725063.9121136004,1854,-189.58083804889176,-101.92517751874422,0.0,1.1190419233173547,98.88095807668265,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,8,850421.7207130687,2261,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,9,813150.86241889,2262,-316.1251919218933,-195.4417489482864,0.0,1.8885398715843893,98.1114601284156,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,10,717976.97158763,2006,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,11,849498.2418111488,2033,-252.79108774622063,-146.12194030232084,0.0,1.7196000812440067,98.28039991875599,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,12,981222.7679426605,2558,-367.8226466742666,-203.85849583817875,0.0,2.249252945629986,97.75074705437001,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,13,836612.9235674758,2201,-468.97214566615423,-270.61923511093346,0.0,3.274210849790956,96.72578915020904,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,14,790356.7304992611,2254,-455.2291370682324,-233.5138216075553,0.0,3.2084600718557565,96.79153992814425,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,15,843222.6935679782,2243,-301.7364627989952,-187.11668362475285,0.0,2.3108857366317666,97.68911426336824,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,16,837619.2684752,2658,-313.9626554025654,-181.12198427371345,0.0,2.6260298483680113,97.37397015163198,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,17,846509.4591125995,1967,-485.4797205822174,-241.42040086204713,0.0,4.24932354049656,95.75067645950344,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,18,813030.0563732181,1666,-1420.385751941715,-913.560880264553,0.0,10.398675207376652,89.60132479262334,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,19,803639.5729460269,1365,-1756.5950752322817,-1134.3174505727127,0.0,11.794047377349631,88.20595262265036,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,20,817437.1165498309,1582,-714.8312394791701,-374.32930262825977,0.0,5.268811319252385,94.73118868074761,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,21,822651.6878131703,1367,-888.8865564645095,-569.89972064254,0.0,6.3586801669964315,93.64131983300356,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,22,836981.2234123126,1270,-807.8381843920323,-532.5319117834281,0.0,7.1414410431405395,92.85855895685945,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,23,858580.4060437763,1412,-501.20272476462054,-377.8247965701343,0.0,4.552182764136095,95.44781723586391,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,24,867192.0403100192,1485,-865.3194738560991,-449.86816602381253,0.0,5.589897694722698,94.4101023052773,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,25,799156.3822734114,1343,-500.0802960285964,-301.9329699193792,0.0,3.685134769199171,96.31486523080083,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,26,999026.4645837862,1245,-242.61750071600966,-140.19767679132596,0.0,1.732028720619159,98.26797127938084,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,27,889739.7214166392,1357,-76.87838677745121,-39.528212376477654,0.0,0.874867919207809,99.12513208079218,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,28,960752.0107502863,1405,-68.01882295298437,-34.79183553611917,0.0,0.5318021858736677,99.46819781412634,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,29,890532.8206203636,1490,-137.57488111560193,-71.75191548103949,0.0,1.0002766140017698,98.99972338599822,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,30,923227.1201805174,1530,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,31,848041.3576884903,1532,-89.28325024964587,-55.4683875171644,0.0,0.564590331020955,99.43540966897905,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,32,977003.8343729004,1655,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,33,1002751.2094135955,1954,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,34,985818.5276249489,2132,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,35,928586.3254171005,2076,-23.169934948199202,-15.342033748277538,0.0,0.1551964366763099,99.8448035633237,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,36,1054989.218036253,2307,-297.9087243650245,-173.1319376095754,0.0,2.1473201342360717,97.85267986576393,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,37,816509.1705278521,2346,-138.1121760851382,-67.04491400909832,0.0,0.8646741402097329,99.13532585979027,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,38,1025496.1449818918,2273,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,39,1052644.0610482516,2516,-64.32908291421661,-33.34882276404303,0.0,0.5933129732085258,99.40668702679147,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,40,951663.3189942017,2321,-68.0199662566548,-54.63949211187022,0.0,0.8077817347786123,99.19221826522138,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,41,992059.1948588807,2075,-130.94104769585823,-85.93476252373806,0.0,1.0583086925318448,98.94169130746816,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,42,950551.6002006074,2437,-412.2895383558998,-246.65508485487155,0.0,2.818749254432238,97.18125074556777,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,43,836419.1511828713,2304,-287.9183699198395,-150.41494518866992,0.0,1.946097605996941,98.05390239400306,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,44,895333.9635705389,2384,-135.6289097334432,-94.05068990745771,0.0,0.7622610621542196,99.23773893784578,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,45,799957.5124054132,2263,-115.07932360404895,-71.59522612325749,0.0,0.885357937726356,99.11464206227365,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,46,761897.3778973678,2546,-81.84992977024079,-61.54129093227226,0.0,0.481369580254299,99.5186304197457,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,47,867307.7704183739,2199,-350.1727093381362,-254.918975472173,0.0,2.83850514294721,97.16149485705279,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,48,870682.4429765828,2415,-252.7774908871411,-127.14168451253322,0.0,1.476792018015754,98.52320798198426,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,49,932265.948839244,2556,-218.85384310584232,-127.45619338931405,0.0,1.5548306867408372,98.44516931325916,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,50,894968.6188149988,2476,-596.2456728433558,-325.73999324499346,0.0,4.3129902150128245,95.68700978498718,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,51,829734.8316096319,2210,-429.6281779776196,-257.957138677694,0.0,2.9710311729996532,97.02896882700036,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,52,818504.33112856,2423,-115.19890968333335,-73.61937850695845,0.0,1.075526173440338,98.92447382655966,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,53,951037.0421622312,2462,-441.209651028968,-260.682878886784,0.0,3.311554477966759,96.68844552203323,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,54,888160.4485685276,2634,-434.39344983596806,-226.01239619488985,0.0,2.994812675126038,97.00518732487396,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,55,862781.3636104548,2402,-306.18990091296007,-195.2503981908194,0.0,2.7908426635084784,97.20915733649153,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,56,995335.949568063,2554,-186.73845412304217,-117.16362595850772,0.0,1.715058035695973,98.28494196430402,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,57,820487.2454507686,2457,-275.0401992091161,-166.66206633923662,0.0,2.716843262807224,97.28315673719278,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,58,888265.9260372296,2771,-166.51474826186316,-110.88544577747726,0.0,1.644158018553708,98.35584198144629,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,59,1072762.894963582,3277,-277.36314457099934,-197.95808651967985,0.0,2.0320205043329302,97.96797949566707,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,60,890939.5325179696,2684,-127.24332627952927,-82.17230638876855,0.0,0.9718630808724051,99.02813691912759,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,61,852869.4351000506,2972,-228.29595840769306,-149.75212146223743,0.0,1.8066272957031078,98.19337270429689,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,62,1052753.834620365,3107,-152.80764020028616,-73.7460090585093,0.0,1.1700384159576858,98.82996158404231,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,63,808553.7615260435,2664,-4.324294318672219,-3.2513492730312468,0.0,0.020481159012106523,99.9795188409879,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,64,821809.4679571511,2892,-166.62246833444922,-86.22815857688177,0.0,1.0713172165649054,98.9286827834351,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,65,783201.934132061,2981,-376.2166473704299,-169.24645355552215,0.0,1.9677746076589921,98.032225392341,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,66,794115.9019829761,2673,-204.97442915879108,-105.08483075135976,0.0,1.2582201186499353,98.74177988135007,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,67,717226.3126747683,2361,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,68,693726.040424672,2314,-1.2289218575874112,-0.7403144518118474,0.0,0.01818894418083237,99.98181105581916,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,69,740464.4604325127,2191,-55.173132180764384,-41.311464875282915,0.0,0.5661929372490264,99.43380706275097,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,70,526909.7326777326,2181,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,71,633244.6721667945,2326,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,72,625561.2369850501,2202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,73,646460.7288818415,2142,-0.6217146768653463,-0.46745488374314886,0.0,0.008781772788245778,99.99121822721176,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,74,695191.8419399736,1936,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,75,616487.440191891,2217,-13.287400939397397,-9.990524917406884,0.0,0.11770097443039854,99.8822990255696,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,76,636470.1518140035,2353,-7.6515722209920884,-5.753062193012768,0.0,0.04526391512436471,99.95473608487563,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,77,665006.6496884525,2177,-5.2577285339118855,-3.953179544860168,0.0,0.024902184312607958,99.97509781568739,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,78,577656.7247909941,2024,-14.180594530248491,-10.662098904386365,0.0,0.12561296237127936,99.87438703762872,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,79,495636.510767729,1623,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,80,371045.5980732329,1348,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,81,426126.8965085875,1202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,82,428512.5140837636,1073,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,83,350492.716175911,1122,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,84,363676.311346977,1170,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,85,225323.60030047875,586,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,86,203371.22341872193,606,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,87,241664.4647327941,647,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,88,268246.6515791165,584,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,89,218463.18797226623,618,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2030,90+,641160.2576665655,1719,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,0-15,12487422.991360318,32504,-237.5091876841059,-135.49356251713522,0.0,1.5919676627341122,98.40803233726588,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,16-24,7521649.577675684,14772,-977.8150712042982,-622.7702072263725,0.0,7.178770789578123,92.82122921042188,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,25-34,9298311.985021843,15643,-111.04979850471713,-64.37509592923315,0.0,0.8197556089723272,99.18024439102767,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,35-49,13769330.465612326,35018,-186.3947527832497,-114.13733970976955,0.0,1.3427306196376954,98.6572693803623,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,50-64,13481242.204942245,39985,-281.9661239962722,-168.5206444142564,0.0,2.1534784939515386,97.84652150604846,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,65+,13618048.819140285,44376,-39.90295518135854,-20.29706044793724,0.0,0.25414512543799217,99.74585487456201,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,all,70176006.04375269,182298,-260.2658894593801,-158.09781402928252,0.0,1.8878125196442817,98.11218748035574,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,0,666416.6338531338,1394,-67.74148472144034,-43.80228741286781,0.0,0.5460958673865358,99.45390413261347,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,1,688162.1802925374,1405,-15.96193484401371,-12.108926935545657,0.0,0.16126466126593586,99.83873533873407,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,2,703707.2640535124,1932,-121.88006088233637,-75.70892150423346,0.0,0.9482575240530503,99.05174247594695,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,3,745449.8255744223,1802,-379.6996218163625,-221.32008900333696,0.0,2.5623686732331405,97.43763132676686,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,4,733269.9516487569,1789,-41.986573767574136,-26.590166266649888,0.0,0.3442581904720179,99.65574180952798,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,5,754364.2366492674,2270,-564.3794149664934,-304.68494429945247,0.0,3.706439519798836,96.29356048020117,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,6,770748.0139329024,2240,-16.772993153000414,-10.122873102456884,0.0,0.10457285460026655,99.89542714539972,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,7,726804.0669620112,1854,-225.06740264547292,-121.00129207561258,0.0,1.2895283797375579,98.71047162026244,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,8,852462.7333606128,2261,-13.101176758757893,-7.572938206009146,0.0,0.12877589605159034,99.8712241039484,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,9,815102.4231025195,2262,-322.4628502032398,-199.3563254792893,0.0,1.888677770519882,98.11132222948011,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,10,719700.1164678168,2006,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,11,851537.0370215941,2033,-261.9035951482771,-151.22546804030358,0.0,1.8053103736356053,98.1946896263644,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,12,983577.7007372603,2558,-386.5610273220497,-214.51119211079967,0.0,2.361088590087908,97.63891140991208,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,13,838620.7933871988,2201,-478.44159166318354,-276.072813042469,0.0,3.274739403840865,96.72526059615913,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,14,792253.5868971422,2254,-464.46753722894385,-238.24947835213365,0.0,3.210506416034408,96.7894935839656,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,15,845246.4274196308,2243,-309.30916972213953,-191.7855011223408,0.0,2.3216171525405933,97.67838284745942,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,16,839629.558196119,2658,-314.51699719621826,-181.27861226657666,0.0,2.626029816589858,97.37397018341014,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,17,848541.0818631211,1967,-517.8624218279309,-259.74127535058966,0.0,4.495351189494847,95.50464881050516,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,18,814981.3275266718,1666,-1470.995188713235,-945.3053658529066,0.0,10.594523668390424,89.40547633160958,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,19,805568.3063778151,1365,-1793.8983930085885,-1158.2715194074185,0.0,11.79428520778524,88.20571479221476,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,20,819398.9637726331,1582,-843.6583602184214,-461.6000663574398,0.0,6.286879649162971,93.71312035083703,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,21,824626.0544052003,1367,-1009.0147736693078,-655.9946676416986,0.0,7.360377258142455,92.63962274185754,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,22,838989.9792438783,1270,-921.2740027919405,-600.7087007972985,0.0,7.775732450444939,92.22426754955507,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,23,860641.0015057977,1412,-864.1620847886438,-755.4897802088209,0.0,6.509886245952258,93.49011375404774,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,24,869273.3047844479,1485,-1112.7801424846668,-615.2256362839089,0.0,7.470511689653435,92.52948831034657,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,25,801074.3639823901,1343,-512.4658925603293,-309.4077748574601,0.0,3.7002615201112303,96.29973847988877,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,26,1001424.1293669678,1245,-249.64400288647897,-144.38528122714797,0.0,1.7465154917483077,98.25348450825169,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,27,891875.1037278585,1357,-78.41584245101055,-40.31870422528982,0.0,0.8748679261183014,99.1251320738817,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,28,963057.8161798213,1405,-69.38324097977832,-35.491086843943826,0.0,0.5318475775416138,99.46815242245839,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,29,892670.0973736895,1490,-140.84147979912174,-73.55492865868206,0.0,1.0002766249827084,98.9997233750173,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,30,925442.8654808123,1530,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,31,850076.6610919461,1532,-115.75709238111187,-75.14032310758449,0.0,0.7222753650009216,99.27772463499907,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,32,979348.6409550235,1655,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,33,1005157.8116393164,1954,-11.11095672807528,-6.422521446793541,0.0,0.10921335044898632,99.89078664955102,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,34,988184.4952240176,2132,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,35,930814.9315572046,2076,-23.633276185882185,-15.64883871059015,0.0,0.15519643388912605,99.84480356611087,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,36,1057521.1889572572,2307,-303.86608664034856,-176.5942245703786,0.0,2.1473200057574986,97.8526799942425,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,37,818468.7927123988,2346,-149.31646329531844,-72.92455524674611,0.0,1.0430207261697575,98.95697927383024,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,38,1027957.3358265767,2273,-0.012599602820429821,-0.0048647123388199645,0.0,0.00010942023096585781,99.99989057976903,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,39,1055170.404455522,2516,-68.24744333936516,-35.600162429984444,0.0,0.7220252669361427,99.27797473306386,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,40,953947.3107798155,2321,-69.34563207604116,-55.71132346345094,0.0,0.8077817438493496,99.19221825615065,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,41,994440.1307721101,2075,-133.47260906914556,-87.58531635061443,0.0,1.0584192442548446,98.94158075574515,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,42,952832.9221803322,2437,-445.10053068384406,-266.361661169818,0.0,2.9911372312836297,97.00886276871637,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,43,838426.557678692,2304,-303.7356134617047,-163.47245834019228,0.0,2.043658387102507,97.95634161289749,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,44,897482.7652419321,2384,-157.65089351456913,-112.0211822139158,0.0,0.9299038547643665,99.07009614523562,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,45,801877.4104922675,2263,-117.3806192936317,-73.02696124400843,0.0,0.8853579133451681,99.11464208665484,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,46,763725.9339611623,2546,-83.4867374494181,-62.77196635411203,0.0,0.4813695946443973,99.5186304053556,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,47,869389.3076601988,2199,-441.9706411169968,-323.7726414697893,0.0,3.66153481352435,96.33846518647566,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,48,872772.0818840591,2415,-270.4601049466793,-136.95416034711818,0.0,1.6025713441554217,98.39742865584458,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,49,934503.3914527968,2556,-247.86746072071907,-143.2507692471046,0.0,1.687305065885808,98.31269493411419,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,50,897116.5447297841,2476,-603.1315964737352,-329.1948149145918,0.0,4.313965547274087,95.6860344527259,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,51,831726.1929285098,2210,-432.82262916929636,-259.8687295278251,0.0,2.9728982297049975,97.027101770295,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,52,820468.7401137897,2423,-117.16966456799135,-74.90514904883156,0.0,1.0755676644496863,98.92443233555032,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,53,953319.527615984,2462,-491.73036004170405,-289.51885412771543,0.0,3.588564558364746,96.41143544163525,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,54,890292.0322274575,2634,-442.6703646322672,-230.38321540509074,0.0,2.99676593564872,97.00323406435129,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,55,864852.0374744274,2402,-312.2658875961079,-199.1159552344672,0.0,2.791012493645868,97.20898750635413,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,56,997724.7559571317,2554,-244.66038504158016,-155.82224089646172,0.0,2.0713820938158665,97.92861790618413,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,57,822456.4157135691,2457,-285.8172006387015,-173.15844268149104,0.0,2.7508462978033283,97.24915370219666,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,58,890397.7659211932,2771,-231.7679761317126,-150.94903037150334,0.0,2.070360674823396,97.92963932517661,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,59,1075337.5310265943,3277,-332.4064253638593,-232.18360019925709,0.0,2.3736547798166314,97.62634522018337,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,60,893077.7878187066,2684,-135.8192401000962,-88.08558312914194,0.0,1.0074407208141856,98.99255927918581,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,61,854916.3238405548,2972,-232.8226491159013,-152.7235147178164,0.0,1.8066273205033303,98.19337267949668,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,62,1055280.4467411917,3107,-155.5707633080684,-75.11458799054913,0.0,1.1701886515157065,98.8298113484843,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,63,810494.2908049328,2664,-4.410770418671582,-3.316369511048658,0.0,0.020481158724063246,99.97951884127593,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,64,823781.8120284183,2892,-169.98074437533603,-87.97843254543066,0.0,1.071533516289406,98.9284664837106,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,65,785081.6180711817,2981,-383.83618953081304,-172.67486264498316,0.0,1.9683319019563301,98.03166809804367,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,66,796021.780171983,2673,-211.14355588173322,-108.41950252307457,0.0,1.2725452526551868,98.72745474734481,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,67,718947.6561813978,2361,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,68,695390.9821390901,2314,-5.233514338553108,-3.152720590260099,0.0,0.21333598451009206,99.78666401548992,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,69,742241.5750224013,2191,-60.005251184060164,-44.383856767009206,0.0,0.7490222042594287,99.25097779574057,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,70,528174.3162566684,2181,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,71,634764.4603132587,2326,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,72,627062.5836165268,2202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,73,648012.2341405284,2142,-0.7717228505098137,-0.5802426369777359,0.0,0.011465344406279707,99.98853465559372,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,74,696860.2995326314,1936,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,75,617967.0102973785,2217,-13.553117149748214,-10.190312995562602,0.0,0.11770097297846452,99.88229902702153,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,76,637997.6787676411,2353,-7.804583608549041,-5.868108311641337,0.0,0.04526391182101668,99.95473608817899,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,77,666602.665850359,2177,-5.3628712057792844,-4.0322349318474995,0.0,0.024902183962536528,99.97509781603746,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,78,579043.1016270835,2024,-14.464172462646763,-10.875316946471335,0.0,0.1256129607212511,99.87438703927874,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,79,496826.03826431744,1623,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,80,371936.1070941109,1348,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,81,427149.5986107625,1202,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,82,429540.9433447849,1073,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,83,351333.89916479867,1122,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,84,364549.1338655688,1170,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,85,225864.3762919223,586,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,86,203859.3136138022,606,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,87,242244.46086147614,647,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,88,268890.4450999955,584,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,89,218987.49874336272,618,0.0,0.0,0.0,0.0,100.0,0.0
-milburn_report_package_phased,"Milburn report package, phased as claimants are reassessed",2031,90+,642699.0421972526,1719,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,0-15,12379372.96375927,32504,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,16-24,7456566.933352301,14772,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,25-34,9217856.378450006,15643,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,35-49,13650188.481204446,35018,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,50-64,13364592.940182116,39985,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,65+,13500215.822747702,44376,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,all,69568793.51969585,182298,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,0,660650.3285442842,1394,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,1,682207.7109844796,1405,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,2,697618.286451472,1932,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,3,738999.6677187374,1802,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,4,726925.1780625358,1789,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,5,747836.9432965405,2270,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,6,764078.9566406049,2240,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,7,720515.2419836419,1854,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,8,845086.6227188352,2261,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,9,808049.5793069135,2262,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,10,713472.7622401398,2006,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,11,844168.9341359967,2033,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,12,975067.0924717113,2558,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,13,831364.4509011162,2201,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,14,785398.4484701045,2254,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,15,837932.7598321568,2243,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,16,832364.4867544705,2658,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,17,841198.902036103,1967,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,18,807929.5311746895,1666,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,19,798597.9592624949,1365,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,20,812308.9439469762,1582,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,21,817490.804576444,1367,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,22,831730.4420792237,1270,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,23,853194.1273259912,1412,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,24,861751.7361959075,1485,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,25,794142.8975443058,1343,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,26,992759.0899144476,1245,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,27,884157.9632103639,1357,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,28,954724.7557392288,1405,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,29,884946.0817798758,1490,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,30,917435.2758852905,1530,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,31,842721.1912947185,1532,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,32,970874.6253383234,1655,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,33,996460.4769524559,1954,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,34,979634.0207909951,2132,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,35,922760.859505902,2076,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,36,1048370.7684757933,2307,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,37,811386.8233325556,2346,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,38,1019062.7216609754,2273,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,39,1046040.3230032725,2516,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,40,945693.0807622513,2321,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,41,985835.5366079304,2075,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,42,944588.3423564741,2437,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,43,831171.897445973,2304,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,44,889717.1094759936,2384,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,45,794938.9998023417,2263,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,46,757117.6349671613,2546,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,47,861866.7364590643,2199,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,48,865220.2407969395,2415,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,49,926417.4065518179,2556,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,50,889354.0554271056,2476,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,51,824529.5106106764,2210,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,52,813369.4636416561,2423,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,53,945070.7319103638,2462,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,54,882588.5951230102,2634,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,55,857368.725968943,2402,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,56,989091.7364837611,2554,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,57,815339.9386954643,2457,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,58,882693.4118845006,2771,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,59,1066032.9483821401,3277,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,60,885350.2436780445,2684,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,61,847518.9818644663,2972,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,62,1046149.4087520139,3107,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,63,803481.3216074035,2664,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,64,816653.8661525669,2892,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,65,778288.5381094096,2981,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,66,789134.0377045758,2673,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,67,712726.8109709295,2361,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,68,689373.9656167785,2314,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,69,735819.1752974922,2191,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,70,523604.17780882027,2181,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,71,629272.0288403146,2326,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,72,621636.7948910659,2202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,73,642405.1716060583,2142,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,74,690830.5716413865,1936,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,75,612619.9222457381,2217,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,76,632477.2716668854,2353,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,77,660834.7438800451,2177,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,78,574032.8110498432,2024,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,79,492527.14929776825,1623,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,80,368717.85375757515,1348,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,81,423453.59888346493,1202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,82,425824.25149883516,1073,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,83,348293.9095409084,1122,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,84,361394.79716788325,1170,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,85,223910.0391966179,586,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,86,202095.37885141373,606,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,87,240148.38952431642,647,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,88,266563.81366145145,584,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,89,217092.664299272,618,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2027,90+,637137.9557388518,1719,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,0-15,12400417.90915456,32504,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,16-24,7469243.099581062,14772,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,25-34,9233526.739615269,15643,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,35-49,13673393.798069222,35018,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,50-64,13387312.760212213,39985,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,65+,13523166.185304144,44376,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,all,69687060.49193648,182298,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,0,661773.4326249659,1394,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,1,683367.4649520628,1405,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,2,698804.2416595947,1932,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,3,740255.9664128684,1802,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,4,728160.9527415857,1789,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,5,749108.2642148277,2270,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,6,765377.8901515584,2240,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,7,721740.1180805722,1854,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,8,846523.27271365,2261,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,9,809423.2646978162,2262,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,10,714685.6665849881,2006,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,11,845604.0221241573,2033,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,12,976724.7067529382,2558,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,13,832777.771735779,2201,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,14,786733.6257089777,2254,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,15,839357.2479982171,2243,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,16,833779.506278622,2658,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,17,842628.943367626,1967,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,18,809303.0132501423,1666,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,19,799955.5734254615,1365,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,20,813689.871617089,1582,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,21,818880.5401642439,1367,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,22,833144.3857810954,1270,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,23,854644.5540525224,1412,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,24,863216.7116442593,1485,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,25,795492.9419217566,1343,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,26,994446.7808264317,1245,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,27,885661.0332095008,1357,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,28,956347.7926936336,1405,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,29,886450.4932632819,1490,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,30,918994.9153852453,1530,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,31,844153.819045648,1532,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,32,972525.1099434104,1655,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,33,998154.4562648572,1954,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,34,981299.3970615044,2132,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,35,924329.5530430395,2076,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,36,1050152.9983947817,2307,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,37,812766.1783251045,2346,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,38,1020795.1296382826,2273,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,39,1047818.5990040898,2516,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,40,947300.7587374933,2321,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,41,987511.4546893779,2075,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,42,946194.1422664821,2437,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,43,832584.8892241251,2304,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,44,891229.6292509604,2384,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,45,796290.393882148,2263,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,46,758404.733933541,2546,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,47,863331.910218806,2199,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,48,866691.1157153184,2415,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,49,927992.3117456706,2556,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,50,890865.9564696085,2476,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,51,825931.210296263,2210,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,52,814752.1945608356,2423,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,53,946677.3546520919,2462,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,54,884088.9965658472,2634,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,55,858826.2506128708,2402,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,56,990773.1924757324,2554,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,57,816726.0200408278,2457,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,58,884193.9922040915,2771,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,59,1067845.2045150893,3277,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,60,886855.3417683681,2684,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,61,848959.7649640283,2972,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,62,1047927.8660995634,3107,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,63,804847.237239915,2664,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,64,818042.1777470792,2892,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,65,779611.62926572,2981,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,66,790475.5643141698,2673,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,67,713938.4466474354,2361,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,68,690545.9030417614,2314,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,69,737070.06460186,2191,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,70,524494.3070842987,2181,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,71,630341.7893005293,2326,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,72,622693.5755645009,2202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,73,643497.2619142402,2142,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,74,692004.9857306397,1936,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,75,613661.3762499923,2217,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,76,633552.4834617721,2353,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,77,661958.1641063807,2177,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,78,575008.6678495016,2024,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,79,493364.4443919575,1623,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,80,369344.671672293,1348,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,81,424173.4702139497,1202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,82,426548.1536595095,1073,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,83,348886.0084765591,1122,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,84,362009.1686945157,1170,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,85,224290.68615291268,586,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,86,202438.94025039114,606,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,87,240556.64090127684,647,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,88,267016.96936927363,584,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,89,217461.7219928261,618,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2028,90+,638221.0903958781,1719,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,0-15,12426458.781868676,32504,-160.56504678726657,-92.03111510114931,0.0,1.1506580811773315,98.84934191882266,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,16-24,7484928.509293001,14772,-579.1231604167943,-353.12197026103104,0.0,4.556282215213249,95.44371778478676,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,25-34,9252917.173685485,15643,-59.92925489399106,-35.1454028046066,0.0,0.4843822276537608,99.51561777234625,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,35-49,13702107.91923944,35018,-140.392449928814,-85.82706542176403,0.0,1.0300079482769953,98.969992051723,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,50-64,13415426.111205969,39985,-160.45385971083374,-95.87672654897587,0.0,1.3753316327583476,98.62466836724165,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,65+,13551564.833987022,44376,-36.79313451151461,-18.47106702875678,0.0,0.224811079977257,99.77518892002274,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,all,69833403.3292796,182298,-164.09489187066993,-97.72489171009201,0.0,1.2672228213019137,98.7327771786981,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,0,663163.1585514983,1394,-63.56910990630935,-41.00966414556248,0.0,0.5455229269573365,99.45447707304267,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,1,684802.537184028,1405,-10.590142120844536,-7.564392864082094,0.0,0.12718325332896427,99.87281674667103,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,2,700271.7301170658,1932,-92.85328496571077,-52.43121504724479,0.0,0.7303876377220406,99.26961236227795,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,3,741810.5066725342,1802,-122.04294594945686,-72.31066184075802,0.0,1.0126962948738236,98.98730370512617,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,4,729690.0912578581,1789,-38.21836557202911,-23.886480087863593,0.0,0.32937516688389173,99.67062483311611,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,5,750681.3934420189,2270,-302.0603039573712,-153.93371436004594,0.0,2.1750450204966696,97.82495497950333,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,6,766985.183116965,2240,-14.13138097340949,-8.168428259601837,0.0,0.09041352767377439,99.90958647232623,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,7,723255.7716970975,1854,-0.03692169971617327,-0.019850377735216734,0.0,0.00022274558871948857,99.99977725441128,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,8,848300.9684052942,2261,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,9,811123.0518897669,2262,-244.64373433883353,-156.46144568764467,0.0,1.5789264912246046,98.4210735087754,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,10,716186.5051731113,2006,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,11,847379.7891520336,2033,-247.34353557375815,-142.9730606297367,0.0,1.719501752172215,98.28049824782778,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,12,978775.8286819002,2558,-344.05926123677193,-190.9510537181847,0.0,2.2492529703141853,97.75074702968581,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,13,834526.6040103128,2201,-386.73565041914964,-223.84877770618036,0.0,2.7585831881725604,97.24141681182743,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,14,788385.7675878806,2254,-335.50427619381054,-176.6584534917416,0.0,2.406964232590524,97.59303576740948,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,15,841119.8949293103,2243,-229.16112602103829,-143.35697174199933,0.0,1.7897679365205894,98.21023206347941,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,16,835530.4438636545,2658,-195.4119607124256,-122.1290719237214,0.0,1.576328156835224,98.42367184316477,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,17,844398.4606348188,1967,-251.78170828530216,-125.17709410876391,0.0,2.1938036291552634,97.80619637084473,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,18,811002.5506070238,1666,-1347.1511186574926,-868.2527659067426,0.0,10.012943959834306,89.9870560401657,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,19,801635.4842682723,1365,-876.518470922619,-551.8154126743347,0.0,6.2031460419251445,93.79685395807485,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,20,815398.619888993,1582,-402.1324346519197,-198.80825903408405,0.0,3.3474226734179644,96.65257732658203,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,21,820600.1872781632,1367,-622.147721268741,-365.4422254623548,0.0,5.055188017470742,94.94481198252926,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,22,834893.987683367,1270,-369.26030431891553,-258.2437978380921,0.0,3.777032667991287,96.22296733200871,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,23,856439.3087733146,1412,-434.7147733352871,-337.4595408440969,0.0,4.167804401124608,95.83219559887539,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,24,865029.4662953946,1485,-745.1707147396786,-372.5087291507884,0.0,4.901661414244736,95.09833858575526,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,25,797163.4784682854,1343,-190.40007551366782,-114.28286517295822,0.0,1.5629080275324332,98.43709197246757,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,26,996535.1210458446,1245,-235.77231943992075,-136.10800388261742,0.0,1.682138501693601,98.3178614983064,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,27,887520.924682064,1357,-52.96104169788399,-29.081403337479237,0.0,0.6733275861756478,99.32667241382435,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,28,958356.122151142,1405,-6.921176138281414,-4.072217019873076,0.0,0.1717908330114654,99.82820916698853,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,29,888312.0423452733,1490,-45.315443705939735,-25.711040375991946,0.0,0.3601914889948364,99.63980851100517,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,30,920924.8086779676,1530,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,31,845926.5447541773,1532,-87.35251341969901,-54.26777790148968,0.0,0.5645333924383443,99.43546660756165,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,32,974567.4208624046,1655,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,33,1000250.5842152014,1954,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,34,983360.1264831247,2132,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,35,926270.644970593,2076,-22.671103471215563,-15.011733456467372,0.0,0.15519643279494102,99.84480356720505,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,36,1052358.3184064887,2307,-291.4953951595287,-169.40474102850382,0.0,2.147320020092734,97.85267997990726,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,37,814472.9860223923,2346,-135.13876924518095,-65.6015058458831,0.0,0.8646741261823611,99.13532587381764,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,38,1022938.7985752746,2273,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,39,1050019.0124899326,2516,-62.9441731701947,-32.63086197454029,0.0,0.5933129767187498,99.40668702328125,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,40,949290.0889223199,2321,-62.12597326549332,-49.04011939380457,0.0,0.7064190194602603,99.29358098053974,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,41,989585.2269956339,2075,-128.08486941107117,-84.0567169312046,0.0,1.05830871399298,98.94169128600701,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,42,948181.1510802573,2437,-317.81086010220275,-198.51638946342825,0.0,2.072467229853766,97.92753277014623,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,43,834333.3180580977,2304,-275.2149523064302,-143.90790859416205,0.0,1.8872090998571487,98.11279090014285,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,44,893101.2098776158,2384,-85.00480283543052,-58.3928712449658,0.0,0.5064913185100965,99.4935086814899,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,45,797962.6066722358,2263,-81.40595743723819,-51.26078220513489,0.0,0.6165203880416446,99.38347961195836,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,46,759997.3846349204,2546,-50.402464727838925,-37.896590351204296,0.0,0.35558231677151336,99.64441768322848,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,47,865144.9077679114,2199,-331.3190042399891,-240.92652884759255,0.0,2.7566803468734884,97.24331965312652,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,48,868511.1676551243,2415,-229.33967824837302,-112.63656732472752,0.0,1.3454254345422691,98.65457456545774,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,49,929941.0971106407,2556,-40.92792718421758,-32.247906249705395,0.0,0.3839152664916656,99.61608473350833,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,50,892736.7755159889,2476,-526.4433554804417,-284.52165174066573,0.0,3.8789635362526482,96.12103646374736,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,51,827665.6684209909,2210,-144.51664312546555,-92.42544367897607,0.0,1.1338560940054254,98.86614390599458,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,52,816463.1727441577,2423,-92.25806961588083,-57.480731773531375,0.0,0.8531694353879256,99.14683056461207,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,53,948665.3769270163,2462,-190.78133388767756,-114.46793767698777,0.0,1.7341532264012094,98.26584677359878,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,54,885945.5829012082,2634,-204.84590276551447,-98.91940044356888,0.0,1.561183461606631,98.43881653839337,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,55,860629.7886919109,2402,-200.38837999894767,-125.71873577892248,0.0,1.9678296880441772,98.03217031195582,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,56,992853.8145056493,2554,-116.3399411304358,-71.1428579833712,0.0,1.1588284978140726,98.84117150218593,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,57,818441.1405109409,2457,-162.0905213250751,-105.1794908679909,0.0,2.091275329350724,97.90872467064928,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,58,886050.7976086922,2771,-52.562552824542664,-37.596623931509534,0.0,0.7734529964824802,99.22654700351752,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,59,1070087.6787896613,3277,-209.6831126222654,-159.55737598997473,0.0,1.5142334186831186,98.48576658131688,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,60,888717.7356956908,2684,-91.35755285355809,-55.495015056210036,0.0,0.7495690022910235,99.25043099770897,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,61,850742.5780093698,2972,-111.18259678336292,-80.63229003581736,0.0,1.1004049255043915,98.89959507449561,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,62,1050128.515140175,3107,-115.08360638084,-51.43979141627852,0.0,0.9205016434577906,99.0794983565422,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,63,806537.4198394762,2664,-4.231195559894703,-3.181350843996416,0.0,0.020481158427237044,99.97951884157277,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,64,819760.0659050411,2892,-162.91113655750263,-84.29062664373507,0.0,1.0705682317615615,98.92943176823844,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,65,781248.8126165653,2981,-367.7102650804671,-165.37100181421857,0.0,1.964964189791012,98.035035810209,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,66,792135.5617015567,2673,-196.8236739758283,-100.60817294022411,0.0,1.2310308659412117,98.76896913405879,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,67,715437.7190184239,2361,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,68,691996.0477281725,2314,-1.2024665597667932,-0.7243766678874287,0.0,0.018188944000268225,99.98181105599974,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,69,738617.9137219954,2191,-53.86813491101777,-40.33396745114185,0.0,0.5643276140673965,99.4356723859326,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,70,525595.7434387607,2181,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,71,631665.508042099,2326,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,72,624001.2331350744,2202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,73,644848.6063001007,2142,-0.3918685646478567,-0.29463809616106595,0.0,0.005946055726697271,99.9940539442733,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,74,693458.1968962597,1936,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,75,614950.0637380341,2217,-5.188758938729167,-3.9013208581810415,0.0,0.04697379961710104,99.9530262003829,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,76,634882.9434514195,2353,-7.486841545767604,-5.629202780931215,0.0,0.04526391606023488,99.95473608393976,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,77,663348.2758219712,2177,-5.144533684790336,-3.8680714111174344,0.0,0.02490218377783289,99.97509781622217,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,78,576216.1839649584,2024,-5.53755296863866,-4.163571897430169,0.0,0.05013142961342198,99.94986857038658,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,79,494400.5101192286,1623,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,80,370120.2972694067,1348,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,81,425064.2350950595,1202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,82,427443.90535930544,1073,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,83,349618.6684307987,1122,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,84,362769.38674717024,1170,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,85,224761.69741120655,586,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,86,202864.06304369867,606,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,87,241061.8099803049,647,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,88,267577.7059172988,584,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,89,217918.39143753238,618,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2029,90+,639561.3536006194,1719,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,0-15,12457524.939504288,32504,-227.37363501098437,-129.34387447539305,0.0,1.544409978093378,98.45559002190663,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,16-24,7503640.831036154,14772,-854.634452521662,-525.8067057327979,0.0,6.396946258401363,93.60305374159864,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,25-34,9276049.44892494,15643,-105.00218661102538,-60.46603366658393,0.0,0.790665401632496,99.2093345983675,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,35-49,13736363.201355431,35018,-170.88416566770292,-103.61180821839578,0.0,1.2245240417170498,98.77547595828295,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,50-64,13448964.683635626,39985,-261.7555277959518,-156.08716071223313,0.0,2.0473400097645658,97.95265999023543,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,65+,13585443.761409868,44376,-38.591651100837765,-19.581085248465513,0.0,0.23321800126055361,99.76678199873945,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,all,70007986.8658663,182298,-237.27779416225215,-141.50004084141602,0.0,1.744053075933236,98.2559469240667,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,0,664821.0646332884,1394,-65.73058922722824,-42.455090474891946,0.0,0.5460303003023438,99.45396969969765,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,1,686514.5472785085,1405,-13.788221869055443,-10.01857337939262,0.0,0.14314902243297606,99.85685097756702,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,2,702022.4095008112,1932,-94.89629069871555,-53.584827449637196,0.0,0.7303876246625856,99.26961237533742,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,3,743665.0313415444,1802,-372.2554891392839,-216.98101951469965,0.0,2.5623687223302305,97.43763127766977,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,4,731514.316106745,1789,-41.1617776488074,-26.067555710627126,0.0,0.3442464425615578,99.65575355743844,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,5,752558.0992830247,2270,-553.3022855127981,-298.70557143680907,0.0,3.7062938345868197,96.29370616541318,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,6,768902.6471386533,2240,-16.44256943911929,-9.923162606538751,0.0,0.1045616640020453,99.89543833599795,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,7,725063.9121136004,1854,-189.58083804889176,-101.92517751874422,0.0,1.1190419233173547,98.88095807668265,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,8,850421.7207130687,2261,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,9,813150.86241889,2262,-316.1251919218933,-195.4417489482864,0.0,1.8885398715843893,98.1114601284156,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,10,717976.97158763,2006,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,11,849498.2418111488,2033,-252.79108774622063,-146.12194030232084,0.0,1.7196000812440067,98.28039991875599,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,12,981222.7679426605,2558,-367.8226466742666,-203.85849583817875,0.0,2.249252945629986,97.75074705437001,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,13,836612.9235674758,2201,-468.97214566615423,-270.61923511093346,0.0,3.274210849790956,96.72578915020904,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,14,790356.7304992611,2254,-455.2291370682324,-233.5138216075553,0.0,3.2084600718557565,96.79153992814425,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,15,843222.6935679782,2243,-301.7364627989952,-187.11668362475285,0.0,2.3108857366317666,97.68911426336824,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,16,837619.2684752,2658,-313.9626554025654,-181.12198427371345,0.0,2.6260298483680113,97.37397015163198,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,17,846509.4591125995,1967,-485.4797205822174,-241.42040086204713,0.0,4.24932354049656,95.75067645950344,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,18,813030.0563732181,1666,-1420.385751941715,-913.560880264553,0.0,10.398675207376652,89.60132479262334,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,19,803639.5729460269,1365,-1756.5950752322817,-1134.3174505727127,0.0,11.794047377349631,88.20595262265036,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,20,817437.1165498309,1582,-714.8312394791701,-374.32930262825977,0.0,5.268811319252385,94.73118868074761,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,21,822651.6878131703,1367,-888.8865564645095,-569.89972064254,0.0,6.3586801669964315,93.64131983300356,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,22,836981.2234123126,1270,-807.8381843920323,-532.5319117834281,0.0,7.1414410431405395,92.85855895685945,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,23,858580.4060437763,1412,-501.20272476462054,-377.8247965701343,0.0,4.552182764136095,95.44781723586391,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,24,867192.0403100192,1485,-865.3194738560991,-449.86816602381253,0.0,5.589897694722698,94.4101023052773,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,25,799156.3822734114,1343,-500.0802960285964,-301.9329699193792,0.0,3.685134769199171,96.31486523080083,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,26,999026.4645837862,1245,-242.61750071600966,-140.19767679132596,0.0,1.732028720619159,98.26797127938084,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,27,889739.7214166392,1357,-76.87838677745121,-39.528212376477654,0.0,0.874867919207809,99.12513208079218,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,28,960752.0107502863,1405,-68.01882295298437,-34.79183553611917,0.0,0.5318021858736677,99.46819781412634,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,29,890532.8206203636,1490,-137.57488111560193,-71.75191548103949,0.0,1.0002766140017698,98.99972338599822,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,30,923227.1201805174,1530,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,31,848041.3576884903,1532,-89.28325024964587,-55.4683875171644,0.0,0.564590331020955,99.43540966897905,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,32,977003.8343729004,1655,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,33,1002751.2094135955,1954,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,34,985818.5276249489,2132,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,35,928586.3254171005,2076,-23.169934948199202,-15.342033748277538,0.0,0.1551964366763099,99.8448035633237,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,36,1054989.218036253,2307,-297.9087243650245,-173.1319376095754,0.0,2.1473201342360717,97.85267986576393,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,37,816509.1705278521,2346,-138.1121760851382,-67.04491400909832,0.0,0.8646741402097329,99.13532585979027,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,38,1025496.1449818918,2273,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,39,1052644.0610482516,2516,-64.32908291421661,-33.34882276404303,0.0,0.5933129732085258,99.40668702679147,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,40,951663.3189942017,2321,-68.0199662566548,-54.63949211187022,0.0,0.8077817347786123,99.19221826522138,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,41,992059.1948588807,2075,-130.94104769585823,-85.93476252373806,0.0,1.0583086925318448,98.94169130746816,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,42,950551.6002006074,2437,-412.2895383558998,-246.65508485487155,0.0,2.818749254432238,97.18125074556777,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,43,836419.1511828713,2304,-287.9183699198395,-150.41494518866992,0.0,1.946097605996941,98.05390239400306,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,44,895333.9635705389,2384,-135.6289097334432,-94.05068990745771,0.0,0.7622610621542196,99.23773893784578,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,45,799957.5124054132,2263,-115.07932360404895,-71.59522612325749,0.0,0.885357937726356,99.11464206227365,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,46,761897.3778973678,2546,-81.84992977024079,-61.54129093227226,0.0,0.481369580254299,99.5186304197457,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,47,867307.7704183739,2199,-350.1727093381362,-254.918975472173,0.0,2.83850514294721,97.16149485705279,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,48,870682.4429765828,2415,-252.7774908871411,-127.14168451253322,0.0,1.476792018015754,98.52320798198426,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,49,932265.948839244,2556,-218.85384310584232,-127.45619338931405,0.0,1.5548306867408372,98.44516931325916,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,50,894968.6188149988,2476,-596.2456728433558,-325.73999324499346,0.0,4.3129902150128245,95.68700978498718,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,51,829734.8316096319,2210,-429.6281779776196,-257.957138677694,0.0,2.9710311729996532,97.02896882700036,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,52,818504.33112856,2423,-115.19890968333335,-73.61937850695845,0.0,1.075526173440338,98.92447382655966,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,53,951037.0421622312,2462,-441.209651028968,-260.682878886784,0.0,3.311554477966759,96.68844552203323,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,54,888160.4485685276,2634,-434.39344983596806,-226.01239619488985,0.0,2.994812675126038,97.00518732487396,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,55,862781.3636104548,2402,-306.18990091296007,-195.2503981908194,0.0,2.7908426635084784,97.20915733649153,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,56,995335.949568063,2554,-186.73845412304217,-117.16362595850772,0.0,1.715058035695973,98.28494196430402,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,57,820487.2454507686,2457,-275.0401992091161,-166.66206633923662,0.0,2.716843262807224,97.28315673719278,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,58,888265.9260372296,2771,-166.51474826186316,-110.88544577747726,0.0,1.644158018553708,98.35584198144629,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,59,1072762.894963582,3277,-277.36314457099934,-197.95808651967985,0.0,2.0320205043329302,97.96797949566707,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,60,890939.5325179696,2684,-127.24332627952927,-82.17230638876855,0.0,0.9718630808724051,99.02813691912759,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,61,852869.4351000506,2972,-228.29595840769306,-149.75212146223743,0.0,1.8066272957031078,98.19337270429689,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,62,1052753.834620365,3107,-152.80764020028616,-73.7460090585093,0.0,1.1700384159576858,98.82996158404231,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,63,808553.7615260435,2664,-4.324294318672219,-3.2513492730312468,0.0,0.020481159012106523,99.9795188409879,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,64,821809.4679571511,2892,-166.62246833444922,-86.22815857688177,0.0,1.0713172165649054,98.9286827834351,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,65,783201.934132061,2981,-376.2166473704299,-169.24645355552215,0.0,1.9677746076589921,98.032225392341,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,66,794115.9019829761,2673,-204.97442915879108,-105.08483075135976,0.0,1.2582201186499353,98.74177988135007,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,67,717226.3126747683,2361,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,68,693726.040424672,2314,-1.2289218575874112,-0.7403144518118474,0.0,0.01818894418083237,99.98181105581916,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,69,740464.4604325127,2191,-55.173132180764384,-41.311464875282915,0.0,0.5661929372490264,99.43380706275097,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,70,526909.7326777326,2181,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,71,633244.6721667945,2326,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,72,625561.2369850501,2202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,73,646460.7288818415,2142,-0.6217146768653463,-0.46745488374314886,0.0,0.008781772788245778,99.99121822721176,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,74,695191.8419399736,1936,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,75,616487.440191891,2217,-13.287400939397397,-9.990524917406884,0.0,0.11770097443039854,99.8822990255696,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,76,636470.1518140035,2353,-7.6515722209920884,-5.753062193012768,0.0,0.04526391512436471,99.95473608487563,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,77,665006.6496884525,2177,-5.2577285339118855,-3.953179544860168,0.0,0.024902184312607958,99.97509781568739,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,78,577656.7247909941,2024,-14.180594530248491,-10.662098904386365,0.0,0.12561296237127936,99.87438703762872,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,79,495636.510767729,1623,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,80,371045.5980732329,1348,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,81,426126.8965085875,1202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,82,428512.5140837636,1073,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,83,350492.716175911,1122,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,84,363676.311346977,1170,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,85,225323.60030047875,586,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,86,203371.22341872193,606,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,87,241664.4647327941,647,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,88,268246.6515791165,584,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,89,218463.18797226623,618,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2030,90+,641160.2576665655,1719,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,0-15,12487422.991360318,32504,-237.5091876841059,-135.49356251713522,0.0,1.5919676627341122,98.40803233726588,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,16-24,7521649.577675684,14772,-977.8150712042982,-622.7702072263725,0.0,7.178770789578123,92.82122921042188,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,25-34,9298311.985021843,15643,-111.04979850471713,-64.37509592923315,0.0,0.8197556089723272,99.18024439102767,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,35-49,13769330.465612326,35018,-186.3947527832497,-114.13733970976955,0.0,1.3427306196376954,98.6572693803623,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,50-64,13481242.204942245,39985,-281.9661239962722,-168.5206444142564,0.0,2.1534784939515386,97.84652150604846,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,65+,13618048.819140285,44376,-39.90295518135854,-20.29706044793724,0.0,0.25414512543799217,99.74585487456201,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,all,70176006.04375269,182298,-260.2658894593801,-158.09781402928252,0.0,1.8878125196442817,98.11218748035574,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,0,666416.6338531338,1394,-67.74148472144034,-43.80228741286781,0.0,0.5460958673865358,99.45390413261347,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,1,688162.1802925374,1405,-15.96193484401371,-12.108926935545657,0.0,0.16126466126593586,99.83873533873407,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,2,703707.2640535124,1932,-121.88006088233637,-75.70892150423346,0.0,0.9482575240530503,99.05174247594695,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,3,745449.8255744223,1802,-379.6996218163625,-221.32008900333696,0.0,2.5623686732331405,97.43763132676686,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,4,733269.9516487569,1789,-41.986573767574136,-26.590166266649888,0.0,0.3442581904720179,99.65574180952798,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,5,754364.2366492674,2270,-564.3794149664934,-304.68494429945247,0.0,3.706439519798836,96.29356048020117,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,6,770748.0139329024,2240,-16.772993153000414,-10.122873102456884,0.0,0.10457285460026655,99.89542714539972,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,7,726804.0669620112,1854,-225.06740264547292,-121.00129207561258,0.0,1.2895283797375579,98.71047162026244,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,8,852462.7333606128,2261,-13.101176758757893,-7.572938206009146,0.0,0.12877589605159034,99.8712241039484,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,9,815102.4231025195,2262,-322.4628502032398,-199.3563254792893,0.0,1.888677770519882,98.11132222948011,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,10,719700.1164678168,2006,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,11,851537.0370215941,2033,-261.9035951482771,-151.22546804030358,0.0,1.8053103736356053,98.1946896263644,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,12,983577.7007372603,2558,-386.5610273220497,-214.51119211079967,0.0,2.361088590087908,97.63891140991208,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,13,838620.7933871988,2201,-478.44159166318354,-276.072813042469,0.0,3.274739403840865,96.72526059615913,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,14,792253.5868971422,2254,-464.46753722894385,-238.24947835213365,0.0,3.210506416034408,96.7894935839656,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,15,845246.4274196308,2243,-309.30916972213953,-191.7855011223408,0.0,2.3216171525405933,97.67838284745942,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,16,839629.558196119,2658,-314.51699719621826,-181.27861226657666,0.0,2.626029816589858,97.37397018341014,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,17,848541.0818631211,1967,-517.8624218279309,-259.74127535058966,0.0,4.495351189494847,95.50464881050516,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,18,814981.3275266718,1666,-1470.995188713235,-945.3053658529066,0.0,10.594523668390424,89.40547633160958,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,19,805568.3063778151,1365,-1793.8983930085885,-1158.2715194074185,0.0,11.79428520778524,88.20571479221476,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,20,819398.9637726331,1582,-843.6583602184214,-461.6000663574398,0.0,6.286879649162971,93.71312035083703,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,21,824626.0544052003,1367,-1009.0147736693078,-655.9946676416986,0.0,7.360377258142455,92.63962274185754,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,22,838989.9792438783,1270,-921.2740027919405,-600.7087007972985,0.0,7.775732450444939,92.22426754955507,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,23,860641.0015057977,1412,-864.1620847886438,-755.4897802088209,0.0,6.509886245952258,93.49011375404774,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,24,869273.3047844479,1485,-1112.7801424846668,-615.2256362839089,0.0,7.470511689653435,92.52948831034657,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,25,801074.3639823901,1343,-512.4658925603293,-309.4077748574601,0.0,3.7002615201112303,96.29973847988877,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,26,1001424.1293669678,1245,-249.64400288647897,-144.38528122714797,0.0,1.7465154917483077,98.25348450825169,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,27,891875.1037278585,1357,-78.41584245101055,-40.31870422528982,0.0,0.8748679261183014,99.1251320738817,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,28,963057.8161798213,1405,-69.38324097977832,-35.491086843943826,0.0,0.5318475775416138,99.46815242245839,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,29,892670.0973736895,1490,-140.84147979912174,-73.55492865868206,0.0,1.0002766249827084,98.9997233750173,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,30,925442.8654808123,1530,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,31,850076.6610919461,1532,-115.75709238111187,-75.14032310758449,0.0,0.7222753650009216,99.27772463499907,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,32,979348.6409550235,1655,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,33,1005157.8116393164,1954,-11.11095672807528,-6.422521446793541,0.0,0.10921335044898632,99.89078664955102,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,34,988184.4952240176,2132,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,35,930814.9315572046,2076,-23.633276185882185,-15.64883871059015,0.0,0.15519643388912605,99.84480356611087,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,36,1057521.1889572572,2307,-303.86608664034856,-176.5942245703786,0.0,2.1473200057574986,97.8526799942425,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,37,818468.7927123988,2346,-149.31646329531844,-72.92455524674611,0.0,1.0430207261697575,98.95697927383024,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,38,1027957.3358265767,2273,-0.012599602820429821,-0.0048647123388199645,0.0,0.00010942023096585781,99.99989057976903,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,39,1055170.404455522,2516,-68.24744333936516,-35.600162429984444,0.0,0.7220252669361427,99.27797473306386,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,40,953947.3107798155,2321,-69.34563207604116,-55.71132346345094,0.0,0.8077817438493496,99.19221825615065,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,41,994440.1307721101,2075,-133.47260906914556,-87.58531635061443,0.0,1.0584192442548446,98.94158075574515,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,42,952832.9221803322,2437,-445.10053068384406,-266.361661169818,0.0,2.9911372312836297,97.00886276871637,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,43,838426.557678692,2304,-303.7356134617047,-163.47245834019228,0.0,2.043658387102507,97.95634161289749,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,44,897482.7652419321,2384,-157.65089351456913,-112.0211822139158,0.0,0.9299038547643665,99.07009614523562,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,45,801877.4104922675,2263,-117.3806192936317,-73.02696124400843,0.0,0.8853579133451681,99.11464208665484,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,46,763725.9339611623,2546,-83.4867374494181,-62.77196635411203,0.0,0.4813695946443973,99.5186304053556,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,47,869389.3076601988,2199,-441.9706411169968,-323.7726414697893,0.0,3.66153481352435,96.33846518647566,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,48,872772.0818840591,2415,-270.4601049466793,-136.95416034711818,0.0,1.6025713441554217,98.39742865584458,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,49,934503.3914527968,2556,-247.86746072071907,-143.2507692471046,0.0,1.687305065885808,98.31269493411419,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,50,897116.5447297841,2476,-603.1315964737352,-329.1948149145918,0.0,4.313965547274087,95.6860344527259,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,51,831726.1929285098,2210,-432.82262916929636,-259.8687295278251,0.0,2.9728982297049975,97.027101770295,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,52,820468.7401137897,2423,-117.16966456799135,-74.90514904883156,0.0,1.0755676644496863,98.92443233555032,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,53,953319.527615984,2462,-491.73036004170405,-289.51885412771543,0.0,3.588564558364746,96.41143544163525,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,54,890292.0322274575,2634,-442.6703646322672,-230.38321540509074,0.0,2.99676593564872,97.00323406435129,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,55,864852.0374744274,2402,-312.2658875961079,-199.1159552344672,0.0,2.791012493645868,97.20898750635413,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,56,997724.7559571317,2554,-244.66038504158016,-155.82224089646172,0.0,2.0713820938158665,97.92861790618413,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,57,822456.4157135691,2457,-285.8172006387015,-173.15844268149104,0.0,2.7508462978033283,97.24915370219666,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,58,890397.7659211932,2771,-231.7679761317126,-150.94903037150334,0.0,2.070360674823396,97.92963932517661,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,59,1075337.5310265943,3277,-332.4064253638593,-232.18360019925709,0.0,2.3736547798166314,97.62634522018337,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,60,893077.7878187066,2684,-135.8192401000962,-88.08558312914194,0.0,1.0074407208141856,98.99255927918581,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,61,854916.3238405548,2972,-232.8226491159013,-152.7235147178164,0.0,1.8066273205033303,98.19337267949668,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,62,1055280.4467411917,3107,-155.5707633080684,-75.11458799054913,0.0,1.1701886515157065,98.8298113484843,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,63,810494.2908049328,2664,-4.410770418671582,-3.316369511048658,0.0,0.020481158724063246,99.97951884127593,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,64,823781.8120284183,2892,-169.98074437533603,-87.97843254543066,0.0,1.071533516289406,98.9284664837106,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,65,785081.6180711817,2981,-383.83618953081304,-172.67486264498316,0.0,1.9683319019563301,98.03166809804367,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,66,796021.780171983,2673,-211.14355588173322,-108.41950252307457,0.0,1.2725452526551868,98.72745474734481,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,67,718947.6561813978,2361,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,68,695390.9821390901,2314,-5.233514338553108,-3.152720590260099,0.0,0.21333598451009206,99.78666401548992,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,69,742241.5750224013,2191,-60.005251184060164,-44.383856767009206,0.0,0.7490222042594287,99.25097779574057,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,70,528174.3162566684,2181,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,71,634764.4603132587,2326,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,72,627062.5836165268,2202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,73,648012.2341405284,2142,-0.7717228505098137,-0.5802426369777359,0.0,0.011465344406279707,99.98853465559372,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,74,696860.2995326314,1936,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,75,617967.0102973785,2217,-13.553117149748214,-10.190312995562602,0.0,0.11770097297846452,99.88229902702153,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,76,637997.6787676411,2353,-7.804583608549041,-5.868108311641337,0.0,0.04526391182101668,99.95473608817899,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,77,666602.665850359,2177,-5.3628712057792844,-4.0322349318474995,0.0,0.024902183962536528,99.97509781603746,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,78,579043.1016270835,2024,-14.464172462646763,-10.875316946471335,0.0,0.1256129607212511,99.87438703927874,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,79,496826.03826431744,1623,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,80,371936.1070941109,1348,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,81,427149.5986107625,1202,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,82,429540.9433447849,1073,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,83,351333.89916479867,1122,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,84,364549.1338655688,1170,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,85,225864.3762919223,586,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,86,203859.3136138022,606,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,87,242244.46086147614,647,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,88,268890.4450999955,584,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,89,218987.49874336272,618,0.0,0.0,0.0,0.0,100.0,0.0
+milburn_report_package_phased,"Health element and PIP removal from April 2029, phased as claimants are reassessed",2031,90+,642699.0421972526,1719,0.0,0.0,0.0,0.0,100.0,0.0

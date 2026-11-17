@@ -90,8 +90,11 @@ work" (no flag in the data); claim dates; new-style ESA.
 
 State with any figure: per the modifier's docstring
 (`pip_removed_ages_18_to_24.py:33-37`) and the analysis note, the engine's
-passports (Carer's Allowance, disability premia, benefit cap and non-dependant
-exemptions) follow the PIP amounts; `has_enhanced_pip_dl_award` in the engine
+passports (disability premia, the UC disabled child additions, the education
+and shared accommodation exceptions, benefit cap and non-dependant
+exemptions) follow the PIP amounts; Carer's Allowance and the UC carer element
+do not (policyengine-uk 2.177.7 does not link a carer's entitlement to the
+cared-for person's PIP: `cares_for_severely_disabled_person` defaults to true); `has_enhanced_pip_dl_award` in the engine
 reads the amount against the enhanced rate, which confirms it for the premia.
 So a stand-in paid through `pip_dl`/`pip_m` keeps or loses them by amount. Whether
 the real allowance passports is the report's call and moves the saving by

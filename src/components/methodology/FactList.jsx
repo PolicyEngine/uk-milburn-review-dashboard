@@ -75,6 +75,7 @@ const TERM_ICONS = {
   "Small samples at 16 and 17": Users,
   "Few young claimant households": Users,
   "Overlapping losses": Layers,
+  "Carer's Allowance and PIP": HeartPulse,
   "Caseloads against published counts": Users,
   "No replacement in the upper bound": CircleSlash,
   // The limits against the final report's design (MethodologyTab.jsx)

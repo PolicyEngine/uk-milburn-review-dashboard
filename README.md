@@ -41,7 +41,10 @@ The report's measures, from April 2029, when the report's welfare savings start 
 | `milburn_report_package_phased` | The package phased in: new 18-year-olds at once, existing claimants at an assumed 45% a year (about 95% within five years, para 773) | £2.77bn saving | 341,000 |
 | `milburn_report_employer_nics_threshold_glide_path` | The NI threshold in assumed equal steps, £6,000 in 2027-28 to £10,000 in 2031-32 | £0.14bn cost | 766,000 |
 | `milburn_report_youth_allowance_work_allowance` | Illustrative: a work allowance for every under-25 UC claim (para 749 gives no amount), at the current UC work allowance amounts, the lower with a housing element: our assumption | £0.46bn cost | 422,000 |
-| `milburn_report_child_dla_to_18` | Child DLA extended to 18 (para 760): PIP at 16 and 17 swapped for DLA at the equivalent level, whose rates are equal; the effect of avoiding reassessment at 16 is not estimated | £0.00bn | 0 |
+| `milburn_report_youth_allowance_combined` | Our combination: the higher Youth Allowance and the illustrative work allowance, simulated together (separately −£0.13bn and −£0.46bn) | £0.63bn cost | 548,000 |
+| `milburn_report_package_with_youth_allowance` | Our combination: the health element and PIP removal plus both Youth Allowance changes, simulated together; no replacement payments modelled | £4.05bn saving | 1,043,000 |
+
+Child DLA extended to 18 (para 760) is listed as not computable: DLA and PIP pay the same amounts, so the swap changes no payment, and its effect on reassessment at 16 is not in the data (its reserved run, `milburn_report_child_dla_to_18`, is all zeros and is not published).
 
 Comparators modelled before the report (from April 2027): `pip_halved_under_25` (a stand-in for the Additional Cost Allowance, whose rates the report does not set) and `employer_nics_zero_under_25` (the option the report considers and does not propose, para 268). The other pre-report runs stay in `public/data/milburn/` and load by link, but the selector does not offer them.
 
@@ -87,7 +90,7 @@ HOUSEHOLD_MODAL_APP=uk-milburn-household uv run --with modal modal deploy src/uk
 uv run --with modal modal app stop -y uk-milburn-household          # stop it
 ```
 
-Then build the page with `NEXT_PUBLIC_HOUSEHOLD_API_URL=https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact` (the URL follows the production app's label pattern; check it in the deploy's output).
+Then build the page with `NEXT_PUBLIC_HOUSEHOLD_API_URL=https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact` (the URL follows the production app's label pattern; check it in the deploy's output). Without the variable the build passes with a warning: the tab shows the stored examples only and says custom households are not available yet.
 
 Tests and lint: `bunx vitest run --pool=forks`, `bunx eslint src`, `.venv/bin/pytest tests/test_milburn_design.py tests/test_milburn_measures.py -n 2`.
 

@@ -295,6 +295,8 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
       /MILBURN_POLICY_DETAILS\.push\(\n  \{\n    id: "milburn_report_youth_allowance_independent"[\s\S]*?\n\);/,
       // Child DLA to 18, and the work allowance at an assumed amount
       /MILBURN_POLICY_DETAILS\.push\(\n  \{\n    id: "milburn_report_child_dla_to_18"[\s\S]*?\n\);/,
+      // Our combined runs: the two Youth Allowance changes, and those with the package
+      /MILBURN_POLICY_DETAILS\.push\(\n  \{\n    id: "milburn_report_youth_allowance_combined"[\s\S]*?\n\);/,
     ],
     // The Milburn review: the measures listed as not computable, in the
     // registry's own words

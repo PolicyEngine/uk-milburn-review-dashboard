@@ -36,7 +36,7 @@
     {
       "id": "pip_removed_under_25",
       "name": "PIP removed for 18 to 24-year-olds",
-      "description": "From April 2027 people aged 18 to 24 receive neither component of Personal Independence Payment; 16 and 17-year-olds keep it and Disability Living Allowance for children is unchanged. Entitlements that depend on receiving PIP go with it. Scottish recipients of Adult Disability Payment, which the data record as PIP, are included.",
+      "description": "From April 2027 people aged 18 to 24 receive neither component of Personal Independence Payment; 16 and 17-year-olds keep it and Disability Living Allowance for children is unchanged. Universal Credit amounts that depend on receiving PIP go with it; Carer's Allowance is not linked to PIP in the model and does not change. Scottish recipients of Adult Disability Payment, which the data record as PIP, are included.",
       "status": "computable",
       "first_year": 2027
     },
@@ -71,7 +71,7 @@
     {
       "id": "pip_halved_under_25",
       "name": "PIP at half rate for 18 to 24-year-olds",
-      "description": "From April 2027 people aged 18 to 24 receive half their current Personal Independence Payment. This is an illustrative stand-in for the report's Additional Cost Allowance, for which the report gives no rates; Scottish Adult Disability Payment, recorded as PIP, is included. Half an award can fall below the amounts that qualify a carer for Carer's Allowance or a household for disability premia, so those can be lost too; a new allowance could carry its own qualifying rules.",
+      "description": "From April 2027 people aged 18 to 24 receive half their current Personal Independence Payment. This is an illustrative stand-in for the report's Additional Cost Allowance, for which the report gives no rates; Scottish Adult Disability Payment, recorded as PIP, is included. Half an award can fall below the amounts that some disability rules read, such as severe disability status, so those can be lost too; a new allowance could carry its own qualifying rules. Carer's Allowance is not linked to PIP in the model and does not change.",
       "status": "computable",
       "first_year": 2027
     },
@@ -113,7 +113,7 @@
     {
       "id": "milburn_report_pip",
       "name": "PIP removed for 18 to 24-year-olds",
-      "description": "From April 2029 people aged 18 to 24 receive neither component of Personal Independence Payment; 16 and 17-year-olds keep it and Disability Living Allowance for children is unchanged. Entitlements that depend on receiving PIP go with it. Scottish recipients of Adult Disability Payment, which the data record as PIP, are included.",
+      "description": "From April 2029 people aged 18 to 24 receive neither component of Personal Independence Payment; 16 and 17-year-olds keep it and Disability Living Allowance for children is unchanged. Universal Credit amounts that depend on receiving PIP go with it; Carer's Allowance is not linked to PIP in the model and does not change. Scottish recipients of Adult Disability Payment, which the data record as PIP, are included.",
       "status": "computable",
       "first_year": 2029
     },
@@ -146,18 +146,25 @@
       "first_year": 2027
     },
     {
-      "id": "milburn_report_child_dla_to_18",
-      "name": "Child Disability Living Allowance extended to 18",
-      "description": "From April 2029, 16 and 17-year-olds stay on child Disability Living Allowance (DLA) instead of moving to Personal Independence Payment (PIP) at 16 (report para 760). Modelled as a swap at the equivalent award level: PIP daily living at the standard or enhanced rate becomes the DLA care component at the middle or highest rate, and PIP mobility at the standard or enhanced rate becomes DLA mobility at the lower or higher rate. Each pair has the same weekly amount, so awards do not change in the model. The data do not record who would keep, lose or change an award without the reassessment at 16, so that effect is not estimated. Scottish records are left as they are: Child Disability Payment is already paid to 18.",
-      "status": "computable",
-      "first_year": 2027
-    },
-    {
       "id": "milburn_report_youth_allowance_work_allowance",
       "name": "Work allowance for under-25s in work (illustrative)",
       "description": "From April 2029 every Universal Credit claim in which all claimants are under 25 has a work allowance: earnings below it do not reduce the award. The report proposes a work allowance for everyone on the Youth Allowance who is in employment (para 749) and gives no amount. The amount here is our assumption: the current Universal Credit work allowance, the lower rate for claims with a housing costs element and the higher rate for those without, uprated each year. Claims that already have a work allowance (with a child or limited capability for work) keep it, and the 55% taper and the standard allowance are unchanged.",
       "status": "computable",
       "first_year": 2027
+    },
+    {
+      "id": "milburn_report_youth_allowance_combined",
+      "name": "Higher Youth Allowance and work allowance (illustrative) for under-25s, from April 2029 (combined)",
+      "description": "Our combination of two of the report's Youth Allowance proposals, simulated together with their interactions: the 25-and-over standard allowance for under-25 claims with a housing costs element (the review's proxy for living independently), and a work allowance for every Universal Credit claim in which all claimants are under 25. The report gives no work allowance amount; the current Universal Credit work allowance is our assumption, so the run is illustrative.",
+      "status": "computable",
+      "first_year": 2029
+    },
+    {
+      "id": "milburn_report_package_with_youth_allowance",
+      "name": "Health element and PIP removal with higher Youth Allowance and work allowance (illustrative), from April 2029 (combined)",
+      "description": "Our combination, simulated together with their interactions: UC health element removed for under-25s; PIP removed for 18 to 24-year-olds; the higher Youth Allowance for under-25s living independently; and the illustrative work allowance for under-25s (the current Universal Credit work allowance, our assumption: the report gives no amount). The report's replacement payments are not modelled.",
+      "status": "computable",
+      "first_year": 2029
     },
     {
       "id": "child_dla_to_18",

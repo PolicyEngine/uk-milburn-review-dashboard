@@ -16,7 +16,7 @@
     "milburn_report_uc_health",
     "milburn_report_pip"
    ],
-   "name": "The report's package",
+   "name": "Health element and PIP removal (no replacement awards)",
    "kind": "package",
    "description": "The Universal Credit health element and PIP removed for under-25s, run together. Its two parts are each removal on its own."
   },
@@ -55,6 +55,8 @@
   "Benefit rates, the minimum wage and tax thresholds are the engine's for 2029-30, on the OBR forecast; every award is claimed in full, all year.",
   "The report's replacement payments (such as its additional cost allowance) are not modelled, so nothing is paid in place of the health element or PIP.",
   "Each run is compared with current law for the same household. The Youth Allowance, work allowance and employer National Insurance runs are separate: they are not added to the package or to each other.",
+  "Losing PIP daily living moves a single renter under 35 onto the shared accommodation rate of Local Housing Allowance, so the PIP part of a renter's change can include a fall in the Universal Credit housing element as well as the PIP itself.",
+  "A young person living with their parents holds no TV licence: the parents' household holds it.",
   "Hours, wages (other than the employer National Insurance saving, which the model passes to pay) and housing costs are held fixed; no behavioural response is modelled."
  ],
  "examples": [
@@ -100,8 +102,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 11324.33,
-      "reform": 4363.49,
+      "baseline": 11504.33,
+      "reform": 4543.49,
       "change": -6960.84
      },
      "included": [
@@ -127,17 +129,9 @@
       "combined": -6960.84,
       "sum_of_singles": -6960.84,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
-      {
-       "id": "tv_licence",
-       "label": "TV licence",
-       "baseline": 180.0,
-       "reform": 180.0,
-       "change": 0.0,
-       "group": "tax"
-      },
       {
        "id": "universal_credit",
        "label": "Universal Credit",
@@ -217,8 +211,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 11324.33,
-      "reform": 11324.33,
+      "baseline": 11504.33,
+      "reform": 11504.33,
       "change": 0.0
      },
      "included": [
@@ -237,17 +231,9 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
-      {
-       "id": "tv_licence",
-       "label": "TV licence",
-       "baseline": 180.0,
-       "reform": 180.0,
-       "change": 0.0,
-       "group": "tax"
-      },
       {
        "id": "universal_credit",
        "label": "Universal Credit",
@@ -327,8 +313,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 11324.33,
-      "reform": 11324.33,
+      "baseline": 11504.33,
+      "reform": 11504.33,
       "change": 0.0
      },
      "included": [
@@ -347,17 +333,9 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
-      {
-       "id": "tv_licence",
-       "label": "TV licence",
-       "baseline": 180.0,
-       "reform": 180.0,
-       "change": 0.0,
-       "group": "tax"
-      },
       {
        "id": "universal_credit",
        "label": "Universal Credit",
@@ -437,8 +415,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 11324.33,
-      "reform": 11324.33,
+      "baseline": 11504.33,
+      "reform": 11504.33,
       "change": 0.0
      },
      "included": [
@@ -457,17 +435,9 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
-      {
-       "id": "tv_licence",
-       "label": "TV licence",
-       "baseline": 180.0,
-       "reform": 180.0,
-       "change": 0.0,
-       "group": "tax"
-      },
       {
        "id": "universal_credit",
        "label": "Universal Credit",
@@ -594,7 +564,7 @@
       "combined": -13095.73,
       "sum_of_singles": -13095.73,
       "residual": -0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -711,7 +681,7 @@
       "combined": 1158.35,
       "sum_of_singles": 1158.35,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -828,7 +798,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -945,7 +915,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -1089,7 +1059,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -1206,7 +1176,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -1323,7 +1293,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -1440,7 +1410,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -1555,8 +1525,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 4173.72,
-      "reform": 4173.72,
+      "baseline": 4353.72,
+      "reform": 4353.72,
       "change": 0.0
      },
      "included": [
@@ -1582,17 +1552,9 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
-      {
-       "id": "tv_licence",
-       "label": "TV licence",
-       "baseline": 180.0,
-       "reform": 180.0,
-       "change": 0.0,
-       "group": "tax"
-      },
       {
        "id": "pip",
        "label": "Personal Independence Payment",
@@ -1647,8 +1609,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 4173.72,
-      "reform": 4173.72,
+      "baseline": 4353.72,
+      "reform": 4353.72,
       "change": 0.0
      },
      "included": [
@@ -1667,17 +1629,9 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
-      {
-       "id": "tv_licence",
-       "label": "TV licence",
-       "baseline": 180.0,
-       "reform": 180.0,
-       "change": 0.0,
-       "group": "tax"
-      },
       {
        "id": "pip",
        "label": "Personal Independence Payment",
@@ -1732,8 +1686,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 4173.72,
-      "reform": 4173.72,
+      "baseline": 4353.72,
+      "reform": 4353.72,
       "change": 0.0
      },
      "included": [
@@ -1752,17 +1706,9 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
-      {
-       "id": "tv_licence",
-       "label": "TV licence",
-       "baseline": 180.0,
-       "reform": 180.0,
-       "change": 0.0,
-       "group": "tax"
-      },
       {
        "id": "pip",
        "label": "Personal Independence Payment",
@@ -1817,8 +1763,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 4173.72,
-      "reform": 4173.72,
+      "baseline": 4353.72,
+      "reform": 4353.72,
       "change": 0.0
      },
      "included": [
@@ -1837,17 +1783,9 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
-      {
-       "id": "tv_licence",
-       "label": "TV licence",
-       "baseline": 180.0,
-       "reform": 180.0,
-       "change": 0.0,
-       "group": "tax"
-      },
       {
        "id": "pip",
        "label": "Personal Independence Payment",
@@ -1951,7 +1889,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -2051,7 +1989,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -2151,7 +2089,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -2251,7 +2189,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -2379,7 +2317,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -2490,7 +2428,7 @@
       "combined": 1158.35,
       "sum_of_singles": 1158.35,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -2601,7 +2539,7 @@
       "combined": 3076.33,
       "sum_of_singles": 3076.33,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -2712,7 +2650,7 @@
       "combined": 293.48,
       "sum_of_singles": 293.48,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -2853,7 +2791,7 @@
       "combined": -10944.41,
       "sum_of_singles": -10944.41,
       "residual": -0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -3014,7 +2952,7 @@
       "combined": 1158.35,
       "sum_of_singles": 1158.35,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -3175,7 +3113,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -3336,7 +3274,7 @@
       "combined": 211.3,
       "sum_of_singles": 211.3,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -3527,7 +3465,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -3643,7 +3581,7 @@
       "combined": 1158.35,
       "sum_of_singles": 1158.35,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -3759,7 +3697,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {
@@ -3875,7 +3813,7 @@
       "combined": 0.0,
       "sum_of_singles": 0.0,
       "residual": 0.0,
-      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+      "method": "Each part's change is that measure on its own, with the run's other measures held at current law, against the same current-law household. The run's change switches them all at once. The residual is the run's change minus the sum of the parts: what the measures do together beyond what each does alone."
      },
      "programmes": [
       {

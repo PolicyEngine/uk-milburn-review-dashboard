@@ -86,7 +86,7 @@ function ExampleCards({ examples, value, onChoose, onCustom }) {
                 {changeText(change)}
                 {Math.round(change) !== 0 && <span className="household-card-figure-unit"> a year</span>}
               </span>
-              <span className="milburn-card-caption">Under the report&rsquo;s package</span>
+              <span className="milburn-card-caption">Under the health element and PIP removal</span>
             </span>
             {/* Always there, so every card keeps the same height */}
             <span className={`milburn-card-others${others ? "" : " is-empty"}`} data-others>
@@ -412,7 +412,7 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
             </div>
           ) : (
             <p className="milburn-note" role="note">
-              Custom households need the household API, which this build does not have (set NEXT_PUBLIC_HOUSEHOLD_API_URL). The examples above work without it.
+              Custom households are not available yet. The stored examples above are.
             </p>
           )}
         </section>

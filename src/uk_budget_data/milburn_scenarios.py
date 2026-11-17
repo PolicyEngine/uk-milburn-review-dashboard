@@ -4,11 +4,12 @@ under current law and under the Milburn package.
 Household calculations only (no survey data): one single person aged 22,
 renting privately, with limited capability for work and work-related
 activity (LCWRA) and no PIP, on Universal Credit with no earnings, who moves
-into work at 16 or 25 hours a week at the 2027-28 minimum wage for their age
+into work at 16 or 25 hours a week at the 2029-30 minimum wage for their age
 (the National Living Wage, which applies from 21). Each entry case compares
 the person in work with the same person out of work, once under current law
-and once under ``milburn_package`` (the health element removal for
-under-25s and the PIP removal for 18 to 24-year-olds):
+and once under ``milburn_report_package`` (the health element removal for
+under-25s and the PIP removal for 18 to 24-year-olds, from April 2029), in
+2029-30, the year of the report runs' saving:
 
 - ``net_income_gain_*``: the change in household net income;
 - ``exchequer_gain_*``: the change in income tax plus employee and employer
@@ -27,11 +28,12 @@ from pathlib import Path
 
 from uk_budget_data import local_build
 from uk_budget_data.models import DataConfig
-from uk_budget_data.reforms import MILBURN_PACKAGE_ID, get_reform
+from uk_budget_data.reforms import MILBURN_REPORT_PACKAGE_ID, get_reform
 
-YEAR = 2027
+YEAR = 2029
+FISCAL_YEAR = f"{YEAR}-{(YEAR + 1) % 100:02d}"
 AGE = 22
-# £ a year: £500 a month, below every 2027-28 Local Housing Allowance rate
+# £ a year: £500 a month, below every Local Housing Allowance rate
 # for one bedroom outside London, so the housing element is the rent.
 ANNUAL_RENT = 6_000
 REGION = "NORTH_WEST"
@@ -62,7 +64,7 @@ def _situation(employment_income: float, hours: float) -> dict:
 
 
 def hourly_wage() -> float:
-    """The 2027-28 minimum wage for someone of AGE, from the engine."""
+    """The year's minimum wage for someone of AGE, from the engine."""
     from policyengine_uk import Simulation
 
     from uk_budget_data.forecast import with_forecast
@@ -107,7 +109,7 @@ def _gains(out_of_work: dict, in_work: dict) -> tuple[float, float]:
 def milburn_scenarios() -> dict:
     """The entry cases, under current law and under the package."""
     warnings.simplefilter("ignore")
-    package = get_reform(MILBURN_PACKAGE_ID)
+    package = get_reform(MILBURN_REPORT_PACKAGE_ID)
     wage = hourly_wage()
     out_current, out_package = _pair(0, 0, package)
     cases = []
@@ -131,18 +133,18 @@ def milburn_scenarios() -> dict:
     return {
         "year": YEAR,
         "basis": (
-            f"Household calculation for 2027-28 ({local_build.LABEL}), on "
+            f"Household calculation for {FISCAL_YEAR} ({local_build.LABEL}), on "
             "the OBR October 2026 forecast. A single person aged "
             f"{AGE}, renting privately in the North West for "
             f"£{ANNUAL_RENT:,} a year, with limited capability for work and "
             "work-related activity, no PIP and no other income, on "
             "Universal Credit; moving from no work to 16 or 25 hours a week "
-            "at the National Living Wage for 2027-28, all year. Gains are "
+            f"at the National Living Wage for {FISCAL_YEAR}, all year. Gains are "
             "annual, in work minus out of work. The Exchequer gain is income "
             "tax plus employee and employer National Insurance plus the fall "
             "in benefits; employer National Insurance is counted. Package: "
-            "milburn_package (health element removed for under-25s and PIP "
-            "removed for 18 to 24-year-olds)."
+            "milburn_report_package (health element removed for under-25s "
+            "and PIP removed for 18 to 24-year-olds, from April 2029)."
         ),
         "entry_cases": cases,
         "notes": [

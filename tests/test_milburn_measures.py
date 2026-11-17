@@ -16,6 +16,7 @@ from uk_budget_data.forecast import forecast_parameters
 from uk_budget_data.models import DataConfig
 from uk_budget_data.personal_impact import household_simulations
 from uk_budget_data.reforms import (
+    MILBURN_PROMOTED_IDS,
     EMPLOYER_NICS_UNDER_25_ID,
     MILBURN_PACKAGE_COMPONENTS,
     MILBURN_PACKAGE_ID,
@@ -283,6 +284,8 @@ def test_the_registry_holds_the_milburn_measures_only():
         "pip_removed_16_to_24",
         "milburn_package_phased",
         "milburn_package_entry_25pct",
+        # The report runs promoted onto the page
+        *MILBURN_PROMOTED_IDS,
     ]
     assert MILBURN_PACKAGE_COMPONENTS == (
         UC_HEALTH_UNDER_25_ID,

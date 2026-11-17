@@ -34,9 +34,16 @@ def pip_removed_ages_18_to_24(
 
     16 and 17-year-olds on PIP keep it (the measure covers 18 to 24), and
     DLA for children is untouched. The engine's passports read the PIP
-    amounts (carer's benefits, disability premia, the benefit cap
-    exceptions, non-dependant deduction exemptions), so they go with the
-    payment; the PIP categories and points do not change.
+    amounts (disability premia, the Universal Credit disabled child
+    additions, the education exception, the shared accommodation rate
+    exception, the benefit cap exceptions, non-dependant deduction
+    exemptions), so they go with the payment; the PIP categories and points
+    do not change. Carer's Allowance and the Universal Credit carer element
+    do not follow: in policyengine-uk 2.177.7 a carer qualifies through
+    ``cares_for_severely_disabled_person``, an input that defaults to true
+    and is not linked to the PIP of the person cared for, so this removal
+    changes no carer's award (in reality a carer whose entitlement rests on
+    the person's PIP daily living award could lose it).
 
     ``share_kept`` pays that share of both components. ``shares_kept``,
     when given, replaces it with a share for each component at each award

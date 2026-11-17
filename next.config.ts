@@ -56,9 +56,9 @@ const basePath = artifactExport
   : '/uk/milburn-review';
 
 
-// The Household impact tab's API URL is baked in at build time: fail a
-// production build that lacks it, and every build that has it in the wrong
-// form (scripts/household-api-env.mjs).
+// The Household impact tab's API URL is baked in at build time: fail every
+// build that has it in the wrong form; without it, warn and show the stored
+// examples only (scripts/household-api-env.mjs).
 checkHouseholdApiEnv(process.env);
 
 const nextConfig: NextConfig = {

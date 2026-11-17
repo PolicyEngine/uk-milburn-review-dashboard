@@ -59,16 +59,16 @@
       "child_poverty_change_pp_rel_bhc": 0.516,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 102.2,
-        "h25": 79.9
+        "h16": 97.4,
+        "h25": 76.7
       },
       "entrants_to_match_income_loss": {
-        "h16": 593415,
-        "h25": 463583
+        "h16": 565316,
+        "h25": 445024
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -100,16 +100,16 @@
       "child_poverty_change_pp_rel_bhc": -0.046,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 57.9,
-        "h25": 45.3
+        "h16": 55.2,
+        "h25": 43.4
       },
       "entrants_to_match_income_loss": {
-        "h16": 336173,
-        "h25": 262623
+        "h16": 320255,
+        "h25": 252109
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -141,16 +141,16 @@
       "child_poverty_change_pp_rel_bhc": -0.018,
       "people_directly_affected": 82781,
       "break_even_share_in_work_pct": {
-        "h16": 108.7,
-        "h25": 84.9
+        "h16": 103.5,
+        "h25": 81.5
       },
       "entrants_to_match_income_loss": {
-        "h16": 610662,
-        "h25": 477056
+        "h16": 581746,
+        "h25": 457957
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -182,46 +182,17 @@
       "child_poverty_change_pp_rel_bhc": 0.364,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 102.3,
-        "h25": 79.9
+        "h16": 97.5,
+        "h25": 76.7
       },
       "entrants_to_match_income_loss": {
-        "h16": 479430,
-        "h25": 374536
+        "h16": 456728,
+        "h25": 359542
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
-    },
-    {
-      "id": "milburn_report_child_dla_to_18",
-      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
-      "saving_bn": {
-        "2027": 0.0,
-        "2028": 0.0,
-        "2029": 0.0,
-        "2030": 0.0,
-        "2031": 0.0
-      },
-      "direction": "loss",
-      "young_people_in_losing_households": 0,
-      "share_of_16_24_in_losing_households_pct": 0.0,
-      "average_loss_young_person_in_losing_household": null,
-      "everyone_in_losing_households_pct": 0.0,
-      "poverty_change_pp": {
-        "rel_bhc": 0.0,
-        "rel_ahc": 0.0,
-        "abs_bhc": 0.0,
-        "abs_ahc": 0.0
-      },
-      "people_into_poverty_abs_ahc": 0,
-      "people_into_poverty_rel_ahc": 0,
-      "child_poverty_change_pp_rel_ahc": 0.0,
-      "people_into_poverty_abs_bhc": 0,
-      "people_into_poverty_rel_bhc": 0,
-      "child_poverty_change_pp_rel_bhc": 0.0,
-      "people_directly_affected": 0
     },
     {
       "id": "milburn_report_employer_nics_threshold",
@@ -310,16 +281,16 @@
       "child_poverty_change_pp_rel_bhc": 0.516,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 102.2,
-        "h25": 79.9
+        "h16": 97.4,
+        "h25": 76.7
       },
       "entrants_to_match_income_loss": {
-        "h16": 593415,
-        "h25": 463583
+        "h16": 565316,
+        "h25": 445024
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -351,16 +322,57 @@
       "child_poverty_change_pp_rel_bhc": 0.111,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 103.1,
-        "h25": 80.6
+        "h16": 98.3,
+        "h25": 77.4
       },
       "entrants_to_match_income_loss": {
-        "h16": 351765,
-        "h25": 274803
+        "h16": 335108,
+        "h25": 263801
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
+      }
+    },
+    {
+      "id": "milburn_report_package_with_youth_allowance",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": 0.0,
+        "2028": 0.0,
+        "2029": 4.05,
+        "2030": 4.159,
+        "2031": 4.267
+      },
+      "direction": "loss",
+      "young_people_in_losing_households": 583106,
+      "share_of_16_24_in_losing_households_pct": 7.79,
+      "average_loss_young_person_in_losing_household": 11304,
+      "everyone_in_losing_households_pct": 2.03,
+      "poverty_change_pp": {
+        "rel_bhc": 0.352,
+        "rel_ahc": 0.317,
+        "abs_bhc": 0.458,
+        "abs_ahc": 0.528
+      },
+      "people_into_poverty_abs_ahc": 368449,
+      "people_into_poverty_rel_ahc": 221696,
+      "child_poverty_change_pp_rel_ahc": 0.569,
+      "people_into_poverty_abs_bhc": 319944,
+      "people_into_poverty_rel_bhc": 246077,
+      "child_poverty_change_pp_rel_bhc": 0.516,
+      "people_directly_affected": 0,
+      "break_even_share_in_work_pct": {
+        "h16": 84.2,
+        "h25": 66.2
+      },
+      "entrants_to_match_income_loss": {
+        "h16": 490689,
+        "h25": 386276
+      },
+      "exchequer_gain_per_entrant": {
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -392,16 +404,16 @@
       "child_poverty_change_pp_rel_bhc": 0.449,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 83.1,
-        "h25": 64.9
+        "h16": 79.2,
+        "h25": 62.3
       },
       "entrants_to_match_income_loss": {
-        "h16": 463314,
-        "h25": 361946
+        "h16": 441375,
+        "h25": 347456
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -433,17 +445,46 @@
       "child_poverty_change_pp_rel_bhc": 0.088,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 35.5,
-        "h25": 27.7
+        "h16": 33.8,
+        "h25": 26.6
       },
       "entrants_to_match_income_loss": {
-        "h16": 143479,
-        "h25": 112088
+        "h16": 136685,
+        "h25": 107600
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
+    },
+    {
+      "id": "milburn_report_youth_allowance_combined",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": 0.0,
+        "2028": 0.0,
+        "2029": -0.625,
+        "2030": -0.635,
+        "2031": -0.633
+      },
+      "direction": "gain",
+      "young_people_in_losing_households": 545350,
+      "share_of_16_24_in_losing_households_pct": 7.29,
+      "average_loss_young_person_in_losing_household": -1724,
+      "everyone_in_losing_households_pct": 0.01,
+      "poverty_change_pp": {
+        "rel_bhc": -0.005,
+        "rel_ahc": -0.038,
+        "abs_bhc": -0.024,
+        "abs_ahc": -0.028
+      },
+      "people_into_poverty_abs_ahc": -19704,
+      "people_into_poverty_rel_ahc": -26541,
+      "child_poverty_change_pp_rel_ahc": -0.024,
+      "people_into_poverty_abs_bhc": -17084,
+      "people_into_poverty_rel_bhc": -3819,
+      "child_poverty_change_pp_rel_bhc": 0.003,
+      "people_directly_affected": 0
     },
     {
       "id": "milburn_report_youth_allowance_independent",
@@ -532,16 +573,16 @@
       "child_poverty_change_pp_rel_bhc": -0.137,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 41.4,
-        "h25": 32.4
+        "h16": 39.5,
+        "h25": 31.1
       },
       "entrants_to_match_income_loss": {
-        "h16": 230943,
-        "h25": 180415
+        "h16": 220007,
+        "h25": 173192
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -573,16 +614,16 @@
       "child_poverty_change_pp_rel_bhc": 0.72,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 91.7,
-        "h25": 71.7
+        "h16": 87.4,
+        "h25": 68.8
       },
       "entrants_to_match_income_loss": {
-        "h16": 595616,
-        "h25": 465302
+        "h16": 567413,
+        "h25": 446674
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -614,16 +655,16 @@
       "child_poverty_change_pp_rel_bhc": 0.449,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 83.1,
-        "h25": 64.9
+        "h16": 79.2,
+        "h25": 62.3
       },
       "entrants_to_match_income_loss": {
-        "h16": 463314,
-        "h25": 361946
+        "h16": 441375,
+        "h25": 347456
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -655,16 +696,16 @@
       "child_poverty_change_pp_rel_bhc": 0.009,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 32.0,
-        "h25": 25.0
+        "h16": 30.5,
+        "h25": 24.0
       },
       "entrants_to_match_income_loss": {
-        "h16": 75411,
-        "h25": 58912
+        "h16": 71840,
+        "h25": 56553
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -696,16 +737,16 @@
       "child_poverty_change_pp_rel_bhc": 0.088,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 35.5,
-        "h25": 27.7
+        "h16": 33.8,
+        "h25": 26.6
       },
       "entrants_to_match_income_loss": {
-        "h16": 143479,
-        "h25": 112088
+        "h16": 136685,
+        "h25": 107600
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -737,16 +778,16 @@
       "child_poverty_change_pp_rel_bhc": 0.009,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 17.6,
-        "h25": 13.8
+        "h16": 16.8,
+        "h25": 13.2
       },
       "entrants_to_match_income_loss": {
-        "h16": 16719,
-        "h25": 13061
+        "h16": 15927,
+        "h25": 12538
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {
@@ -778,16 +819,16 @@
       "child_poverty_change_pp_rel_bhc": 0.098,
       "people_directly_affected": 0,
       "break_even_share_in_work_pct": {
-        "h16": 37.0,
-        "h25": 28.9
+        "h16": 35.3,
+        "h25": 27.8
       },
       "entrants_to_match_income_loss": {
-        "h16": 105231,
-        "h25": 82208
+        "h16": 100248,
+        "h25": 78916
       },
       "exchequer_gain_per_entrant": {
-        "h16": 4026.67,
-        "h25": 8934.25
+        "h16": 4227.0,
+        "h25": 9438.18
       }
     },
     {

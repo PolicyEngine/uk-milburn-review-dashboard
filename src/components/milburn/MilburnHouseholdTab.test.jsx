@@ -84,7 +84,8 @@ describe("MilburnHouseholdTab", () => {
     expect(container.querySelectorAll("[data-example]")).toHaveLength(8);
     expect(cards.getByRole("button", { name: "Your household" })).toBeTruthy();
     expect(cards.getByRole("button", { name: "20, living with parents" }).getAttribute("aria-pressed")).toBe("true");
-    expect(screen.getByText("£11,324 a year")).toBeTruthy();
+    // No TV licence: the parents hold it
+    expect(screen.getByText("£11,504 a year")).toBeTruthy();
     const runs = container.querySelectorAll("[data-run]");
     expect([...runs].map((run) => run.dataset.run)).toEqual(RUNS.map((run) => run.key));
     expect(runs[0].textContent).toContain(formatSignedPounds(-6960.84));
@@ -110,11 +111,12 @@ describe("MilburnHouseholdTab", () => {
     expect(within(table).getByText("Less: withdrawn against income")).toBeTruthy();
   });
 
-  it("says custom households need the API when the build has none", () => {
+  it("says custom households are not available yet when the build has no API", () => {
     vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", "");
     render(<MilburnHouseholdTab presets={PRESETS} />);
     fireEvent.click(screen.getByRole("button", { name: "Change these answers" }));
-    expect(screen.getByRole("note").textContent).toContain("Custom households need the household API");
+    expect(screen.getByRole("note").textContent).toBe("Custom households are not available yet. The stored examples above are.");
+    expect(screen.queryByText(/NEXT_PUBLIC_HOUSEHOLD_API_URL/)).toBeNull();
     expect(screen.getByLabelText("Age")).toBeTruthy();
   });
 
@@ -165,7 +167,7 @@ describe("the coordinator's fixes", () => {
 
   it("names the run in lower case mid-sentence in the table's caption", () => {
     render(<MilburnHouseholdTab presets={PRESETS} />);
-    expect(screen.getByRole("table", { name: /under the report's package, 2029-30/ })).toBeTruthy();
+    expect(screen.getByRole("table", { name: /under the health element and PIP removal, 2029-30/ })).toBeTruthy();
   });
 
   it("opens an example by its number as well as its id", () => {

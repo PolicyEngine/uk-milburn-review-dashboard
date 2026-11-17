@@ -6,8 +6,8 @@ Each run is one request to the household API (``/api/household-impact``),
 through ``household_impact.calculate_household_impact`` as the API runs it,
 against current law for the same household:
 
-- ``package``: the report's package, the health element and PIP removals
-  run together (their own changes are its split by measure);
+- ``package``: the health element and PIP removals run together (our
+  design of the report's changes, with no replacement awards) (their own changes are its split by measure);
 - ``youth_allowance``, ``work_allowance`` and ``employer_ni``: separate
   runs, never added to the package's figure or to each other.
 
@@ -22,14 +22,14 @@ from uk_budget_data import household_impact as hi
 YEAR = 2029
 FISCAL_YEAR = hi.fiscal_year(YEAR)
 
-# (key, policies, name, kind): ``package`` is the report's package; the
+# (key, policies, name, kind): ``package`` is both removals together; the
 # others are separate runs. The illustrative work allowance's amount is our
 # assumption (the report gives none).
 RUNS = (
     {
         "key": "package",
         "policies": ["milburn_report_uc_health", "milburn_report_pip"],
-        "name": "The report's package",
+        "name": "Health element and PIP removal (no replacement awards)",
         "kind": "package",
         "description": (
             "The Universal Credit health element and PIP removed for "
@@ -235,9 +235,26 @@ ASSUMPTIONS = (
     "Each run is compared with current law for the same household. The "
     "Youth Allowance, work allowance and employer National Insurance runs "
     "are separate: they are not added to the package or to each other.",
+    "Losing PIP daily living moves a single renter under 35 onto the "
+    "shared accommodation rate of Local Housing Allowance, so the PIP part "
+    "of a renter's change can include a fall in the Universal Credit "
+    "housing element as well as the PIP itself.",
+    "A young person living with their parents holds no TV licence: the "
+    "parents' household holds it.",
     "Hours, wages (other than the employer National Insurance saving, "
     "which the model passes to pay) and housing costs are held fixed; no "
     "behavioural response is modelled.",
+)
+
+
+# The split by measure, said for these runs: against current law, not the
+# Autumn Budget's "Budget setting" and "pre-Budget law".
+BY_POLICY_METHOD = (
+    "Each part's change is that measure on its own, with the run's other "
+    "measures held at current law, against the same current-law household. "
+    "The run's change switches them all at once. The residual is the run's "
+    "change minus the sum of the parts: what the measures do together "
+    "beyond what each does alone."
 )
 
 
@@ -257,10 +274,13 @@ def run_household(household: dict, runs=RUNS) -> dict:
                 "include": ["by_policy"],
             }
         )
-        results[run["key"]] = hi.calculate_household_impact(
+        result = hi.calculate_household_impact(
             request.household.answers(),
             request.policies,
             request.year,
             include=tuple(request.include),
         )
+        if isinstance(result.get("by_policy"), dict):
+            result["by_policy"]["method"] = BY_POLICY_METHOD
+        results[run["key"]] = result
     return results

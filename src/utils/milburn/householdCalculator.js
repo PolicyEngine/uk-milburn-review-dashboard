@@ -20,7 +20,7 @@ export const FISCAL_YEAR = "2029-30";
 
 // `inSentence`: the name mid-sentence; `short`: on an example's card
 export const RUNS = [
-  { key: "package", name: "The report's package", inSentence: "the report's package", short: "package", kind: "package" },
+  { key: "package", name: "Health element and PIP removal (no replacement awards)", inSentence: "the health element and PIP removal", short: "health element and PIP removal", kind: "package" },
   { key: "youth_allowance", name: "Higher Youth Allowance", inSentence: "the higher Youth Allowance", short: "Youth Allowance", kind: "separate" },
   { key: "work_allowance", name: "Work allowance (illustrative)", inSentence: "the work allowance (illustrative)", short: "work allowance (illustrative)", kind: "illustrative" },
   { key: "employer_ni", name: "Employer NI threshold", inSentence: "the employer NI threshold", short: "employer NI", kind: "separate" },
@@ -54,7 +54,7 @@ export const PIP_OPTIONS = [
 export const SECTOR_OPTIONS = [
   { value: "OTHER", label: "Other" },
   { value: "RETAIL", label: "Retail" },
-  { value: "HOSPITALITY", label: "Hospitality" },
+  { value: "HOSPITALITY", label: "Hospitality (food and drink service)" },
 ];
 
 /** The form's answers for a new custom household. */

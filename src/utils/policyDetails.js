@@ -753,7 +753,7 @@ export const MILBURN_POLICY_DETAILS = [
     visual: { kind: "milburn-pip", place: "change", from: 18, share: 0 },
     details: [
       "Static: recipients do not change their work or claims in response.",
-      "Benefits that depend on PIP receipt change with it, as the model's rules set out.",
+      "UC amounts that depend on PIP change with it; Carer's Allowance does not in the model.",
       // Report 6.5, para 760
       "The report proposes extending child Disability Living Allowance to 18; this run leaves 16 and 17-year-olds on PIP.",
       "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
@@ -915,7 +915,7 @@ export const MILBURN_POLICY_DETAILS = [
     points: [
       // Report 6.5, paras 751 and 754: no rates or eligibility test given
       { label: "Stands for", icon: "scale", text: "The report's Additional Cost Allowance, whose rates are not in the model." },
-      { label: "Knock-on", icon: "coins", text: "Carer's Allowance and premia can be lost." },
+      { label: "Knock-on", icon: "coins", text: "Some disability rules can be lost; Carer's Allowance is unchanged." },
     ],
     affects: "PIP recipients aged 18 to 24",
     starts: "Apr 2027",
@@ -923,7 +923,8 @@ export const MILBURN_POLICY_DETAILS = [
     type: "Benefit",
     details: [
       "Static: recipients do not change their work or claims in response.",
-      "Half an award can fall below the amounts that qualify a carer or a household for other help.",
+      "Half an award can fall below the amounts some disability rules require.",
+      "Carer's Allowance does not follow PIP in the model, so carers are unaffected.",
       "Scottish Adult Disability Payment, recorded as PIP, is included.",
       "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
@@ -944,7 +945,7 @@ export const MILBURN_POLICY_DETAILS = [
     type: "Benefit",
     details: [
       "Static: recipients do not change their work or claims in response.",
-      "Benefits that depend on PIP receipt change with it, as the model's rules set out.",
+      "UC amounts that depend on PIP change with it; Carer's Allowance does not in the model.",
       "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-pip", place: "change", from: 16, share: 0 },
@@ -1030,6 +1031,8 @@ MILBURN_POLICY_DETAILS.push(
       "The report proposes a higher Youth Allowance for young people living independently (paragraph 748).",
       "A housing costs element is the review's own proxy for living independently (analytical annex, section 8).",
       "The report gives no amount for its work allowance, so none is modelled.",
+      "About 1,600 households lose about £200 a year, likely through another member's Housing Benefit or Council Tax Reduction.",
+      "The young person's higher UC would count as non-dependant income there and raise the deduction; not yet confirmed.",
       "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-standard-allowance", place: "change", housingCosts: true, ratesNote: true },
@@ -1143,6 +1146,62 @@ MILBURN_POLICY_DETAILS.push(
       "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-standard-allowance", place: "change", workAllowance: true, ratesNote: true },
+  },
+);
+
+// Our combined runs (not the report's package): the two Youth Allowance
+// changes together, and those with the health element and PIP removal
+MILBURN_POLICY_DETAILS.push(
+  {
+    id: "milburn_report_youth_allowance_combined",
+    shortName: "Higher Youth Allowance and work allowance (illustrative)",
+    noun: "the higher Youth Allowance and an illustrative work allowance, together",
+    sentence: "paying the higher Youth Allowance and an illustrative work allowance to under-25s together",
+    summary: "The higher Youth Allowance and the illustrative work allowance, run together.",
+    points: [
+      { label: "Combines", icon: "layers", text: "The two Youth Allowance runs, simulated as one." },
+      { label: "Amount", icon: "coins", text: "Work allowance assumed: the current UC amounts." },
+      // Report 6.5, paras 748 and 749
+      { label: "Report", icon: "file", text: "Proposes both; gives no amount for either." },
+    ],
+    affects: "Under-25 UC claims",
+    starts: "Apr 2029",
+    inForce: { from: "2029-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "Our design: the two measures are simulated together, so the total is not the sum of each alone.",
+      "A housing costs element is the review's own proxy for living independently (analytical annex, section 8).",
+      "The work allowance amount is our assumption: the current Universal Credit work allowance, uprated each year.",
+      "As in the higher-rate run alone, about 1,600 households lose about £200 a year, likely through non-dependant deductions.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-standard-allowance", place: "change", housingCosts: true, ratesNote: true },
+  },
+  {
+    id: "milburn_report_package_with_youth_allowance",
+    shortName: "Health element and PIP removal with both Youth Allowance changes",
+    noun: "the health element and PIP removal with both Youth Allowance changes",
+    sentence: "removing the health element and PIP for young people while paying both Youth Allowance changes",
+    summary: "Health element and PIP removal, plus both Youth Allowance changes, run together.",
+    points: [
+      { label: "Combines", icon: "layers", text: "Four runs, simulated as one: our design." },
+      { label: "Replacement", icon: "scale", text: "None modelled for PIP: losses are an upper bound." },
+      { label: "Amount", icon: "coins", text: "Work allowance assumed: the current UC amounts." },
+    ],
+    affects: "Under-25s on UC; 18 to 24s with PIP",
+    starts: "Apr 2029",
+    inForce: { from: "2029-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "The four measures are simulated together, so the total is not the sum of each alone.",
+      // Report 6.5, para 732
+      "The report's Additional Cost Allowance and other replacements are not modelled.",
+      "The work allowance amount is our assumption: the current Universal Credit work allowance, uprated each year.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-package", place: "change", pipShare: 0, ratesNote: true },
   },
 );
 

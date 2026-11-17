@@ -321,9 +321,12 @@ The two options added on 17 November:
 - **Tiered PIP** (`REPORT_PIP_REPLACEMENT_SHARES`) scales the `pip_dl` and
   `pip_m` amounts by the person's award level (`pip_dl_category`,
   `pip_m_category`), as the uniform share does. Entitlements that passport
-  off a component (carer's benefits, disability premia, benefit cap
+  off a component (disability premia, the Universal Credit disabled child
+  additions and education and shared accommodation exceptions, benefit cap
   exceptions, non-dependant deductions) therefore stay where any of it is
-  still paid and go where none is: all `1.0` is current law, all `0.0` is
+  still paid and go where none is (Carer's Allowance and the UC carer
+  element are not linked to PIP in policyengine-uk 2.177.7, so they never
+  change): all `1.0` is current law, all `0.0` is
   `pip_removed_under_25`, all `0.5` is `pip_halved_under_25`. The
   replacement is not a separate payment, and the local health and
   disability fund is not modelled. The award level stands in for "enduring

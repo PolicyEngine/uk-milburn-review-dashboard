@@ -65,12 +65,14 @@ Negative saving = a cost; for gain measures the loss columns are gains (negative
   households but an average household loss of about £7,000 rather than
   £12,600; absolute AHC poverty +0.45pp (~314k) against +0.59pp (~410k). PIP at half
   rate alone saves £1.72bn, more than half of direct PIP (£1.46bn): half an
-  award can fall below the amounts that qualify carers for Carer's
-  Allowance and households for disability premia, so the proxy may
-  overstate losses relative to a new allowance with its own passports.
+  award can fall below the amounts that some disability rules read (such
+  as severe disability status), so the proxy may overstate losses relative
+  to a new allowance with its own passports. Carer's Allowance does not
+  change in the model: policyengine-uk 2.177.7 does not link a carer's
+  entitlement to the PIP of the person cared for.
   Severe cases kept: the health element removal saves £0.83bn rather than
   £1.15bn. PIP from 16: £4.42bn rather than £3.44bn (87k recipients aged
-  16–17 and their carers).
+  16–17).
 - **Overlap.** In the data, limited capability for work among under-25s
   mostly coincides with PIP receipt (about nine in ten young LCWRA claimants
   also get PIP). The package therefore stacks both losses on largely the
@@ -88,8 +90,13 @@ Negative saving = a cost; for gain measures the loss columns are gains (negative
   adult is under 25 (RF: 260k young people on UC health); 2.79m LCWRA units
   in all, about 23% above DWP's 2.27m paid households, so the all-age LCWRA
   stock runs high. PIP removal saves £3.44bn against £2.91bn of direct PIP:
-  the other ~£0.5bn is carer benefits, disability premia and benefit cap
-  exemptions that follow the PIP award.
+  the other ~£0.5bn is Universal Credit amounts that follow the PIP award
+  (such as the disabled child element, entitlement while in education and
+  the shared accommodation rate exemption). Carer's Allowance and the UC
+  carer element do not change: the model does not link a carer's
+  entitlement to the PIP of the person cared for (in reality a carer could
+  lose it, a limitation). For the report's 18–24 run in 2029-30: about
+  £3.09bn of PIP and £0.56bn of knock-on effects.
 - **Health element rate.** The engine pays the new-claimant rate (£217.26 a
   month) to a random 13% of awards in 2027-28, regardless of age. Young
   claimants turn over fast, so more of them are likely on the lower rate;
