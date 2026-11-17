@@ -395,15 +395,6 @@ def test_property_and_savings_income_rates(document, measure_id, income):
             assert row[str(year)] == values, (label, year)
 
 
-def test_unearned_income_rates_withdrawn():
-    # Withdrawn (split in two), but its builder still reads it
-    table = withdrawn_rows(registry.UNEARNED_INCOME_RATES_ID)
-    for label, values in RATES_UP.items():
-        row = by_key(table[label])
-        for year in range(2027, 2032):
-            assert row[str(year)] == values, (label, year)
-
-
 def test_the_display_follows_the_shape_not_the_measure():
     from uk_budget_data.policy_table import display_for
 

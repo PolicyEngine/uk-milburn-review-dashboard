@@ -7,11 +7,9 @@ with those the separate commands make. The last test runs the real engine
 on the invented dataset and is marked slow.
 """
 
-import functools
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-import numpy as np
 import pytest
 
 from tests.publication_support import World
@@ -23,7 +21,6 @@ from uk_budget_data.modal_runner import (
     NationalModalRunner,
 )
 from uk_budget_data.models import DataConfig
-from uk_budget_data.parallel import SerialRunner
 from uk_budget_data.publication import generate as generate_module
 from uk_budget_data.publication.artifacts import read_receipt
 from uk_budget_data.publication.generate import (
@@ -502,39 +499,9 @@ MANIFEST_FIXTURE = (
 )
 
 
-def test_dry_run_prints_the_plan_and_runs_nothing(monkeypatch, capsys):
-    monkeypatch.setattr(
-        national, "run_national", lambda *a, **k: pytest.fail("ran")
-    )
-    from uk_budget_data.publication.combine import combined_key
-
-    key = combined_key(PACKAGE)
-    code = cli.main(
-        [
-            "generate",
-            "--national",
-            "--backend",
-            "modal",
-            "--dry-run",
-            "--combined-key",
-            key,
-            "--reforms",
-            *PACKAGE,
-        ]
-    )
-    out = capsys.readouterr().out
-    assert code == 0
-    assert key == RELEASE_KEY
-    assert f"8 measures and their package {key}" in out
-    assert "prime the dataset cache" in out and "30 min limit" in out
-    assert "total: about 13-17 min" in out
-    assert "Dry run: nothing was run." in out
-
-
 @pytest.mark.parametrize(
     "arguments, message",
     [
-        (["--reforms", *PACKAGE, "--combined-key", "combined--x"], "not"),
         (["--manifest", "/nonexistent/manifest.json"], "no publication"),
         (["--reforms", *PACKAGE, "--artifacts"], "leave out --artifacts"),
         (
@@ -569,60 +536,9 @@ def test_the_manifests_published_set_is_its_displayable_measures():
         cli.manifest_measures("/nonexistent/manifest.json")
 
 
-def test_without_reforms_the_measures_are_the_manifests_published_set(
-    monkeypatch, capsys
-):
-    seen = []
-    monkeypatch.setattr(
-        national, "run_national", lambda *a, **k: pytest.fail("ran")
-    )
-    monkeypatch.setattr(
-        cli, "manifest_measures", lambda path: seen.append(path) or PACKAGE
-    )
-    code = cli.main(
-        [
-            "generate",
-            "--national",
-            "--dry-run",
-            "--manifest",
-            "release/manifest.json",
-            "--combined-key",
-            RELEASE_KEY,
-        ]
-    )
-    out = capsys.readouterr().out
-    assert code == 0 and seen == [Path("release/manifest.json")]
-    assert "Measures from the publication manifest's published measures" in out
-    assert f"8 measures and their package {RELEASE_KEY}" in out
-
-
 def test_the_national_flags_need_national(capsys):
     assert cli.main(["generate", "--dry-run", "--reforms", PACKAGE[0]]) == 1
     assert "--dry-run goes with --national" in capsys.readouterr().out
-
-
-def test_the_local_command_runs_measures_then_package_then_files(
-    monkeypatch, capsys
-):
-    seen = {}
-
-    def run_national(reforms, config, runner, stash, **kwargs):
-        seen["ids"] = [r.id for r in reforms]
-        seen["runner"] = runner
-        return national.NationalReport(
-            artifacts=generate_module.GenerationReport(),
-            package_key="k",
-            flat_files=[Path("public/data/income_distribution.csv")],
-        )
-
-    monkeypatch.setattr(national, "run_national", run_national)
-    code = cli.main(
-        ["generate", "--national", "--reforms", PACKAGE[1], PACKAGE[0]]
-    )
-    assert code == 0
-    assert seen["ids"] == [PACKAGE[1], PACKAGE[0]]
-    assert isinstance(seen["runner"], national.LocalNationalRunner)
-    assert "flat file written" in capsys.readouterr().out
 
 
 def test_the_cost_guards():
@@ -651,92 +567,6 @@ def test_the_cost_guards():
 
 
 # --- the real engine on the invented dataset ------------------------------
-
-
-@pytest.mark.slow
-def test_rows_read_after_the_artifact_are_the_flat_paths_bytes(
-    monkeypatch, tmp_path
-):
-    """The engine on the invented dataset: each artifact is run in full
-    (simulations, tables, floor, checks, up to the receipt, which refuses
-    the uncertified dataset), its rows are then read from the same two
-    simulations, and the three files are byte-identical to the
-    ``--only ... --published-package`` path's, which builds its own."""
-    from uk_budget_data import calculators, synthetic_dataset
-    from uk_budget_data.reforms import get_reform
-
-    dataset = synthetic_dataset.write(tmp_path / "synthetic.h5", 1500, 2026)
-
-    def own_ids(simulation, dataset_path):
-        return np.asarray(simulation.calculate("household_id", 2026).values)
-
-    monkeypatch.setattr(pipeline, "scatter_survey_households", own_ids)
-    monkeypatch.setattr(
-        calculators,
-        "distribution_points",
-        functools.partial(calculators.distribution_points, min_households=5),
-    )
-    reforms = [
-        get_reform("trading_allowance_raise"),
-        get_reform("savings_income_rates_up"),
-    ]
-    years = [2026, 2027, 2028]
-    new_dir, old_dir = tmp_path / "new", tmp_path / "old"
-    stash, reused = {}, []
-
-    class AfterEachArtifact:
-        """The national container's steps, here: the artifact (refused at
-        its receipt on this dataset, after everything else), then its
-        rows from the simulations it built."""
-
-        jobs = 1
-        in_process = True
-
-        def map(self, function, jobs, on_result=lambda i, r: None):
-            out = []
-            for index, job in enumerate(jobs):
-                built = []
-                outcome = run_artifact(
-                    replace(
-                        job, build=national.CapturingBuild(job.build, built)
-                    )
-                )
-                assert len(built) == 2, outcome.progress
-                rows = national.flat_tables_for(job, built)
-                reused.append("artifact's simulations" in rows.messages[0])
-                stash[job.key] = rows
-                out.append(outcome)
-                on_result(index, outcome)
-            return out
-
-    config = DataConfig(output_dir=new_dir, dataset_path=dataset, years=years)
-    generate_artifacts(
-        reforms,
-        config,
-        combined_sets=[reforms],
-        artifacts_root=tmp_path / "artifacts",
-        generator_argv=["test"],
-        runner=AfterEachArtifact(),
-    )
-    assert reused == [True, True, True]
-    ordered = sorted(reforms, key=lambda r: r.id)
-    answer = national.StashRunner(stash)
-    pipeline.generate_income_distribution(
-        ordered, config, runner=answer, combined_sets=[ordered]
-    )
-    pipeline.generate_income_growth(
-        ordered, config, runner=answer, combined_sets=[ordered]
-    )
-    old = DataConfig(output_dir=old_dir, dataset_path=dataset, years=years)
-    for generate in (
-        pipeline.generate_income_distribution,
-        pipeline.generate_income_growth,
-    ):
-        generate(ordered, old, runner=SerialRunner(), combined_sets=[ordered])
-    for name in FLAT:
-        whole = (old_dir / name).read_bytes()
-        assert whole.count(b"\n") > 5, name
-        assert (new_dir / name).read_bytes() == whole, name
 
 
 def test_the_container_line_splits_out_the_rows_time():

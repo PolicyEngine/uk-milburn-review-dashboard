@@ -1912,7 +1912,9 @@ LEGACY = (
 
 
 def with_legacy_file(root: Path) -> str:
-    shutil.copy(REPO / "public" / "white.png", root / "public" / "white.png")
+    # Any committed image will do (public/white.png itself was deleted)
+    logo = REPO / "public" / "assets" / "logos" / "policyengine-teal.png"
+    shutil.copy(logo, root / "public" / "white.png")
     sha = hashlib.sha256((root / "public" / "white.png").read_bytes())
     return LEGACY.format(sha=sha.hexdigest())
 

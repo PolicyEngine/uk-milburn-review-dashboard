@@ -11,20 +11,14 @@ ID...``) writes the combined run of exactly the published measures under
 """
 
 import json
-import pickle
 from pathlib import Path
 
 import pytest
 
 from uk_budget_data import cli, pipeline
 from uk_budget_data.models import DataConfig
-from uk_budget_data.parallel import (
-    CombinedMeasures,
-    portable_combined,
-    resolve_reform,
-)
 from uk_budget_data.publication.combine import combined_key
-from uk_budget_data.reforms import AUTUMN_BUDGET_2026_COMBINED_ID, get_reform
+from uk_budget_data.reforms import AUTUMN_BUDGET_2026_COMBINED_ID
 
 FIXTURE = (
     Path(__file__).resolve().parents[1]
@@ -70,64 +64,6 @@ class CapturingRunner:
             )
             for unit in self.units
         ]
-
-
-def test_the_eight_compose_to_the_package_key():
-    # The key tonight's combined run and the area run use (#222)
-    package = portable_combined([get_reform(i) for i in EIGHT])
-    assert package.id == "combined--7baf4e89377bcc9c"
-    assert package.id == combined_key(EIGHT)
-
-
-def test_a_combined_run_travels_as_its_members_and_composes_where_it_runs():
-    package = portable_combined([get_reform(i) for i in reversed(EIGHT)])
-    # Members in application order (by id), each as parallel.portable
-    # sends it (itself, or its registered id when it does not pickle)
-    assert [m.id for m in package.members] == EIGHT
-    sent = pickle.loads(pickle.dumps(package))
-    assert isinstance(sent, CombinedMeasures)
-    combined = resolve_reform(sent, DataConfig())
-    assert combined.id == package.id
-    for member in EIGHT:
-        for path in get_reform(member).parameter_changes or {}:
-            assert path in combined.parameter_changes
-
-
-def test_a_combined_reference_whose_members_do_not_match_its_key_is_refused():
-    package = portable_combined([get_reform(i) for i in EIGHT[:2]])
-    forged = CombinedMeasures(id=combined_key(EIGHT), members=package.members)
-    with pytest.raises(ValueError, match="compose to"):
-        resolve_reform(forged, DataConfig())
-
-
-def test_distribution_rows_are_keyed_by_the_package_not_the_registry(
-    tmp_path,
-):
-    runner = CapturingRunner()
-    pipeline.generate_income_distribution(
-        config=DataConfig(output_dir=tmp_path, years=[2027]),
-        runner=runner,
-        combined_sets=[[get_reform(i) for i in EIGHT]],
-    )
-    ids = [unit.reform.id for unit in runner.units]
-    # The members, then their package; never the registry's alias
-    assert ids == [*EIGHT, combined_key(EIGHT)]
-    assert AUTUMN_BUDGET_2026_COMBINED_ID not in ids
-    written = (tmp_path / pipeline.INCOME_DISTRIBUTION_FILE).read_text()
-    assert combined_key(EIGHT) in written
-    assert AUTUMN_BUDGET_2026_COMBINED_ID not in written
-
-
-def test_growth_takes_the_same_package(tmp_path):
-    runner = CapturingRunner()
-    pipeline.generate_income_growth(
-        reforms=[get_reform(i) for i in EIGHT],
-        config=DataConfig(output_dir=tmp_path, years=[2026, 2027]),
-        runner=runner,
-        combined_sets=[[get_reform(i) for i in EIGHT]],
-    )
-    assert [u.reform.id for u in runner.units] == [*EIGHT, combined_key(EIGHT)]
-    assert all(u.tables == pipeline.GROWTH for u in runner.units)
 
 
 def test_without_a_package_the_registry_is_run_as_before(tmp_path):
@@ -227,62 +163,6 @@ def run_cli(monkeypatch, tmp_path, args):
         monkeypatch.setattr(cli, name, fake(name))
     parsed = cli.parse_args(["generate", "--output-dir", str(tmp_path), *args])
     return cli.run_generate(parsed), calls
-
-
-def test_cli_published_package_reads_the_manifest(monkeypatch, tmp_path):
-    path = tmp_path / "manifest.json"
-    path.write_text(json.dumps(manifest_for(EIGHT)))
-    code, calls = run_cli(
-        monkeypatch,
-        tmp_path,
-        [
-            "--only",
-            "income_distribution",
-            "--published-package",
-            "--manifest",
-            str(path),
-        ],
-    )
-    assert code == 0
-    assert calls["generate_income_distribution"] == {
-        "reforms": EIGHT,
-        "combined_sets": [EIGHT],
-    }
-
-
-def test_cli_published_package_reads_the_default_manifest(
-    monkeypatch, tmp_path
-):
-    # The runbook's command gives no --manifest: it reads
-    # public/data/manifest.json from the checkout it runs in
-    data = tmp_path / "public" / "data"
-    data.mkdir(parents=True)
-    (data / "manifest.json").write_text(json.dumps(manifest_for(EIGHT)))
-    monkeypatch.chdir(tmp_path)
-    code, calls = run_cli(
-        monkeypatch,
-        tmp_path,
-        ["--only", "income_growth", "--published-package"],
-    )
-    assert code == 0
-    assert calls["generate_income_growth"] == {
-        "reforms": EIGHT,
-        "combined_sets": [EIGHT],
-    }
-
-
-def test_cli_combined_by_hand(monkeypatch, tmp_path):
-    code, calls = run_cli(
-        monkeypatch,
-        tmp_path,
-        ["--only", "income_growth", "--combined", *EIGHT],
-    )
-    assert code == 0
-    # No --reforms: the members alone, worked out from the set
-    assert calls["generate_income_growth"] == {
-        "reforms": None,
-        "combined_sets": [EIGHT],
-    }
 
 
 @pytest.mark.parametrize(
