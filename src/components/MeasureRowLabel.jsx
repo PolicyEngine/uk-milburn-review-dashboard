@@ -40,14 +40,14 @@ export function MeasureIcon({ measure, colour, compact = false }) {
  *   The catalogue's measure (id, label or name, color); `name` overrides the
  *   short name
  */
-export default function MeasureRowLabel({ measure, colour, name, compact = false, caption = false, tip = true, nameClassName }) {
+export default function MeasureRowLabel({ measure, colour, name, compact = false, caption = false, tip = true, nameClassName, summary }) {
   const { label: category } = measureCategoryOf(measure);
   const short = name ?? shortNameOf(measure);
   const full = measure?.label ?? measure?.name ?? short;
   const text = (
     <span className="mrl-text" tabIndex={tip ? 0 : undefined}>
       <span className={nameClassName ? `mrl-name ${nameClassName}` : "mrl-name"}>{short}</span>
-      {caption && !compact && <span className="mrl-caption">{category}</span>}
+      {caption && !compact && <span className="mrl-caption">{summary ? `${category} · ${summary}` : category}</span>}
     </span>
   );
   return (

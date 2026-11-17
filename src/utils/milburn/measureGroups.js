@@ -31,6 +31,23 @@ export const MILBURN_DISPLAY_NAMES = Object.freeze({
   employer_nics_zero_under_25: "Employer NI zero rate extended to under-25s",
 });
 
+/**
+ * One line under each run's name in the policy selector, so what it changes
+ * and from when reads without the info tip (Vahid, 17 Nov). Page wording
+ * only; the measures' own descriptions stay as milburn_measures.json has them.
+ */
+export const MILBURN_SELECTOR_SUMMARIES = Object.freeze({
+  milburn_report_package: "Health element (under 25) and PIP (18 to 24) removed together, from April 2029",
+  milburn_report_package_phased: "The same, with existing claimants moved over about five years",
+  milburn_report_uc_health: "No UC health element for claimants under 25, from April 2029",
+  milburn_report_pip: "No PIP for 18 to 24-year-olds, replacement not modelled, from April 2029",
+  milburn_report_youth_allowance_independent: "The 25-and-over UC rate for under-25s with housing costs, from April 2029",
+  milburn_report_employer_nics_threshold: "Employers pay NI above £10,000, not £5,000; the end state",
+  milburn_report_employer_nics_threshold_glide_path: "£6,000 in 2027-28, rising £1,000 a year to £10,000",
+  pip_halved_under_25: "Half of PIP kept at 18 to 24, a stand-in for the new allowance",
+  employer_nics_zero_under_25: "No employer NI for any under-25, an option the report does not propose",
+});
+
 export const REPORT_GROUP = "report";
 export const PACKAGES_GROUP = "packages";
 export const SINGLE_GROUP = "single";

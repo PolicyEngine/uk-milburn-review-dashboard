@@ -209,6 +209,11 @@
 .policy-item-label .mrl-caption {
   font-size: var(--fs-micro);
   color: var(--pe-gray-500);
+  /* The one-line summary under a Milburn run's name may wrap */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.35;
 }
 
 /* The info tip: a 32px target, centred on the row */

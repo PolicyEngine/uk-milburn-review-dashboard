@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import MeasureRowLabel from "./MeasureRowLabel";
+import { MILBURN_SELECTOR_SUMMARIES } from "../utils/milburn/measureGroups";
 import usePresence, { leavingProps, popoverClass } from "../hooks/usePresence";
 import "./PolicySelector.css";
 import { ListChecks } from "lucide-react";
@@ -227,7 +228,7 @@ function PolicySelector({ policies: providedPolicies, selectedPolicies, onPolicy
                       checked={checked}
                       onChange={() => onPolicyToggle(policy.id)}
                     />
-                    <MeasureRowLabel tip={false} caption measure={policy} name={shortNameOf(policy)} nameClassName="policy-selector-name" />
+                    <MeasureRowLabel tip={false} caption measure={policy} name={shortNameOf(policy)} nameClassName="policy-selector-name" summary={MILBURN_SELECTOR_SUMMARIES[policy.id]} />
                   </label>
                   {summary && <InfoTip wide content={summary} label={`About ${shortNameOf(policy)}`} />}
                 </div>
