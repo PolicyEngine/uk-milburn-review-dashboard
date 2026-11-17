@@ -19,13 +19,13 @@ wage, in the reform only. It is a scenario, not a behavioural estimate.
 
 import numpy as np
 from policyengine_core.periods import period as as_period
-
-from uk_budget_data.budget_measures import milburn_design as design
-from uk_budget_data.measure_templates import _call_formula, _replace_formula
 from policyengine_uk.utils.supplied_inputs import set_model_value
 from policyengine_uk.utils.uc_work_related_requirements import (
     other_member_of_single_claim,
 )
+
+from uk_budget_data.budget_measures import milburn_design as design
+from uk_budget_data.measure_templates import _call_formula, _replace_formula
 
 # The 15 November designs (milburn_design, first group). Every function
 # below takes them as arguments; the report's versions pass the REPORT_*

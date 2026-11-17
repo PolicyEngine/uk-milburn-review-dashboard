@@ -230,12 +230,16 @@ def caseloads(sim, year, by_country=False):
         ).astype(str)
         # Each benefit unit takes its members' country (one household).
         benunit_country = np.empty(len(element), dtype=person_country.dtype)
-        benunit_country[
-            sim.populations["benunit"].members_entity_id
-        ] = person_country
+        benunit_country[sim.populations["benunit"].members_entity_id] = (
+            person_country
+        )
         for country in sorted(set(person_country)):
             groups.append(
-                (country, person_country == country, benunit_country == country)
+                (
+                    country,
+                    person_country == country,
+                    benunit_country == country,
+                )
             )
 
     rows = []

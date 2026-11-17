@@ -31,6 +31,7 @@ import json
 @dataclass
 class DataSource:
     """Represents an external data source."""
+
     name: str
     organisation: str
     description: str
@@ -59,7 +60,7 @@ class DataSources:
         # =============================================================
         # 1. END CHILD POVERTY - TWO-CHILD LIMIT DATA
         # =============================================================
-        sources['end_child_poverty'] = DataSource(
+        sources["end_child_poverty"] = DataSource(
             name="End Child Poverty - Two-Child Limit Data",
             organisation="End Child Poverty Coalition / Loughborough University",
             description="""
@@ -80,7 +81,7 @@ class DataSources:
                 "Region - UK region name",
                 "Constituency - Parliamentary constituency name",
                 "Percentage of children affected by two-child limit - % of children in families hit by 2CL",
-                "Percentage of children living in poverty - Child poverty rate after housing costs (AHC)"
+                "Percentage of children living in poverty - Child poverty rate after housing costs (AHC)",
             ],
             how_to_use="""
             1. Download the Excel file from the download URL
@@ -107,13 +108,13 @@ class DataSources:
             - After Housing Costs (AHC) measure - typically higher than BHC
             - Updated to 2024 constituency boundaries after General Election
             """,
-            license="Open Government Licence"
+            license="Open Government Licence",
         )
 
         # =============================================================
         # 2. DWP/HMRC - CHILDREN IN LOW INCOME FAMILIES
         # =============================================================
-        sources['dwp_low_income'] = DataSource(
+        sources["dwp_low_income"] = DataSource(
             name="Children in Low Income Families: Local Area Statistics",
             organisation="Department for Work and Pensions (DWP) / HMRC",
             description="""
@@ -133,7 +134,7 @@ class DataSources:
                 "Westminster Parliamentary Constituency - Constituency name",
                 "Area Code - ONS constituency code (E14..., W07..., S14...)",
                 "Number of children - Count of children in low income families",
-                "Percentage of children - % of children in relative low income (BHC)"
+                "Percentage of children - % of children in relative low income (BHC)",
             ],
             how_to_use="""
             1. Download the ODS file from GOV.UK
@@ -166,13 +167,13 @@ class DataSources:
             - Does NOT include Northern Ireland constituency data
             - Replaced older HMRC/DWP separate publications in 2020
             """,
-            license="Open Government Licence v3.0"
+            license="Open Government Licence v3.0",
         )
 
         # =============================================================
         # 3. HOUSE OF COMMONS LIBRARY - CONSTITUENCY DATA
         # =============================================================
-        sources['commons_library'] = DataSource(
+        sources["commons_library"] = DataSource(
             name="House of Commons Library - Constituency Data: Child Poverty",
             organisation="House of Commons Library",
             description="""
@@ -192,7 +193,7 @@ class DataSources:
                 "Child poverty rate (relative, BHC)",
                 "Child poverty rate (absolute, BHC)",
                 "Number of children in poverty",
-                "Regional comparisons"
+                "Regional comparisons",
             ],
             how_to_use="""
             1. Visit the Commons Library page
@@ -211,13 +212,13 @@ class DataSources:
             - Good for MP-facing communications
             - Also available via Stat-Xplore for custom queries
             """,
-            license="Open Parliament Licence"
+            license="Open Parliament Licence",
         )
 
         # =============================================================
         # 4. STAT-XPLORE (DWP)
         # =============================================================
-        sources['stat_xplore'] = DataSource(
+        sources["stat_xplore"] = DataSource(
             name="Stat-Xplore - Children in Low Income Families",
             organisation="Department for Work and Pensions (DWP)",
             description="""
@@ -236,7 +237,7 @@ class DataSources:
                 "Children in Low Income Families (Relative/Absolute)",
                 "Breakdowns by: Age, Gender, Family Type, Work Status",
                 "Time series from FYE 2015 onwards",
-                "Geographic breakdowns to ward level"
+                "Geographic breakdowns to ward level",
             ],
             how_to_use="""
             1. Register for a free account at stat-xplore.dwp.gov.uk
@@ -254,13 +255,13 @@ class DataSources:
             - Can get ward-level data for detailed analysis
             - API available for programmatic access
             """,
-            license="Open Government Licence v3.0"
+            license="Open Government Licence v3.0",
         )
 
         # =============================================================
         # 5. INSTITUTE FOR FISCAL STUDIES (IFS)
         # =============================================================
-        sources['ifs'] = DataSource(
+        sources["ifs"] = DataSource(
             name="IFS Analysis - Two-Child Limit",
             organisation="Institute for Fiscal Studies",
             description="""
@@ -279,7 +280,7 @@ class DataSources:
                 "Cost of abolition: ~£2.5bn/year",
                 "Children lifted out of poverty: ~540,000",
                 "Poverty reduction: ~4 percentage points (absolute)",
-                "Cost per child lifted out: comparison with alternatives"
+                "Cost per child lifted out: comparison with alternatives",
             ],
             how_to_use="""
             IFS provides analysis rather than raw data. Use for:
@@ -302,13 +303,13 @@ class DataSources:
             - Methodologically rigorous
             - Good for validating order of magnitude
             """,
-            license="IFS publications are copyrighted but quotable"
+            license="IFS publications are copyrighted but quotable",
         )
 
         # =============================================================
         # 6. RESOLUTION FOUNDATION
         # =============================================================
-        sources['resolution_foundation'] = DataSource(
+        sources["resolution_foundation"] = DataSource(
             name="Resolution Foundation - Child Poverty Analysis",
             organisation="Resolution Foundation",
             description="""
@@ -327,7 +328,7 @@ class DataSources:
                 "Cost of abolition: £2.5bn (2024-25), rising to £3.6bn by 2035",
                 "Children lifted from poverty: ~490,000 immediately",
                 "Cost per child: ~£10,000 per child lifted out",
-                "Interaction with benefit cap analysis"
+                "Interaction with benefit cap analysis",
             ],
             how_to_use="""
             Resolution Foundation provides detailed projections:
@@ -351,13 +352,13 @@ class DataSources:
             - Good for time-series validation
             - Includes behavioural responses
             """,
-            license="Resolution Foundation publications are freely available"
+            license="Resolution Foundation publications are freely available",
         )
 
         # =============================================================
         # 7. CHILD POVERTY ACTION GROUP (CPAG)
         # =============================================================
-        sources['cpag'] = DataSource(
+        sources["cpag"] = DataSource(
             name="CPAG - Two-Child Limit Research",
             organisation="Child Poverty Action Group",
             description="""
@@ -376,7 +377,7 @@ class DataSources:
                 "Families affected: 1.6 million children in 450,000 families",
                 "Cost of abolition: £1.8-2bn",
                 "Children lifted from poverty: 300,000-350,000",
-                "Depth of poverty analysis"
+                "Depth of poverty analysis",
             ],
             how_to_use="""
             CPAG provides context and case studies:
@@ -399,13 +400,13 @@ class DataSources:
             - Case studies useful for communications
             - May have different cost estimates (different assumptions)
             """,
-            license="CPAG materials available for non-commercial use"
+            license="CPAG materials available for non-commercial use",
         )
 
         # =============================================================
         # 8. OBR - OFFICE FOR BUDGET RESPONSIBILITY
         # =============================================================
-        sources['obr'] = DataSource(
+        sources["obr"] = DataSource(
             name="OBR - Policy Costings",
             organisation="Office for Budget Responsibility",
             description="""
@@ -424,7 +425,7 @@ class DataSources:
                 "Static costing - Direct fiscal impact",
                 "Post-behavioural costing - Including behavioural responses",
                 "Year-by-year projections (5 years)",
-                "Uncertainty ranges"
+                "Uncertainty ranges",
             ],
             how_to_use="""
             OBR costings are in Budget documents:
@@ -444,7 +445,7 @@ class DataSources:
             - More conservative than academic estimates
             - May differ from project due to methodology
             """,
-            license="Open Government Licence"
+            license="Open Government Licence",
         )
 
         return sources
@@ -491,28 +492,30 @@ class DataSources:
         print(f"{'Key':<25} {'Name':<40} {'Format':<15} {'Geography'}")
         print("-" * 100)
         for key, source in self.sources.items():
-            print(f"{key:<25} {source.name[:38]:<40} {source.file_format[:13]:<15} {source.geography_level}")
+            print(
+                f"{key:<25} {source.name[:38]:<40} {source.file_format[:13]:<15} {source.geography_level}"
+            )
 
     def export_to_json(self, filepath: str):
         """Export all sources to JSON file."""
         data = {}
         for key, source in self.sources.items():
             data[key] = {
-                'name': source.name,
-                'organisation': source.organisation,
-                'description': source.description.strip(),
-                'url': source.url,
-                'download_url': source.download_url,
-                'file_format': source.file_format,
-                'update_frequency': source.update_frequency,
-                'geography_level': source.geography_level,
-                'key_fields': source.key_fields,
-                'how_to_use': source.how_to_use.strip(),
-                'notes': source.notes.strip(),
-                'license': source.license
+                "name": source.name,
+                "organisation": source.organisation,
+                "description": source.description.strip(),
+                "url": source.url,
+                "download_url": source.download_url,
+                "file_format": source.file_format,
+                "update_frequency": source.update_frequency,
+                "geography_level": source.geography_level,
+                "key_fields": source.key_fields,
+                "how_to_use": source.how_to_use.strip(),
+                "notes": source.notes.strip(),
+                "license": source.license,
             }
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(data, f, indent=2)
         print(f"Exported to {filepath}")
 
@@ -556,7 +559,8 @@ def print_full_guide():
     print("=" * 100)
     print("VALIDATION WORKFLOW")
     print("=" * 100)
-    print("""
+    print(
+        """
     1. PRIMARY VALIDATION (Constituency Level):
        - Download End Child Poverty data (two-child limit %)
        - Download DWP Children in Low Income Families data
@@ -580,7 +584,8 @@ def print_full_guide():
 
     Run the validation script:
         uv run python scripts/validate_constituency_data.py
-    """)
+    """
+    )
 
 
 if __name__ == "__main__":

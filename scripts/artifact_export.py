@@ -53,7 +53,14 @@ def relativise():
     """Every absolute path the export writes, made relative to its file."""
     for root, _, files in os.walk(OUT):
         rel = os.path.relpath(root, OUT)
-        if rel.split(os.sep)[0] in ("data", "assets", "cache", "server", "types", "publish"):
+        if rel.split(os.sep)[0] in (
+            "data",
+            "assets",
+            "cache",
+            "server",
+            "types",
+            "publish",
+        ):
             continue
         for name in files:
             if not name.endswith((".html", ".js", ".css", ".txt")):
@@ -84,7 +91,9 @@ def relativise():
                 # means the same character
                 text = text.replace("\ufffd", "\\uFFFD")
             if text != original:
-                with open(path, "w", encoding="utf-8", errors="surrogateescape") as fh:
+                with open(
+                    path, "w", encoding="utf-8", errors="surrogateescape"
+                ) as fh:
                     fh.write(text)
 
 
@@ -109,13 +118,23 @@ SKIP_PUBLISHED = (
 def skipped(path):
     """Whether a file (its path under the export) is left out of what is published."""
     path = path.replace(os.sep, "/")
-    return any(fnmatch.fnmatchcase(path, pattern) for pattern in SKIP_PUBLISHED)
+    return any(
+        fnmatch.fnmatchcase(path, pattern) for pattern in SKIP_PUBLISHED
+    )
 
 
 def stage():
     shutil.rmtree(PUBLISH, ignore_errors=True)
     os.makedirs(PUBLISH)
-    skip_dirs = {"cache", "server", "types", "publish", "_not-found", "diagnostics", "build"}
+    skip_dirs = {
+        "cache",
+        "server",
+        "types",
+        "publish",
+        "_not-found",
+        "diagnostics",
+        "build",
+    }
     skip_files = {"404.html", "_not-found.html", "_not-found.txt"}
     for root, dirs, files in os.walk(OUT):
         rel = os.path.relpath(root, OUT)
@@ -126,25 +145,37 @@ def stage():
         if rel == ".":
             dirs[:] = [d for d in dirs if d not in skip_dirs]
         for name in files:
-            if rel == "." and (name in skip_files or name.endswith(".json") or name.startswith(".")):
+            if rel == "." and (
+                name in skip_files
+                or name.endswith(".json")
+                or name.startswith(".")
+            ):
                 continue
             if skipped(os.path.normpath(os.path.join(rel, name))):
                 continue
             src = os.path.join(root, name)
             # Client-side navigation payloads: this one-page app never uses them
-            if rel == "." and (name.startswith("__next.") or name == "index.txt"):
+            if rel == "." and (
+                name.startswith("__next.") or name == "index.txt"
+            ):
                 continue
             # Pages-router build manifests: nothing in this app reads them
             if name.startswith("_") and name.endswith("Manifest.js"):
                 continue
-            dest_name = "dashboard.html" if (rel == "." and name == "index.html") else name
+            dest_name = (
+                "dashboard.html"
+                if (rel == "." and name == "index.html")
+                else name
+            )
             parts = rel.split(os.sep)
             if parts[0] == "_next":
                 parts[0] = "nx"
             dest = os.path.join(PUBLISH, *parts, dest_name)
             os.makedirs(os.path.dirname(dest), exist_ok=True)
             shutil.copy2(src, dest)
-    with open(os.path.join(PUBLISH, "index.html"), "w", encoding="utf-8") as fh:
+    with open(
+        os.path.join(PUBLISH, "index.html"), "w", encoding="utf-8"
+    ) as fh:
         fh.write(LOADER)
 
 
@@ -155,7 +186,9 @@ def main():
     stage()
     files = [os.path.join(r, f) for r, _, fs in os.walk(PUBLISH) for f in fs]
     size = sum(os.path.getsize(f) for f in files)
-    print(f"Staged {len(files)} files, {size / 1e6:.1f} MB, in {os.path.relpath(PUBLISH, ROOT)}/")
+    print(
+        f"Staged {len(files)} files, {size / 1e6:.1f} MB, in {os.path.relpath(PUBLISH, ROOT)}/"
+    )
 
 
 if __name__ == "__main__":

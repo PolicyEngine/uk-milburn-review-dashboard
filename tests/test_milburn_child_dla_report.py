@@ -36,7 +36,9 @@ def rates():
     return forecast_parameters().gov.dwp
 
 
-def family(age, daily_living="NONE", mobility="NONE", region="NORTH_WEST", **child):
+def family(
+    age, daily_living="NONE", mobility="NONE", region="NORTH_WEST", **child
+):
     """A lone parent on Universal Credit with one young person."""
     young = {
         "age": {YEAR: age},

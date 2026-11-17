@@ -6,13 +6,13 @@ One modifier in a module of its own: see the package docstring.
 """
 
 import numpy as np
-
-from uk_budget_data.budget_measures import milburn_design as design
 from policyengine_core.periods import period as as_period
 from policyengine_uk.utils.supplied_inputs import set_model_value
 from policyengine_uk.utils.uc_work_related_requirements import (
     other_member_of_single_claim,
 )
+
+from uk_budget_data.budget_measures import milburn_design as design
 
 
 def uc_health_element_removed_under_25(

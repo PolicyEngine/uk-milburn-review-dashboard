@@ -52,7 +52,9 @@ COLORS = {
 }
 
 # Font family from design system
-FONT_FAMILY = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+FONT_FAMILY = (
+    "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+)
 
 YEAR_LABELS = ["2026-27", "2027-28", "2028-29", "2029-30", "2030-31"]
 
@@ -62,50 +64,430 @@ YEAR_LABELS = ["2026-27", "2027-28", "2028-29", "2029-30", "2030-31"]
 
 # Figure 1: Distributional impact data (£/year by decile)
 DISTRIBUTIONAL_DATA = {
-    "2026-27": [669.9, 1139.5, 440.1, 363.7, 211.8, 152.7, 140.5, 183.4, 164.7, 170.0],
-    "2027-28": [655.3, 1155.5, 441.8, 309.2, 146.1, 91.2, 54.5, 72.9, 56.0, 59.8],
-    "2028-29": [458.4, 1446.0, 338.4, 283.1, 39.2, -36.7, -156.0, -179.4, -290.9, -504.8],
-    "2029-30": [441.9, 1434.7, 176.4, 216.2, -180.8, -231.9, -416.1, -526.9, -1028.2, -1449.0],
-    "2030-31": [466.7, 1343.2, 235.8, 58.7, -202.0, -350.2, -576.2, -766.5, -1327.7, -1874.0],
+    "2026-27": [
+        669.9,
+        1139.5,
+        440.1,
+        363.7,
+        211.8,
+        152.7,
+        140.5,
+        183.4,
+        164.7,
+        170.0,
+    ],
+    "2027-28": [
+        655.3,
+        1155.5,
+        441.8,
+        309.2,
+        146.1,
+        91.2,
+        54.5,
+        72.9,
+        56.0,
+        59.8,
+    ],
+    "2028-29": [
+        458.4,
+        1446.0,
+        338.4,
+        283.1,
+        39.2,
+        -36.7,
+        -156.0,
+        -179.4,
+        -290.9,
+        -504.8,
+    ],
+    "2029-30": [
+        441.9,
+        1434.7,
+        176.4,
+        216.2,
+        -180.8,
+        -231.9,
+        -416.1,
+        -526.9,
+        -1028.2,
+        -1449.0,
+    ],
+    "2030-31": [
+        466.7,
+        1343.2,
+        235.8,
+        58.7,
+        -202.0,
+        -350.2,
+        -576.2,
+        -766.5,
+        -1327.7,
+        -1874.0,
+    ],
 }
 
 # Figure 2: Winners/losers data (% by category for each decile + All) - rounded to 1 decimal
 # Order: ["All", " ", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1"]
 WINNERS_LOSERS_DATA = {
     "2026-27": {
-        "gain_more_5": [8.8, None, 4.2, 5.8, 4.9, 3.8, 5.7, 5.7, 11.2, 10.5, 23.0, 13.4],
-        "gain_less_5": [43.7, None, 42.6, 47.5, 53.6, 50.2, 49.1, 50.9, 38.9, 36.5, 33.5, 33.5],
-        "no_change": [47.6, None, 53.2, 46.7, 41.6, 46.0, 45.2, 43.5, 50.0, 53.1, 43.6, 53.2],
-        "lose_less_5": [0.0, None, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        "lose_more_5": [0.0, None, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        "gain_more_5": [
+            8.8,
+            None,
+            4.2,
+            5.8,
+            4.9,
+            3.8,
+            5.7,
+            5.7,
+            11.2,
+            10.5,
+            23.0,
+            13.4,
+        ],
+        "gain_less_5": [
+            43.7,
+            None,
+            42.6,
+            47.5,
+            53.6,
+            50.2,
+            49.1,
+            50.9,
+            38.9,
+            36.5,
+            33.5,
+            33.5,
+        ],
+        "no_change": [
+            47.6,
+            None,
+            53.2,
+            46.7,
+            41.6,
+            46.0,
+            45.2,
+            43.5,
+            50.0,
+            53.1,
+            43.6,
+            53.2,
+        ],
+        "lose_less_5": [
+            0.0,
+            None,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+        "lose_more_5": [
+            0.0,
+            None,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
     },
     "2027-28": {
-        "gain_more_5": [8.3, None, 3.7, 5.5, 4.7, 3.3, 5.0, 5.8, 10.0, 10.7, 22.1, 12.1],
-        "gain_less_5": [42.5, None, 41.3, 44.4, 51.0, 46.7, 47.8, 47.7, 41.0, 35.7, 34.0, 35.1],
-        "no_change": [45.5, None, 49.6, 41.3, 36.3, 43.6, 41.8, 44.9, 48.3, 53.3, 43.8, 52.8],
-        "lose_less_5": [3.7, None, 5.5, 8.8, 8.0, 6.5, 5.4, 1.6, 0.6, 0.4, 0.2, 0.0],
-        "lose_more_5": [0.0, None, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0],
+        "gain_more_5": [
+            8.3,
+            None,
+            3.7,
+            5.5,
+            4.7,
+            3.3,
+            5.0,
+            5.8,
+            10.0,
+            10.7,
+            22.1,
+            12.1,
+        ],
+        "gain_less_5": [
+            42.5,
+            None,
+            41.3,
+            44.4,
+            51.0,
+            46.7,
+            47.8,
+            47.7,
+            41.0,
+            35.7,
+            34.0,
+            35.1,
+        ],
+        "no_change": [
+            45.5,
+            None,
+            49.6,
+            41.3,
+            36.3,
+            43.6,
+            41.8,
+            44.9,
+            48.3,
+            53.3,
+            43.8,
+            52.8,
+        ],
+        "lose_less_5": [
+            3.7,
+            None,
+            5.5,
+            8.8,
+            8.0,
+            6.5,
+            5.4,
+            1.6,
+            0.6,
+            0.4,
+            0.2,
+            0.0,
+        ],
+        "lose_more_5": [
+            0.0,
+            None,
+            0.0,
+            0.1,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.1,
+            0.0,
+            0.0,
+            0.0,
+        ],
     },
     "2028-29": {
-        "gain_more_5": [6.7, None, 1.8, 0.9, 2.8, 2.2, 3.2, 4.9, 8.5, 8.4, 24.3, 10.2],
-        "gain_less_5": [12.8, None, 2.8, 3.3, 9.2, 10.9, 12.3, 13.3, 16.9, 13.7, 22.1, 24.9],
-        "no_change": [8.7, None, 0.8, 0.4, 1.5, 2.9, 4.4, 5.6, 7.0, 11.4, 14.6, 40.7],
-        "lose_less_5": [69.8, None, 91.9, 90.8, 84.7, 81.9, 78.4, 75.3, 64.7, 65.0, 37.9, 23.4],
-        "lose_more_5": [2.0, None, 2.6, 4.6, 1.8, 2.1, 1.8, 0.9, 2.9, 1.5, 1.2, 0.7],
+        "gain_more_5": [
+            6.7,
+            None,
+            1.8,
+            0.9,
+            2.8,
+            2.2,
+            3.2,
+            4.9,
+            8.5,
+            8.4,
+            24.3,
+            10.2,
+        ],
+        "gain_less_5": [
+            12.8,
+            None,
+            2.8,
+            3.3,
+            9.2,
+            10.9,
+            12.3,
+            13.3,
+            16.9,
+            13.7,
+            22.1,
+            24.9,
+        ],
+        "no_change": [
+            8.7,
+            None,
+            0.8,
+            0.4,
+            1.5,
+            2.9,
+            4.4,
+            5.6,
+            7.0,
+            11.4,
+            14.6,
+            40.7,
+        ],
+        "lose_less_5": [
+            69.8,
+            None,
+            91.9,
+            90.8,
+            84.7,
+            81.9,
+            78.4,
+            75.3,
+            64.7,
+            65.0,
+            37.9,
+            23.4,
+        ],
+        "lose_more_5": [
+            2.0,
+            None,
+            2.6,
+            4.6,
+            1.8,
+            2.1,
+            1.8,
+            0.9,
+            2.9,
+            1.5,
+            1.2,
+            0.7,
+        ],
     },
     "2029-30": {
-        "gain_more_5": [4.7, None, 0.0, 0.0, 0.2, 0.2, 0.7, 1.4, 7.1, 7.0, 22.2, 8.9],
-        "gain_less_5": [6.4, None, 0.2, 0.2, 2.9, 2.7, 6.9, 3.2, 7.4, 5.8, 13.2, 22.4],
-        "no_change": [7.1, None, 0.3, 0.1, 0.9, 1.0, 3.8, 3.8, 5.8, 8.6, 12.1, 36.6],
-        "lose_less_5": [77.1, None, 93.4, 91.7, 90.6, 91.8, 84.0, 87.2, 74.1, 75.1, 49.0, 30.1],
-        "lose_more_5": [4.8, None, 6.1, 7.9, 5.5, 4.3, 4.7, 4.4, 5.6, 3.6, 3.6, 2.0],
+        "gain_more_5": [
+            4.7,
+            None,
+            0.0,
+            0.0,
+            0.2,
+            0.2,
+            0.7,
+            1.4,
+            7.1,
+            7.0,
+            22.2,
+            8.9,
+        ],
+        "gain_less_5": [
+            6.4,
+            None,
+            0.2,
+            0.2,
+            2.9,
+            2.7,
+            6.9,
+            3.2,
+            7.4,
+            5.8,
+            13.2,
+            22.4,
+        ],
+        "no_change": [
+            7.1,
+            None,
+            0.3,
+            0.1,
+            0.9,
+            1.0,
+            3.8,
+            3.8,
+            5.8,
+            8.6,
+            12.1,
+            36.6,
+        ],
+        "lose_less_5": [
+            77.1,
+            None,
+            93.4,
+            91.7,
+            90.6,
+            91.8,
+            84.0,
+            87.2,
+            74.1,
+            75.1,
+            49.0,
+            30.1,
+        ],
+        "lose_more_5": [
+            4.8,
+            None,
+            6.1,
+            7.9,
+            5.5,
+            4.3,
+            4.7,
+            4.4,
+            5.6,
+            3.6,
+            3.6,
+            2.0,
+        ],
     },
     "2030-31": {
-        "gain_more_5": [4.7, None, 0.0, 0.0, 0.1, 0.2, 0.5, 2.5, 5.4, 8.6, 20.9, 9.9],
-        "gain_less_5": [6.3, None, 0.2, 0.3, 3.0, 2.9, 6.4, 2.8, 6.8, 6.0, 13.3, 22.8],
-        "no_change": [6.8, None, 0.3, 0.1, 1.0, 1.0, 3.8, 4.2, 3.7, 8.3, 11.3, 36.4],
-        "lose_less_5": [76.7, None, 91.2, 90.9, 89.3, 91.3, 84.2, 85.1, 78.2, 73.4, 50.4, 29.0],
-        "lose_more_5": [5.5, None, 8.3, 8.7, 6.6, 4.6, 5.2, 5.3, 6.0, 3.7, 4.2, 2.0],
+        "gain_more_5": [
+            4.7,
+            None,
+            0.0,
+            0.0,
+            0.1,
+            0.2,
+            0.5,
+            2.5,
+            5.4,
+            8.6,
+            20.9,
+            9.9,
+        ],
+        "gain_less_5": [
+            6.3,
+            None,
+            0.2,
+            0.3,
+            3.0,
+            2.9,
+            6.4,
+            2.8,
+            6.8,
+            6.0,
+            13.3,
+            22.8,
+        ],
+        "no_change": [
+            6.8,
+            None,
+            0.3,
+            0.1,
+            1.0,
+            1.0,
+            3.8,
+            4.2,
+            3.7,
+            8.3,
+            11.3,
+            36.4,
+        ],
+        "lose_less_5": [
+            76.7,
+            None,
+            91.2,
+            90.9,
+            89.3,
+            91.3,
+            84.2,
+            85.1,
+            78.2,
+            73.4,
+            50.4,
+            29.0,
+        ],
+        "lose_more_5": [
+            5.5,
+            None,
+            8.3,
+            8.7,
+            6.6,
+            4.6,
+            5.2,
+            5.3,
+            6.0,
+            3.7,
+            4.2,
+            2.0,
+        ],
     },
 }
 
@@ -115,30 +497,126 @@ WINNERS_LOSERS_DATA = {
 POVERTY_DATA = {
     "absolute": {
         "bhc": {
-            "Overall": {"2026-27": -0.7, "2027-28": -0.7, "2028-29": -0.7, "2029-30": -0.7, "2030-31": -0.8},
-            "Child": {"2026-27": -2.3, "2027-28": -2.3, "2028-29": -2.5, "2029-30": -2.5, "2030-31": -2.9},
-            "Working-age": {"2026-27": -0.3, "2027-28": -0.3, "2028-29": -0.4, "2029-30": -0.4, "2030-31": -0.4},
-            "Pensioner": {"2026-27": 0.0, "2027-28": 0.0, "2028-29": 0.1, "2029-30": 0.1, "2030-31": 0.1},
+            "Overall": {
+                "2026-27": -0.7,
+                "2027-28": -0.7,
+                "2028-29": -0.7,
+                "2029-30": -0.7,
+                "2030-31": -0.8,
+            },
+            "Child": {
+                "2026-27": -2.3,
+                "2027-28": -2.3,
+                "2028-29": -2.5,
+                "2029-30": -2.5,
+                "2030-31": -2.9,
+            },
+            "Working-age": {
+                "2026-27": -0.3,
+                "2027-28": -0.3,
+                "2028-29": -0.4,
+                "2029-30": -0.4,
+                "2030-31": -0.4,
+            },
+            "Pensioner": {
+                "2026-27": 0.0,
+                "2027-28": 0.0,
+                "2028-29": 0.1,
+                "2029-30": 0.1,
+                "2030-31": 0.1,
+            },
         },
         "ahc": {
-            "Overall": {"2026-27": -1.0, "2027-28": -1.1, "2028-29": -1.0, "2029-30": -0.9, "2030-31": -1.0},
-            "Child": {"2026-27": -3.5, "2027-28": -3.6, "2028-29": -3.5, "2029-30": -3.4, "2030-31": -3.8},
-            "Working-age": {"2026-27": -0.5, "2027-28": -0.5, "2028-29": -0.5, "2029-30": -0.4, "2030-31": -0.5},
-            "Pensioner": {"2026-27": 0.0, "2027-28": 0.0, "2028-29": 0.1, "2029-30": 0.1, "2030-31": 0.1},
+            "Overall": {
+                "2026-27": -1.0,
+                "2027-28": -1.1,
+                "2028-29": -1.0,
+                "2029-30": -0.9,
+                "2030-31": -1.0,
+            },
+            "Child": {
+                "2026-27": -3.5,
+                "2027-28": -3.6,
+                "2028-29": -3.5,
+                "2029-30": -3.4,
+                "2030-31": -3.8,
+            },
+            "Working-age": {
+                "2026-27": -0.5,
+                "2027-28": -0.5,
+                "2028-29": -0.5,
+                "2029-30": -0.4,
+                "2030-31": -0.5,
+            },
+            "Pensioner": {
+                "2026-27": 0.0,
+                "2027-28": 0.0,
+                "2028-29": 0.1,
+                "2029-30": 0.1,
+                "2030-31": 0.1,
+            },
         },
     },
     "relative": {
         "bhc": {
-            "Overall": {"2026-27": -0.5, "2027-28": -0.5, "2028-29": -0.5, "2029-30": -0.5, "2030-31": -0.6},
-            "Child": {"2026-27": -1.8, "2027-28": -1.8, "2028-29": -1.9, "2029-30": -1.9, "2030-31": -2.2},
-            "Working-age": {"2026-27": -0.2, "2027-28": -0.2, "2028-29": -0.3, "2029-30": -0.3, "2030-31": -0.3},
-            "Pensioner": {"2026-27": 0.0, "2027-28": 0.0, "2028-29": 0.1, "2029-30": 0.0, "2030-31": 0.1},
+            "Overall": {
+                "2026-27": -0.5,
+                "2027-28": -0.5,
+                "2028-29": -0.5,
+                "2029-30": -0.5,
+                "2030-31": -0.6,
+            },
+            "Child": {
+                "2026-27": -1.8,
+                "2027-28": -1.8,
+                "2028-29": -1.9,
+                "2029-30": -1.9,
+                "2030-31": -2.2,
+            },
+            "Working-age": {
+                "2026-27": -0.2,
+                "2027-28": -0.2,
+                "2028-29": -0.3,
+                "2029-30": -0.3,
+                "2030-31": -0.3,
+            },
+            "Pensioner": {
+                "2026-27": 0.0,
+                "2027-28": 0.0,
+                "2028-29": 0.1,
+                "2029-30": 0.0,
+                "2030-31": 0.1,
+            },
         },
         "ahc": {
-            "Overall": {"2026-27": -0.8, "2027-28": -0.8, "2028-29": -0.8, "2029-30": -0.7, "2030-31": -0.8},
-            "Child": {"2026-27": -2.8, "2027-28": -2.9, "2028-29": -2.8, "2029-30": -2.7, "2030-31": -3.0},
-            "Working-age": {"2026-27": -0.4, "2027-28": -0.4, "2028-29": -0.4, "2029-30": -0.3, "2030-31": -0.4},
-            "Pensioner": {"2026-27": 0.0, "2027-28": 0.0, "2028-29": 0.1, "2029-30": 0.1, "2030-31": 0.1},
+            "Overall": {
+                "2026-27": -0.8,
+                "2027-28": -0.8,
+                "2028-29": -0.8,
+                "2029-30": -0.7,
+                "2030-31": -0.8,
+            },
+            "Child": {
+                "2026-27": -2.8,
+                "2027-28": -2.9,
+                "2028-29": -2.8,
+                "2029-30": -2.7,
+                "2030-31": -3.0,
+            },
+            "Working-age": {
+                "2026-27": -0.4,
+                "2027-28": -0.4,
+                "2028-29": -0.4,
+                "2029-30": -0.3,
+                "2030-31": -0.4,
+            },
+            "Pensioner": {
+                "2026-27": 0.0,
+                "2027-28": 0.0,
+                "2028-29": 0.1,
+                "2029-30": 0.1,
+                "2030-31": 0.1,
+            },
         },
     },
 }
@@ -147,7 +625,7 @@ POVERTY_DATA = {
 def create_distributional_html(output_path: Path) -> None:
     """Create Figure 1: Distributional impact chart (£/year by decile) with year slider."""
 
-    html_content = f'''<!DOCTYPE html>
+    html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -249,7 +727,7 @@ def create_distributional_html(output_path: Path) -> None:
         }});
     </script>
 </body>
-</html>'''
+</html>"""
 
     output_path.write_text(html_content)
     print(f"  + Saved: {output_path}")
@@ -260,7 +738,7 @@ def create_winners_losers_html(output_path: Path) -> None:
 
     y_labels = ["All", " ", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1"]
 
-    html_content = f'''<!DOCTYPE html>
+    html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -393,7 +871,7 @@ def create_winners_losers_html(output_path: Path) -> None:
         }});
     </script>
 </body>
-</html>'''
+</html>"""
 
     output_path.write_text(html_content)
     print(f"  + Saved: {output_path}")
@@ -402,7 +880,7 @@ def create_winners_losers_html(output_path: Path) -> None:
 def create_poverty_html(output_path: Path) -> None:
     """Create Figure 4: Poverty impact chart with toggles for absolute/relative and BHC/AHC."""
 
-    html_content = f'''<!DOCTYPE html>
+    html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -560,7 +1038,7 @@ def create_poverty_html(output_path: Path) -> None:
         updateChart();
     </script>
 </body>
-</html>'''
+</html>"""
 
     output_path.write_text(html_content)
     print(f"  + Saved: {output_path}")
@@ -576,7 +1054,9 @@ def create_constituency_map_html(output_path: Path) -> None:
 
     # Load constituency data
     constituency_df = pd.read_csv("public/data/constituency.csv")
-    reform_data = constituency_df[constituency_df["reform_id"] == "autumn_budget_2025_combined"].copy()
+    reform_data = constituency_df[
+        constituency_df["reform_id"] == "autumn_budget_2025_combined"
+    ].copy()
 
     # Prepare data by year (map constituency code to average gain) - round to 1 decimal
     data_by_year = {}
@@ -591,7 +1071,7 @@ def create_constituency_map_html(output_path: Path) -> None:
             for _, row in year_data.iterrows()
         }
 
-    html_content = f'''<!DOCTYPE html>
+    html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -857,7 +1337,7 @@ def create_constituency_map_html(output_path: Path) -> None:
         }});
     </script>
 </body>
-</html>'''
+</html>"""
 
     output_path.write_text(html_content)
     print(f"  + Saved: {output_path}")
@@ -887,10 +1367,18 @@ def main():
     print(f"All charts saved to {output_dir}/")
     print()
     print("Charts will be available at:")
-    print("  https://policyengine.github.io/uk-autumn-budget-dashboard/combined_reforms/distributional.html")
-    print("  https://policyengine.github.io/uk-autumn-budget-dashboard/combined_reforms/winners_losers.html")
-    print("  https://policyengine.github.io/uk-autumn-budget-dashboard/combined_reforms/constituency_map.html")
-    print("  https://policyengine.github.io/uk-autumn-budget-dashboard/combined_reforms/poverty_inequality.html")
+    print(
+        "  https://policyengine.github.io/uk-autumn-budget-dashboard/combined_reforms/distributional.html"
+    )
+    print(
+        "  https://policyengine.github.io/uk-autumn-budget-dashboard/combined_reforms/winners_losers.html"
+    )
+    print(
+        "  https://policyengine.github.io/uk-autumn-budget-dashboard/combined_reforms/constituency_map.html"
+    )
+    print(
+        "  https://policyengine.github.io/uk-autumn-budget-dashboard/combined_reforms/poverty_inequality.html"
+    )
 
 
 if __name__ == "__main__":

@@ -167,7 +167,9 @@ def employer_nics_threshold_ages_21_to_24(
         gov = parameters(period).gov
         class_1 = gov.hmrc.national_insurance.class_1
         earnings = person("ni_class_1_income", period)
-        if not gov.contrib.policyengine.employer_ni.exempt_employer_pension_contributions:
+        if (
+            not gov.contrib.policyengine.employer_ni.exempt_employer_pension_contributions
+        ):
             earnings = earnings + person(
                 "employer_pension_contributions", period
             )
@@ -192,7 +194,9 @@ def employer_nics_threshold_ages_21_to_24(
             + pension
             + person("salary_sacrifice_pension_ni_excess", period)
         )
-        if gov.contrib.policyengine.employer_ni.exempt_employer_pension_contributions:
+        if (
+            gov.contrib.policyengine.employer_ni.exempt_employer_pension_contributions
+        ):
             earnings = earnings - pension
         threshold = secondary_class_1_threshold(person, period, class_1)
         width = band_width(person, period, threshold)
@@ -218,7 +222,9 @@ def employer_nics_threshold_ages_21_to_24(
             return current
 
         # As the native formula, from here to the reformed schedule.
-        prior_employment_income = person("employment_income_before_lsr", period)
+        prior_employment_income = person(
+            "employment_income_before_lsr", period
+        )
         behavioural_response = person(
             "employment_income_behavioral_response", period
         )
@@ -240,13 +246,20 @@ def employer_nics_threshold_ages_21_to_24(
             pay_before_sacrifice + sacrifice_pay_b + benefits + pension
         )
         baseline_parameters = baseline.tax_benefit_system.parameters(period)
-        baseline_class_1 = baseline_parameters.gov.hmrc.national_insurance.class_1
+        baseline_class_1 = (
+            baseline_parameters.gov.hmrc.national_insurance.class_1
+        )
         r_b = baseline_class_1.employer_scale.components[1].rate
         t_b = secondary_class_1_threshold(person, period, baseline_class_1)
-        p_b = baseline_parameters.gov.contrib.policyengine.employer_ni.exempt_employer_pension_contributions
+        p_b = (
+            baseline_parameters.gov.contrib.policyengine.employer_ni.exempt_employer_pension_contributions
+        )
         pension_subtracted_b = pension if p_b else 0
         baseline_employer_ni = r_b * np.maximum(
-            ni_class_1_income - pension_subtracted_b + ni_only_earnings_b - t_b,
+            ni_class_1_income
+            - pension_subtracted_b
+            + ni_only_earnings_b
+            - t_b,
             0,
         )
         c_b = ni_class_1_income + baseline_employer_ni

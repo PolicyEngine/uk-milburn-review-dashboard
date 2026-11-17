@@ -68,7 +68,9 @@ LOCK_JOB = "neet-breakdown"
 TOKEN_VARIABLES = ("HUGGING_FACE_TOKEN", "HF_TOKEN", "HUGGINGFACE_HUB_TOKEN")
 REFORM_ID = "milburn_report_package"
 OUTPUT = ROOT / "public" / "data" / "milburn_neet.json"
-AGE_IMPACT = ROOT / "public" / "data" / "milburn" / REFORM_ID / "age_impact.csv"
+AGE_IMPACT = (
+    ROOT / "public" / "data" / "milburn" / REFORM_ID / "age_impact.csv"
+)
 LOWER_AGE, UPPER_AGE = 16, 25  # 16 to 24
 MIN_RECORDS = 100
 ONS_BENCHMARK_ID = "neet_16_24"  # public/data/milburn_benchmarks.json
@@ -195,7 +197,10 @@ def take_lock():
                 except FileNotFoundError:
                     pass
                 continue
-            print(f"{time.strftime('%H:%M')} waiting for {LOCK} ({text})", flush=True)
+            print(
+                f"{time.strftime('%H:%M')} waiting for {LOCK} ({text})",
+                flush=True,
+            )
             time.sleep(30)
             continue
         with os.fdopen(handle, "w") as stream:
@@ -250,8 +255,12 @@ def read_people(year):
     period = as_period(year)
     claimant = (
         np.asarray(population("is_uc_assessed_claimant", period), dtype=bool)
-        & ~np.asarray(other_member_of_single_claim(population, period), dtype=bool)
-        & np.asarray(population("uc_limited_capability_for_WRA", period), dtype=bool)
+        & ~np.asarray(
+            other_member_of_single_claim(population, period), dtype=bool
+        )
+        & np.asarray(
+            population("uc_limited_capability_for_WRA", period), dtype=bool
+        )
     )
     frame = pd.DataFrame(
         {
@@ -261,7 +270,9 @@ def read_people(year):
             "baseline_income": person(baseline, "household_net_income"),
             "reform_income": person(reformed, "household_net_income"),
             "employment_income": person(baseline, "employment_income"),
-            "self_employment_income": person(baseline, "self_employment_income"),
+            "self_employment_income": person(
+                baseline, "self_employment_income"
+            ),
             "in_full_time_education": person(
                 baseline, "is_in_full_time_education", bool
             ),
@@ -294,8 +305,12 @@ def summarise(frame, year, label):
 
     frame = frame[frame["decile"] >= 1]
     weight = frame["weight"].to_numpy(dtype=float)
-    change = (frame["reform_income"] - frame["baseline_income"]).to_numpy(dtype=float)
-    relative = change / np.maximum(frame["baseline_income"].to_numpy(dtype=float), 1)
+    change = (frame["reform_income"] - frame["baseline_income"]).to_numpy(
+        dtype=float
+    )
+    relative = change / np.maximum(
+        frame["baseline_income"].to_numpy(dtype=float), 1
+    )
     worse = relative < -AGE_CHANGE_THRESHOLD
     no_earnings = (frame["employment_income"].to_numpy(dtype=float) == 0) & (
         frame["self_employment_income"].to_numpy(dtype=float) == 0
@@ -304,13 +319,19 @@ def summarise(frame, year, label):
     loses_pip = (frame["reform_pip"] < frame["baseline_pip"]).to_numpy()
     loses_uc_health = (
         frame["lcwra_claimant"].to_numpy(dtype=bool)
-        & (frame["reform_lcwra_element"] < frame["baseline_lcwra_element"]).to_numpy()
+        & (
+            frame["reform_lcwra_element"] < frame["baseline_lcwra_element"]
+        ).to_numpy()
     )
     loses_benefit = loses_pip | loses_uc_health
 
     def count(mask):
         """Weighted people, withheld under MIN_RECORDS records."""
-        return round(float(weight[mask].sum())) if mask.sum() >= MIN_RECORDS else None
+        return (
+            round(float(weight[mask].sum()))
+            if mask.sum() >= MIN_RECORDS
+            else None
+        )
 
     def group(members):
         records = int(members.sum())
@@ -321,18 +342,25 @@ def summarise(frame, year, label):
             "records": records,
             "population": round(people) if enough else None,
             "share_in_losing_households_pct": (
-                round(float(weight[losing].sum()) / people * 100, 2) if enough else None
+                round(float(weight[losing].sum()) / people * 100, 2)
+                if enough
+                else None
             ),
             "people_in_losing_households": count(losing) if enough else None,
             "average_change_in_household_net_income": (
-                round(float((weight[members] * change[members]).sum()) / people, 2)
+                round(
+                    float((weight[members] * change[members]).sum()) / people,
+                    2,
+                )
                 if enough
                 else None
             ),
             "people_losing_uc_health_or_pip": count(members & loses_benefit),
             "people_losing_pip": count(members & loses_pip),
             "people_losing_uc_health": count(members & loses_uc_health),
-            "records_losing_uc_health_or_pip": int((members & loses_benefit).sum()),
+            "records_losing_uc_health_or_pip": int(
+                (members & loses_benefit).sum()
+            ),
         }
         if enough:
             lost = row["people_losing_uc_health_or_pip"]
@@ -401,9 +429,13 @@ def reconcile(parts, year):
         target = float(published[key])
         ok = abs(value - target) <= 1e-6 * max(1.0, abs(target))
         failed = failed or not ok
-        print(f"  {key}: ours {value:.6f}, published {target:.6f} {'ok' if ok else 'MISMATCH'}")
+        print(
+            f"  {key}: ours {value:.6f}, published {target:.6f} {'ok' if ok else 'MISMATCH'}"
+        )
     if failed:
-        raise SystemExit("Does not reproduce the published row: nothing written.")
+        raise SystemExit(
+            "Does not reproduce the published row: nothing written."
+        )
 
 
 def diagnostics(parts):
@@ -416,8 +448,12 @@ def diagnostics(parts):
         print(f"  {name}: {int(mask.sum())}, {weight[mask].sum():,.0f}")
     training = neet & frame["in_approved_training"].to_numpy(dtype=bool)
     hours = neet & (frame["hours_worked"].to_numpy(dtype=float) > 0)
-    print(f"  in approved training: {int(training.sum())}, {weight[training].sum():,.0f}")
-    print(f"  with hours worked: {int(hours.sum())}, {weight[hours].sum():,.0f}")
+    print(
+        f"  in approved training: {int(training.sum())}, {weight[training].sum():,.0f}"
+    )
+    print(
+        f"  with hours worked: {int(hours.sum())}, {weight[hours].sum():,.0f}"
+    )
 
 
 def main(argv=None):
@@ -438,7 +474,10 @@ def main(argv=None):
     else:
         take_lock()
         try:
-            print(f"{time.strftime('%H:%M')} lock taken: {LOCK.read_text().strip()}", flush=True)
+            print(
+                f"{time.strftime('%H:%M')} lock taken: {LOCK.read_text().strip()}",
+                flush=True,
+            )
             frame = read_people(arguments.year)
         finally:
             release_lock()
@@ -451,7 +490,9 @@ def main(argv=None):
     summary, parts = summarise(frame, arguments.year, local_build.LABEL)
     reconcile(parts, arguments.year)
     diagnostics(parts)
-    arguments.output.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n")
+    arguments.output.write_text(
+        json.dumps(summary, indent=2, ensure_ascii=False) + "\n"
+    )
     print(json.dumps(summary["groups"], indent=2))
     print(f"NEET-approx total: {summary['neet_approx_total']}")
     print(f"Wrote {arguments.output}")

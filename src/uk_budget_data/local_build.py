@@ -42,6 +42,8 @@ DATASET_SHA256 = (
     "301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90"
 )
 ENGINE = {"policyengine-uk": "2.177.7", "policyengine-core": "3.34.10"}
+
+
 # The installed policyengine.py release (6.20.1 and later certify this build;
 # bundle_certifies checks the installed one)
 def _installed_policyengine() -> str:
@@ -172,12 +174,20 @@ def bundle_certifies() -> bool:
         import importlib.resources as resources
 
         manifest = json.loads(
-            (resources.files("policyengine") / "data" / "bundle" / "manifest.json").read_text()
+            (
+                resources.files("policyengine")
+                / "data"
+                / "bundle"
+                / "manifest.json"
+            ).read_text()
         )
         artifact = manifest["data_releases"]["uk"]["certified_data_artifact"]
     except (ModuleNotFoundError, FileNotFoundError, KeyError, ValueError):
         return False
-    return artifact.get("build_id") == BUILD_ID and artifact.get("sha256") == DATASET_SHA256
+    return (
+        artifact.get("build_id") == BUILD_ID
+        and artifact.get("sha256") == DATASET_SHA256
+    )
 
 
 def drop_hugging_face_token() -> list[str]:

@@ -107,7 +107,8 @@ try:
     # expired at policyengine-uk 2.151.0 (PR 238).
     guarantee = model_limits.record(
         next(
-            limit for limit in model_limits.MODEL_LIMITS
+            limit
+            for limit in model_limits.MODEL_LIMITS
             if limit.key == "pc_minimum_guarantee_uprating"
         ),
         ["gov.dwp.pension_credit.guarantee_credit.minimum_guarantee.SINGLE"],
