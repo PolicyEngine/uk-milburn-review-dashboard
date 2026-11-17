@@ -1,12 +1,13 @@
 {
-  "label": "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release",
-  "build": "uk-frs-calibration-attempt-20261112T133744Z-6f918b81",
-  "dataset_sha256": "e268e3af7932784ad4471f008097a5acc6c3c5bc15c4c54fbb5a489b2a0ac9ae",
+  "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1",
+  "build": "uk-frs-calibration-attempt-20261115T104657Z-fcfac709",
+  "dataset_sha256": "301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90",
   "engine": {
     "policyengine-uk": "2.177.7",
     "policyengine-core": "3.34.10"
   },
-  "certified": false,
+  "certified": true,
+  "policyengine": "6.20.1",
   "measures": [
     "youth_allowance_at_25_plus_rate"
   ],

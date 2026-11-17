@@ -101,7 +101,7 @@ describe("the benchmarks file", () => {
       "employer_nics_under_25",
     ]);
     for (const row of parsed.rows.filter((each) => each.estimate?.fixed)) {
-      expect(row.estimate.label, row.id).toBe("PolicyEngine, build 6f918b81, 2027-28");
+      expect(row.estimate.label, row.id).toBe("PolicyEngine, build fcfac709, 2027-28");
       expect(estimateFor(row, { ageRows: [], packageRows: [], packageKey: null, year: 2027 })).toBeNull();
     }
     expect(parsed.rows.find((row) => row.id === "uc_health_no_work_requirements").estimate.fixed).toBe("232,000");

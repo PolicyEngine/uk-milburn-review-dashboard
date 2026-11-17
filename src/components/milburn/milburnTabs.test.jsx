@@ -100,7 +100,7 @@ describe("Benchmarks", () => {
     for (const [published, estimate] of [["260,000", "232,000"]]) {
       const row = screen.getByText(published).closest("li");
       expect(row.textContent).toContain(estimate);
-      expect(row.textContent).toContain("PolicyEngine, build 6f918b81, 2027-28");
+      expect(row.textContent).toContain("PolicyEngine, build fcfac709, 2027-28");
     }
     expect(screen.getByText("£4.43bn a year").closest("li").textContent).toContain("£5.1bn a year");
     // Each comparable pair is a comparison panel with its gap as a % of the published figure
