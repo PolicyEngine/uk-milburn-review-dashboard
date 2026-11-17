@@ -80,7 +80,7 @@ describe("the switch", () => {
     const text = flat(REPORT_COPY.after);
     expect(text).not.toMatch(STALE);
     expect(text).not.toMatch(/government will|will adopt|should|must/i);
-    expect(REPORT_COPY.after.comparatorsLabel).toBe("Comparators, wider than the report proposes");
+    expect(REPORT_COPY.after.comparatorsLabel).toBe("Comparators (pre-report runs)");
     expect(REPORT_COPY.after.policyLimit).toContain("not government policy unless the government adopts them");
   });
 

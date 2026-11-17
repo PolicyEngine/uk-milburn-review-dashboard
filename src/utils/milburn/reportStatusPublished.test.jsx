@@ -47,13 +47,7 @@ describe("with the final report published", () => {
 
   it("labels the comparators as wider than the report proposes, and keeps the other groups as they were", () => {
     const labels = MILBURN_GROUPS.filter((group) => !group.hidden).map((group) => group.label);
-    expect(labels).toEqual([
-      "The report's measures",
-      "Pre-report variants (modelled before the report)",
-      "Single measures",
-      "Variants",
-      "Comparators, wider than the report proposes",
-    ]);
+    expect(labels).toEqual(["The report's measures", "Comparators (pre-report runs)"]);
     expect(MILBURN_GROUPS.find((group) => group.id === COMPARATORS_GROUP).label).toBe(REPORT_COPY.after.comparatorsLabel);
   });
 

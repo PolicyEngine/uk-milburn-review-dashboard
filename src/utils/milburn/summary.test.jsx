@@ -469,32 +469,33 @@ describe("EntryComparison", () => {
 });
 
 describe("measure groups", () => {
-  it("names the packages and groups packages, single measures, variants and comparators", () => {
+  it("offers the report's measures, then two comparators, and keeps the pre-report runs loadable but not offered", () => {
     expect(milburnDisplayName("milburn_package", "Milburn package (combined)")).toBe("Full abolition, no replacements (upper bound)");
     expect(milburnDisplayName("pip_halved_under_25", "PIP at half rate")).toBe("PIP at half rate");
+    expect(milburnGroupOf({ id: "milburn_report_package" })).toBe("report");
     expect(milburnGroupOf({ id: "employer_nics_zero_under_25" })).toBe("comparators");
+    expect(milburnGroupOf({ id: "pip_halved_under_25" })).toBe("comparators");
     expect(milburnGroupOf({ id: "uc_health_element_removed_under_25" })).toBe("single");
-    expect(milburnGroupOf({ id: "uc_health_element_removed_under_22" })).toBe("variants");
     const groups = groupMilburnMeasures([
       { id: "youth_allowance_at_25_plus_rate" },
-      { id: "pip_removed_16_to_24" },
+      { id: "pip_halved_under_25" },
       { id: "milburn_package_entry_25pct" },
-      { id: "uc_health_element_removed_under_25_new_claims" },
-      { id: "pip_removed_under_25" },
-      { id: "milburn_package_phased" },
+      { id: "milburn_report_pip" },
       { id: "milburn_package" },
+      { id: "milburn_report_package" },
+      { id: "employer_nics_zero_under_25" },
     ]);
-    expect(groups.map((group) => group.label)).toEqual(["Pre-report variants (modelled before the report)", "Single measures", "Variants", reportCopy().comparatorsLabel]);
-    expect(groups[0].measures.map((measure) => measure.id)).toEqual(["milburn_package", "milburn_package_phased"]);
-    // The 25% entry run and the new-claims run stay loadable but are not offered
-    expect(groups.flatMap((group) => group.measures.map((measure) => measure.id))).not.toContain("milburn_package_entry_25pct");
-    expect(groups.flatMap((group) => group.measures.map((measure) => measure.id))).not.toContain("uc_health_element_removed_under_25_new_claims");
+    expect(groups.map((group) => group.label)).toEqual(["The report's measures", reportCopy().comparatorsLabel]);
+    expect(groups[0].measures.map((measure) => measure.id)).toEqual(["milburn_report_package", "milburn_report_pip"]);
+    expect(groups[1].measures.map((measure) => measure.id)).toEqual(["pip_halved_under_25", "employer_nics_zero_under_25"]);
+    const offered = groups.flatMap((group) => group.measures.map((measure) => measure.id));
+    for (const id of ["milburn_package", "milburn_package_entry_25pct", "youth_allowance_at_25_plus_rate"]) expect(offered).not.toContain(id);
   });
 
-  it("defaults to the full abolition package, though the catalogue puts the 25% entry run (the largest saving) first", () => {
-    const catalogueOrder = [{ id: "milburn_package_entry_25pct" }, { id: "milburn_package" }, { id: "pip_removed_under_25" }];
-    expect(milburnDefaultMeasure(catalogueOrder).id).toBe("milburn_package");
-    expect(milburnDefaultMeasure([{ id: "milburn_package_entry_25pct" }, { id: "pip_removed_under_25" }]).id).toBe("pip_removed_under_25");
+  it("defaults to the first run offered: the report's package, whatever the catalogue's order", () => {
+    const catalogueOrder = [{ id: "milburn_package_entry_25pct" }, { id: "milburn_package" }, { id: "milburn_report_package" }];
+    expect(milburnDefaultMeasure(catalogueOrder).id).toBe("milburn_report_package");
+    expect(milburnDefaultMeasure([{ id: "milburn_package_entry_25pct" }, { id: "pip_halved_under_25" }]).id).toBe("pip_halved_under_25");
     expect(milburnDefaultMeasure([])).toBeNull();
   });
 });

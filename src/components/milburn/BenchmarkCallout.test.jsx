@@ -63,7 +63,7 @@ describe("BenchmarkCallout", () => {
     vi.stubGlobal("fetch", serve(text));
     render(<BenchmarkCallout place="poverty" reportDay={false} />);
     const strip = await screen.findByRole("complementary", { name: "Published figures" });
-    expect(within(strip).getByRole("heading", { name: "Published figures" })).toBeInTheDocument();
+    expect(within(strip).getByText("Published figures")).toBeInTheDocument();
     const items = within(within(strip).getByRole("list", { name: "Published figures, with sources" })).getAllByRole("listitem");
     expect(items).toHaveLength(2);
     expect(items[0]).toHaveTextContent("50,000 fewer");

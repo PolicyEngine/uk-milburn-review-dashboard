@@ -97,3 +97,68 @@
   outline-offset: 2px;
   border-radius: 2px;
 }
+
+/* Folded strip: one clickable line with the count */
+.bm-callout-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--fs-small);
+  color: var(--c-text);
+}
+
+.bm-callout-summary::-webkit-details-marker {
+  display: none;
+}
+
+.bm-callout-summary::after {
+  content: "▸";
+  margin-left: auto;
+  color: var(--c-subtab-muted);
+  transition: transform 150ms ease-out;
+}
+
+.bm-callout-details[open] > .bm-callout-summary::after {
+  transform: rotate(90deg);
+}
+
+.bm-callout-title {
+  font-weight: 600;
+}
+
+.bm-callout-count {
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--c-muted-fill);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.bm-callout-hint {
+  color: var(--c-subtab-muted);
+  font-size: var(--fs-caption);
+}
+
+.bm-callout-details[open] .bm-callout-items {
+  margin-top: 10px;
+}
+
+.bm-callout-details .bm-callout-more {
+  display: inline-flex;
+  margin-top: 8px;
+}
+
+.bm-callout-summary:focus-visible {
+  outline: 2px solid var(--c-gain);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bm-callout-summary::after {
+    transition: none;
+  }
+}

@@ -37,28 +37,32 @@ export const HIDDEN_GROUP = "hidden";
  * feeds Return to work only.
  */
 export const MILBURN_GROUPS = Object.freeze([
-  // The final report's benefit changes, run from April 2029, when its
-  // welfare savings start (annex section 1); first, so the page opens on them
+  // The final report's measures, run from April 2029, when its welfare
+  // savings start (annex section 1); first, so the page opens on them
   {
     id: REPORT_GROUP,
     label: "The report's measures",
     ids: ["milburn_report_package", "milburn_report_uc_health", "milburn_report_pip", "milburn_report_employer_nics_threshold"],
   },
-  {
-    id: PACKAGES_GROUP,
-    label: "Pre-report variants (modelled before the report)",
-    ids: ["milburn_package", "milburn_package_central", "milburn_package_phased"],
-  },
-  { id: SINGLE_GROUP, label: "Single measures", ids: ["uc_health_element_removed_under_25", "pip_removed_under_25"] },
-  {
-    id: VARIANTS_GROUP,
-    label: "Variants",
-    ids: ["uc_health_element_removed_under_22", "uc_health_element_removed_under_25_severe_kept", "pip_halved_under_25", "pip_removed_16_to_24"],
-  },
+  // Two runs from before the report, kept as comparators (Vahid, 17 Nov):
+  // PIP at half rate stands in for the Additional Cost Allowance, whose rates
+  // the report does not set; zero employer NICs under 25 is the option the
+  // report rejects (para 268)
   {
     id: COMPARATORS_GROUP,
     label: COMPARATORS_LABEL,
-    ids: ["youth_allowance_at_25_plus_rate", "employer_nics_zero_under_25"],
+    ids: ["pip_halved_under_25", "employer_nics_zero_under_25"],
+  },
+  // The other pre-report runs stay loadable (a link naming one still opens
+  // it) but are not offered: the packages feed Key figures' range strip and
+  // Return to work (the 25% entry run against the full abolition package)
+  { id: PACKAGES_GROUP, label: "Pre-report packages", hidden: true, ids: ["milburn_package", "milburn_package_central", "milburn_package_phased"] },
+  { id: SINGLE_GROUP, label: "Single measures", hidden: true, ids: ["uc_health_element_removed_under_25", "pip_removed_under_25"] },
+  {
+    id: VARIANTS_GROUP,
+    label: "Variants",
+    hidden: true,
+    ids: ["uc_health_element_removed_under_22", "uc_health_element_removed_under_25_severe_kept", "pip_removed_16_to_24", "youth_allowance_at_25_plus_rate"],
   },
   { id: HIDDEN_GROUP, label: null, hidden: true, ids: ["milburn_package_entry_25pct", "uc_health_element_removed_under_25_new_claims"] },
 ]);

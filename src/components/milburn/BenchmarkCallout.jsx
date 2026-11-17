@@ -110,12 +110,36 @@ export default function BenchmarkCallout({ place, reportDay = REPORT_DAY }) {
   if (!items.length) return null;
   return (
     <aside className="bm-callout" aria-label="Published figures" data-place={place}>
-      <div className="bm-callout-heading">
-        <h4>
+      {/* Folded at first (Vahid, 17 Nov): one line with the count; open for
+          the figures, their basis and sources */}
+      <details className="bm-callout-details">
+        <summary className="bm-callout-summary">
           <TitleIcon name="fileText" bare size={14} />
-          Published figures
-        </h4>
-        <p>As published, for comparison; not PolicyEngine estimates.</p>
+          <span className="bm-callout-title">Published figures</span>
+          <span className="bm-callout-count">{items.length}</span>
+          <span className="bm-callout-hint">As published, for comparison; not PolicyEngine estimates</span>
+        </summary>
+        <ul className="bm-callout-items" aria-label="Published figures, with sources">
+          {items.map(({ id, row, value, label, icon, differs }) => (
+            <li key={id} data-benchmark={id}>
+              <TitleIcon name={icon} bare size={15} />
+              <div>
+                <p className="bm-callout-figure">
+                  <strong>{value}</strong> <span>{label}</span>
+                </p>
+                <p className="bm-callout-basis" title={row.basis || undefined}>
+                  {differs}
+                </p>
+                <p className="bm-callout-source">
+                  <a href={row.url} target="_blank" rel="noopener noreferrer">
+                    {row.source}
+                  </a>
+                  {row.date && <span>, {row.date}</span>}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
         <a
           className="bm-callout-more"
           href={populationSubHref("benchmarks")}
@@ -127,28 +151,7 @@ export default function BenchmarkCallout({ place, reportDay = REPORT_DAY }) {
           All benchmarks
           <TitleIcon name="arrowRight" bare size={13} />
         </a>
-      </div>
-      <ul className="bm-callout-items" aria-label="Published figures, with sources">
-        {items.map(({ id, row, value, label, icon, differs }) => (
-          <li key={id} data-benchmark={id}>
-            <TitleIcon name={icon} bare size={15} />
-            <div>
-              <p className="bm-callout-figure">
-                <strong>{value}</strong> <span>{label}</span>
-              </p>
-              <p className="bm-callout-basis" title={row.basis || undefined}>
-                {differs}
-              </p>
-              <p className="bm-callout-source">
-                <a href={row.url} target="_blank" rel="noopener noreferrer">
-                  {row.source}
-                </a>
-                {row.date && <span>, {row.date}</span>}
-              </p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      </details>
     </aside>
   );
 }

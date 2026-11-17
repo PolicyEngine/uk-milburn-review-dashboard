@@ -117,7 +117,7 @@ export const REPORT_COPY = Object.freeze({
     // Both comparators are wider forms of a proposal in the report (a
     // Youth Allowance; an employer NICs relief for 21 to 24-year-olds in
     // retail and hospitality), so neither is "not in the report"
-    comparatorsLabel: "Comparators, wider than the report proposes",
+    comparatorsLabel: "Comparators (pre-report runs)",
   }),
 });
 
