@@ -12,13 +12,13 @@
  * - A value set in the wrong form fails every build: it can never work.
  * - A missing value is a loud warning in every build, production included:
  *   the tab then shows its stored examples only, and says custom households
- *   are not available yet (the Milburn household API is not deployed).
+ *   are not available yet.
  */
 
 export const HOUSEHOLD_API_VAR = "NEXT_PUBLIC_HOUSEHOLD_API_URL";
 export const HOUSEHOLD_API_SUFFIX = "/api/household-impact";
 export const HOUSEHOLD_API_EXAMPLE =
-  "https://uk-budget-api-2026-qevs5bboca-ew.a.run.app/api/household-impact";
+  "https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact";
 
 /**
  * What is wrong with the household API URL in `env`, if anything.

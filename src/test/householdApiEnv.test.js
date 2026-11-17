@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { checkHouseholdApiEnv, householdApiUrlProblem } from "../../scripts/household-api-env.mjs";
 
 const HOUSEHOLD =
-  "https://uk-budget-api-2026-qevs5bboca-ew.a.run.app/api/household-impact";
+  "https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact";
 
 describe("householdApiUrlProblem", () => {
   it("accepts the service URL followed by /api/household-impact", () => {
@@ -16,11 +16,11 @@ describe("householdApiUrlProblem", () => {
 
   it("refuses any other form in every build", () => {
     for (const url of [
-      "https://uk-budget-api-2026-qevs5bboca-ew.a.run.app",
-      "https://uk-budget-api-2026-qevs5bboca-ew.a.run.app/api/personal-impact",
+      "https://policyengine--uk-milburn-household-web.us-east.modal.run",
+      "https://policyengine--uk-milburn-household-web.us-east.modal.run/api/personal-impact",
       `${HOUSEHOLD}/`,
       `${HOUSEHOLD}?x=1`,
-      "uk-budget-api-2026/api/household-impact",
+      "uk-milburn-household/api/household-impact",
     ]) {
       for (const extra of [{}, { VERCEL_ENV: "preview" }, { NEXT_PUBLIC_MOCK: "1" }]) {
         const problem = householdApiUrlProblem({ NEXT_PUBLIC_HOUSEHOLD_API_URL: url, ...extra });

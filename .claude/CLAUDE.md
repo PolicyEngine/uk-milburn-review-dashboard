@@ -1,6 +1,6 @@
-# UK Autumn Budget 2026 dashboard: style and architecture guide
+# Milburn review dashboard: style and architecture guide
 
-When working on the UK Autumn Budget 2026 dashboard, follow these guidelines. What the dashboard shows, its architecture, local development, data generation, review and deployment are in the [README](../README.md); this file does not repeat them.
+When working on the Milburn review dashboard (PolicyEngine's estimates of the measures in the final report of the independent review of young people and work, served at `/uk/milburn-review`), follow these guidelines. It is forked from the UK Autumn Budget 2026 dashboard, whose README is kept at [`docs/autumn-budget-template-README.md`](../docs/autumn-budget-template-README.md). What the dashboard shows, local development, running the measures and the status are in the [README](../README.md); this file does not repeat them.
 
 ## Critical: Dependency Management
 
@@ -41,7 +41,7 @@ Microsimulations are built through `pe.uk.managed_microsimulation()`, which
 resolves the bundle's dataset from the private HuggingFace repo. That needs
 `HUGGING_FACE_TOKEN` in the environment (and as a repo secret in CI).
 
-The reforms in `src/uk_budget_data/reforms.py` are candidate Autumn Budget 2026 measures compared against current law (policyengine-uk before the Budget): each changes parameters, or applies a module-level modifier from its own module in `budget_measures/`, to show its impact.
+The Milburn runs in `src/uk_budget_data/reforms.py` (Milburn section) are the review's measures and our variants, compared against current law: each changes parameters, or applies a module-level modifier from its own module in `budget_measures/`, to show its impact. The report's design choices are in `milburn_design.py`.
 
 ## Visual Style Guide
 
@@ -147,7 +147,7 @@ The stack is in the README's "Architecture" section. For components: React 19 ho
 ## Data Handling
 
 ### Data files
-- Files under `public/data/` are written by `uk-budget-data` and served under `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/data/<file>`. Budget figures use verified artifacts through `src/utils/publication/load.js` and `loadVerifiedTable`, or verified flat files through `src/utils/publication/flat.js`; a raw Budget CSV is never publication authority. The Living standards baseline and March 2026 forecast use their independent outlook loader.
+- Files under `public/data/` are written by `uk-budget-data` and the `scripts/milburn_*.py` scripts, and served under `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/data/<file>`. The page reads the local build route (`src/utils/milburn/localBuild.js`): `milburn_measures.json` and each run's folder under `public/data/milburn/<id>/`, plus the `milburn_*.json` files, `policy_parameters.json` (Measures) and `living_standards_outlook.json` (Poverty).
 - Every file under `public/` is a publication and must pass the automated disclosure checks. Review rows are needed only while sign-off is on (`src/uk_budget_data/sign_off.py`, off from 28 October 2026); see "Review and sign-off" in the README.
 - The Pre-measures forecast file's shape is in `docs/DATA_CONTRACT.md`.
 
@@ -189,7 +189,7 @@ src/
 ```
 
 ### Routing
-- One Next.js page under the base path `/uk/autumn-budget-2026`; no client router
+- One Next.js page under the base path `/uk/milburn-review` (hardcoded in `next.config.ts`; none for the artifact export); no client router
 - Tabs and sub-tabs are query parameters (`?tab=`, `?sub=`), so links are shareable
 
 ## Performance Considerations
