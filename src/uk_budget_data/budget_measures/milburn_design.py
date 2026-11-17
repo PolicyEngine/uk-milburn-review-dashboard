@@ -76,6 +76,29 @@ REPORT_PIP_LOWER_AGE = 18  # 16 for a 16 to 24 band
 REPORT_PIP_UPPER_AGE = 25
 REPORT_PIP_INCLUDE_SCOTLAND = True  # False: Scottish ADP records untouched
 REPORT_PIP_REPLACEMENT_SHARE = 0.0  # 0.5: half the award kept as a stand-in
+# A tiered replacement: the share of each PIP component kept at each award
+# level. None: the uniform REPORT_PIP_REPLACEMENT_SHARE above applies. When
+# set it replaces the uniform share in milburn_report_pip and the report
+# packages, and needs exactly the four keys below, e.g. enhanced awards
+# kept in full ("enduring severe needs") and standard awards removed:
+# {"daily_living_enhanced": 1.0, "daily_living_standard": 0.0,
+#  "mobility_enhanced": 1.0, "mobility_standard": 0.0}
+# A share above 1 pays more than the current award. Like the uniform
+# share, it scales the PIP amounts, so entitlements that depend on
+# receiving a component stay with any share above 0 and go at 0.
+REPORT_PIP_REPLACEMENT_SHARES = None
+# What the report calls the replacement, lower case, e.g. "additional cost
+# allowance". Text only: when set with a share above (uniform or tiered),
+# milburn_report_pip is named "PIP replaced by an additional cost allowance
+# for ..." and its description says the shares stand in for it. Its real
+# rates and eligibility are not modelled; the shares are the stand-in.
+REPORT_PIP_REPLACEMENT_NAME = None
+REPORT_PIP_SHARE_KEYS = (
+    "daily_living_enhanced",
+    "daily_living_standard",
+    "mobility_enhanced",
+    "mobility_standard",
+)
 
 REPORT_REASSESSED_EACH_YEAR = 0.25  # 0: transitional protection (new
 #                                     entrants only)
@@ -87,6 +110,16 @@ REPORT_NEW_ENTRANT_AGE = 18
 # law), as {year: (single under 25, couple both under 25)}, e.g.
 # {2027: (400.0, 630.0), 2028: (408.0, 642.6), ...}.
 REPORT_YOUTH_ALLOWANCE_MONTHLY = None
+
+# Employer National Insurance for young employees. None: not run (the
+# 15 November comparator employer_nics_zero_under_25 is the zero rate).
+# Otherwise the employer rate on earnings between the secondary threshold
+# and the upper secondary threshold (£50,270 a year) for employees under
+# REPORT_EMPLOYER_NICS_AGE_LIMIT, e.g. 0.075 against the main 15%. Under-21s
+# and apprentices under 25 keep their zero rate. When set,
+# milburn_report_employer_nics exists and joins milburn_report_package.
+REPORT_EMPLOYER_NICS_UNDER_25_RATE = None
+REPORT_EMPLOYER_NICS_AGE_LIMIT = 25
 
 _MONTHS = (
     "January",
@@ -139,6 +172,11 @@ def percent_text(share):
     return f"{round(share * 100):.0f}%"
 
 
+def rate_text(rate):
+    """'7.5%' (percent_text rounds to a whole number)."""
+    return f"{rate * 100:.10g}%"
+
+
 def check_report_design():
     """Refuse a report design the modifiers cannot run as written."""
     problems = []
@@ -158,6 +196,45 @@ def check_report_design():
         problems.append("REPORT_PIP ages: lower must be below upper.")
     if not 0 <= REPORT_PIP_REPLACEMENT_SHARE < 1:
         problems.append("REPORT_PIP_REPLACEMENT_SHARE must be in [0, 1).")
+    shares = REPORT_PIP_REPLACEMENT_SHARES
+    if shares is not None and (
+        not isinstance(shares, dict)
+        or set(shares) != set(REPORT_PIP_SHARE_KEYS)
+        or not all(
+            isinstance(share, (int, float))
+            and not isinstance(share, bool)
+            and share >= 0
+            for share in shares.values()
+        )
+    ):
+        problems.append(
+            "REPORT_PIP_REPLACEMENT_SHARES must be None or give a share of "
+            "0 or more for exactly: " + ", ".join(REPORT_PIP_SHARE_KEYS) + "."
+        )
+    label = REPORT_PIP_REPLACEMENT_NAME
+    if label is not None and not (isinstance(label, str) and label.strip()):
+        problems.append(
+            "REPORT_PIP_REPLACEMENT_NAME must be None or a name, e.g. "
+            "'additional cost allowance'."
+        )
+    rate = REPORT_EMPLOYER_NICS_UNDER_25_RATE
+    if rate is not None and (
+        isinstance(rate, bool)
+        or not isinstance(rate, (int, float))
+        or not 0 <= rate < 1
+    ):
+        problems.append(
+            "REPORT_EMPLOYER_NICS_UNDER_25_RATE must be None or a rate in "
+            "[0, 1), e.g. 0.075 for 7.5%."
+        )
+    if (
+        type(REPORT_EMPLOYER_NICS_AGE_LIMIT) is not int
+        or REPORT_EMPLOYER_NICS_AGE_LIMIT <= 21
+    ):
+        problems.append(
+            "REPORT_EMPLOYER_NICS_AGE_LIMIT must be a whole age above 21 "
+            "(under-21s already have the zero rate)."
+        )
     if not 0 <= REPORT_REASSESSED_EACH_YEAR <= 1:
         problems.append("REPORT_REASSESSED_EACH_YEAR must be in [0, 1].")
     if REPORT_YOUTH_ALLOWANCE_MONTHLY is not None:

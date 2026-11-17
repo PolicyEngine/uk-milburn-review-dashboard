@@ -59,6 +59,7 @@ from uk_budget_data.budget_measures.pension_tax_allowance import (
 )
 from uk_budget_data.budget_measures import milburn_design
 from uk_budget_data.budget_measures.milburn_report import (
+    milburn_report_employer_nics,
     milburn_report_package_phased,
     milburn_report_package_with_entry_25pct,
     milburn_report_pip,
@@ -1751,6 +1752,9 @@ MILBURN_REPORT_UC_HEALTH_ID = "milburn_report_uc_health"
 MILBURN_REPORT_PHASED_ID = "milburn_report_package_phased"
 MILBURN_REPORT_ENTRY_ID = "milburn_report_package_entry_25pct"
 MILBURN_REPORT_YOUTH_ALLOWANCE_ID = "milburn_report_youth_allowance"
+# Exists only while REPORT_EMPLOYER_NICS_UNDER_25_RATE is set, and then
+# joins the report package.
+MILBURN_REPORT_EMPLOYER_NICS_ID = "milburn_report_employer_nics"
 MILBURN_REPORT_PACKAGE_COMPONENTS = (
     MILBURN_REPORT_UC_HEALTH_ID,
     MILBURN_REPORT_PIP_ID,
@@ -1808,16 +1812,75 @@ def _report_uc_health_text() -> tuple[str, str]:
     return name, description
 
 
+def _with_article(label: str) -> str:
+    """'an additional cost allowance'."""
+    return f"{'an' if label[0].lower() in 'aeiou' else 'a'} {label}"
+
+
+def _report_pip_tier_text(shares: dict, people: str) -> tuple[str, str]:
+    """The name and the 'receive ...' clause of a tiered PIP replacement
+    (``REPORT_PIP_REPLACEMENT_SHARES``)."""
+    d = milburn_design
+
+    def paid(share):
+        if share == 0:
+            return "no longer paid"
+        if share == 1:
+            return "paid in full"
+        return f"paid at {d.rate_text(share)} of its current amount"
+
+    values = [shares[key] for key in d.REPORT_PIP_SHARE_KEYS]
+    enhanced = (shares["daily_living_enhanced"], shares["mobility_enhanced"])
+    standard = (shares["daily_living_standard"], shares["mobility_standard"])
+    if all(value == 1 for value in values):
+        name = f"PIP unchanged for {people}"
+    elif all(value == 0 for value in values):
+        name = f"PIP removed for {people}"
+    elif enhanced == (1, 1) and standard == (0, 0):
+        name = f"PIP kept only at the enhanced rate for {people}"
+    else:
+        name = f"PIP replaced by tiered support for {people}"
+    label = d.REPORT_PIP_REPLACEMENT_NAME
+    if label and any(value != 1 for value in values):
+        name = f"PIP replaced by {_with_article(label)} for {people}"
+    stand_in = f"the report's {label}" if label else (
+        "the report's replacement support"
+    )
+    receive = (
+        "receive Personal Independence Payment at a share of its current "
+        "amount set by component and award level: the daily living "
+        f"component is {paid(shares['daily_living_enhanced'])} at the "
+        f"enhanced rate and {paid(shares['daily_living_standard'])} at the "
+        "standard rate; the mobility component is "
+        f"{paid(shares['mobility_enhanced'])} at the enhanced rate and "
+        f"{paid(shares['mobility_standard'])} at the standard rate. The "
+        f"shares stand in for {stand_in}, whose rates and "
+        "eligibility rules the data cannot identify, and no local health "
+        "and disability fund is modelled"
+    )
+    return name, receive
+
+
 def _report_pip_text() -> tuple[str, str]:
     d = milburn_design
     low, high = d.REPORT_PIP_LOWER_AGE, d.REPORT_PIP_UPPER_AGE
     start = d.start_text(d.REPORT_START_YEAR, d.REPORT_START_MONTH)
     people = d.age_band_people_text(low, high)
     share = d.REPORT_PIP_REPLACEMENT_SHARE
-    if share:
+    shares = d.REPORT_PIP_REPLACEMENT_SHARES
+    if shares is not None:
+        name, receive = _report_pip_tier_text(shares, people)
+    elif share:
         kept = d.percent_text(share)
         name = f"PIP at {kept} of its rate for {people}"
         receive = f"receive {kept} of their current Personal Independence Payment"
+        if d.REPORT_PIP_REPLACEMENT_NAME:
+            label = d.REPORT_PIP_REPLACEMENT_NAME
+            name = f"PIP replaced by {_with_article(label)} for {people}"
+            receive += (
+                f", which stands in for the report's {label}, whose rates "
+                "and eligibility rules the data cannot identify"
+            )
     else:
         name = f"PIP removed for {people}"
         receive = "receive neither component of Personal Independence Payment"
@@ -1830,7 +1893,12 @@ def _report_pip_text() -> tuple[str, str]:
     description = (
         f"{start} people aged {d.age_band_text(low, high)} {receive}"
         f"{younger}Disability Living Allowance for children is unchanged. "
-        "Entitlements that depend on receiving PIP go with it. "
+        + (
+            "Entitlements that depend on receiving a component stay where "
+            "any of it is still paid and go where none is. "
+            if shares is not None
+            else "Entitlements that depend on receiving PIP go with it. "
+        )
         + (
             _SCOTLAND_INCLUDED
             if d.REPORT_PIP_INCLUDE_SCOTLAND
@@ -1860,6 +1928,51 @@ def _create_milburn_report_pip() -> Reform:
     )
 
 
+def _report_employer_nics_text() -> tuple[str, str]:
+    d = milburn_design
+    rate = d.rate_text(d.REPORT_EMPLOYER_NICS_UNDER_25_RATE)
+    limit = d.REPORT_EMPLOYER_NICS_AGE_LIMIT
+    start = d.start_text(d.REPORT_START_YEAR, d.REPORT_START_MONTH)
+    name = f"Employer NICs at {rate} for under-{limit}s"
+    description = (
+        f"{start} employers pay Class 1 National Insurance at {rate}, not "
+        "the main 15%, on earnings between the secondary threshold and the "
+        "upper secondary threshold (£50,270 a year) for employees under "
+        f"{limit}; earnings above it bear the main rate. Under-21s and "
+        "apprentices under 25 keep their zero rate. The model passes "
+        "employers' National Insurance through to wages, so the saving "
+        "shows as higher pay for these employees."
+    )
+    return name, description
+
+
+def _report_without_employer_nics_text() -> str:
+    """A sentence for the report variants that leave the employer rate
+    out; empty while no rate is set."""
+    if milburn_design.REPORT_EMPLOYER_NICS_UNDER_25_RATE is None:
+        return ""
+    return (
+        " The report's employer National Insurance rate is not part of "
+        "this run."
+    )
+
+
+def _create_milburn_report_employer_nics() -> Optional[Reform]:
+    """The report's reduced employer rate for young employees; None while
+    ``REPORT_EMPLOYER_NICS_UNDER_25_RATE`` is None (nothing to run)."""
+    d = milburn_design
+    if d.REPORT_EMPLOYER_NICS_UNDER_25_RATE is None:
+        return None
+    d.check_report_design()
+    name, description = _report_employer_nics_text()
+    return Reform(
+        id=MILBURN_REPORT_EMPLOYER_NICS_ID,
+        name=name,
+        description=description,
+        simulation_modifier=milburn_report_employer_nics,
+    )
+
+
 def _create_milburn_report_package_phased() -> Reform:
     d = milburn_design
     if d.REPORT_REASSESSED_EACH_YEAR:
@@ -1880,7 +1993,7 @@ def _create_milburn_report_package_phased() -> Reform:
         name="Milburn report package, phased as claimants are reassessed",
         description=(
             "The report's health element and PIP changes for young people, "
-            "reaching " + reach
+            "reaching " + reach + _report_without_employer_nics_text()
         ),
         simulation_modifier=milburn_report_package_phased,
     )
@@ -1901,7 +2014,7 @@ def _create_milburn_report_package_entry_25pct() -> Reform:
             "limited capability for work and work-related activity) moving "
             f"into {d.ENTRY_HOURS} hours a week at their minimum wage. An "
             "illustrative scenario, not an estimate of how people would "
-            "respond."
+            "respond." + _report_without_employer_nics_text()
         ),
         simulation_modifier=milburn_report_package_with_entry_25pct,
     )
@@ -1971,6 +2084,7 @@ _RESERVED_IDS = frozenset(
         MILBURN_REPORT_PHASED_ID,
         MILBURN_REPORT_ENTRY_ID,
         MILBURN_REPORT_YOUTH_ALLOWANCE_ID,
+        MILBURN_REPORT_EMPLOYER_NICS_ID,
         MILBURN_PACKAGE_16_TO_24_ID,
         PIP_UNDER_25_EXCLUDING_SCOTLAND_ID,
         PIP_16_TO_24_EXCLUDING_SCOTLAND_ID,
@@ -1983,6 +2097,7 @@ _RESERVED_FACTORIES = (
     _create_milburn_report_package_phased,
     _create_milburn_report_package_entry_25pct,
     _create_milburn_report_youth_allowance,
+    _create_milburn_report_employer_nics,
     _create_pip_removed_under_25_excluding_scotland,
     _create_pip_removed_16_to_24_excluding_scotland,
 )
@@ -2038,13 +2153,20 @@ def _get_reserved() -> dict[str, Reform]:
         reserved = {r.id: r for r in singles if r is not None}
         name, _ = _report_uc_health_text()
         pip_name, _ = _report_pip_text()
+        # The health element and PIP changes, with the employer rate when
+        # one is set (the youth allowance stays a measure of its own).
+        members = [reserved[i] for i in MILBURN_REPORT_PACKAGE_COMPONENTS]
+        names = [name, pip_name]
+        if MILBURN_REPORT_EMPLOYER_NICS_ID in reserved:
+            members.append(reserved[MILBURN_REPORT_EMPLOYER_NICS_ID])
+            names.append(reserved[MILBURN_REPORT_EMPLOYER_NICS_ID].name)
         report = _create_milburn_package(
-            [reserved[i] for i in MILBURN_REPORT_PACKAGE_COMPONENTS],
+            members,
             package_id=MILBURN_REPORT_PACKAGE_ID,
             name="Milburn report package (combined)",
             description=(
                 f"The report's design, simulated together with their "
-                f"interactions: {name}; {pip_name}."
+                f"interactions: {'; '.join(names)}."
             ),
         )
         # Not the cached lookup: this can run while _get_reforms is still

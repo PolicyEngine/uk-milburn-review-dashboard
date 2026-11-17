@@ -294,6 +294,10 @@ The design choices are in one module,
 | Severe cases keep the health element (points proxy) | `REPORT_UC_HEALTH_SEVERE_KEPT = True`, `REPORT_SEVERE_DL_POINTS` |
 | Scottish ADP not affected | `REPORT_PIP_INCLUDE_SCOTLAND = False` |
 | A uniform share of PIP kept as a stand-in for the replacement | `REPORT_PIP_REPLACEMENT_SHARE` (e.g. `0.5`) |
+| PIP replaced by tiered support (e.g. only "enduring severe needs" keep it) | `REPORT_PIP_REPLACEMENT_SHARES = {"daily_living_enhanced": 1.0, "daily_living_standard": 0.0, "mobility_enhanced": 1.0, "mobility_standard": 0.0}`: the share of each component kept at each award level, all four keys. When set it replaces the uniform share in `milburn_report_pip` and every report package. A share above 1 pays more than now |
+| The replacement has a name (e.g. an "additional cost allowance") | `REPORT_PIP_REPLACEMENT_NAME = "additional cost allowance"` with a share above: text only, the measure is then named "PIP replaced by an additional cost allowance for ..." |
+| PIP ends in England and Wales only | `REPORT_PIP_INCLUDE_SCOTLAND = False` (with `REPORT_PIP_LOWER_AGE = 16` for "under 25"). Northern Ireland records are still reached: no constant leaves them out |
+| A lower employer NICs rate for young employees | `REPORT_EMPLOYER_NICS_UNDER_25_RATE` (e.g. `0.075` against the main 15%; `0.0` is the zero-rate comparator) and `REPORT_EMPLOYER_NICS_AGE_LIMIT` (default `25`). Creates `milburn_report_employer_nics` and adds it to `milburn_report_package` |
 | Starts April 2028 (or later, to 2031) | `REPORT_START_YEAR` (a mid-year start is refused: use the first full year) |
 | Natural migration at another rate; transitional protection | `REPORT_REASSESSED_EACH_YEAR` (`0`: new entrants only) |
 | Youth allowance at given amounts | `REPORT_YOUTH_ALLOWANCE_MONTHLY = {2027: (single, couple), ..., 2031: (...)}` |
@@ -305,18 +309,44 @@ with the loop in step 2:
 .venv/bin/python -m pytest tests/test_milburn_design.py tests/test_milburn_measures.py -n 2 -q
 .venv/bin/python -c "import warnings; warnings.simplefilter('ignore'); from uk_budget_data.reforms import get_reserved_reforms; [print(r.id, '|', r.name, '|', r.description, chr(10)) for r in get_reserved_reforms()]"
 IDS=(milburn_report_package milburn_report_uc_health milburn_report_pip milburn_report_package_phased milburn_report_package_entry_25pct)
+# With REPORT_EMPLOYER_NICS_UNDER_25_RATE set, also run its part:
+IDS+=(milburn_report_employer_nics)
 ```
+
+The two options added on 17 November:
+
+- **Tiered PIP** (`REPORT_PIP_REPLACEMENT_SHARES`) scales the `pip_dl` and
+  `pip_m` amounts by the person's award level (`pip_dl_category`,
+  `pip_m_category`), as the uniform share does. Entitlements that passport
+  off a component (carer's benefits, disability premia, benefit cap
+  exceptions, non-dependant deductions) therefore stay where any of it is
+  still paid and go where none is: all `1.0` is current law, all `0.0` is
+  `pip_removed_under_25`, all `0.5` is `pip_halved_under_25`. The
+  replacement is not a separate payment, and the local health and
+  disability fund is not modelled. The award level stands in for "enduring
+  severe needs", which the data cannot identify.
+- **Employer NICs at a reduced rate** is a modifier
+  (`budget_measures/employer_nics_reduced_rate_under_25.py`), not a
+  parameter: the zero-rate comparator moves one parameter (the under-21
+  age limit) and no parameter holds a second rate for an age band. It
+  charges the reduced rate between the secondary and upper secondary
+  thresholds and passes the saving through to pay as the engine does for
+  the comparator, so `0.0` equals `employer_nics_zero_under_25` and the
+  main rate changes nothing. Under-21s and apprentices under 25 keep their
+  zero rate. It is in `milburn_report_package` only: the phased and
+  move-into-work variants leave it out (their descriptions say so).
 
 Reserved ids (all resolvable by `generate --reforms`, none listed on the
 page until promoted):
 
 | Id | What |
 |---|---|
-| `milburn_report_package` | The report's health element and PIP changes together (`combine_measures` of the two below) |
+| `milburn_report_package` | The report's health element and PIP changes together (`combine_measures` of the two below), with `milburn_report_employer_nics` when a rate is set |
 | `milburn_report_uc_health`, `milburn_report_pip` | Its parts |
 | `milburn_report_package_phased` | The report package by natural migration |
 | `milburn_report_package_entry_25pct` | The report package with the illustrative move into work |
-| `milburn_report_youth_allowance` | Exists only while `REPORT_YOUTH_ALLOWANCE_MONTHLY` is set |
+| `milburn_report_youth_allowance` | Exists only while `REPORT_YOUTH_ALLOWANCE_MONTHLY` is set (not part of the report package) |
+| `milburn_report_employer_nics` | Exists only while `REPORT_EMPLOYER_NICS_UNDER_25_RATE` is set; then also a member of `milburn_report_package` |
 | `milburn_package_16_to_24` | 15 November health element removal with PIP removed from 16 |
 | `pip_removed_under_25_excluding_scotland`, `pip_removed_16_to_24_excluding_scotland` | PIP removal leaving Scottish ADP records alone |
 
@@ -326,9 +356,9 @@ update `test_the_registry_holds_the_milburn_measures_only`, and edit the
 frontend lists (`docs/report-day/01-pipeline-runbook.md`, sections 3 and 5:
 a new id shows as an ungrouped single measure until then, and
 `milburn_measures.py` writes package members for `milburn_package` only).
-A design the constants cannot express (a tiered PIP replacement, a lower
-rate of the health element, a country list) is new code: see the runbook's
-section 1.
+A design the constants cannot express (a PIP replacement paid as a new
+benefit with its own eligibility, a lower rate of the health element, a
+country list) is new code: see the runbook's section 1.
 
 ### 6. Household API and page
 

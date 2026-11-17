@@ -12,6 +12,9 @@ The ids are reserved in ``reforms.py`` (resolvable by ``generate
 """
 
 from uk_budget_data.budget_measures import milburn_design as design
+from uk_budget_data.budget_measures.employer_nics_reduced_rate_under_25 import (
+    employer_nics_reduced_rate_under_25,
+)
 from uk_budget_data.budget_measures.milburn_variants import (
     _employment_response,
     lcwra_removed_under_25_phased,
@@ -40,7 +43,9 @@ def milburn_report_uc_health(sim):
 
 
 def milburn_report_pip(sim):
-    """The report's PIP removal (or reduction, with a replacement share)."""
+    """The report's PIP removal (or reduction, with a uniform replacement
+    share or, when ``REPORT_PIP_REPLACEMENT_SHARES`` is set, a share for
+    each component and award level)."""
     design.check_report_design()
     return pip_removed_ages_18_to_24(
         sim,
@@ -49,6 +54,26 @@ def milburn_report_pip(sim):
         age_limit=design.REPORT_PIP_UPPER_AGE,
         include_scotland=design.REPORT_PIP_INCLUDE_SCOTLAND,
         share_kept=design.REPORT_PIP_REPLACEMENT_SHARE,
+        shares_kept=design.REPORT_PIP_REPLACEMENT_SHARES,
+    )
+
+
+def milburn_report_employer_nics(sim):
+    """The report's reduced employer National Insurance rate for young
+    employees (``REPORT_EMPLOYER_NICS_UNDER_25_RATE``; refused while it is
+    None)."""
+    design.check_report_design()
+    if design.REPORT_EMPLOYER_NICS_UNDER_25_RATE is None:
+        raise ValueError(
+            "Milburn report design: REPORT_EMPLOYER_NICS_UNDER_25_RATE is "
+            "None, so there is no employer NICs measure to run."
+        )
+    return employer_nics_reduced_rate_under_25(
+        sim,
+        rate=design.REPORT_EMPLOYER_NICS_UNDER_25_RATE,
+        start_year=design.REPORT_START_YEAR,
+        end_year=design.LAST_POLICY_YEAR,
+        age_limit=design.REPORT_EMPLOYER_NICS_AGE_LIMIT,
     )
 
 
@@ -56,7 +81,8 @@ def milburn_report_package_phased(sim):
     """The report's package reaching claimants by natural migration: new
     entrants at once, the stock at ``REPORT_REASSESSED_EACH_YEAR`` a year
     (0: existing claimants are never reached, transitional protection).
-    The severe-case proxy is not applied in the phased run."""
+    The severe-case proxy is not applied in the phased run, and the
+    employer National Insurance rate is not part of it."""
     design.check_report_design()
     migration = dict(
         rate=design.REPORT_REASSESSED_EACH_YEAR,
@@ -78,6 +104,7 @@ def milburn_report_package_phased(sim):
         age_limit=design.REPORT_PIP_UPPER_AGE,
         include_scotland=design.REPORT_PIP_INCLUDE_SCOTLAND,
         share_kept=design.REPORT_PIP_REPLACEMENT_SHARE,
+        shares_kept=design.REPORT_PIP_REPLACEMENT_SHARES,
         **migration,
     )
 
@@ -85,7 +112,8 @@ def milburn_report_package_phased(sim):
 def milburn_report_package_with_entry_25pct(sim):
     """The report's package, with a quarter of affected non-working young
     people (from the PIP lower age to the higher of the two upper ages)
-    moving into 16 hours a week at their minimum wage."""
+    moving into 16 hours a week at their minimum wage. The employer
+    National Insurance rate is not part of it."""
     design.check_report_design()
     sim = _employment_response(
         sim,

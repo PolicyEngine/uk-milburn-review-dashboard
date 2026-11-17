@@ -21,6 +21,7 @@ from tests.test_milburn_measures import (
     PIP_DL_STANDARD,
     PIP_M_ENHANCED,
     PROTECTED_LCWRA,
+    _with_dl,
     change,
     single,
 )
@@ -122,6 +123,7 @@ def test_the_modifiers_defaults_are_the_literals_they_replaced():
         "age_limit": 25,
         "include_scotland": True,
         "share_kept": 0.0,
+        "shares_kept": None,
     }
     assert defaults(uc_module.uc_health_element_removed_under_25) == {
         "start_year": 2027,
@@ -150,6 +152,7 @@ def test_the_modifiers_defaults_are_the_literals_they_replaced():
         "include_scotland": True,
         "share_kept": 0.0,
         **migration,
+        "shares_kept": None,
     }
     assert defaults(milburn_variants._employment_response) == {
         "start_year": 2027,
@@ -402,3 +405,364 @@ def test_a_design_the_modifiers_cannot_run_is_refused(report, monkeypatch):
     )
     with pytest.raises(ValueError, match="every year"):
         design.check_report_design()
+
+
+# The report's reduced employer National Insurance rate
+
+NICS = "milburn_report_employer_nics"
+NICS_VARIABLES = ("ni_class_1_employer", "employment_income", "household_net_income")
+
+
+def test_the_employer_nics_id_exists_only_while_a_rate_is_set(report):
+    assert design.REPORT_EMPLOYER_NICS_UNDER_25_RATE is None
+    assert design.REPORT_EMPLOYER_NICS_AGE_LIMIT == 25
+    assert reforms.get_reform(NICS) is None
+    with pytest.raises(ValueError, match="REPORT_EMPLOYER_NICS_UNDER_25_RATE"):
+        milburn_report.milburn_report_employer_nics(None)
+    tonight = reforms.get_reform("milburn_report_package").description
+    report(REPORT_EMPLOYER_NICS_UNDER_25_RATE=0.075)
+    measure = reforms.get_reform(NICS)
+    assert measure.name == "Employer NICs at 7.5% for under-25s"
+    assert measure.description.startswith(
+        "From April 2027 employers pay Class 1 National Insurance at 7.5%, "
+        "not the main 15%, on earnings between the secondary threshold and "
+        "the upper secondary threshold (£50,270 a year) for employees "
+        "under 25;"
+    )
+    # Reserved: resolvable, not listed, and in the report package.
+    assert NICS in reforms.list_reserved_reform_ids()
+    assert NICS not in reforms.list_reform_ids()
+    assert NICS not in {r.id for r in reforms.get_milburn_reforms()}
+    package = reforms.get_reform("milburn_report_package").description
+    assert package == tonight[:-1] + "; Employer NICs at 7.5% for under-25s."
+    for variant in ("milburn_report_package_phased", "milburn_report_package_entry_25pct"):
+        assert reforms.get_reform(variant).description.endswith(
+            "The report's employer National Insurance rate is not part of "
+            "this run."
+        )
+
+
+def test_the_employer_nics_id_can_be_promoted(report, monkeypatch):
+    report(REPORT_EMPLOYER_NICS_UNDER_25_RATE=0.075)
+    monkeypatch.setattr(reforms, "MILBURN_PROMOTED_IDS", (NICS,))
+    monkeypatch.setattr(reforms, "_REFORMS_CACHE", None)
+    monkeypatch.setattr(reforms, "_REFORM_LOOKUP_CACHE", None)
+    monkeypatch.setattr(reforms, "_RESERVED_CACHE", None)
+    listed = reforms.list_reform_ids()
+    assert listed[-1] == NICS and len(listed) == 14
+    monkeypatch.undo()
+    reforms._REFORMS_CACHE = None
+    reforms._REFORM_LOOKUP_CACHE = None
+    reforms._RESERVED_CACHE = None
+    assert len(reforms.list_reform_ids()) == 13
+
+
+@pytest.mark.parametrize("pay", [20_000, 60_000])
+def test_employer_nics_at_the_main_rate_change_nothing(report, pay):
+    report(REPORT_EMPLOYER_NICS_UNDER_25_RATE=0.15)
+    situation = single(23, rent=0, employment_income=pay)
+    for variable in NICS_VARIABLES:
+        before, after = change(NICS, situation, variable)
+        assert after == pytest.approx(before, abs=0.01) and before > 0
+
+
+@pytest.mark.parametrize("pay", [4_000, 20_000, 50_000, 60_000])
+def test_employer_nics_at_a_zero_rate_are_the_zero_rate_comparator(report, pay):
+    """Charge, pay and net income, below the secondary threshold, in the
+    band, where the pay rise crosses the upper secondary threshold, and
+    above it."""
+    report(REPORT_EMPLOYER_NICS_UNDER_25_RATE=0.0)
+    situation = single(23, rent=0, employment_income=pay)
+    for variable in NICS_VARIABLES:
+        ours = change(NICS, situation, variable)
+        theirs = change("employer_nics_zero_under_25", situation, variable)
+        assert ours == pytest.approx(theirs, abs=0.02)
+    if pay == 20_000:
+        charge = change(NICS, situation, "ni_class_1_employer")
+        assert charge[0] == pytest.approx(2_250, abs=0.5) and charge[1] == 0
+
+
+def test_employer_nics_at_half_the_main_rate(report):
+    """A 23-year-old on £20,000. The employer's cost is £20,000 + 15% x
+    £15,000 = £22,250 and is held: pay x solves x + 7.5% x (x - £5,000) =
+    £22,250, so x = £21,046.51 and the charge is £1,203.49."""
+    report(REPORT_EMPLOYER_NICS_UNDER_25_RATE=0.075)
+    situation = single(23, rent=0, employment_income=20_000)
+    pay = change(NICS, situation, "employment_income")
+    assert pay[1] - pay[0] == pytest.approx(1_046.51, abs=0.05)
+    charge = change(NICS, situation, "ni_class_1_employer")
+    assert charge == pytest.approx((2_250, 1_203.49), abs=0.05)
+    before, after = change(NICS, situation)
+    assert after - before == pytest.approx(1_046.51 * (1 - 0.20 - 0.08), abs=1)
+    # Between the zero-rate comparator and current law.
+    zero = change("employer_nics_zero_under_25", situation)
+    assert before < after < zero[1]
+    # Above the upper secondary threshold the band is relieved in full:
+    # 7.5% x (£50,270 - £5,000) = £3,395.25 less cost, all of it pay, on
+    # which the main rate is then due: £3,395.25 / 1.15 = £2,952.39.
+    high = single(23, rent=0, employment_income=60_000)
+    pay = change(NICS, high, "employment_income")
+    assert pay[1] - pay[0] == pytest.approx(3_395.25 / 1.15, abs=0.5)
+
+
+@pytest.mark.parametrize("age", [19, 25, 30])
+def test_employer_nics_outside_the_age_band_are_unchanged(report, age):
+    """A 30-year-old (and a 25-year-old) is over the limit; a 19-year-old
+    keeps the under-21 zero rate."""
+    report(REPORT_EMPLOYER_NICS_UNDER_25_RATE=0.075)
+    situation = single(age, rent=0, employment_income=20_000)
+    for variable in NICS_VARIABLES:
+        before, after = change(NICS, situation, variable)
+        assert after == before
+    charge = change(NICS, situation, "ni_class_1_employer")[0]
+    assert (charge == 0) == (age < 21)
+
+
+def test_the_employer_nics_age_limit_and_start_year(report):
+    report(
+        REPORT_EMPLOYER_NICS_UNDER_25_RATE=0.075,
+        REPORT_EMPLOYER_NICS_AGE_LIMIT=22,
+    )
+    assert reforms.get_reform(NICS).name == "Employer NICs at 7.5% for under-22s"
+    kept = change(NICS, single(23, rent=0, employment_income=20_000), "employment_income")
+    assert kept[1] == kept[0]
+    moved = change(NICS, single(21, rent=0, employment_income=20_000), "employment_income")
+    assert moved[1] - moved[0] == pytest.approx(1_046.51, abs=0.05)
+    report(REPORT_EMPLOYER_NICS_UNDER_25_RATE=0.075, REPORT_START_YEAR=2028)
+    later = change(NICS, single(21, rent=0, employment_income=20_000), "employment_income")
+    assert later[1] == later[0]
+
+
+def test_the_report_package_takes_the_employer_rate_and_the_package_does_not(report):
+    report(REPORT_EMPLOYER_NICS_UNDER_25_RATE=0.075)
+    employee = single(23, rent=0, employment_income=20_000)
+    pay = change("milburn_report_package", employee, "employment_income")
+    assert pay[1] - pay[0] == pytest.approx(1_046.51, abs=0.05)
+    pay = change("milburn_package", employee, "employment_income")
+    assert pay[1] == pay[0]
+    # The benefit changes are still in it.
+    claimant = single(20, lcwra=True, pip=True)
+    assert change("milburn_report_package", claimant) == pytest.approx(
+        change("milburn_package", claimant), abs=0.005
+    )
+
+
+# The report's tiered PIP replacement
+
+ENHANCED_ONLY = {
+    "daily_living_enhanced": 1.0,
+    "daily_living_standard": 0.0,
+    "mobility_enhanced": 1.0,
+    "mobility_standard": 0.0,
+}
+PIP_VARIABLES = ("pip_dl", "pip_m", "pip", "household_net_income")
+
+
+def uniform(share):
+    return dict.fromkeys(design.REPORT_PIP_SHARE_KEYS, share)
+
+
+@pytest.mark.parametrize("claimant", ["pip_only", "lcwra_renter"])
+def test_tiered_shares_of_one_are_current_law(report, claimant):
+    assert design.REPORT_PIP_REPLACEMENT_SHARES is None
+    report(REPORT_PIP_REPLACEMENT_SHARES=uniform(1.0))
+    assert reforms.get_reform("milburn_report_pip").name == (
+        "PIP unchanged for 18 to 24-year-olds"
+    )
+    situation = (
+        single(20, rent=0, pip=True)
+        if claimant == "pip_only"
+        else single(20, lcwra=True, pip=True)
+    )
+    for variable in PIP_VARIABLES:
+        before, after = change("milburn_report_pip", situation, variable)
+        assert after == pytest.approx(before, abs=0.005) and before > 0
+
+
+@pytest.mark.parametrize("claimant", ["pip_only", "lcwra_renter"])
+def test_tiered_shares_of_zero_are_full_removal(report, claimant):
+    """Amounts and what passports off them (the renter also loses the
+    shared accommodation exemption) move as under the listed removal."""
+    report(REPORT_PIP_REPLACEMENT_SHARES=uniform(0.0))
+    pip = reforms.get_reform("milburn_report_pip")
+    assert pip.name == reforms.get_reform("pip_removed_under_25").name
+    situation = (
+        single(20, rent=0, pip=True)
+        if claimant == "pip_only"
+        else single(20, lcwra=True, pip=True)
+    )
+    for variable in PIP_VARIABLES:
+        ours = change("milburn_report_pip", situation, variable)
+        theirs = change("pip_removed_under_25", situation, variable)
+        assert ours == pytest.approx(theirs, abs=0.005)
+    assert change("milburn_report_pip", situation, "pip")[1] == 0
+    assert change("milburn_report_package", situation) == pytest.approx(
+        change("milburn_package", situation), abs=0.005
+    )
+
+
+def test_tiered_shares_of_a_half_are_the_half_rate_measure(report):
+    report(REPORT_PIP_REPLACEMENT_SHARES=uniform(0.5))
+    situation = single(20, lcwra=True, pip=True)
+    for variable in PIP_VARIABLES:
+        ours = change("milburn_report_pip", situation, variable)
+        theirs = change("pip_halved_under_25", situation, variable)
+        assert ours == pytest.approx(theirs, abs=0.005)
+
+
+def test_enhanced_only_keeps_the_enhanced_award(report):
+    """Standard daily living with enhanced mobility: the first goes
+    (52 x £79.38), the second stays."""
+    report(REPORT_PIP_REPLACEMENT_SHARES=ENHANCED_ONLY)
+    pip = reforms.get_reform("milburn_report_pip")
+    assert pip.name == "PIP kept only at the enhanced rate for 18 to 24-year-olds"
+    assert (
+        "the daily living component is paid in full at the enhanced rate "
+        "and no longer paid at the standard rate; the mobility component "
+        "is paid in full at the enhanced rate and no longer paid at the "
+        "standard rate." in pip.description
+    )
+    mixed = single(20, rent=0, pip=True)
+    daily_living = change("milburn_report_pip", mixed, "pip_dl")
+    assert daily_living == pytest.approx((52 * PIP_DL_STANDARD, 0), abs=0.05)
+    mobility = change("milburn_report_pip", mixed, "pip_m")
+    assert mobility == pytest.approx((52 * PIP_M_ENHANCED,) * 2, abs=0.05)
+    before, after = change("milburn_report_pip", mixed)
+    assert before - after == pytest.approx(52 * PIP_DL_STANDARD, abs=0.05)
+    # Enhanced daily living alone: kept whole. Standard alone: removed.
+    enhanced = _with_dl(single(20, rent=0), "ENHANCED")
+    for variable in ("pip", "household_net_income"):
+        before, after = change("milburn_report_pip", enhanced, variable)
+        assert after == pytest.approx(before) and before > 0
+    standard = _with_dl(single(20, rent=0), "STANDARD")
+    assert change("milburn_report_pip", standard, "pip")[1] == 0
+    # Outside the age band nothing moves.
+    older = single(26, rent=0, pip=True)
+    before, after = change("milburn_report_pip", older, "pip")
+    assert after == pytest.approx(before) and before > 0
+
+
+def test_the_tiered_shares_replace_the_uniform_share_in_every_report_id(report):
+    report(
+        REPORT_PIP_REPLACEMENT_SHARES=ENHANCED_ONLY,
+        REPORT_PIP_REPLACEMENT_SHARE=0.5,
+    )
+    kept = 52 * PIP_M_ENHANCED
+    entrant = single(18, rent=0, pip=True)
+    for report_id in (
+        "milburn_report_pip",
+        "milburn_report_package",
+        "milburn_report_package_phased",
+        "milburn_report_package_entry_25pct",
+    ):
+        before, after = change(report_id, entrant, "pip")
+        assert (before, after) == pytest.approx((PIP_AWARD, kept), abs=0.05)
+    assert (
+        "PIP kept only at the enhanced rate for 18 to 24-year-olds"
+        in reforms.get_reform("milburn_report_package").description
+    )
+    # The 15 November package still removes the whole award.
+    assert change("milburn_package", entrant, "pip")[1] == 0
+    assert change("milburn_package_phased", entrant, "pip")[1] == 0
+
+
+def test_a_share_above_one_pays_more(report):
+    shares = {**ENHANCED_ONLY, "mobility_enhanced": 1.2}
+    report(REPORT_PIP_REPLACEMENT_SHARES=shares)
+    pip = reforms.get_reform("milburn_report_pip")
+    assert pip.name == "PIP replaced by tiered support for 18 to 24-year-olds"
+    assert "paid at 120% of its current amount at the enhanced rate" in pip.description
+    before, after = change("milburn_report_pip", single(20, rent=0, pip=True), "pip_m")
+    assert after == pytest.approx(1.2 * before, abs=0.05)
+
+
+def test_new_report_constants_the_modifiers_cannot_run_are_refused(report, monkeypatch):
+    for name, value, match in (
+        ("REPORT_PIP_REPLACEMENT_SHARES", {"daily_living_enhanced": 1.0}, "SHARES"),
+        ("REPORT_PIP_REPLACEMENT_SHARES", {**ENHANCED_ONLY, "other": 1.0}, "SHARES"),
+        ("REPORT_PIP_REPLACEMENT_SHARES", uniform(-0.5), "SHARES"),
+        ("REPORT_PIP_REPLACEMENT_SHARES", 0.5, "SHARES"),
+        ("REPORT_EMPLOYER_NICS_UNDER_25_RATE", 7.5, "RATE"),
+        ("REPORT_EMPLOYER_NICS_UNDER_25_RATE", -0.01, "RATE"),
+        ("REPORT_EMPLOYER_NICS_AGE_LIMIT", 21, "AGE_LIMIT"),
+        ("REPORT_PIP_REPLACEMENT_NAME", "", "NAME"),
+    ):
+        monkeypatch.setattr(design, name, value)
+        with pytest.raises(ValueError, match=match):
+            design.check_report_design()
+        monkeypatch.undo()
+    design.check_report_design()
+
+
+# The 17 November briefing: PIP from 16, Scotland left alone, replaced by
+# an additional cost allowance
+
+
+@pytest.mark.parametrize(
+    "report_id", ["milburn_report_pip", "milburn_report_package"]
+)
+def test_pip_from_16_excluding_scotland(report, report_id):
+    report(REPORT_PIP_LOWER_AGE=16, REPORT_PIP_INCLUDE_SCOTLAND=False)
+    pip = reforms.get_reform("milburn_report_pip")
+    assert pip.name == "PIP removed for 16 to 24-year-olds"
+    assert "left as they are" in pip.description
+    # A 17-year-old in England loses PIP.
+    english = single(17, rent=0, pip=True)
+    assert change(report_id, english, "pip") == pytest.approx(
+        (PIP_AWARD, 0), abs=0.05
+    )
+    before, after = change(report_id, english)
+    assert before - after == pytest.approx(PIP_AWARD, abs=0.05)
+    # A 20-year-old in Scotland keeps it.
+    scottish = single(20, rent=0, region="SCOTLAND", pip=True)
+    assert change(report_id, scottish, "pip") == pytest.approx(
+        (PIP_AWARD, PIP_AWARD), abs=0.05
+    )
+    before, after = change(report_id, scottish)
+    assert after == pytest.approx(before)
+    # The health element removal in the package is UK-wide.
+    if report_id == "milburn_report_package":
+        element = "uc_LCWRA_element"
+        lost = change(
+            report_id, single(20, lcwra=True, region="SCOTLAND"), element
+        )
+        assert lost[1] == 0 and lost[0] > 0
+
+
+def test_the_briefed_design_with_an_additional_cost_allowance(report):
+    """PIP from 16 outside Scotland, with enhanced awards standing in for
+    the additional cost allowance."""
+    report(
+        REPORT_PIP_LOWER_AGE=16,
+        REPORT_PIP_INCLUDE_SCOTLAND=False,
+        REPORT_PIP_REPLACEMENT_SHARES=ENHANCED_ONLY,
+        REPORT_PIP_REPLACEMENT_NAME="additional cost allowance",
+    )
+    pip = reforms.get_reform("milburn_report_pip")
+    assert pip.name == (
+        "PIP replaced by an additional cost allowance for 16 to 24-year-olds"
+    )
+    assert "stand in for the report's additional cost allowance" in pip.description
+    assert pip.name in reforms.get_reform("milburn_report_package").description
+    kept = 52 * PIP_M_ENHANCED
+    for report_id in ("milburn_report_pip", "milburn_report_package"):
+        english = change(report_id, single(17, rent=0, pip=True), "pip")
+        assert english == pytest.approx((PIP_AWARD, kept), abs=0.05)
+        scottish = single(20, rent=0, region="SCOTLAND", pip=True)
+        assert change(report_id, scottish, "pip") == pytest.approx(
+            (PIP_AWARD, PIP_AWARD), abs=0.05
+        )
+    # The name alone moves no figure, and labels a uniform share too.
+    report(
+        REPORT_PIP_LOWER_AGE=18,
+        REPORT_PIP_REPLACEMENT_SHARES=None,
+        REPORT_PIP_REPLACEMENT_SHARE=0.5,
+    )
+    pip = reforms.get_reform("milburn_report_pip")
+    assert pip.name == (
+        "PIP replaced by an additional cost allowance for 18 to 24-year-olds"
+    )
+    report(REPORT_PIP_REPLACEMENT_SHARE=0.0)
+    assert reforms.get_reform("milburn_report_pip").name == (
+        "PIP removed for 18 to 24-year-olds"
+    )

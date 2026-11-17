@@ -104,12 +104,16 @@ def pip_removed_18_to_24_phased(
     rate=REASSESSED_EACH_YEAR,
     cohort_start=START,
     entrant_age=design.NEW_ENTRANT_AGE,
+    shares_kept=None,
 ):
-    """PIP removal for 18 to 24-year-olds, reaching recipients as above."""
+    """PIP removal for 18 to 24-year-olds, reaching recipients as above.
+    ``shares_kept`` is the tiered share of ``pip_removed_ages_18_to_24``
+    (by component and award level), in place of ``share_kept``."""
+    components = {"pip_dl": "daily_living", "pip_m": "mobility"}
     for name in ("pip_dl", "pip_m"):
         native = sim.tax_benefit_system.get_variable(name)
 
-        def formula(person, period, parameters, native=native):
+        def formula(person, period, parameters, native=native, name=name):
             current = _call_formula(native, person, period, parameters)
             if period.start.year < start_year:
                 return current
@@ -124,6 +128,19 @@ def pip_removed_18_to_24_phased(
                 removed = removed & (
                     country != country.possible_values.SCOTLAND
                 )
+            if shares_kept is not None:
+                category = person(f"{name}_category", period)
+                levels = category.possible_values
+                component = components[name]
+                share = np.select(
+                    [category == levels.ENHANCED, category == levels.STANDARD],
+                    [
+                        shares_kept[f"{component}_enhanced"],
+                        shares_kept[f"{component}_standard"],
+                    ],
+                    default=1.0,
+                )
+                return np.where(removed, current * share, current)
             if share_kept == 0:
                 return np.where(removed, 0.0, current)
             return np.where(removed, current * share_kept, current)
