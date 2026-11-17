@@ -1,0 +1,99 @@
+/* Published figures (BenchmarkCallout.jsx): a quiet strip inside a headline box */
+.bm-callout {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-grid);
+}
+
+.bm-callout-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-bottom: 12px;
+}
+
+.bm-callout-heading h4 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.bm-callout-heading p {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--c-axis-title);
+}
+
+.bm-callout-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--c-gain-text);
+}
+
+.bm-callout-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px 24px;
+}
+
+.bm-callout-items li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bm-callout-items li > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  margin-top: 3px;
+  color: var(--c-axis-title);
+}
+
+.bm-callout-items li > div {
+  min-width: 0;
+}
+
+.bm-callout-items p {
+  margin: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.bm-callout-figure {
+  font-size: var(--fs-small);
+  color: var(--c-text);
+}
+
+.bm-callout-figure strong {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.bm-callout-basis,
+.bm-callout-source {
+  font-size: var(--fs-caption);
+  color: var(--c-axis-title);
+}
+
+.bm-callout-source a {
+  color: var(--c-gain-text);
+}
+
+.bm-callout a:focus-visible {
+  outline: 2px solid var(--c-gain-text);
+  outline-offset: 2px;
+  border-radius: 2px;
+}

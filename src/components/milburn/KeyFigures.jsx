@@ -15,6 +15,7 @@ import {
 } from "../../utils/milburn/summary";
 import { PACKAGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGroups";
 import TitleIcon from "../TitleIcon";
+import BenchmarkCallout from "./BenchmarkCallout";
 import { buildChartCsv } from "../../utils/chartCsv";
 import { CHART_COLOURS } from "../../utils/chartTheme";
 import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, YearOnlyChip } from "./MilburnCharts";
@@ -275,6 +276,8 @@ export default function KeyFigures({ runId, nameShownAbove = false }) {
     <section className="report-section milburn-key card" aria-label="Key figures">
       {heading}
       {body}
+      {/* Under the tiles, once the run has figures to set them beside */}
+      {status === "ready" && summaryRun(summary, id) && <BenchmarkCallout place="young" />}
       {status === "ready" && <RangeStrip summary={summary} selectedId={id} />}
       {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
         <ul className="milburn-points">

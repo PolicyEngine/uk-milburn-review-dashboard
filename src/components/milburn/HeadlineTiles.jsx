@@ -11,6 +11,7 @@ import {
   useMilburnSummary,
 } from "../../utils/milburn/summary";
 import TitleIcon from "../TitleIcon";
+import BenchmarkCallout from "./BenchmarkCallout";
 import { packageRange } from "./KeyFigures";
 import { YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
@@ -161,6 +162,7 @@ export function PovertyHeadline({ runId }) {
           <span>Static: nobody changes their work or claims. Counts rounded to the nearest thousand.</span>
         </li>
       </ul>
+      <BenchmarkCallout place="poverty" />
     </section>
   );
 }
@@ -243,6 +245,7 @@ export function FinancesHeadline({ runId, selectedYear }) {
           <span>A positive figure is a saving to the Exchequer; a negative one is a cost.</span>
         </li>
       </ul>
+      <BenchmarkCallout place="finances" />
     </section>
   );
 }
