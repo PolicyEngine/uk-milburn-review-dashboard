@@ -9,7 +9,7 @@ const COPY = reportCopy();
  * 2026; the section each comes from is cited on its entry). They replace
  * the pre-report list, and are the page's list on every data route: the
  * pipeline's registry (uk_budget_data.reforms.NOT_COMPUTABLE_MEASURES)
- * holds the same ten, by id and in this order, for milburn_measures.json.
+ * holds the same fourteen, by id and in this order, for milburn_measures.json.
  * Not listed: the Youth Allowance's independent rate and work allowance
  * (the latter at an assumed amount, illustratively) and the higher
  * employer National Insurance threshold at 21 to 24, which the pipeline
@@ -34,20 +34,23 @@ export const NOT_COMPUTABLE_MEASURES = [
     // Report para 760: 16 and 17-year-olds stay on DLA instead of moving to
     // PIP. The national run (milburn_report_child_dla_to_18) gives exactly
     // £0: the paired DLA and PIP rates are identical, so the switch changes
-    // no payment; the aim, sparing a reassessment at 16, is not in the data
+    // no payment for those who move. Para 759: "About 77% of Child DLA
+    // claimants graduate onto PIP by the age of 17", so about 23% do not,
+    // and some who would lose an award at 16 would keep DLA to 18; the data
+    // cannot identify them
     id: "child_dla_to_18",
     name: "Child DLA extended to 18",
     summary: "16 and 17-year-olds stay on Disability Living Allowance instead of moving to PIP.",
     affects: "Disabled 16 and 17-year-olds",
     category: BENEFITS,
     kind: "A change to when a benefit switches.",
-    notModelled: "DLA and PIP pay the same amounts, so the switch changes no payment; its effect on reassessment is not in the data.",
+    notModelled: "DLA and PIP pay the same amounts, but some who lose an award at sixteen would keep DLA longer; the data cannot identify them.",
     visual: {
       kind: "swap",
       caption: "Disability benefit for older teenagers",
       before: { when: "Today", icon: "wallet", label: "PIP", facts: ["Same rates"] },
       after: { when: "Proposed", icon: "wallet", label: "DLA kept longer", facts: ["Same rates"], unknowns: ["Reassessment"] },
-      alt: "Today young people move from DLA to PIP as older teenagers; the proposal keeps them on DLA until adulthood. The two pay the same amounts, so no payment changes.",
+      alt: "Today young people move from DLA to PIP as older teenagers; the proposal keeps them on DLA until adulthood. The two pay the same amounts, so no payment changes for those who move; those who would lose an award at the reassessment would keep it longer, and the data cannot identify them.",
     },
   },
   {
@@ -138,6 +141,32 @@ export const NOT_COMPUTABLE_MEASURES = [
     },
   },
   {
+    // Report 6.5, para 746 ("pause support rather than completely detach
+    // from it and financial help should be provided"), para 782 (income
+    // protected on clinical evidence) and 6.4, para 716 (the duty to engage
+    // suspended during serious acute illness or treatment). No rule or
+    // amount is given; our runs remove the health element from these
+    // people as from every other claimant under 25
+    id: "income_protection_serious_illness",
+    name: "Income protection during serious illness",
+    summary: "Support paused, not lost, during serious illness or treatment, with financial help meanwhile.",
+    affects: "Young people with a serious illness or in intensive treatment",
+    category: BENEFITS,
+    kind: "A rule on pausing support.",
+    notModelled: "No rule or amount is given; our runs remove the health element from these people too.",
+    visual: {
+      kind: "split",
+      caption: "What happens during serious illness",
+      root: [{ icon: "user", label: "A young person on the Youth Allowance" }],
+      test: { icon: "heartPulse", label: "Serious illness or treatment", unknown: "No flag in the data" },
+      branches: [
+        { answer: "No", icon: "clipboard", label: "Duty to engage" },
+        { answer: "Yes", icon: "shield", label: "Duty paused, income protected", tone: "gain", plus: true },
+      ],
+      alt: "During serious illness, injury or intensive treatment a young person's duty to engage would be paused and their income protected. No rule or amount is given, and our runs remove the health element from these people too.",
+    },
+  },
+  {
     // Report 1.1, para 71 (and 4.5, care-experienced young people): £50 a
     // week for 6 months, conditional on a participation plan
     id: "care_leaver_transition_allowance",
@@ -184,15 +213,42 @@ export const NOT_COMPUTABLE_MEASURES = [
     },
   },
   {
+    // Report 6.4, para 684: a 13-week civic service programme, volunteering
+    // with a charity or non-profit while job seeking; those taking part for
+    // 8 to 24 hours a week get additional financial support, of no stated
+    // amount, and a certificate
+    id: "civic_service",
+    name: "Civic service programme",
+    summary: "A 13-week volunteering programme, with extra financial support at 8 to 24 hours a week.",
+    affects: "Young people job seeking or on a participation plan",
+    category: EMPLOYMENT,
+    kind: "Volunteering with extra support.",
+    notModelled: "No amount is given, and the data do not show who would take part.",
+    visual: {
+      kind: "offers",
+      caption: "What civic service offers",
+      offers: [
+        { icon: "compass", label: "Volunteering" },
+        { icon: "cap", label: "Skills and a certificate" },
+      ],
+      today: "Job search today",
+      more: "Civic service alongside",
+      scale: "Not to scale",
+      alt: "The civic service programme offers volunteering with a charity or non-profit while job seeking, with extra financial support and a certificate. No amount is given, and the data do not show who would take part.",
+    },
+  },
+  {
     // Report 1.1, para 51, and 3.5 "Helping employers financially": £3,000
     // for a young person NEET for 6 months; £2,000 premiums for greater
-    // barriers and for businesses with fewer than 50 employees
+    // barriers and for businesses with fewer than 50 employees. Paras 51,
+    // 280 and 472: the apprenticeship hiring payment rises from £2,000 to
+    // £2,500 and is extended to levy payers
     id: "employer_hiring_payments",
     name: "Hiring payments to employers",
     summary: "£3,000 for hiring a young person six months out of work and education; £2,000 premiums.",
     affects: "Employers, and young people out of work and education",
     category: EMPLOYMENT,
-    kind: "A grant to employers.",
+    kind: "Grants to employers, with a higher apprenticeship payment.",
     notModelled: "Its effect is on hiring, which a static model omits.",
     visual: {
       kind: "split",
@@ -204,7 +260,58 @@ export const NOT_COMPUTABLE_MEASURES = [
         { answer: "Yes", icon: "banknote", label: "Hiring payment", tone: "gain", plus: true },
       ],
       marker: "Hiring response, not modelled",
-      alt: "An employer who hires a young person out of work and education for six months would get a hiring payment, with premiums for small businesses and for young people facing greater barriers. How hiring responds is not modelled.",
+      alt: "An employer who hires a young person out of work and education for six months would get a hiring payment, with premiums for small businesses and for young people facing greater barriers; the payment for taking on a young apprentice would rise and extend to levy payers. How hiring responds is not modelled.",
+    },
+  },
+  {
+    // Report 6.4, paras 689 and 690 (a Flexible Jobs Scheme on the Danish
+    // flexjob model: the state pays the difference between what a person
+    // can do and a living wage; paid jobs through supported businesses and
+    // social enterprises) and para 780 (state-backed paid opportunity, a
+    // flexjob subsidy). No rates are given
+    id: "flexible_jobs_scheme",
+    name: "Flexible Jobs Scheme and supported paid jobs",
+    summary: "Wage subsidies and supported paid jobs for disabled young people where the market creates none.",
+    affects: "Disabled young people the open labour market excludes",
+    category: EMPLOYMENT,
+    kind: "A programme of subsidised jobs.",
+    notModelled: "A programme with no rates given, working through hiring, which a static model omits.",
+    visual: {
+      kind: "offers",
+      caption: "What the Flexible Jobs Scheme adds",
+      offers: [
+        { icon: "briefcase", label: "Carved roles" },
+        { icon: "building", label: "Supported businesses" },
+        { icon: "banknote", label: "Pay topped up" },
+      ],
+      today: "Open market jobs",
+      more: "Jobs the state helps create",
+      scale: "Not to scale",
+      alt: "The Flexible Jobs Scheme would top up pay for disabled young people towards a living wage, with roles carved to fit and paid jobs in supported businesses where the open market creates none. No rates are given.",
+    },
+  },
+  {
+    // Report 6.4, "Entrepreneurs and self-employment" (after para 681): up
+    // to £500 from the Flexible Support Fund to explore a business idea; a
+    // £3,000 grant, disregarded for the Youth Allowance, once the business
+    // is assessed as viable; a start-up period of up to 18 months
+    id: "self_employment_support",
+    name: "Start-up support for young entrepreneurs",
+    summary: "A £3,000 start-up grant the Youth Allowance disregards, and up to £500 to test ideas.",
+    affects: "Young people starting a business",
+    category: EMPLOYMENT,
+    kind: "Grants and a longer start-up period.",
+    notModelled: "The data do not show who would start a business, and a disregarded grant changes no award.",
+    visual: {
+      kind: "split",
+      caption: "When a young entrepreneur gets a start-up grant",
+      root: [{ icon: "user", label: "A young person with a business idea" }],
+      test: { icon: "clipboard", label: "Business assessed as viable", unknown: "No flag in the data" },
+      branches: [
+        { answer: "Not yet", icon: "lifebuoy", label: "Help to test the idea" },
+        { answer: "Yes", icon: "banknote", label: "Start-up grant", tone: "gain", plus: true },
+      ],
+      alt: "A young person whose business idea is assessed as viable would get a start-up grant, disregarded for the Youth Allowance, and a longer start-up period; others can get help to test an idea. The data do not show who would start a business.",
     },
   },
   {

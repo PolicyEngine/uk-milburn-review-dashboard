@@ -302,13 +302,17 @@ def test_not_computable_measures_carry_a_reason_and_no_reform():
         "severe_complex_needs_insurance",
         "health_and_disability_fund",
         "youth_conditionality",
+        "income_protection_serious_illness",
         "care_leaver_transition_allowance",
         "opportunity_guarantee",
+        "civic_service",
         "employer_hiring_payments",
+        "flexible_jobs_scheme",
+        "self_employment_support",
         "apprenticeship_target",
         "further_education_places",
     ]
-    assert len(ids) == 10
+    assert len(ids) == 14
     for measure in NOT_COMPUTABLE_MEASURES:
         assert measure.status == "not_computable" and measure.reason
         assert get_reform(measure.id) is None
@@ -381,9 +385,15 @@ def test_a_couple_keeps_the_element_only_through_a_claimant_aged_25_plus(
 
 
 def test_under_22_removes_the_element_at_21_but_not_at_23():
-    lost_21 = change("uc_health_element_removed_under_22", single(21, lcwra=True))
-    assert lost_21[0] - lost_21[1] == pytest.approx(12 * PROTECTED_LCWRA, abs=0.05)
-    lost_23 = change("uc_health_element_removed_under_22", single(23, lcwra=True))
+    lost_21 = change(
+        "uc_health_element_removed_under_22", single(21, lcwra=True)
+    )
+    assert lost_21[0] - lost_21[1] == pytest.approx(
+        12 * PROTECTED_LCWRA, abs=0.05
+    )
+    lost_23 = change(
+        "uc_health_element_removed_under_22", single(23, lcwra=True)
+    )
     assert lost_23[0] == pytest.approx(lost_23[1], abs=0.01)
 
 
@@ -401,13 +411,21 @@ def _with_points(situation, points):
 
 def test_severe_cases_kept_spares_24_or_more_daily_living_points():
     rid = "uc_health_element_removed_under_25_severe_kept"
-    kept = change(rid, _with_points(single(22, lcwra=True), 26), "uc_LCWRA_element")
+    kept = change(
+        rid, _with_points(single(22, lcwra=True), 26), "uc_LCWRA_element"
+    )
     assert kept[1] == pytest.approx(kept[0], abs=0.01) and kept[0] > 0
-    lost12 = change(rid, _with_points(single(22, lcwra=True), 12), "uc_LCWRA_element")
+    lost12 = change(
+        rid, _with_points(single(22, lcwra=True), 12), "uc_LCWRA_element"
+    )
     assert lost12[1] == 0 and lost12[0] > 0
-    kept = change(rid, _with_points(single(22, lcwra=True), 24), "uc_LCWRA_element")
+    kept = change(
+        rid, _with_points(single(22, lcwra=True), 24), "uc_LCWRA_element"
+    )
     assert kept[1] == pytest.approx(kept[0], abs=0.01) and kept[0] > 0
-    lost = change(rid, _with_dl(single(22, lcwra=True), "STANDARD"), "uc_LCWRA_element")
+    lost = change(
+        rid, _with_dl(single(22, lcwra=True), "STANDARD"), "uc_LCWRA_element"
+    )
     assert lost[1] == 0 and lost[0] > 0
 
 
@@ -421,19 +439,30 @@ def test_the_central_package_is_registered():
 
 
 def test_pip_from_16_removes_a_17_year_olds_award():
-    before, after = change("pip_removed_16_to_24", single(17, rent=0, pip=True))
+    before, after = change(
+        "pip_removed_16_to_24", single(17, rent=0, pip=True)
+    )
     assert before - after == pytest.approx(8_433.58, abs=0.05)
 
 
 def test_a_new_entrant_is_reached_at_once_by_the_phased_package():
     # Aged 18 in 2027-28: turned 18 after April 2026, so reached whatever
     # the reassessment draw.
-    before, after = change("milburn_package_phased", single(18, rent=0, pip=True))
+    before, after = change(
+        "milburn_package_phased", single(18, rent=0, pip=True)
+    )
     assert before - after == pytest.approx(8_433.58, abs=0.05)
 
 
 def test_the_entry_scenario_runs_on_a_household():
-    before, after = change("milburn_package_entry_25pct", single(20, rent=0, pip=True))
+    before, after = change(
+        "milburn_package_entry_25pct", single(20, rent=0, pip=True)
+    )
     # Either the person stays out of work (loses PIP) or moves into work;
     # both are finite and the PIP is gone.
-    assert change("milburn_package_entry_25pct", single(20, rent=0, pip=True), "pip")[1] == 0
+    assert (
+        change(
+            "milburn_package_entry_25pct", single(20, rent=0, pip=True), "pip"
+        )[1]
+        == 0
+    )

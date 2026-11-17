@@ -291,9 +291,9 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
       /for \(const \[id, base\] of Object\.entries\(REPORT_RUN_OF\)\) \{[\s\S]*?\n\}/,
       // The report's employer NI threshold card
       /MILBURN_POLICY_DETAILS\.push\(\{\n  id: "milburn_report_employer_nics_threshold"[\s\S]*?\n\}\);/,
-      // The report's runs with stated assumptions: Youth Allowance, phased package, glide path
+      // The report's runs with stated assumptions: Youth Allowance, phased package, glide path, every sector
       /MILBURN_POLICY_DETAILS\.push\(\n  \{\n    id: "milburn_report_youth_allowance_independent"[\s\S]*?\n\);/,
-      // Child DLA to 18, and the work allowance at an assumed amount
+      // Child DLA to 18, and the work allowance at assumed amounts (current, and 15 hours' pay)
       /MILBURN_POLICY_DETAILS\.push\(\n  \{\n    id: "milburn_report_child_dla_to_18"[\s\S]*?\n\);/,
       // Our combined runs: the two Youth Allowance changes, and those with the package
       /MILBURN_POLICY_DETAILS\.push\(\n  \{\n    id: "milburn_report_youth_allowance_combined"[\s\S]*?\n\);/,

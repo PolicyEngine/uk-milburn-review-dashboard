@@ -218,7 +218,7 @@ describe("the measures we cannot compute (NotComputableVisual)", () => {
 
   it("gives each a diagram of a known kind, in words and icons, never a figure", async () => {
     const { NOT_COMPUTABLE_MEASURES, NotComputableVisual, NOT_COMPUTABLE_KINDS } = await load();
-    expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.visual.kind)).toEqual(["swap", "swap", "split", "split", "split", "split", "offers", "split", "offers", "offers"]);
+    expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.visual.kind)).toEqual(["swap", "swap", "split", "split", "split", "split", "split", "offers", "offers", "split", "offers", "split", "offers", "offers"]);
     for (const measure of NOT_COMPUTABLE_MEASURES) {
       expect(Object.keys(NOT_COMPUTABLE_KINDS), measure.id).toContain(measure.visual.kind);
       expect(JSON.stringify(measure.visual), measure.id).not.toMatch(/[£%\d]/);

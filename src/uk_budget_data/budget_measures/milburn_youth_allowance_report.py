@@ -48,6 +48,15 @@ YOUTH_ALLOWANCE_AGE_LIMIT = 25
 MONTHS = 12
 # ``work_allowance_monthly`` value for the year's statutory amounts.
 CURRENT_WORK_ALLOWANCE = "current"
+# The 15-hour sensitivity (``milburn_report_youth_allowance_work_allowance_15h``):
+# para 749, "Many young people who are NEET are likely to be able to work 10
+# or 15 hours a week initially". The allowance is 15 hours a week at the
+# minimum wage for workers aged 21 and over (the National Living Wage since
+# April 2024), over 52 weeks, a month. The report gives no amount: the hours
+# are its, the pay rate and the single amount are our assumptions.
+WORK_ALLOWANCE_HOURS_A_WEEK = 15
+WEEKS_A_YEAR = 52
+MINIMUM_WAGE_AGE = 21
 
 
 def _in_force(period, start_year, end_year):
@@ -72,6 +81,7 @@ def youth_allowance_report(
     age_limit=YOUTH_ALLOWANCE_AGE_LIMIT,
     independent_at_25_plus_rate=True,
     work_allowance_monthly=None,
+    work_allowance_hours=None,
 ):
     """The report's Youth Allowance, inside Universal Credit, from
     ``start_year`` (to ``end_year`` inclusive; None: no end).
@@ -97,6 +107,13 @@ def youth_allowance_report(
     taper is unchanged, and a claim that is neither young nor entitled
     under reg. 22 has no allowance, as now.
 
+    ``work_allowance_hours`` (instead of ``work_allowance_monthly``) sets
+    one monthly amount for every young claim, with or without a housing
+    costs element: that many hours a week at the year's minimum wage for
+    workers aged 21 and over (``minimum_wage.non_apprentice`` at 21), over
+    52 weeks, divided by 12. A young claim that has a statutory work
+    allowance already gets the higher of the two.
+
     Everything that reads the allowance follows it: the maximum amount, the
     award and the benefit cap (the higher allowance counts towards it).
     """
@@ -110,7 +127,18 @@ def youth_allowance_report(
             float(amount) for amount in work_allowance_monthly
         )
         if with_housing < 0 or without_housing < 0:
-            raise ValueError("work_allowance_monthly amounts must be 0 or more")
+            raise ValueError(
+                "work_allowance_monthly amounts must be 0 or more"
+            )
+    if work_allowance_hours is not None:
+        if work_allowance_monthly is not None:
+            raise ValueError(
+                "pass work_allowance_monthly or work_allowance_hours, not both"
+            )
+        if not 0 < float(work_allowance_hours) <= 48:
+            raise ValueError(
+                "work_allowance_hours must be above 0 and at most 48"
+            )
 
     if independent_at_25_plus_rate:
         native_allowance = sim.tax_benefit_system.get_variable(
@@ -138,7 +166,7 @@ def youth_allowance_report(
 
         _replace_formula(sim, "uc_standard_allowance", standard_allowance)
 
-    if work_allowance_monthly is not None:
+    if work_allowance_monthly is not None or work_allowance_hours is not None:
         native_eligible = sim.tax_benefit_system.get_variable(
             "is_uc_work_allowance_eligible"
         )
@@ -171,6 +199,23 @@ def youth_allowance_report(
                 return current
             young, _ = _young_claim(benunit, period, age_limit)
             housing = benunit("uc_housing_costs_element", period) > 0
+            if work_allowance_hours is not None:
+                hourly = parameters(
+                    period
+                ).gov.hmrc.minimum_wage.non_apprentice.calc(
+                    np.array([MINIMUM_WAGE_AGE])
+                )[
+                    0
+                ]
+                monthly = (
+                    float(work_allowance_hours)
+                    * hourly
+                    * WEEKS_A_YEAR
+                    / MONTHS
+                )
+                return np.where(
+                    young, np.maximum(current, MONTHS * monthly), current
+                )
             if statutory_amounts:
                 table = parameters(
                     period
@@ -210,4 +255,23 @@ def milburn_report_youth_allowance_work_allowance(sim):
         start_year=design.REPORT_START_YEAR,
         independent_at_25_plus_rate=False,
         work_allowance_monthly=CURRENT_WORK_ALLOWANCE,
+    )
+
+
+def milburn_report_youth_allowance_work_allowance_15h(sim):
+    """Illustrative sensitivity at the report's own hours (para 749: "10
+    or 15 hours a week"): from ``design.REPORT_START_YEAR`` a claim whose
+    claimants are all under 25 has a work allowance of 15 hours a week at
+    the year's minimum wage for workers aged 21 and over, over 52 weeks, a
+    month (about £900 in 2029-30), the same with or without a housing
+    costs element (our assumption: the report gives one figure, in hours,
+    and nothing on housing costs). A claim with a statutory work allowance
+    already gets the higher amount. The standard allowance is not changed
+    here."""
+    design.check_report_design()
+    return youth_allowance_report(
+        sim,
+        start_year=design.REPORT_START_YEAR,
+        independent_at_25_plus_rate=False,
+        work_allowance_hours=WORK_ALLOWANCE_HOURS_A_WEEK,
     )

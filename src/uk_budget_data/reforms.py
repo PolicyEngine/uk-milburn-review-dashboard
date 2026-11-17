@@ -1501,11 +1501,14 @@ NOT_COMPUTABLE_MEASURES = (
         name="Child DLA extended to 18",
         description=(
             "16 and 17-year-olds stay on Disability Living Allowance "
-            "instead of moving to PIP (report paragraph 760)."
+            "instead of moving to PIP (report paragraph 760). About 77% of "
+            "child DLA claimants move to PIP by 17 (paragraph 759), so "
+            "about 23% do not."
         ),
         reason=(
-            "DLA and PIP pay the same amounts, so the switch changes no "
-            "payment; its effect on reassessment is not in the data."
+            "DLA and PIP pay the same amounts, but some who lose an award "
+            "at sixteen would keep DLA longer; the data cannot identify "
+            "them."
         ),
     ),
     NotComputableMeasure(
@@ -1551,6 +1554,19 @@ NOT_COMPUTABLE_MEASURES = (
         reason="It works through behaviour, which a static model omits.",
     ),
     NotComputableMeasure(
+        id="income_protection_serious_illness",
+        name="Income protection during serious illness",
+        description=(
+            "Support paused, not lost, during serious illness or treatment, "
+            "with financial help meanwhile (report paragraphs 716, 746 and "
+            "782)."
+        ),
+        reason=(
+            "No rule or amount is given; our runs remove the health element "
+            "from these people too."
+        ),
+    ),
+    NotComputableMeasure(
         id="care_leaver_transition_allowance",
         name="Care Leaver Transition Allowance",
         description=(
@@ -1569,13 +1585,55 @@ NOT_COMPUTABLE_MEASURES = (
         reason="An entitlement to places, not a tax or benefit rule.",
     ),
     NotComputableMeasure(
+        id="civic_service",
+        name="Civic service programme",
+        description=(
+            "A 13-week volunteering programme, with additional financial "
+            "support for those taking part 8 to 24 hours a week (report "
+            "paragraph 684)."
+        ),
+        reason=(
+            "No amount is given, and the data do not show who would take "
+            "part."
+        ),
+    ),
+    NotComputableMeasure(
         id="employer_hiring_payments",
         name="Hiring payments to employers",
         description=(
             "Payments to employers for hiring a young person who has been "
-            "out of work and education for six months."
+            "out of work and education for six months, and a higher "
+            "apprenticeship hiring payment, £2,000 to £2,500, extended to "
+            "levy payers (report paragraphs 51, 280 and 472)."
         ),
         reason="Its effect is on hiring, which a static model omits.",
+    ),
+    NotComputableMeasure(
+        id="flexible_jobs_scheme",
+        name="Flexible Jobs Scheme and supported paid jobs",
+        description=(
+            "Wage subsidies and supported paid jobs for disabled young "
+            "people where the market creates none (report paragraphs 689, "
+            "690 and 780)."
+        ),
+        reason=(
+            "A programme with no rates given, working through hiring, which "
+            "a static model omits."
+        ),
+    ),
+    NotComputableMeasure(
+        id="self_employment_support",
+        name="Start-up support for young entrepreneurs",
+        description=(
+            "A £3,000 start-up grant disregarded for the Youth Allowance, up "
+            "to £500 from the Flexible Support Fund to test an idea, and a "
+            "start-up period of up to 18 months (report chapter 6.4, "
+            "after paragraph 681)."
+        ),
+        reason=(
+            "The data do not show who would start a business, and a "
+            "disregarded grant changes no award."
+        ),
     ),
     NotComputableMeasure(
         id="apprenticeship_target",
@@ -1613,7 +1671,9 @@ MILBURN_PACKAGE_COMPONENTS = (UC_HEALTH_UNDER_25_ID, PIP_UNDER_25_ID)
 
 
 UC_HEALTH_UNDER_22_ID = "uc_health_element_removed_under_22"
-UC_HEALTH_UNDER_25_SEVERE_KEPT_ID = "uc_health_element_removed_under_25_severe_kept"
+UC_HEALTH_UNDER_25_SEVERE_KEPT_ID = (
+    "uc_health_element_removed_under_25_severe_kept"
+)
 PIP_HALVED_ID = "pip_halved_under_25"
 MILBURN_CENTRAL_ID = "milburn_package_central"
 MILBURN_CENTRAL_COMPONENTS = (UC_HEALTH_UNDER_25_SEVERE_KEPT_ID, PIP_HALVED_ID)
@@ -1667,6 +1727,8 @@ def _create_pip_halved_under_25() -> Reform:
         ),
         simulation_modifier=pip_halved_ages_18_to_24,
     )
+
+
 PIP_16_TO_24_ID = "pip_removed_16_to_24"
 MILBURN_PHASED_ID = "milburn_package_phased"
 MILBURN_ENTRY_ID = "milburn_package_entry_25pct"
@@ -1837,6 +1899,8 @@ MILBURN_PROMOTED_IDS: tuple[str, ...] = (
     "milburn_report_youth_allowance_work_allowance",
     "milburn_report_youth_allowance_combined",
     "milburn_report_package_with_youth_allowance",
+    "milburn_report_employer_nics_threshold_all_sectors",
+    "milburn_report_youth_allowance_work_allowance_15h",
 )
 
 _SCOTLAND_INCLUDED = (
@@ -1916,8 +1980,10 @@ def _report_pip_tier_text(shares: dict, people: str) -> tuple[str, str]:
     label = d.REPORT_PIP_REPLACEMENT_NAME
     if label and any(value != 1 for value in values):
         name = f"PIP replaced by {_with_article(label)} for {people}"
-    stand_in = f"the report's {label}" if label else (
-        "the report's replacement support"
+    stand_in = (
+        f"the report's {label}"
+        if label
+        else ("the report's replacement support")
     )
     receive = (
         "receive Personal Independence Payment at a share of its current "
@@ -1946,7 +2012,9 @@ def _report_pip_text() -> tuple[str, str]:
     elif share:
         kept = d.percent_text(share)
         name = f"PIP at {kept} of its rate for {people}"
-        receive = f"receive {kept} of their current Personal Independence Payment"
+        receive = (
+            f"receive {kept} of their current Personal Independence Payment"
+        )
         if d.REPORT_PIP_REPLACEMENT_NAME:
             label = d.REPORT_PIP_REPLACEMENT_NAME
             name = f"PIP replaced by {_with_article(label)} for {people}"
@@ -2167,7 +2235,6 @@ def _create_pip_removed_16_to_24_excluding_scotland() -> Reform:
     )
 
 
-
 # The final report's employer National Insurance proposal (paras 269-270):
 # the secondary threshold rises from £5,000 to £10,000 for employees aged 21
 # to 24 whose main job is in retail (SIC division 47) or hospitality (55, 56).
@@ -2177,7 +2244,9 @@ from uk_budget_data.budget_measures.milburn_employer_nics_report import (  # noq
     milburn_employer_nics_report,
 )
 
-MILBURN_REPORT_EMPLOYER_NICS_THRESHOLD_ID = "milburn_report_employer_nics_threshold"
+MILBURN_REPORT_EMPLOYER_NICS_THRESHOLD_ID = (
+    "milburn_report_employer_nics_threshold"
+)
 
 
 def _create_milburn_report_employer_nics_threshold() -> Reform:
@@ -2208,11 +2277,23 @@ from uk_budget_data.budget_measures.milburn_youth_allowance_report import (  # n
     milburn_report_youth_allowance as _youth_allowance_independent,
 )
 from uk_budget_data.budget_measures.milburn_employer_nics_report import (  # noqa: E402
+    milburn_employer_nics_report_all_sectors,
     milburn_employer_nics_report_glide_path,
 )
 
-MILBURN_REPORT_YOUTH_ALLOWANCE_INDEPENDENT_ID = "milburn_report_youth_allowance_independent"
-MILBURN_REPORT_EMPLOYER_NICS_GLIDE_PATH_ID = "milburn_report_employer_nics_threshold_glide_path"
+MILBURN_REPORT_YOUTH_ALLOWANCE_INDEPENDENT_ID = (
+    "milburn_report_youth_allowance_independent"
+)
+MILBURN_REPORT_EMPLOYER_NICS_GLIDE_PATH_ID = (
+    "milburn_report_employer_nics_threshold_glide_path"
+)
+# Para 270: "Over time the government should consider how to extend this new
+# employer National Insurance relief to other sectors in the economy". The
+# report names no sectors or timing: every sector, at the end state from
+# April 2027, is our illustration of that extension.
+MILBURN_REPORT_EMPLOYER_NICS_ALL_SECTORS_ID = (
+    "milburn_report_employer_nics_threshold_all_sectors"
+)
 
 
 def _create_milburn_report_youth_allowance_independent() -> Reform:
@@ -2248,6 +2329,27 @@ def _create_milburn_report_employer_nics_threshold_glide_path() -> Reform:
     )
 
 
+def _create_milburn_report_employer_nics_threshold_all_sectors() -> Reform:
+    return Reform(
+        id=MILBURN_REPORT_EMPLOYER_NICS_ALL_SECTORS_ID,
+        name="Employer NI threshold of £10,000 for all 21 to 24s (illustrative)",
+        description=(
+            "Illustrative: the report's end state extended to every sector. "
+            "Employers pay Class 1 National Insurance on earnings above "
+            "£10,000 a year, not £5,000, for every employee aged 21 to 24, "
+            "whatever the sector. The report starts with retail and "
+            "hospitality and says the government should consider extending "
+            "the relief to other sectors over time (para 270), naming none; "
+            "every sector, from April 2027, is our assumption. The 15% rate "
+            "is unchanged, and under-21s and apprentices under 25 keep their "
+            "zero rate. policyengine-uk holds each employer's total cost of "
+            "employment fixed, so the saving passes to employees as higher "
+            "pay; hiring does not respond."
+        ),
+        simulation_modifier=milburn_employer_nics_report_all_sectors,
+    )
+
+
 # The report's child DLA to 18 (para 760) and, illustratively, its work
 # allowance for young people in work (para 749, which gives no amount: the
 # current Universal Credit work allowance is our assumption). Both from
@@ -2257,11 +2359,17 @@ from uk_budget_data.budget_measures.milburn_child_dla_report import (  # noqa: E
 )
 from uk_budget_data.budget_measures.milburn_youth_allowance_report import (  # noqa: E402
     milburn_report_youth_allowance_work_allowance as _youth_work_allowance,
+    milburn_report_youth_allowance_work_allowance_15h as _youth_work_allowance_15h,
 )
 
 MILBURN_REPORT_CHILD_DLA_ID = "milburn_report_child_dla_to_18"
 MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_ID = (
     "milburn_report_youth_allowance_work_allowance"
+)
+# The same at the report's own hours (para 749, "10 or 15 hours a week"):
+# 15 hours at the minimum wage for 21 and over, our assumption
+MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_15H_ID = (
+    "milburn_report_youth_allowance_work_allowance_15h"
 )
 
 
@@ -2308,10 +2416,34 @@ def _create_milburn_report_youth_allowance_work_allowance() -> Reform:
     )
 
 
+def _create_milburn_report_youth_allowance_work_allowance_15h() -> Reform:
+    return Reform(
+        id=MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_15H_ID,
+        name="Work allowance at 15 hours' minimum-wage pay (illustrative)",
+        description=(
+            "From April 2029 every Universal Credit claim in which all "
+            "claimants are under 25 has a work allowance of 15 hours a week "
+            "at the minimum wage for workers aged 21 and over, over 52 "
+            "weeks, a month (about £900 in 2029-30): earnings below it do "
+            "not reduce the award. The report proposes a work allowance for "
+            "everyone on the Youth Allowance who is in employment and says "
+            "many young people out of work could work 10 or 15 hours a week "
+            "at first (para 749); it gives no amount. The amount is our "
+            "assumption, the same with or without a housing costs element. "
+            "Claims with a work allowance today (with a child or limited "
+            "capability for work) get the higher of the two. The 55% taper "
+            "and the standard allowance are unchanged."
+        ),
+        simulation_modifier=_youth_work_allowance_15h,
+    )
+
+
 # Our combined designs (not the report's package): the two Youth
 # Allowance changes together, and those with the health element and PIP
 # removal, each simulated as one run with their interactions.
-MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_ID = "milburn_report_youth_allowance_combined"
+MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_ID = (
+    "milburn_report_youth_allowance_combined"
+)
 MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_COMPONENTS = (
     MILBURN_REPORT_YOUTH_ALLOWANCE_INDEPENDENT_ID,
     MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_ID,
@@ -2344,6 +2476,8 @@ _RESERVED_IDS = frozenset(
         MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_ID,
         MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_ID,
         MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_ID,
+        MILBURN_REPORT_EMPLOYER_NICS_ALL_SECTORS_ID,
+        MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_15H_ID,
     }
 )
 
@@ -2361,6 +2495,8 @@ _RESERVED_FACTORIES = (
     _create_milburn_report_employer_nics_threshold_glide_path,
     _create_milburn_report_child_dla_to_18,
     _create_milburn_report_youth_allowance_work_allowance,
+    _create_milburn_report_employer_nics_threshold_all_sectors,
+    _create_milburn_report_youth_allowance_work_allowance_15h,
 )
 
 

@@ -33,11 +33,18 @@ export const BENCHMARK_SECTIONS = [
     ids: ["pip_spend_16_24", "uc_health_spend_16_24", "young_benefits_spend", "employer_nics_under_25"],
   },
   {
+    key: "jobs",
+    title: "Where do young people work?",
+    intro: "The review's share of young people's jobs in retail and hospitality, the sectors its employer NI threshold starts with, beside ours for the same industries.",
+    icon: "briefcase",
+    ids: ["retail_hospitality_jobs_16_24"],
+  },
+  {
     key: "review",
     title: "The review's own estimates",
     intro: "These include replacement awards, a Youth Allowance, a work allowance and more young people in work, in 2026-27 prices; our static runs include none of them, so no PolicyEngine figure is set beside them.",
     icon: "scale",
-    ids: ["review_welfare_saving_2036", "milburn_welfare_saving_10y", "relative_poverty_review"],
+    ids: ["review_welfare_saving_2036", "milburn_welfare_saving_10y", "relative_poverty_review", "young_net_incomes_review"],
   },
   {
     key: "poverty",
@@ -54,8 +61,13 @@ export const BENCHMARK_SECTIONS = [
     ids: [
       "neet_16_24",
       "neet_rate_projection_2036",
+      "hidden_neets_england",
+      "disabled_neet_16_24",
       "incapacity_benefits_young",
       "dla_pip_16_24",
+      "child_dla_recipients",
+      "pip_spend_trend_16_24",
+      "uc_health_spend_young_2024",
       "into_sustained_work_2036",
       "review_investment_2036",
       "youth_hiring_incentives_cost",
@@ -168,6 +180,42 @@ export const BENCHMARK_SHORT = {
     basis: "Once fully rolled out, with 440,000 more young people in work",
   },
   kept_out_of_poverty: { label: "Kept out of poverty by UC health and/or PIP", icon: "shield" },
+  young_net_incomes_review: {
+    label: "Rise in young people's net incomes, the review estimates",
+    icon: "bars",
+    basis: "All its reforms, with 440,000 more young people in work (paragraphs 111 and 739)",
+  },
+  retail_hospitality_jobs_16_24: {
+    label: "16–24s' jobs in retail and hospitality",
+    icon: "cart",
+    basis: "ONS, sections G and I, to 2025 (paragraph 50); ours is 26% in the run's divisions 47, 55 and 56",
+    estimateBasis: "Main job in sections G or I, ages 16 to 24, UK, 2025",
+  },
+  pip_spend_trend_16_24: {
+    label: "PIP spending on 16–24s over time, the review says",
+    icon: "calendar",
+    basis: "Around £1.3bn in 2019-20; around £6.5bn within five years (paragraph 653)",
+  },
+  uc_health_spend_young_2024: {
+    label: "UC spending on young people with a health issue, the review says",
+    icon: "tag",
+    basis: "Their whole award, not only the health element (paragraph 653)",
+  },
+  hidden_neets_england: {
+    label: "Hidden NEETs in England, the review says",
+    icon: "user",
+    basis: "18–24s out of work and education, not receiving benefits, 2023-24 (paragraph 275)",
+  },
+  disabled_neet_16_24: {
+    label: "Disabled 16–24s not in education, employment or training",
+    icon: "users",
+    basis: "2025-26: around 3.5 times the non-disabled rate (paragraph 692)",
+  },
+  child_dla_recipients: {
+    label: "Children receiving DLA, the review says",
+    icon: "clock",
+    basis: "About 77% move to PIP by 17, implying about 23% do not (paragraph 759)",
+  },
   pip_no_extra_costs: { label: "Young PIP claimants reporting no extra costs", icon: "receipt" },
 };
 

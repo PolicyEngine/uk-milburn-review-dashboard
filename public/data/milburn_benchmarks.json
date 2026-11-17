@@ -287,6 +287,88 @@
       "date": "11 November 2026",
       "press_report": false,
       "policyengine_estimate": null
+    },
+    {
+      "id": "young_net_incomes_review",
+      "figure": "Rise in young people's net incomes the review estimates",
+      "value": "Over £2bn",
+      "basis": "All the review's reforms considered together (paragraphs 111 and 739; analytical annex, section 7): the earnings of young people the review expects to move into work, less the modelled welfare savings and fiscal offsets. No year or price basis is given with the figure",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "retail_hospitality_jobs_16_24",
+      "figure": "Share of jobs for people aged 16 to 24 in retail and hospitality, as stated in the review",
+      "value": "37%",
+      "basis": "The review's figure (paragraph 50), from the Office for National Statistics' employment by industry section and age group to 2025 (footnote 14): sections G (wholesale and retail trade, including motor vehicle repair) and I (accommodation and food service)",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "29%",
+        "basis": "Employed and self-employed people aged 16 to 24 whose main job is in SIC sections G or I (divisions 45 to 47, 55 and 56), UK, 2025, at the build's calibrated weights",
+        "label": "PolicyEngine, build fcfac709, 2025",
+        "note": "Why ours is lower: both count main jobs in the same sections, so the gap is in the data. The run's sectors, divisions 47, 55 and 56, are 26%, so the retail and hospitality threshold may reach fewer young workers than the published share suggests"
+      }
+    },
+    {
+      "id": "pip_spend_trend_16_24",
+      "figure": "PIP spending on people aged 16 to 24 over time, as stated in the review",
+      "value": "£3.2bn in 2024-25; around £1.3bn in 2019-20, around £6.5bn within five years",
+      "basis": "The review's figures (paragraph 653): annual PIP spending on people aged 16 to 24, around £3.2bn in 2024-25, up from around £1.3bn in 2019-20, and around £6.5bn within five years on the interim report's central trajectory",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "uc_health_spend_young_2024",
+      "figure": "Universal Credit spending on young people with a health issue, as stated in the review",
+      "value": "£2.1bn in 2024-25; almost double 2019-20",
+      "basis": "The review's figure (paragraph 653): overall Universal Credit spending on people aged 16 to 24 with a health issue, all of their award and not only the health element, which almost doubled between 2019-20 and 2024-25",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "hidden_neets_england",
+      "figure": "Hidden NEETs in England: out of work and education and not receiving benefits",
+      "value": "314,000",
+      "basis": "The review's figure (paragraphs 51 and 275, from its interim report): people aged 18 to 24 in England in 2023-24 neither in work nor in education and not themselves receiving benefits. Extending the Youth Jobs Grant to them could add up to 40,000 recipients a year (paragraph 275)",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "disabled_neet_16_24",
+      "figure": "Disabled people aged 16 to 24 not in education, employment or training (NEET)",
+      "value": "30.2%; 8.6% of non-disabled young people",
+      "basis": "The review's figures for 2025-26 (paragraph 692, from its interim report and DWP's The employment of disabled people 2026): disabled young people were around 3.5 times as likely to be NEET",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
+    },
+    {
+      "id": "child_dla_recipients",
+      "figure": "Children receiving Disability Living Allowance, as stated in the review",
+      "value": "Over 900,000; about 77% move to PIP by 17",
+      "basis": "The review's figures (paragraph 759, from DWP's DLA and PIP data): children under 16 receiving child Disability Living Allowance, a number rising year on year; about 77% of claimants move onto PIP by the age of 17",
+      "source": "From a Welfare State to a Working State",
+      "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": null
     }
   ]
 }

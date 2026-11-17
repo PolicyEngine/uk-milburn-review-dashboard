@@ -179,9 +179,13 @@ describe("the view tabs", () => {
       "Severe and Complex Needs Insurance",
       "Local Health and Disability Fund",
       "Duty to engage",
+      "Income protection during serious illness",
       "Care Leaver Transition Allowance",
       "Opportunity Guarantee",
+      "Civic service programme",
       "Hiring payments to employers",
+      "Flexible Jobs Scheme and supported paid jobs",
+      "Start-up support for young entrepreneurs",
       "Apprenticeship target",
       "Further education places",
     ]);

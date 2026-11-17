@@ -60,6 +60,10 @@ export const BENCHMARK_PLACES = {
       id: "neet_16_24",
       differs: "Labour Force Survey, April to June 2026, UK: not a benefit caseload or a modelled figure.",
     },
+    {
+      id: "young_net_incomes_review",
+      differs: "All the review's reforms, with more young people in work; ours is static, a measure at a time.",
+    },
   ],
 };
 

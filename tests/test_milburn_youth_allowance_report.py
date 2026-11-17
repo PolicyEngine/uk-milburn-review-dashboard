@@ -50,7 +50,9 @@ def health(sim):
     return uc_health_element_removed_under_25(sim, start_year=YEAR)
 
 
-def change(situation, *modifiers, variable="household_net_income", **arguments):
+def change(
+    situation, *modifiers, variable="household_net_income", **arguments
+):
     """(current law, measure) annual values of ``variable`` in 2027-28,
     built as the national run builds a household."""
 
@@ -133,9 +135,10 @@ def test_with_the_health_element_removed_in_either_order(order):
     assert after - before == pytest.approx(
         SINGLE_GAIN - 12 * PROTECTED_LCWRA, abs=0.05
     )
-    assert change(
-        single(22, lcwra=True), *order, variable="uc_LCWRA_element"
-    )[1] == 0
+    assert (
+        change(single(22, lcwra=True), *order, variable="uc_LCWRA_element")[1]
+        == 0
+    )
 
 
 def test_a_23_year_old_lone_parent_renter_keeps_the_child_element():
@@ -158,8 +161,12 @@ def test_a_couple_with_one_partner_25_or_over_is_unchanged():
     assert before == after
     amounts = forecast_parameters().gov.dwp.universal_credit
     allowances = change(couple(23, 27), variable="uc_standard_allowance")
-    assert allowances[0] == allowances[1] == pytest.approx(
-        12 * amounts.standard_allowance.amount.COUPLE_OLD(f"{YEAR}-04-30")
+    assert (
+        allowances[0]
+        == allowances[1]
+        == pytest.approx(
+            12 * amounts.standard_allowance.amount.COUPLE_OLD(f"{YEAR}-04-30")
+        )
     )
 
 
@@ -242,9 +249,9 @@ def test_the_illustrative_work_allowance_is_the_years_statutory_one(
     # No housing costs element: the higher amount; no standard allowance
     # change with it.
     home = single(22, rent=0, employment_income=8_000)
-    assert change(home, measure, variable="uc_work_allowance") == pytest.approx(
-        (0, 12 * without_housing), abs=0.05
-    )
+    assert change(
+        home, measure, variable="uc_work_allowance"
+    ) == pytest.approx((0, 12 * without_housing), abs=0.05)
     standard = change(home, measure, variable="uc_standard_allowance")
     assert standard[0] == standard[1]
     # No earnings, a child (a statutory allowance already) and 26: unchanged.
@@ -254,6 +261,42 @@ def test_the_illustrative_work_allowance_is_the_years_statutory_one(
         single(26, employment_income=8_000),
     ):
         assert change(other, measure)[0] == change(other, measure)[1]
+
+
+def test_the_15_hour_work_allowance_is_15_hours_at_the_minimum_wage(
+    monkeypatch,
+):
+    parameters = forecast_parameters()
+    day = f"{YEAR}-04-30"
+    hourly = parameters.gov.hmrc.minimum_wage.non_apprentice(day).calc(21)
+    monthly = 15 * hourly * 52 / 12
+    statutory = parameters.gov.dwp.universal_credit.means_test.work_allowance
+    assert monthly > statutory.without_housing(day)
+    monkeypatch.setattr(design, "REPORT_START_YEAR", YEAR)
+    measure = ya.milburn_report_youth_allowance_work_allowance_15h
+    # The same amount with or without a housing costs element.
+    for rent in (6_000, 0):
+        earner = single(22, rent=rent, employment_income=20_000)
+        assert change(
+            earner, measure, variable="uc_work_allowance"
+        ) == pytest.approx((0, 12 * monthly), abs=0.05)
+        standard = change(earner, measure, variable="uc_standard_allowance")
+        assert standard[0] == standard[1]
+    # A young parent's statutory allowance is raised to it; 26 and no
+    # earnings are unchanged.
+    parent = with_child(single(23, employment_income=20_000))
+    assert change(parent, measure, variable="uc_work_allowance")[
+        1
+    ] == pytest.approx(12 * monthly, abs=0.05)
+    for other in (single(22), single(26, employment_income=8_000)):
+        assert change(other, measure)[0] == change(other, measure)[1]
+
+
+def test_hours_and_amounts_are_not_both_given():
+    with pytest.raises(ValueError, match="not both"):
+        ya.youth_allowance_report(
+            None, work_allowance_monthly=(1, 1), work_allowance_hours=15
+        )
 
 
 def test_the_report_measure_reads_the_design_start_year(monkeypatch):

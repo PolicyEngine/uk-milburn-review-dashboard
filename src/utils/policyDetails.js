@@ -1087,6 +1087,32 @@ MILBURN_POLICY_DETAILS.push(
     // The end state's chart, with the steps to it
     visual: { kind: "milburn-employer-nics", place: "change", limit: 25, threshold: 10000, glide: { from: 6000, step: 1000, firstYear: 2027, lastYear: 2031 } },
   },
+  {
+    id: "milburn_report_employer_nics_threshold_all_sectors",
+    shortName: "Employer NI threshold £10,000, 21 to 24s, every sector (illustrative)",
+    noun: "an illustrative £10,000 employer National Insurance threshold for 21 to 24s in every sector",
+    sentence: "raising the employer National Insurance threshold to £10,000 for every 21 to 24-year-old employee",
+    summary: "Illustrative: employers pay NI above £10,000, not £5,000, for every 21 to 24.",
+    points: [
+      { label: "Who", icon: "users", text: "Employees aged 21 to 24, in every sector." },
+      { label: "Rate", icon: "coins", text: "15% rate unchanged; only the threshold moves." },
+      // Report, para 270
+      { label: "Report", icon: "file", text: "Says the relief could extend to other sectors over time." },
+    ],
+    affects: "21 to 24-year-old employees and their employers",
+    starts: "Apr 2027 (assumed), at £10,000",
+    inForce: { from: "2027-04" },
+    type: "National Insurance",
+    details: [
+      "Static: employers' total cost of employment is held fixed, so the saving passes to pay; hiring does not respond.",
+      "Its cost is net of the income tax and National Insurance paid on the higher pay.",
+      // Report, para 270
+      "An illustration: the report says government should consider extending the relief to other sectors (paragraph 270).",
+      "The report names no sectors or timing: every sector and the April 2027 start are our assumptions.",
+    ],
+    // The end state's chart, every sector
+    visual: { kind: "milburn-employer-nics", place: "change", limit: 25, threshold: 10000, allSectors: true },
+  },
 );
 
 // The report's child DLA to 18 (para 760), and its work allowance for young
@@ -1146,6 +1172,34 @@ MILBURN_POLICY_DETAILS.push(
       "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-standard-allowance", place: "change", workAllowance: true, ratesNote: true },
+  },
+  {
+    id: "milburn_report_youth_allowance_work_allowance_15h",
+    shortName: "Work allowance at 15 hours' minimum-wage pay (illustrative)",
+    noun: "an illustrative work allowance of 15 hours' minimum-wage pay for under-25s",
+    sentence: "giving every under-25 Universal Credit claim a work allowance of 15 hours' minimum-wage pay",
+    summary: "Gives under-25 UC claims a work allowance of 15 hours' minimum-wage pay.",
+    points: [
+      { label: "Who", icon: "users", text: "UC claims, every claimant under 25, with earnings." },
+      { label: "Amount", icon: "coins", text: "Assumed: 15 hours a week at the 21-and-over minimum wage." },
+      // Report 6.5, para 749
+      { label: "Report", icon: "file", text: "Says many could work 10 or 15 hours a week at first." },
+    ],
+    affects: "Under-25 UC claims in paid work",
+    starts: "Apr 2029",
+    inForce: { from: "2029-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      // Report 6.5, para 749
+      "The report proposes a work allowance (paragraph 749) with no amount; it mentions 10 or 15 hours a week.",
+      "Our assumption: 15 hours a week at the minimum wage for 21 and over, about £900 a month in 2029-30.",
+      "The same amount with or without housing costs: the report gives one figure, in hours.",
+      "Claims with a work allowance today, with a child or health condition, get the higher of the two.",
+      "The 55% taper and the standard allowance are unchanged.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-standard-allowance", place: "change", workAllowance: true, hours: 15, ratesNote: true },
   },
 );
 

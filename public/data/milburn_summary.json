@@ -230,6 +230,36 @@
       "people_directly_affected": 483205
     },
     {
+      "id": "milburn_report_employer_nics_threshold_all_sectors",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": -0.904,
+        "2028": -0.906,
+        "2029": -0.909,
+        "2030": -0.912,
+        "2031": -0.892
+      },
+      "direction": "gain",
+      "young_people_in_losing_households": 2856944,
+      "share_of_16_24_in_losing_households_pct": 38.17,
+      "average_loss_young_person_in_losing_household": -555,
+      "average_loss_basis": "mean change among 16-24s in gaining households",
+      "everyone_in_losing_households_pct": 0.0,
+      "poverty_change_pp": {
+        "rel_bhc": 0.067,
+        "rel_ahc": 0.02,
+        "abs_bhc": -0.003,
+        "abs_ahc": -0.035
+      },
+      "people_into_poverty_abs_ahc": -24638,
+      "people_into_poverty_rel_ahc": 13679,
+      "child_poverty_change_pp_rel_ahc": 0.046,
+      "people_into_poverty_abs_bhc": -2047,
+      "people_into_poverty_rel_bhc": 46734,
+      "child_poverty_change_pp_rel_bhc": 0.148,
+      "people_directly_affected": 1994959
+    },
+    {
       "id": "milburn_report_employer_nics_threshold_glide_path",
       "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
       "saving_bn": {
@@ -557,6 +587,36 @@
       "people_into_poverty_abs_bhc": -14543,
       "people_into_poverty_rel_bhc": -1526,
       "child_poverty_change_pp_rel_bhc": 0.003,
+      "people_directly_affected": 0
+    },
+    {
+      "id": "milburn_report_youth_allowance_work_allowance_15h",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": 0.0,
+        "2028": 0.0,
+        "2029": -0.875,
+        "2030": -0.906,
+        "2031": -0.922
+      },
+      "direction": "gain",
+      "young_people_in_losing_households": 751648,
+      "share_of_16_24_in_losing_households_pct": 10.04,
+      "average_loss_young_person_in_losing_household": -1891,
+      "average_loss_basis": "mean change among 16-24s in gaining households",
+      "everyone_in_losing_households_pct": 0.0,
+      "poverty_change_pp": {
+        "rel_bhc": 0.044,
+        "rel_ahc": -0.116,
+        "abs_bhc": -0.024,
+        "abs_ahc": -0.133
+      },
+      "people_into_poverty_abs_ahc": -92654,
+      "people_into_poverty_rel_ahc": -81022,
+      "child_poverty_change_pp_rel_ahc": -0.065,
+      "people_into_poverty_abs_bhc": -16486,
+      "people_into_poverty_rel_bhc": 30896,
+      "child_poverty_change_pp_rel_bhc": 0.133,
       "people_directly_affected": 0
     },
     {

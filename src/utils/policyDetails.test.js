@@ -160,9 +160,11 @@ it("describes each Milburn candidate measure in one neutral line, applied whatev
     "milburn_report_youth_allowance_independent",
     "milburn_report_package_phased",
     "milburn_report_employer_nics_threshold_glide_path",
-    // Child DLA to 18, and the work allowance at an assumed amount
+    "milburn_report_employer_nics_threshold_all_sectors",
+    // Child DLA to 18, and the work allowance at assumed amounts
     "milburn_report_child_dla_to_18",
     "milburn_report_youth_allowance_work_allowance",
+    "milburn_report_youth_allowance_work_allowance_15h",
     // Our combined runs: the two Youth Allowance changes, and those with the package
     "milburn_report_youth_allowance_combined",
     "milburn_report_package_with_youth_allowance",

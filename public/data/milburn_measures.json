@@ -167,10 +167,24 @@
       "first_year": 2029
     },
     {
+      "id": "milburn_report_employer_nics_threshold_all_sectors",
+      "name": "Employer NI threshold of \u00a310,000 for all 21 to 24s (illustrative)",
+      "description": "Illustrative: the report's end state extended to every sector. Employers pay Class 1 National Insurance on earnings above \u00a310,000 a year, not \u00a35,000, for every employee aged 21 to 24, whatever the sector. The report starts with retail and hospitality and says the government should consider extending the relief to other sectors over time (para 270), naming none; every sector, from April 2027, is our assumption. The 15% rate is unchanged, and under-21s and apprentices under 25 keep their zero rate. policyengine-uk holds each employer's total cost of employment fixed, so the saving passes to employees as higher pay; hiring does not respond.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
+      "id": "milburn_report_youth_allowance_work_allowance_15h",
+      "name": "Work allowance at 15 hours' minimum-wage pay (illustrative)",
+      "description": "From April 2029 every Universal Credit claim in which all claimants are under 25 has a work allowance of 15 hours a week at the minimum wage for workers aged 21 and over, over 52 weeks, a month (about \u00a3900 in 2029-30): earnings below it do not reduce the award. The report proposes a work allowance for everyone on the Youth Allowance who is in employment and says many young people out of work could work 10 or 15 hours a week at first (para 749); it gives no amount. The amount is our assumption, the same with or without a housing costs element. Claims with a work allowance today (with a child or limited capability for work) get the higher of the two. The 55% taper and the standard allowance are unchanged.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
       "id": "child_dla_to_18",
       "name": "Child DLA extended to 18",
-      "description": "16 and 17-year-olds stay on Disability Living Allowance instead of moving to PIP (report paragraph 760).",
-      "reason": "DLA and PIP pay the same amounts, so the switch changes no payment; its effect on reassessment is not in the data.",
+      "description": "16 and 17-year-olds stay on Disability Living Allowance instead of moving to PIP (report paragraph 760). About 77% of child DLA claimants move to PIP by 17 (paragraph 759), so about 23% do not.",
+      "reason": "DLA and PIP pay the same amounts, but some who lose an award at sixteen would keep DLA longer; the data cannot identify them.",
       "status": "not_computable"
     },
     {
@@ -202,6 +216,13 @@
       "status": "not_computable"
     },
     {
+      "id": "income_protection_serious_illness",
+      "name": "Income protection during serious illness",
+      "description": "Support paused, not lost, during serious illness or treatment, with financial help meanwhile (report paragraphs 716, 746 and 782).",
+      "reason": "No rule or amount is given; our runs remove the health element from these people too.",
+      "status": "not_computable"
+    },
+    {
       "id": "care_leaver_transition_allowance",
       "name": "Care Leaver Transition Allowance",
       "description": "A six-month weekly allowance for care leavers who are NEET or at serious risk.",
@@ -216,10 +237,31 @@
       "status": "not_computable"
     },
     {
+      "id": "civic_service",
+      "name": "Civic service programme",
+      "description": "A 13-week volunteering programme, with additional financial support for those taking part 8 to 24 hours a week (report paragraph 684).",
+      "reason": "No amount is given, and the data do not show who would take part.",
+      "status": "not_computable"
+    },
+    {
       "id": "employer_hiring_payments",
       "name": "Hiring payments to employers",
-      "description": "Payments to employers for hiring a young person who has been out of work and education for six months.",
+      "description": "Payments to employers for hiring a young person who has been out of work and education for six months, and a higher apprenticeship hiring payment, \u00a32,000 to \u00a32,500, extended to levy payers (report paragraphs 51, 280 and 472).",
       "reason": "Its effect is on hiring, which a static model omits.",
+      "status": "not_computable"
+    },
+    {
+      "id": "flexible_jobs_scheme",
+      "name": "Flexible Jobs Scheme and supported paid jobs",
+      "description": "Wage subsidies and supported paid jobs for disabled young people where the market creates none (report paragraphs 689, 690 and 780).",
+      "reason": "A programme with no rates given, working through hiring, which a static model omits.",
+      "status": "not_computable"
+    },
+    {
+      "id": "self_employment_support",
+      "name": "Start-up support for young entrepreneurs",
+      "description": "A \u00a33,000 start-up grant disregarded for the Youth Allowance, up to \u00a3500 from the Flexible Support Fund to test an idea, and a start-up period of up to 18 months (report chapter 6.4, after paragraph 681).",
+      "reason": "The data do not show who would start a business, and a disregarded grant changes no award.",
       "status": "not_computable"
     },
     {

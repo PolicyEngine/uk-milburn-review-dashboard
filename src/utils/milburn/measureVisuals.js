@@ -21,6 +21,9 @@
  * - work allowance, a month: gov/dwp/universal_credit/means_test/
  *   work_allowance/{with_housing,without_housing}.yaml (£427 and £710 in
  *   2026-27), 2027-28 likewise a projection;
+ * - minimum wage for workers aged 21 and over, an hour: gov/hmrc/
+ *   minimum_wage/non_apprentice.yaml at 21 (£13.21 in 2027-28, a
+ *   projection), for the 15-hour work allowance;
  * - DLA weekly rates: gov/dwp/dla/self_care/{middle,higher}.yaml and
  *   gov/dwp/dla/mobility/{lower,higher}.yaml, the same amounts as the PIP
  *   rates they are paired with (the child DLA card draws PIP's);
@@ -54,6 +57,8 @@ export const MILBURN_RATES = Object.freeze({
   standardAllowance: { singleUnder25: 353.17, single25Plus: 443.21, coupleUnder25: 551.11, couple25Plus: 695.71 },
   // A month
   workAllowance: { withHousing: 441.94, withoutHousing: 734.85 },
+  // An hour, aged 21 and over
+  minimumWage: 13.21,
   employerNics: { rate: 0.15, zeroRateBelowAge: 21, apprenticeZeroRateBelowAge: 25, upperSecondaryThreshold: 50270, secondaryThreshold: 5000 },
 });
 
@@ -199,13 +204,15 @@ export function employerNicsView(visual, name) {
     const glide = visual.glide;
     if (glide !== undefined && !(isAge(glide.firstYear) && isAge(glide.lastYear) && glide.lastYear > glide.firstYear && glide.step > 0 && glide.from > secondaryThreshold && glide.from + glide.step * (glide.lastYear - glide.firstYear) === threshold)) return null;
     const band = `${zeroRateBelowAge} to ${limit - 1}`;
+    // Every sector (the report's "other sectors", para 270, our illustration), not retail and hospitality only
+    const allSectors = visual.allSectors === true;
     const moved = (age) => age >= zeroRateBelowAge && age < limit;
     return {
       caption: glide
         ? `Earnings from which employers pay National Insurance, by the employee's age, from ${fiscalYear(glide.lastYear)}`
         : "Earnings from which employers pay National Insurance, by the employee's age",
       ages: cells(16, (age) => ({ before: age < zeroRateBelowAge ? 0 : 1, after: age < zeroRateBelowAge ? 0 : 1, some: moved(age) })),
-      key: [["some", "Higher threshold, retail and hospitality"], ["after", "Unchanged"]],
+      key: [["some", allSectors ? "Higher threshold, every sector" : "Higher threshold, retail and hospitality"], ["after", "Unchanged"]],
       bands: [
         { from: 16, to: zeroRateBelowAge - 1, title: `Under ${zeroRateBelowAge}`, text: "0% already", tone: "kept" },
         { from: zeroRateBelowAge, to: limit - 1, title: band, text: glide ? `From ${wholePounds(threshold)} by ${fiscalYear(glide.lastYear)}, was ${wholePounds(secondaryThreshold)}` : `From ${wholePounds(threshold)}, was ${wholePounds(secondaryThreshold)}`, tone: "cut" },
@@ -218,9 +225,9 @@ export function employerNicsView(visual, name) {
       ],
       alt:
         `${name}: the earnings from which employers pay National Insurance, by the employee's age. ` +
-        `Under ${zeroRateBelowAge}: 0% already. Ages ${band} in retail and hospitality: from ${wholePounds(threshold)} a year under the measure${glide ? ` by ${fiscalYear(glide.lastYear)}` : ""}, instead of ${wholePounds(secondaryThreshold)}` +
+        `Under ${zeroRateBelowAge}: 0% already. Ages ${band}${allSectors ? ", in every sector" : " in retail and hospitality"}: from ${wholePounds(threshold)} a year under the measure${glide ? ` by ${fiscalYear(glide.lastYear)}` : ""}, instead of ${wholePounds(secondaryThreshold)}` +
         (glide ? `, in assumed steps: ${wholePounds(glide.from)} in ${fiscalYear(glide.firstYear)}, rising ${wholePounds(glide.step)} a year. ` : ". ") +
-        `Aged ${limit} and over, and other sectors: from ${wholePounds(secondaryThreshold)}, unchanged. ` +
+        `Aged ${limit} and over${allSectors ? "" : ", and other sectors"}: from ${wholePounds(secondaryThreshold)}, unchanged. ` +
         `The ${percent(rate)} rate is unchanged; apprentices under ${apprenticeZeroRateBelowAge} have a zero rate already.`,
     };
   }
@@ -294,6 +301,7 @@ export function standardAllowanceView(visual, name) {
 const TAPER = 0.55;
 
 function workAllowanceView(visual, name) {
+  if (visual.hours !== undefined) return workAllowanceHoursView(visual, name);
   const when = ratesYearText(visual);
   const { withHousing, withoutHousing } = MILBURN_RATES.workAllowance;
   if (!(withHousing > 0 && withoutHousing > withHousing)) return null;
@@ -321,6 +329,47 @@ function workAllowanceView(visual, name) {
       pairs.map((pair) => `${wholePounds(pair.after)} for ${pair.words}`).join("; ") +
       `, so the award is up to ${pairs.map((pair) => wholePounds(TAPER * pair.after)).join(" or ")} a month higher` +
       `. These are the current work allowance amounts, our assumption: the report gives none. The ${percent(TAPER)} taper is unchanged.`,
+  };
+}
+
+/**
+ * The work allowance at the report's hours (`visual.hours`, para 749's "10
+ * or 15 hours a week"): that many hours at the minimum wage for 21 and over,
+ * over 52 weeks, a month, one amount with or without housing costs (our
+ * assumption). Null for hours outside 1 to 48.
+ */
+function workAllowanceHoursView(visual, name) {
+  const hours = visual.hours;
+  if (!(Number.isInteger(hours) && hours >= 1 && hours <= 48)) return null;
+  const when = ratesYearText(visual);
+  const { minimumWage } = MILBURN_RATES;
+  const monthly = (hours * minimumWage * 52) / 12;
+  const { withoutHousing } = MILBURN_RATES.workAllowance;
+  if (!(monthly > 0)) return null;
+  return {
+    caption: `Work allowance for an under-25 claim, a month, ${when}`,
+    max: Math.max(monthly, withoutHousing),
+    key: [["after", "Earnings kept before the award falls"]],
+    groups: [
+      {
+        label: "With or without housing costs",
+        // The award rises by the taper's share of the earnings no longer counted
+        note: `Award up to +${wholePounds(TAPER * monthly)} a month`,
+        columns: [
+          { label: "Now", text: wholePounds(0), parts: [] },
+          { label: "Measure", text: wholePounds(monthly), parts: [{ value: monthly, tone: "after" }] },
+        ],
+      },
+    ],
+    chips: [
+      { icon: "file-clock", when: "Hours a week", value: `${hours}, at ${pounds(minimumWage)} an hour` },
+      { icon: "coins", when: "Taper above the allowance", value: `${percent(TAPER)}, unchanged` },
+    ],
+    alt:
+      `${name}: the Universal Credit work allowance for a claim in which every claimant is under 25, a month, ${when} (about). ` +
+      `Current law: none for a claim with no child and no limited capability for work, so every pound of earnings reduces the award. ` +
+      `Under the measure: ${wholePounds(monthly)}, ${hours} hours a week at the minimum wage for 21 and over, with or without housing costs, so the award is up to ${wholePounds(TAPER * monthly)} a month higher. ` +
+      `Claims with a work allowance today get the higher of the two. The amount is our assumption: the report gives none. The ${percent(TAPER)} taper is unchanged.`,
   };
 }
 

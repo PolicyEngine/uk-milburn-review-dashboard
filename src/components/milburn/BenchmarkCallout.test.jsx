@@ -49,7 +49,7 @@ describe("the published figures chosen for each place", () => {
     const shown = (place) => calloutItems(place, file.rows).map((item) => item.value);
     expect(shown("finances")).toEqual(["£3.6bn in 2036-37", "£13.7bn by 2036-37", "£3.8bn a year", "£0.92bn a year"]);
     expect(shown("poverty")).toEqual(["50,000 fewer", "120,000"]);
-    expect(shown("young")).toEqual(["176,000", "450,000", "981,000"]);
+    expect(shown("young")).toEqual(["176,000", "450,000", "981,000", "Over £2bn"]);
   });
 
   it("leaves out an id the file lacks", () => {
@@ -99,7 +99,7 @@ describe("BenchmarkCallout", () => {
   it.each([
     ["finances", "the review"],
     ["poverty", "the review, Resolution Foundation"],
-    ["young", "Resolution Foundation, ONS"],
+    ["young", "Resolution Foundation, ONS, the review"],
   ])("%s: the folded line lists whose figures they are", async (place, line) => {
     vi.stubGlobal("fetch", serve(text));
     render(<BenchmarkCallout place={place} reportDay={false} />);

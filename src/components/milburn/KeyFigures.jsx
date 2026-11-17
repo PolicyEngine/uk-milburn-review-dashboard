@@ -34,7 +34,7 @@ export function fallbackRunLine(name) {
   return `Showing: ${name}. Select a single policy to see its own figures.`;
 }
 
-/** What those replacements are, as the final report names them (paragraphs 107 and 752 to 756). */
+/** What those replacements are, as the final report names them (paragraphs 107 and 750 to 757). */
 export const REPLACEMENT_PARTS_NOTE =
   "Left out: Additional Cost Allowance (ongoing costs), local Health and Disability Fund (one-off or changing costs), Severe and Complex Needs Insurance.";
 
