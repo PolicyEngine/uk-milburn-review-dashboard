@@ -18,12 +18,27 @@ export const PRESETS_FILE = "milburn_household_presets.json";
 export const YEAR = 2029;
 export const FISCAL_YEAR = "2029-30";
 
-// `inSentence`: the name mid-sentence; `short`: on an example's card
+// `inSentence`: the name mid-sentence; `short`: on an example's card and
+// in the waterfall; `tab`: the programme table's tab
 export const RUNS = [
-  { key: "package", name: "Health element and PIP removal (no replacement awards)", inSentence: "the health element and PIP removal", short: "health element and PIP removal", kind: "package" },
-  { key: "youth_allowance", name: "Higher Youth Allowance", inSentence: "the higher Youth Allowance", short: "Youth Allowance", kind: "separate" },
-  { key: "work_allowance", name: "Work allowance (illustrative)", inSentence: "the work allowance (illustrative)", short: "work allowance (illustrative)", kind: "illustrative" },
-  { key: "employer_ni", name: "Employer NI threshold", inSentence: "the employer NI threshold", short: "employer NI", kind: "separate" },
+  {
+    key: "package",
+    name: "Health element and PIP removal (no replacement awards)",
+    inSentence: "the health element and PIP removal",
+    short: "health element and PIP removal",
+    tab: "Health element and PIP removal",
+    kind: "package",
+  },
+  { key: "youth_allowance", name: "Higher Youth Allowance", inSentence: "the higher Youth Allowance", short: "Youth Allowance", tab: "Higher Youth Allowance", kind: "separate" },
+  {
+    key: "work_allowance",
+    name: "Work allowance (illustrative; amount is our assumption)",
+    inSentence: "the work allowance (illustrative)",
+    short: "work allowance (illustrative)",
+    tab: "Work allowance (illustrative)",
+    kind: "illustrative",
+  },
+  { key: "employer_ni", name: "Employer NI threshold", inSentence: "the employer NI threshold", short: "employer NI", tab: "Employer NI threshold", kind: "separate" },
 ];
 
 /**
@@ -52,21 +67,35 @@ export const PIP_OPTIONS = [
 ];
 
 export const SECTOR_OPTIONS = [
-  { value: "OTHER", label: "Other" },
   { value: "RETAIL", label: "Retail" },
   { value: "HOSPITALITY", label: "Hospitality (food and drink service)" },
+  { value: "OTHER", label: "Other" },
 ];
+
+// The home: renting (from whichever landlord), owned, or living with
+// parents, which the API models as the young person's own household with
+// no rent (lives_with_parents)
+export const PARENTS = "PARENTS";
+export const RENTING_TENURES = ["RENT_PRIVATELY", "RENT_FROM_COUNCIL", "RENT_FROM_HA"];
+export const isRentingTenure = (tenure) => RENTING_TENURES.includes(tenure);
+// From 16 a child's answers say whether they are in school or college
+export const EDUCATION_AGE = 16;
+export const OLDEST_CHILD = 19;
 
 /** The form's answers for a new custom household. */
 export const DEFAULT_ANSWERS = {
   age: 22,
-  home: "renting",
-  monthlyRent: 500,
   region: "NORTH_WEST",
+  tenure: "RENT_PRIVATELY",
+  monthlyRent: 500,
   hasPartner: false,
   partnerAge: 22,
+  partnerSalary: 0,
   partnerHealth: false,
+  partnerPipDailyLiving: "NONE",
+  partnerPipMobility: "NONE",
   childAges: [],
+  childEducation: [],
   claimsUniversalCredit: true,
   health: false,
   newClaim: false,
@@ -81,7 +110,8 @@ export const DEFAULT_ANSWERS = {
 /**
  * The form's answers as the API's household answers (HouseholdAnswersRequest):
  * 2029-30 pay, no Council Tax (left out, as in the stored examples), and
- * each Milburn answer only when it differs from the API's default.
+ * each Milburn answer only when it differs from the API's default, so a
+ * stored example's answers go back unchanged.
  */
 export function householdRequest(answers) {
   const a = { ...DEFAULT_ANSWERS, ...answers };
@@ -93,18 +123,24 @@ export function householdRequest(answers) {
     claims_universal_credit: a.claimsUniversalCredit,
     council_tax: 0,
   };
-  if (a.home === "parents") household.lives_with_parents = true;
+  if (a.tenure === PARENTS) household.lives_with_parents = true;
   else {
-    household.tenure = "RENT_PRIVATELY";
-    household.monthly_rent = a.monthlyRent;
+    household.tenure = a.tenure;
+    if (isRentingTenure(a.tenure)) household.monthly_rent = a.monthlyRent;
   }
   if (a.hasPartner) {
     household.has_partner = true;
     household.partner_age = a.partnerAge;
-    household.partner_employment_income = 0;
+    household.partner_employment_income = a.partnerSalary;
     if (a.partnerHealth) household.partner_limited_capability_for_work_related_activity = true;
+    if (a.partnerPipDailyLiving !== "NONE") household.partner_pip_daily_living = a.partnerPipDailyLiving;
+    if (a.partnerPipMobility !== "NONE") household.partner_pip_mobility = a.partnerPipMobility;
   }
-  if (a.childAges.length) household.children = a.childAges.map((age) => ({ age }));
+  if (a.childAges.length) {
+    household.children = a.childAges.map((age, index) =>
+      age >= EDUCATION_AGE ? { age, in_education: a.childEducation[index] !== false } : { age },
+    );
+  }
   if (a.health) {
     household.limited_capability_for_work_related_activity = true;
     if (a.newClaim) household.new_claimant_health_element = true;
@@ -124,16 +160,22 @@ export function householdRequest(answers) {
 export function answersFromHousehold(household) {
   const h = household ?? {};
   const hours = h.hours_worked_per_week ?? 0;
+  const children = h.children ?? [];
+  const tenure = h.lives_with_parents ? PARENTS : (h.tenure ?? "OWNED_WITH_MORTGAGE");
   return {
     ...DEFAULT_ANSWERS,
     age: h.age ?? DEFAULT_ANSWERS.age,
-    home: h.lives_with_parents ? "parents" : "renting",
-    monthlyRent: h.lives_with_parents ? DEFAULT_ANSWERS.monthlyRent : (h.monthly_rent ?? 0),
     region: h.region ?? DEFAULT_ANSWERS.region,
+    tenure,
+    monthlyRent: isRentingTenure(tenure) ? (h.monthly_rent ?? 0) : DEFAULT_ANSWERS.monthlyRent,
     hasPartner: Boolean(h.has_partner),
     partnerAge: h.partner_age ?? DEFAULT_ANSWERS.partnerAge,
+    partnerSalary: h.partner_employment_income ?? 0,
     partnerHealth: Boolean(h.partner_limited_capability_for_work_related_activity),
-    childAges: (h.children ?? []).map((child) => child.age),
+    partnerPipDailyLiving: h.partner_pip_daily_living ?? "NONE",
+    partnerPipMobility: h.partner_pip_mobility ?? "NONE",
+    childAges: children.map((child) => child.age),
+    childEducation: children.map((child) => child.in_education !== false),
     claimsUniversalCredit: h.claims_universal_credit !== false,
     health: Boolean(h.limited_capability_for_work_related_activity),
     newClaim: Boolean(h.new_claimant_health_element),
@@ -285,23 +327,18 @@ export const customAvailable = () => Boolean(householdApiUrl());
  * one's policies, from parsePresets), at once, to the household API as the
  * Autumn Budget calculator posts (NEXT_PUBLIC_HOUSEHOLD_API_URL is the
  * endpoint itself, …/api/household-impact), retried while a scaled-to-zero
- * service starts up (postHouseholdImpactRetrying). Rejects with an Error
- * whose message the tab can show.
+ * service starts up (postHouseholdImpactRetrying). Rejects with the API
+ * client's error (HouseholdApiError: its kind, message and the answers it
+ * names), which SingleYearError shows.
  */
 export async function calculateHousehold(answers, { runs, fetchImpl, signal, onRetry } = {}) {
-  if (!householdApiUrl()) throw new Error("Custom households need the household API, which this build does not have.");
+  if (!householdApiUrl()) throw Object.assign(new Error("Custom households need the household API, which this build does not have."), { kind: "unavailable" });
   if (!runs?.length) throw new Error("The runs to calculate are not available.");
   const household = householdRequest(answers);
   const entries = await Promise.all(
     runs.map(async (run) => {
-      try {
-        const body = { year: YEAR, policies: run.policies, household, include: ["by_policy"] };
-        return [run.key, await postHouseholdImpactRetrying(body, { fetchImpl, signal, timeoutMs: MODAL_TIMEOUT_MS, onRetry })];
-      } catch (error) {
-        if (signal?.aborted) throw error;
-        const fields = (error.fields ?? []).map((field) => `${field.label}: ${field.message}`).join("; ");
-        throw new Error(fields ? `${error.message} ${fields}` : error.message);
-      }
+      const body = { year: YEAR, policies: run.policies, household, include: ["by_policy"] };
+      return [run.key, await postHouseholdImpactRetrying(body, { fetchImpl, signal, timeoutMs: MODAL_TIMEOUT_MS, onRetry })];
     }),
   );
   return Object.fromEntries(entries);
@@ -323,4 +360,21 @@ export function writeExampleToLocation(id) {
   if (id) url.searchParams.set("example", id);
   else url.searchParams.delete("example");
   window.history.replaceState(window.history.state, "", url);
+}
+
+/** Two answers to the API are the same household (key order aside). */
+export function sameHousehold(a, b) {
+  const canonical = (value) =>
+    Array.isArray(value)
+      ? value.map(canonical)
+      : value && typeof value === "object"
+        ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]))
+        : value;
+  return JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
+}
+
+/** The stored example these answers are, unedited, if any. */
+export function storedExampleFor(answers, examples) {
+  const household = householdRequest(answers);
+  return (examples ?? []).find((example) => sameHousehold(example.household, household)) ?? null;
 }

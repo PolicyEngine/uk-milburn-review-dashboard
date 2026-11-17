@@ -1,320 +1,344 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Armchair, Baby, BriefcaseBusiness, GraduationCap, HardHat, House, KeyRound, PencilLine, UsersRound } from "lucide-react";
+import { Percent, UsersRound, Wallet } from "lucide-react";
+import TitleIcon from "../TitleIcon";
 import SectionHeading from "../SectionHeading";
+import Disclosure from "../Disclosure";
+import HeadlineTile from "../livingStandards/HeadlineTile";
+import UnavailableNotice from "../publication/UnavailableNotice";
+import HouseholdCards from "../personal/HouseholdCards";
 import { ChoiceTiles, NumberField, SelectField } from "../personal/FormControls";
+import NetIncomeWaterfall from "../personal/NetIncomeWaterfall";
+import PolicyBars from "../personal/PolicyBars";
+import ProgrammeTable from "../personal/ProgrammeTable";
+import { ProcessingPanel, SingleYearError, headlineTotals, useDelayed, useElapsedSeconds } from "../personal/SingleYearResults";
+import { REGION_OPTIONS, StepGroup, YES_NO, hintPlace, useNarrow } from "../HouseholdCalculator";
+import useCollapse from "../../hooks/useCollapse";
+import { normaliseHouseholdImpact } from "../../utils/householdImpactApi";
+import { MINUS, money, policyRows } from "../../utils/singleYear";
+import { CHART_COLOURS } from "../../utils/chartTheme";
+import { prefersReducedMotion } from "../../utils/chartMotion";
+import { scrollBelowBars } from "../../utils/pageScroll";
 import {
   DEFAULT_ANSWERS,
+  EDUCATION_AGE,
   FISCAL_YEAR,
-  KIND_LABELS,
+  OLDEST_CHILD,
+  PARENTS,
   PIP_OPTIONS,
   RUNS,
   SECTOR_OPTIONS,
+  YEAR,
   answersFromHousehold,
   calculateHousehold,
   customAvailable,
   exampleFromLocation,
+  householdRequest,
+  isRentingTenure,
   loadPresets,
-  programmeRows,
   resolveExampleId,
+  sameHousehold,
   separateRunsLine,
+  storedExampleFor,
   summarise,
   writeExampleToLocation,
 } from "../../utils/milburn/householdCalculator";
 import "../HouseholdCalculator.css";
+import "../personal/SingleYear.css";
 import "./MilburnHouseholdTab.css";
 
-const ICONS = { house: House, key: KeyRound, armchair: Armchair, graduate: GraduationCap, family: UsersRound, briefcase: BriefcaseBusiness, hardHat: HardHat, baby: Baby };
-const CUSTOM = "custom";
-
-const REGION_OPTIONS = [
-  ["NORTH_EAST", "North East"],
-  ["NORTH_WEST", "North West"],
-  ["YORKSHIRE", "Yorkshire and the Humber"],
-  ["EAST_MIDLANDS", "East Midlands"],
-  ["WEST_MIDLANDS", "West Midlands"],
-  ["EAST_OF_ENGLAND", "East of England"],
-  ["LONDON", "London"],
-  ["SOUTH_EAST", "South East"],
-  ["SOUTH_WEST", "South West"],
-  ["WALES", "Wales"],
-  ["SCOTLAND", "Scotland"],
-  ["NORTHERN_IRELAND", "Northern Ireland"],
-].map(([value, label]) => ({ value, label }));
-
-const pounds = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 });
-/** "£14,247" */
-export const formatPounds = (value) => `£${pounds.format(Math.round(Math.abs(value)))}`;
 /** "+£1,158", "−£9,883"; a change that rounds to nothing is "£0". */
 export function formatSignedPounds(value) {
   const rounded = Math.round(value);
-  return `${rounded > 0 ? "+" : rounded < 0 ? "−" : ""}£${pounds.format(Math.abs(rounded))}`;
+  return `${rounded > 0 ? "+" : rounded < 0 ? MINUS : ""}${money(Math.abs(rounded))}`;
 }
-const tone = (value) => (Math.round(value) > 0 ? "is-gain" : Math.round(value) < 0 ? "is-loss" : "is-none");
-const changeText = (value) => (Math.round(value) === 0 ? "No change" : formatSignedPounds(value));
+const changeWords = (value) => (Math.round(value) === 0 ? "No change" : formatSignedPounds(value));
+const changeClass = (value) => (Math.round(value) > 0 ? "is-gain" : Math.round(value) < 0 ? "is-loss" : "is-zero");
 
-const YES_NO = [
-  { value: false, label: "No" },
-  { value: true, label: "Yes" },
+// The form, opened by "Your household", and the tenure choice's "Rent"
+const FORM_PANEL_ID = "household-form-panel";
+const RENTING = "RENTING";
+const MAX_CHILDREN = 6;
+const NEW_CHILD_AGE = 5;
+const REGIONS = REGION_OPTIONS.map(([value, label]) => ({ value, label }));
+const regionName = (value) => REGIONS.find((option) => option.value === value)?.label ?? value;
+
+/**
+ * The form's numbered steps, as the Autumn Budget calculator's
+ * (HouseholdCalculator's FORM_GROUPS): You and Household open at first, as
+ * there, and the two steps the report's runs turn on (work and health) too;
+ * Universal Credit starts closed, its line saying the answer once changed.
+ */
+export const MILBURN_STEPS = [
+  { key: "you", title: "You", hint: "Your age and where you live.", open: true, fields: ["age", "region"] },
+  {
+    key: "household",
+    title: "Household",
+    hint: "Who lives with you, and your home.",
+    open: true,
+    fields: ["hasPartner", "childrenCount", "tenure", "partnerAge", "rentFrom", "monthlyRent", "children"],
+  },
+  {
+    key: "work",
+    title: "Work and pay",
+    hint: `Your paid work in ${FISCAL_YEAR}, and your partner's pay.`,
+    open: true,
+    fields: ["hours", "pay", "salary", "sector", "partnerSalary"],
+  },
+  {
+    key: "health",
+    title: "Health and disability",
+    hint: "A health condition that limits work, and Personal Independence Payment (PIP).",
+    open: true,
+    fields: ["health", "newClaim", "pipDailyLiving", "pipMobility", "partnerHealth", "partnerPipDailyLiving", "partnerPipMobility"],
+  },
+  {
+    key: "benefits",
+    title: "Universal Credit",
+    hint: "Yes counts the Universal Credit your answers entitle you to.",
+    fields: ["claimsUniversalCredit"],
+  },
 ];
 
-/** One card per stored example, then "Your household". */
-function ExampleCards({ examples, value, onChoose, onCustom }) {
+const LCWRA_HINT =
+  "Assessed as having limited capability for work and work-related activity (LCWRA): the Universal Credit health element.";
+
+// Choices: ChoiceTiles (segmented) unless `select`
+const CHOICES = {
+  hasPartner: { label: "Partner", options: YES_NO, summary: (v) => (v ? "With a partner" : null) },
+  tenure: {
+    label: "Housing",
+    options: [
+      { value: RENTING, label: "Rent" },
+      { value: PARENTS, label: "With parents" },
+      { value: "OWNED_WITH_MORTGAGE", label: "Mortgage" },
+      { value: "OWNED_OUTRIGHT", label: "Own outright" },
+    ],
+    hint: (answers) =>
+      answers.tenure === PARENTS
+        ? "Modelled as your own household with no rent: your parents' income and housing costs are left out."
+        : undefined,
+  },
+  rentFrom: {
+    label: "Rent from",
+    select: true,
+    options: [
+      { value: "RENT_PRIVATELY", label: "Private landlord" },
+      { value: "RENT_FROM_COUNCIL", label: "Council" },
+      { value: "RENT_FROM_HA", label: "Housing association" },
+    ],
+  },
+  pay: {
+    label: "Pay",
+    options: [
+      { value: "minimum", label: "Minimum wage" },
+      { value: "salary", label: "Enter pay" },
+    ],
+    hint: (answers) =>
+      answers.pay === "minimum" ? `The minimum wage for your age in ${FISCAL_YEAR}, for these hours, all year.` : undefined,
+  },
+  sector: {
+    label: "Sector",
+    select: true,
+    options: SECTOR_OPTIONS,
+    hint: () => "The employer National Insurance run applies to 21 to 24-year-olds in retail and hospitality.",
+    hintAs: "tooltip",
+  },
+  health: { label: "Health condition limiting work-related activity", options: YES_NO, hint: () => LCWRA_HINT, hintAs: "tooltip" },
+  newClaim: {
+    label: "Health element claimed",
+    options: [
+      { value: false, label: "Before April 2026" },
+      { value: true, label: "From April 2026" },
+    ],
+    hint: () => "Claims made from April 2026 are paid a lower health element; earlier claims keep the protected rate.",
+    hintAs: "tooltip",
+  },
+  pipDailyLiving: { label: "PIP daily living", options: PIP_OPTIONS },
+  pipMobility: { label: "PIP mobility", options: PIP_OPTIONS },
+  partnerHealth: { label: "Partner's health condition limiting work-related activity", options: YES_NO, hint: () => LCWRA_HINT, hintAs: "tooltip" },
+  partnerPipDailyLiving: { label: "Partner's PIP daily living", options: PIP_OPTIONS },
+  partnerPipMobility: { label: "Partner's PIP mobility", options: PIP_OPTIONS },
+  claimsUniversalCredit: {
+    label: "Universal Credit",
+    options: [
+      { value: true, label: "Yes" },
+      { value: false, label: "No" },
+    ],
+    hint: () => "Would your household claim Universal Credit if entitled? Yes counts what your answers entitle you to.",
+    hintAs: "tooltip",
+  },
+};
+
+// Number boxes
+const NUMBERS = {
+  age: { label: "Age", min: 16, max: 100, step: 1, hint: "The report's measures are for under-25s; the PIP removal is for 18 to 24-year-olds." },
+  partnerAge: { label: "Partner's age", min: 16, max: 100, step: 1 },
+  monthlyRent: { label: "Rent", min: 0, max: 10000, step: 25, money: true, suffix: "a month" },
+  hours: { label: "Hours of paid work", min: 0, max: 60, step: 1, suffix: "a week" },
+  salary: { label: `Pay in ${FISCAL_YEAR}`, min: 0, max: 200000, step: 500, money: true, suffix: "a year", hint: "Before tax." },
+  partnerSalary: { label: `Partner's pay in ${FISCAL_YEAR}`, min: 0, max: 200000, step: 500, money: true, suffix: "a year" },
+};
+
+// Shown only when they apply
+const APPLIES = {
+  partnerAge: (a) => a.hasPartner,
+  partnerSalary: (a) => a.hasPartner,
+  partnerHealth: (a) => a.hasPartner,
+  partnerPipDailyLiving: (a) => a.hasPartner,
+  partnerPipMobility: (a) => a.hasPartner,
+  rentFrom: (a) => isRentingTenure(a.tenure),
+  monthlyRent: (a) => isRentingTenure(a.tenure),
+  pay: (a) => a.hours > 0,
+  sector: (a) => a.hours > 0,
+  salary: (a) => a.hours > 0 && a.pay === "salary",
+  newClaim: (a) => a.health,
+};
+
+/**
+ * A step's line while it is closed: the answers that differ from the
+ * typical ones (DEFAULT_ANSWERS), as the Budget calculator's stepSummary.
+ */
+export function milburnStepSummary(fields, answers) {
+  const applies = (id) => !APPLIES[id] || APPLIES[id](answers);
+  const parts = [];
+  for (const id of fields.filter(applies)) {
+    if (id === "children") continue;
+    if (id === "childrenCount") {
+      const n = answers.childAges.length;
+      if (n) parts.push(n === 1 ? "1 child" : `${n} children`);
+      continue;
+    }
+    if (id === "region") {
+      if (answers.region !== DEFAULT_ANSWERS.region) parts.push(regionName(answers.region));
+      continue;
+    }
+    if (answers[id] === DEFAULT_ANSWERS[id]) continue;
+    if (id === "claimsUniversalCredit") parts.push(answers[id] ? "Claims Universal Credit" : "Does not claim Universal Credit");
+    else if (id === "tenure") {
+      const value = isRentingTenure(answers.tenure) ? RENTING : answers.tenure;
+      parts.push(CHOICES.tenure.options.find((option) => option.value === value)?.label);
+    } else if (id === "rentFrom") parts.push(CHOICES.rentFrom.options.find((option) => option.value === answers.tenure)?.label);
+    else if (NUMBERS[id]) {
+      const config = NUMBERS[id];
+      parts.push(`${config.label} ${config.money ? money(answers[id]) : answers[id]}${config.suffix ? ` ${config.suffix}` : ""}`);
+    } else if (CHOICES[id]) {
+      const chosen = CHOICES[id].options.find((option) => option.value === answers[id]);
+      if (chosen) parts.push(`${CHOICES[id].label}: ${chosen.label}`);
+    }
+  }
+  const text = parts.filter(Boolean).join(" · ");
+  return { text, changed: text.length > 0 };
+}
+
+// The form's last state, kept for the session so switching tabs keeps it
+const saved = { answers: null, presetId: null, formOpen: false, stepOpen: {}, submitted: null, startFrom: null, custom: null };
+
+/** Forget the form's saved state (a new session; for tests). */
+export function resetSavedMilburnForm() {
+  Object.assign(saved, { answers: null, presetId: null, formOpen: false, stepOpen: {}, submitted: null, startFrom: null, custom: null });
+}
+
+const IDLE = { status: "idle", results: null, error: null, startingUp: false };
+
+// A part's name, short, for the waterfall's rows: the API's name without
+// whom it is for ("PIP removed for 18 to 24-year-olds" is "PIP removed");
+// the full name is in the row's tip
+const shortPart = (name) => String(name ?? "").replace(/ for (?:under-|\d).*$/, "");
+
+/** Each run's answer, as the Budget calculator's results read one. */
+function runViews(results) {
+  return Object.fromEntries(RUNS.map((run) => [run.key, normaliseHouseholdImpact(results[run.key])]));
+}
+
+/**
+ * The result: the Budget calculator's result card (three tiles, then the
+ * waterfall from net income under current law through the package's two
+ * removals), with the package's change as "Your change": the one run the
+ * report sets out as its package. The separate runs follow, by run.
+ */
+function ResultCard({ views }) {
+  const pkg = views.package;
+  const totals = headlineTotals(pkg.net);
+  // Each removal by a short name on the bar (the API's full name in its tip)
+  const steps = pkg.byPolicy
+    ? policyRows(pkg.byPolicy, totals.change, [], YEAR).rows.map((row) => ({ ...row, label: shortPart(row.name) }))
+    : null;
+  const share = totals.before > 0 ? (totals.change / totals.before) * 100 : null;
   return (
-    <div className="household-cards-grid milburn-household-grid" role="group" aria-label="Example households">
-      {examples.map((example, index) => {
-        const Icon = ICONS[example.icon] ?? House;
-        const summary = summarise(example.results);
-        const change = summary?.runs[0].change ?? 0;
-        const others = separateRunsLine(summary, formatSignedPounds);
-        const pressed = value === example.id;
-        return (
-          <div key={example.id} className={`household-card ${pressed ? "is-selected" : ""}`.trim()} style={{ "--i": index + 1 }} data-example={example.id}>
-            <span className="household-card-icon" aria-hidden="true">
-              <Icon size={22} strokeWidth={1.8} />
-            </span>
-            <button
-              type="button"
-              className="household-card-hit"
-              aria-pressed={pressed}
-              aria-describedby={`milburn-card-${example.id}-description`}
-              onClick={() => onChoose(example.id)}
-            >
-              <span className="household-card-name">{example.title}</span>
-            </button>
-            <span className="household-card-result">
-              <span className={`household-card-figure ${tone(change)}`}>
-                {changeText(change)}
-                {Math.round(change) !== 0 && <span className="household-card-figure-unit"> a year</span>}
-              </span>
-              <span className="milburn-card-caption">Under the health element and PIP removal</span>
-            </span>
-            {/* Always there, so every card keeps the same height */}
-            <span className={`milburn-card-others${others ? "" : " is-empty"}`} data-others>
-              {others ? `Separate runs: ${others}` : "No change from the separate runs"}
-            </span>
-            <span className="household-card-description" id={`milburn-card-${example.id}-description`}>
-              {example.description}
-            </span>
-          </div>
-        );
-      })}
-      <div className={`household-card milburn-custom-card ${value === CUSTOM ? "is-selected" : ""}`.trim()} style={{ "--i": examples.length + 1 }}>
-        <span className="household-card-icon" aria-hidden="true">
-          <PencilLine size={22} strokeWidth={1.8} />
-        </span>
-        <button type="button" className="household-card-hit" aria-pressed={value === CUSTOM} onClick={onCustom}>
-          <span className="household-card-name">Your household</span>
-        </button>
-        <span className="household-card-description">Enter your own answers, or change an example&rsquo;s.</span>
+    <section className={`card result-card ${changeClass(totals.change)}`} aria-label="Your result">
+      <div className="forecast-tiles position-tiles result-tiles">
+        <HeadlineTile
+          icon={Wallet}
+          name="Your change"
+          value={<span className="result-change-value">{changeWords(totals.change)}</span>}
+          caption="a year, from the health element and PIP removal"
+          trend={{ rows: [] }}
+          meaning={`In ${FISCAL_YEAR}, with no replacement awards. The separate runs are below.`}
+          meaningKind="small"
+        />
+        <HeadlineTile
+          icon={Percent}
+          name="Share of your income"
+          value={share === null ? "Not available" : `${share > 0 ? "+" : share < 0 ? MINUS : ""}${Math.abs(share).toFixed(2)}%`}
+          caption="of your household's net income"
+          trend={{ rows: [] }}
+          meaning={" "}
+          meaningKind="small"
+        />
+        <HeadlineTile
+          icon={UsersRound}
+          name="Net income under current law"
+          value={money(totals.before)}
+          caption={`a year in ${FISCAL_YEAR}`}
+          trend={{ rows: [] }}
+          meaning="Before housing costs, with no Council Tax"
+          meaningKind="small"
+        />
       </div>
-    </div>
-  );
-}
-
-/** The form: the answers the report's runs read. */
-function HouseholdForm({ answers, onChange }) {
-  const set = (key) => (value) => onChange({ ...answers, [key]: value });
-  const working = answers.hours > 0;
-  return (
-    <div className="milburn-form">
-      <fieldset>
-        <legend>You</legend>
-        <NumberField id="milburn-age" label="Age" value={answers.age} onChange={set("age")} min={16} max={100} step={1} hint="The report's measures are for under-25s; PIP changes are for 18 to 24-year-olds." />
-        <SelectField id="milburn-region" label="Region" options={REGION_OPTIONS} value={answers.region} onChange={set("region")} />
-        <ChoiceTiles
-          id="milburn-home"
-          label="Where you live"
-          options={[
-            { value: "renting", label: "Renting" },
-            { value: "parents", label: "With parents" },
-          ]}
-          value={answers.home}
-          onChange={set("home")}
-          hint={answers.home === "parents" ? "Modelled as your own household with no rent: your parents' income and housing costs are left out." : undefined}
+      <div className="result-card-body">
+        <NetIncomeWaterfall
+          totals={totals}
+          steps={steps}
+          yearLabel={FISCAL_YEAR}
+          title="How each removal changes your income"
+          afterName="With the removals"
         />
-        {answers.home === "renting" && (
-          <NumberField id="milburn-rent" label="Rent a month" value={answers.monthlyRent} onChange={set("monthlyRent")} min={0} max={10000} step={25} money />
-        )}
-      </fieldset>
-      <fieldset>
-        <legend>Household</legend>
-        <ChoiceTiles id="milburn-partner" label="Partner" options={YES_NO} value={answers.hasPartner} onChange={set("hasPartner")} />
-        {answers.hasPartner && (
-          <>
-            <NumberField id="milburn-partner-age" label="Partner's age" value={answers.partnerAge} onChange={set("partnerAge")} min={16} max={100} step={1} />
-            <ChoiceTiles id="milburn-partner-health" label="Partner has limited capability for work-related activity" options={YES_NO} value={answers.partnerHealth} onChange={set("partnerHealth")} />
-          </>
-        )}
-        <NumberField
-          id="milburn-children"
-          label="Children"
-          value={answers.childAges.length}
-          onChange={(count) => onChange({ ...answers, childAges: Array.from({ length: count }, (_, i) => answers.childAges[i] ?? 1) })}
-          min={0}
-          max={4}
-          step={1}
-        />
-        {answers.childAges.map((age, index) => (
-          <NumberField
-            key={index}
-            id={`milburn-child-${index}`}
-            label={`Child ${index + 1}'s age`}
-            value={age}
-            onChange={(value) => onChange({ ...answers, childAges: answers.childAges.map((old, i) => (i === index ? value : old)) })}
-            min={0}
-            max={15}
-            step={1}
-          />
-        ))}
-      </fieldset>
-      <fieldset>
-        <legend>Health and benefits</legend>
-        <ChoiceTiles id="milburn-uc" label="Claims Universal Credit" options={YES_NO} value={answers.claimsUniversalCredit} onChange={set("claimsUniversalCredit")} />
-        <ChoiceTiles
-          id="milburn-health"
-          label="Limited capability for work-related activity"
-          options={YES_NO}
-          value={answers.health}
-          onChange={set("health")}
-          hint="Assessed as having limited capability for work and work-related activity: the Universal Credit health element."
-        />
-        {answers.health && (
-          <ChoiceTiles
-            id="milburn-claim"
-            label="Health element claim"
-            options={[
-              { value: false, label: "Before April 2026" },
-              { value: true, label: "From April 2026" },
-            ]}
-            value={answers.newClaim}
-            onChange={set("newClaim")}
-            hint="Claims made from April 2026 are paid a lower health element; earlier claims keep the protected rate."
-          />
-        )}
-        <ChoiceTiles id="milburn-pip-dl" label="PIP daily living" options={PIP_OPTIONS} value={answers.pipDailyLiving} onChange={set("pipDailyLiving")} />
-        <ChoiceTiles id="milburn-pip-m" label="PIP mobility" options={PIP_OPTIONS} value={answers.pipMobility} onChange={set("pipMobility")} />
-      </fieldset>
-      <fieldset>
-        <legend>Work</legend>
-        <NumberField id="milburn-hours" label="Hours of paid work a week" value={answers.hours} onChange={set("hours")} min={0} max={60} step={1} />
-        {working && (
-          <>
-            <ChoiceTiles
-              id="milburn-pay"
-              label="Pay"
-              options={[
-                { value: "minimum", label: "Minimum wage" },
-                { value: "salary", label: "Enter pay" },
-              ]}
-              value={answers.pay}
-              onChange={set("pay")}
-              hint={answers.pay === "minimum" ? `The minimum wage for your age in ${FISCAL_YEAR}, for these hours, all year.` : undefined}
-            />
-            {answers.pay === "salary" && (
-              <NumberField id="milburn-salary" label={`Pay a year before tax, ${FISCAL_YEAR}`} value={answers.salary} onChange={set("salary")} min={0} max={200000} step={500} money />
-            )}
-            <ChoiceTiles id="milburn-sector" label="Sector" options={SECTOR_OPTIONS} value={answers.sector} onChange={set("sector")} hint="The employer National Insurance run applies to 21 to 24-year-olds in retail and hospitality." />
-          </>
-        )}
-      </fieldset>
-    </div>
-  );
-}
-
-/** Each run's change, the package with its two parts. */
-function RunSummary({ summary }) {
-  return (
-    <section className="milburn-runs" aria-label="Change in net income by run">
-      <p className="milburn-baseline">
-        <span>Net income under current law, {FISCAL_YEAR}</span>
-        <strong>{formatPounds(summary.netIncome)} a year</strong>
-      </p>
-      <ul className="milburn-run-list">
-        {summary.runs.map((run) => (
-          <li key={run.key} className={`milburn-run is-${run.kind}`} data-run={run.key}>
-            <div className="milburn-run-head">
-              <span className="milburn-run-name">
-                {run.name}
-                <span className="milburn-run-kind">{KIND_LABELS[run.kind]}</span>
-              </span>
-              <strong className={`milburn-amount ${tone(run.change)}`}>{changeText(run.change)}</strong>
-            </div>
-            {run.parts.length > 1 && (
-              <ul className="milburn-run-parts">
-                {run.parts.map((part) => (
-                  <li key={part.id}>
-                    <span>{part.name} on its own</span>
-                    <span className={`milburn-amount ${tone(part.change)}`}>{changeText(part.change)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
-      <p className="milburn-note">
-        Each run is compared with current law for the same household. The three separate runs are not added to the package or to each other.
-      </p>
+      </div>
     </section>
   );
 }
 
-/** The programmes under current law and one run, with the change. */
-function ProgrammeBreakdown({ results }) {
-  const [chosen, setChosen] = useState(RUNS[0].key);
-  const result = results[chosen];
-  const rows = programmeRows(result);
-  const row = (item, child = false) => (
-    <tr key={item.id} className={child ? "is-child" : undefined}>
-      <th scope="row">{item.label}</th>
-      <td>{item.signed ? formatSignedPounds(item.baseline) : formatPounds(item.baseline)}</td>
-      <td>{item.signed ? formatSignedPounds(item.reform) : formatPounds(item.reform)}</td>
-      <td className={`milburn-amount ${tone(item.change)}`}>{changeText(item.change)}</td>
-    </tr>
-  );
+/** Each run's change, as the Budget calculator's change by policy. */
+function RunBars({ views }) {
+  const rows = RUNS.map((run) => {
+    const change = views[run.key].net.change;
+    return { id: run.key, name: run.name, color: CHART_COLOURS.noChange, change, rounded: Math.round(change) };
+  });
   return (
-    <section className="milburn-breakdown" aria-label="Breakdown by programme">
-      <div className="milburn-breakdown-tabs" role="tablist" aria-label="Run">
-        {RUNS.map((run) => (
-          <button key={run.key} type="button" role="tab" aria-selected={chosen === run.key} className={chosen === run.key ? "is-active" : ""} onClick={() => setChosen(run.key)}>
-            {run.name}
-          </button>
-        ))}
-      </div>
-      <div className="milburn-table-wrap">
-        <table className="milburn-table">
-          <caption className="visually-hidden">Income, taxes and benefits under current law and under {RUNS.find((run) => run.key === chosen).inSentence}, {FISCAL_YEAR}</caption>
-          <thead>
-            <tr>
-              <th scope="col">Programme</th>
-              <th scope="col">Current law</th>
-              <th scope="col">Under the run</th>
-              <th scope="col">Change</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((item) => [row(item), ...item.children.map((childRow) => row(childRow, true))])}
-            <tr className="is-total">
-              <th scope="row">Net income</th>
-              <td>{formatPounds(result.net_income.baseline)}</td>
-              <td>{formatPounds(result.net_income.reform)}</td>
-              <td className={`milburn-amount ${tone(result.net_income.change)}`}>{changeText(result.net_income.change)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p className="milburn-note">
-        Amounts are pounds a year. Rows the run does not change are left out, other than Universal Credit, PIP and pay. Taxes are shown as amounts paid. Universal Credit&rsquo;s elements are before the earnings taper. The employer
-        National Insurance run shows as higher pay: the model passes the employer&rsquo;s saving to wages.
+    <PolicyBars
+      rows={rows}
+      noEffect={[]}
+      yearLabel={FISCAL_YEAR}
+      title={`Change in net income by run, ${FISCAL_YEAR}`}
+      description="Each run on its own, against current law for the same household."
+      rowWord="Run"
+    >
+      <p className="single-year-quiet milburn-runs-note" role="note">
+        The higher Youth Allowance, the work allowance and the employer NI threshold are separate runs: they are not
+        added to the health element and PIP removal or to each other. The work allowance is illustrative: the report
+        gives no amount, so the amount is our assumption.
       </p>
-    </section>
+    </PolicyBars>
   );
 }
 
 /**
- * The Household impact tab: eight stored young people (precomputed, no API)
- * and a custom household (the household API), each under current law and
- * the report's four runs in 2029-30.
+ * The Household impact tab: the Autumn Budget calculator's flow and parts
+ * (its example cards, numbered steps, Calculate, result card, waterfall
+ * and breakdown table) for one household under current law and the
+ * report's four runs in 2029-30. The eight stored examples answer at once
+ * (public/data/milburn_household_presets.json); any other answers are sent
+ * with Calculate to the household API, one request per run.
  */
 export default function MilburnHouseholdTab({ presets: given = undefined, fetchImpl = undefined }) {
   const [loaded, setLoaded] = useState(given === undefined ? undefined : given);
@@ -329,139 +353,479 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
     };
   }, [given, fetchImpl]);
   const presets = given ?? loaded;
-  const [chosen, setChosen] = useState(() => (typeof window === "undefined" ? null : exampleFromLocation(window.location)));
-  const [answers, setAnswers] = useState(DEFAULT_ANSWERS);
-  const [custom, setCustom] = useState({ status: "idle", results: null, error: null });
   const examples = useMemo(() => presets?.examples ?? [], [presets]);
-  // A slug or a number from 1 to 8 (resolveExampleId)
-  const chosenId = chosen === CUSTOM ? CUSTOM : resolveExampleId(chosen, examples);
-  const example = examples.find((item) => item.id === chosenId) ?? null;
-  // An unknown example in the address opens the first one
-  const value = chosen === CUSTOM ? CUSTOM : (example?.id ?? examples[0]?.id ?? CUSTOM);
-  const shown = value === CUSTOM ? custom.results : (example ?? examples[0])?.results;
-  const summary = shown ? summarise(shown) : null;
-  // Choosing "Your household" brings its form into view (not on load)
-  const formRef = useRef(null);
-  const scrollToForm = useRef(false);
+
+  const [answers, setAnswers] = useState(() => ({ ...DEFAULT_ANSWERS, ...saved.answers }));
+  // The example the form was last filled from, while its answers stand
+  const [presetId, setPresetId] = useState(() => saved.presetId);
+  const [formOpen, setFormOpen] = useState(() => saved.formOpen);
+  const [startFrom, setStartFrom] = useState(() => saved.startFrom);
+  const [stepOpen, setStepOpen] = useState(() => saved.stepOpen);
+  // The answers last sent with Calculate (or an example's), and which
+  // household they are: an example's id or "yours"
+  const [submitted, setSubmitted] = useState(() => saved.submitted);
+  const [custom, setCustom] = useState(() => saved.custom ?? IDLE);
+  const form = useCollapse(formOpen);
+  const narrow = useNarrow("(max-width: 640px)");
+  const resultsRef = useRef(null);
+
   useEffect(() => {
-    if (!scrollToForm.current || chosen !== CUSTOM) return;
-    scrollToForm.current = false;
-    formRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" });
-  }, [chosen]);
-  const choose = (id) => {
-    setChosen(id);
-    writeExampleToLocation(id);
-    scrollToForm.current = id === CUSTOM;
-  };
-  const editExample = () => {
-    const from = example ?? examples[0];
-    changeAnswers(from ? answersFromHousehold(from.household) : answers);
-    choose(CUSTOM);
-  };
-  // One calculation at a time: a new one, or an edited answer, aborts the
-  // one in flight, and its answer (or error) is never shown
+    Object.assign(saved, { answers, presetId, formOpen, startFrom, stepOpen, submitted, custom: custom.status === "loading" ? IDLE : custom });
+  }, [answers, presetId, formOpen, startFrom, stepOpen, submitted, custom]);
+
+  // One calculation at a time: a new one aborts the one in flight
   const inFlight = useRef(null);
   useEffect(() => () => inFlight.current?.abort(), []);
-  const changeAnswers = (next) => {
+
+  const scrollTo = useRef(null);
+  const applyPreset = (example, { scroll = true } = {}) => {
+    if (!example) return;
+    const next = answersFromHousehold(example.household);
     inFlight.current?.abort();
-    inFlight.current = null;
     setAnswers(next);
-    setCustom({ status: "idle", results: null, error: null });
+    setPresetId(example.id);
+    setStartFrom(null);
+    setFormOpen(false);
+    setSubmitted({ answers: next, household: example.id, at: Date.now() });
+    writeExampleToLocation(example.id);
+    if (scroll) scrollTo.current = "result";
   };
-  const calculate = () => {
+
+  // ?example=<slug|1-8> on load, once the examples are in
+  const fromAddress = useRef(typeof window === "undefined" ? null : exampleFromLocation(window.location));
+  useEffect(() => {
+    if (!examples.length || fromAddress.current === null) return;
+    const id = resolveExampleId(fromAddress.current, examples);
+    fromAddress.current = null;
+    if (id) applyPreset(examples.find((example) => example.id === id), { scroll: false });
+    // Once, when the examples arrive
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examples]);
+
+  const activePreset = examples.find((example) => example.id === presetId) ?? null;
+
+  const change = (patch) => {
+    setPresetId(null);
+    writeExampleToLocation(null);
+    setAnswers((prev) => ({ ...prev, ...patch }));
+  };
+
+  const chooseYours = () => {
+    if (presetId === null) {
+      if (!formOpen) scrollTo.current = "form";
+      setFormOpen((open) => !open);
+      return;
+    }
+    scrollTo.current = "form";
+    setStartFrom(activePreset?.title ?? null);
+    setPresetId(null);
+    setSubmitted(null);
+    setFormOpen(true);
+    writeExampleToLocation(null);
+  };
+
+  const resetAnswers = () => {
+    inFlight.current?.abort();
+    setAnswers({ ...DEFAULT_ANSWERS });
+    setPresetId(null);
+    setStartFrom(null);
+    setSubmitted(null);
+    setCustom(IDLE);
+    writeExampleToLocation(null);
+  };
+
+  // The answers differ from those of the result shown
+  const changed = submitted !== null && !sameHousehold(householdRequest(answers), householdRequest(submitted.answers));
+  const shownExample = submitted && submitted.household !== "yours" ? examples.find((example) => example.id === submitted.household) : null;
+  const shownResults = shownExample ? shownExample.results : submitted?.household === "yours" && custom.status === "ready" ? custom.results : null;
+  const views = useMemo(() => (shownResults ? runViews(shownResults) : null), [shownResults]);
+  const running = submitted !== null && !changed && submitted.household === "yours" && custom.status === "loading";
+
+  const calculate = (event) => {
+    event?.preventDefault();
+    if (running) return;
+    scrollTo.current = "result";
+    // Answers that are a stored example's, unedited: its result at once
+    const stored = storedExampleFor(answers, examples);
+    if (stored) {
+      inFlight.current?.abort();
+      setPresetId(stored.id);
+      setSubmitted({ answers, household: stored.id, at: Date.now() });
+      writeExampleToLocation(stored.id);
+      return;
+    }
+    setSubmitted({ answers, household: "yours", at: Date.now() });
+    if (!customAvailable() || !presets) {
+      setCustom({ ...IDLE, status: "unavailable" });
+      return;
+    }
     inFlight.current?.abort();
     const controller = new AbortController();
     inFlight.current = controller;
     const current = () => inFlight.current === controller && !controller.signal.aborted;
-    setCustom({ status: "loading", results: null, error: null, startingUp: false });
+    setCustom({ ...IDLE, status: "loading" });
     calculateHousehold(answers, {
-      runs: presets?.runs,
+      runs: presets.runs,
       fetchImpl,
       signal: controller.signal,
       onRetry: () => current() && setCustom((state) => ({ ...state, startingUp: true })),
     })
-      .then((results) => current() && setCustom({ status: "ready", results, error: null }))
-      .catch((error) => current() && setCustom({ status: "error", results: null, error: error.message }));
+      .then((results) => current() && setCustom({ ...IDLE, status: "ready", results }))
+      .catch((error) => current() && setCustom({ ...IDLE, status: "error", error }));
   };
-  if (presets === undefined) return <p className="milburn-loading" role="status">Loading the examples…</p>;
-  return (
-    <div className="results-container milburn-household">
-      <section className="household-cards" aria-label="Choose a household">
-        <SectionHeading icon="users" title="Choose a household" subtitle={`Young people in ${FISCAL_YEAR} under current law and under the report's runs, by exact household calculation.`} />
-        {examples.length > 0 ? (
-          <ExampleCards examples={examples} value={value} onChoose={choose} onCustom={() => choose(CUSTOM)} />
-        ) : (
-          <p className="milburn-note">The stored examples are not available.</p>
-        )}
-      </section>
 
-      {value === CUSTOM && (
-        <section ref={formRef} className="report-section milburn-custom" aria-label="Your household" id="milburn-household-form">
-          <HouseholdForm answers={answers} onChange={changeAnswers} />
-          {customAvailable() && presets ? (
-            <div className="milburn-actions">
-              <button type="button" className="milburn-calculate" onClick={calculate} disabled={custom.status === "loading"}>
-                {custom.status === "loading" ? "Calculating…" : "Calculate"}
-              </button>
-              {custom.status === "loading" && (
-                <span role="status">
-                  {custom.startingUp ? "The calculator is starting up; this can take up to a minute." : "Calculating the four runs…"}
-                </span>
-              )}
-              {custom.status === "error" && <span role="alert" className="milburn-error">{custom.error}</span>}
-            </div>
-          ) : (
-            <p className="milburn-note" role="note">
-              Custom households are not available yet. The stored examples above are.
-            </p>
-          )}
-        </section>
-      )}
+  // Bring the form or the result into view below the sticky bars
+  useEffect(() => {
+    const target = scrollTo.current;
+    if (!target) return undefined;
+    scrollTo.current = null;
+    const frame = requestAnimationFrame(() => {
+      const node = target === "form" ? document.getElementById(FORM_PANEL_ID) : resultsRef.current;
+      if (!node) return;
+      if (target === "form") node.querySelector("input, select, textarea")?.focus({ preventScroll: true });
+      else node.focus({ preventScroll: true });
+      scrollBelowBars(node, { behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [formOpen, submitted]);
 
-      {summary && (
-        <>
-          <SectionHeading
-            icon="calculator"
-            title="Change in net income"
-            subtitle={value === CUSTOM ? "Your household under each of the report's runs." : `${(example ?? examples[0]).title}: ${(example ?? examples[0]).description}`}
+  const showLoading = useDelayed(running);
+  const seconds = useElapsedSeconds(running, submitted?.at ?? null);
+
+  // The cards' figures: each example's package change and its two parts
+  const cardPresets = useMemo(
+    () =>
+      Object.fromEntries(
+        examples.map((example) => {
+          const summary = summarise(example.results);
+          return [example.id, { [YEAR]: { change: summary?.runs[0].change ?? 0, byPolicy: null } }];
+        }),
+      ),
+    [examples],
+  );
+  const cardExamples = useMemo(
+    () => examples.map((example) => ({ ...example, label: example.title, short: example.title, measures: [] })),
+    [examples],
+  );
+  const yoursChange =
+    presetId === null && submitted?.household === "yours" && !changed && custom.status === "ready"
+      ? custom.results.package.net_income.change
+      : null;
+
+  const applies = (id) => !APPLIES[id] || APPLIES[id](answers);
+  const childAges = answers.childAges;
+  const setChildrenCount = (count) => {
+    const ages = childAges.slice(0, count);
+    while (ages.length < count) ages.push(NEW_CHILD_AGE);
+    change({ childAges: ages, childEducation: ages.map((_, i) => answers.childEducation[i] !== false) });
+  };
+
+  const renderChild = (age, index) => (
+    <div key={`child_${index}`} className={`household-field household-child ${age >= EDUCATION_AGE ? "has-education" : ""}`.trim()} data-row={`child_${index}`}>
+      <div className="child-answers">
+        <NumberField
+          id={`child_age_${index}`}
+          label={`Child ${index + 1}'s age`}
+          value={age}
+          min={0}
+          max={OLDEST_CHILD}
+          step={1}
+          hint={`Age in ${FISCAL_YEAR}, from 0 to 19.`}
+          onChange={(value) => change({ childAges: childAges.map((a, i) => (i === index ? value : a)) })}
+        />
+        {age >= EDUCATION_AGE && (
+          <SelectField
+            id={`child_in_education_${index}`}
+            label={`Child ${index + 1} in full-time education (non-advanced)`}
+            options={YES_NO.slice().reverse()}
+            value={answers.childEducation[index] !== false}
+            onChange={(value) => change({ childEducation: childAges.map((_, i) => (i === index ? value : answers.childEducation[i] !== false)) })}
+            hint="School or college, not university or an apprenticeship. Only then does a 16- to 19-year-old count as a child."
+            hintAs="tooltip"
           />
-          {value !== CUSTOM && (
-            <p className="milburn-edit">
-              <button type="button" className="milburn-link-button" onClick={editExample}>
-                Change these answers
-              </button>
-            </p>
-          )}
-          <div className="report-section">
-            <RunSummary summary={summary} />
-          </div>
-          <SectionHeading icon="list" title="Breakdown by programme" subtitle="Each programme under current law and under the run chosen." />
-          <div className="report-section">
-            <ProgrammeBreakdown results={shown} />
-          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderField = (id) => {
+    if (!applies(id)) return null;
+    if (id === "children") return childAges.map(renderChild);
+    let field;
+    if (id === "childrenCount") {
+      field = (
+        <ChoiceTiles
+          id="children_count"
+          label="Children"
+          layout="segmented"
+          options={Array.from({ length: MAX_CHILDREN + 1 }, (_, n) => ({ value: n, label: String(n) }))}
+          value={childAges.length}
+          onChange={setChildrenCount}
+        />
+      );
+    } else if (id === "region") {
+      field = <SelectField id="region" label="Region" options={REGIONS} value={answers.region} onChange={(value) => change({ region: value })} />;
+    } else if (id === "tenure") {
+      const config = CHOICES.tenure;
+      const hint = config.hint(answers);
+      field = (
+        <ChoiceTiles
+          id="tenure"
+          label={config.label}
+          layout="segmented"
+          options={config.options}
+          value={isRentingTenure(answers.tenure) ? RENTING : answers.tenure}
+          hint={hint}
+          hintAs={hintPlace(hint)}
+          onChange={(value) => change({ tenure: value !== RENTING ? value : isRentingTenure(answers.tenure) ? answers.tenure : "RENT_PRIVATELY" })}
+        />
+      );
+    } else if (id === "rentFrom") {
+      field = <SelectField id="rent_from" label="Rent from" options={CHOICES.rentFrom.options} value={answers.tenure} onChange={(value) => change({ tenure: value })} />;
+    } else if (CHOICES[id]) {
+      const config = CHOICES[id];
+      const hint = config.hint?.(answers);
+      const Control = config.select ? SelectField : ChoiceTiles;
+      field = (
+        <Control
+          id={id}
+          label={config.label}
+          {...(config.select ? {} : { layout: "segmented" })}
+          options={config.options}
+          value={answers[id]}
+          hint={hint}
+          hintAs={hintPlace(hint, config.hintAs)}
+          onChange={(value) => change({ [id]: value })}
+        />
+      );
+    } else {
+      const config = NUMBERS[id];
+      field = (
+        <div className="number-field-wrap">
+          <NumberField id={id} {...config} hintAs={hintPlace(config.hint)} value={answers[id]} onChange={(value) => change({ [id]: value })} />
+        </div>
+      );
+    }
+    return (
+      <div key={id} className="household-field" data-row={id}>
+        {field}
+      </div>
+    );
+  };
+
+  const isStepOpen = (step) => stepOpen[step.key] ?? Boolean(step.open);
+
+  const calculateButton = (
+    <button type="submit" className={`calculate-button ${running ? "is-busy" : ""}`} disabled={running} aria-busy={running || undefined}>
+      {running ? (
+        <>
+          <span className="calculate-spinner" aria-hidden="true" />
+          Calculating…
+        </>
+      ) : (
+        <>
+          Calculate
+          <span className="calculate-arrow" aria-hidden="true">
+            →
+          </span>
         </>
       )}
+    </button>
+  );
+  const resetButton = (
+    <button type="button" className="reset-answers-button" onClick={resetAnswers}>
+      Reset answers
+    </button>
+  );
 
-      {presets && (
-        <details className="milburn-more">
-          <summary>About these figures</summary>
-          <p>
-            {presets.label}
-            {presets.build ? ` (${presets.build})` : ""}. Household calculations with no survey data. Amounts are pounds a year, before housing costs.
-            Council Tax and Council Tax Reduction are left out for every household, renters included.
+  if (presets === undefined) {
+    return (
+      <p className="milburn-loading" role="status">
+        Loading the examples…
+      </p>
+    );
+  }
+
+  return (
+    <div className="household-calculator milburn-household">
+      {examples.length > 0 ? (
+        <HouseholdCards
+          examples={cardExamples}
+          value={presetId}
+          formOpen={formOpen}
+          formId={form.mounted ? FORM_PANEL_ID : undefined}
+          onYours={chooseYours}
+          onChoose={(id) => applyPreset(examples.find((example) => example.id === id))}
+          presets={cardPresets}
+          year={YEAR}
+          chosen={presetId !== null || formOpen || submitted !== null}
+          yoursSelected={presetId === null && (formOpen || submitted !== null)}
+          yoursChange={yoursChange}
+          yearBars={false}
+          positions={false}
+          subtitle={`Young people in ${FISCAL_YEAR} under current law and the report's runs. Enter your own household, or start from an example below.`}
+          yoursLead="See how the report's runs change your income. The first calculation after a quiet spell can take a minute or two."
+          figureTip={() => `Change in net income in ${FISCAL_YEAR} from the health element and PIP removal (no replacement awards)`}
+          cardExtra={(example) => {
+            const summary = summarise(example.results);
+            const others = separateRunsLine(summary, formatSignedPounds);
+            return (
+              <span className="milburn-card-lines">
+                <span className="milburn-card-caption">Health element and PIP removal</span>
+                <span className={`milburn-card-others${others ? "" : " is-empty"}`} data-others>
+                  {others ? `Separate runs: ${others}` : "No change from the separate runs"}
+                </span>
+              </span>
+            );
+          }}
+        />
+      ) : (
+        <p className="milburn-note">The stored examples are not available.</p>
+      )}
+      {activePreset && !formOpen && (
+        <p className="household-example-summary" data-example={activePreset.id}>
+          <button type="button" className="link-button" onClick={chooseYours}>
+            Edit these answers
+          </button>
+        </p>
+      )}
+      <div className="household-layout">
+        {form.mounted && (
+          <div id={FORM_PANEL_ID} className={`expander-body household-form-panel ${form.expanded ? "is-expanded" : ""}`} data-open={formOpen}>
+            <div className="expander-inner">
+              <form className="card household-form" onSubmit={calculate} noValidate aria-label="Your household">
+                <div className="household-form-header">
+                  <div className="household-form-title">
+                    <h2>
+                      <TitleIcon name="house" />
+                      Your household
+                    </h2>
+                    <p>Every answer starts at a typical value for a young person. Change any of them, then press Calculate.</p>
+                    {startFrom && (
+                      <p className="household-start-from">
+                        Starting from: <strong>{startFrom}</strong>. Change anything, then Calculate.
+                      </p>
+                    )}
+                  </div>
+                  {!narrow && (
+                    <div className="household-header-actions">
+                      {resetButton}
+                      {calculateButton}
+                    </div>
+                  )}
+                </div>
+                {MILBURN_STEPS.map((step, index) => (
+                  <StepGroup
+                    key={step.key}
+                    group={step}
+                    number={index + 1}
+                    last={index === MILBURN_STEPS.length - 1}
+                    open={isStepOpen(step)}
+                    onToggle={() => setStepOpen((prev) => ({ ...prev, [step.key]: !isStepOpen(step) }))}
+                    summary={milburnStepSummary(step.fields, answers)}
+                  >
+                    {step.fields.map((id) => renderField(id))}
+                  </StepGroup>
+                ))}
+                {narrow && (
+                  <div className="household-form-footer">
+                    {resetButton}
+                    {calculateButton}
+                  </div>
+                )}
+              </form>
+            </div>
+          </div>
+        )}
+
+        {submitted !== null && changed && (
+          <p className="household-results-stale" role="status">
+            Your answers have changed. Press Calculate to see the new result.
           </p>
-          <ul>
-            {RUNS.map((run) => (
-              <li key={run.key}>
-                <strong>{run.name}.</strong> {presets.runDescriptions[run.key]}
+        )}
+        {submitted !== null && !changed && (
+          <div className="household-results" role="region" aria-label="Results" ref={resultsRef} tabIndex={-1}>
+            {running ? (
+              <div className="single-year-headline" aria-busy="true">
+                <div className="card processing-card">
+                  {(showLoading || custom.startingUp) && <ProcessingPanel seconds={seconds} startingUp={custom.startingUp} />}
+                </div>
+              </div>
+            ) : submitted.household === "yours" && custom.status === "unavailable" ? (
+              <UnavailableNotice reason="Custom households are not available yet">
+                <p>This build has no household calculator. The stored examples above are available.</p>
+              </UnavailableNotice>
+            ) : submitted.household === "yours" && custom.status === "error" ? (
+              <SingleYearError error={custom.error} onRetry={() => calculate()} />
+            ) : views ? (
+              <div className="single-year-headline">
+                <div className="single-year-result">
+                  <SectionHeading
+                    icon="wallet"
+                    id="your-result"
+                    title={`Your result, ${FISCAL_YEAR}`}
+                    subtitle={
+                      shownExample
+                        ? `${shownExample.title}: ${shownExample.description}`
+                        : "How the health element and PIP removal changes your net income, removal by removal."
+                    }
+                  />
+                  <ResultCard views={views} />
+                </div>
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
+
+      {views && submitted !== null && !changed && !running && <ResultDetails views={views} presets={presets} />}
+    </div>
+  );
+}
+
+/** The separate runs, then the breakdown by programme, run by run. */
+function ResultDetails({ views, presets }) {
+  const [run, setRun] = useState(RUNS[0].key);
+  const view = views[run];
+  const chosen = RUNS.find((item) => item.key === run);
+  return (
+    <div className="single-year-details milburn-household-details">
+      <SectionHeading icon="bars" title="Change by run" subtitle="Each of the report's runs on its own, against current law for the same household." />
+      <section className="report-section" id="change-by-run">
+        <RunBars views={views} />
+      </section>
+      <section className="report-section" id="household-breakdown">
+        <ProgrammeTable
+          programmes={view.programmes ?? []}
+          totals={headlineTotals(view.net)}
+          yearLabel={FISCAL_YEAR}
+          year={YEAR}
+          policies={[]}
+          parameterTables={null}
+          afterLabel={`Under the ${chosen.kind === "package" ? "removals" : "run"}`}
+          runTabs={{ tabs: RUNS.map((item) => ({ id: item.key, label: item.tab })), value: run, onChange: setRun, label: "Run" }}
+        />
+      </section>
+      <Disclosure title="About these figures" preview="How they are calculated · What each run is" className="milburn-household-about">
+        <div className="info-sections">
+          <p className="info-text">
+            {presets.label}
+            {presets.build ? ` (${presets.build})` : ""}. Household calculations with no survey data. Amounts are pounds a
+            year, before housing costs. Council Tax and Council Tax Reduction are left out for every household, renters
+            included.
+          </p>
+          <ul className="info-list">
+            {RUNS.map((item) => (
+              <li key={item.key}>
+                <strong>{item.name}.</strong> {presets.runDescriptions[item.key]}
               </li>
             ))}
             {presets.assumptions.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
-        </details>
-      )}
+        </div>
+      </Disclosure>
     </div>
   );
 }

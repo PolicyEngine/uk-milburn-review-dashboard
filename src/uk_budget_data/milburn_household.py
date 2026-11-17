@@ -171,17 +171,19 @@ EXAMPLES = (
     },
     {
         "id": "retail_part_time",
-        "title": "23, part-time in retail",
+        "title": "21, part-time in retail",
         "description": (
-            "Renting alone; 16 hours a week at the minimum wage; on "
-            "Universal Credit."
+            "Renting alone; 15 hours a week at the minimum wage in retail "
+            "(the report's example, para 270); on Universal Credit. In "
+            "2029-30 that pays £10,786, above the £10,000 threshold, so "
+            "employer NI is reduced, not removed."
         ),
         "icon": "briefcase",
         "household": {
             **BASE,
             **RENTING_ALONE,
-            "age": 23,
-            "hours_worked_per_week": 16,
+            "age": 21,
+            "hours_worked_per_week": 15,
             "earnings_at_minimum_wage": True,
             "employment_sector": "RETAIL",
         },

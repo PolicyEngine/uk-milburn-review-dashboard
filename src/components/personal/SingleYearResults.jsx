@@ -26,7 +26,7 @@ import { policyDetailsFor } from "../../utils/policyDetails";
 import { resultPolicies } from "../../utils/calculatorOnlyMeasures";
 
 /** True once `active` has held for `delay` ms (no flash of a loading line). */
-function useDelayed(active, delay = 300) {
+export function useDelayed(active, delay = 300) {
   const [shown, setShown] = useState(false);
   useEffect(() => {
     if (!active) return undefined;
@@ -218,7 +218,7 @@ const changeClass = (value) => (value > 0 ? "is-gain" : value < 0 ? "is-loss" : 
  * while `active` holds; every panel of one calculation counts from the
  * same moment.
  */
-function useElapsedSeconds(active, startedAt) {
+export function useElapsedSeconds(active, startedAt) {
   const since = () => (startedAt ? Math.max(0, Math.floor((Date.now() - startedAt) / 1000)) : 0);
   const [seconds, setSeconds] = useState(since);
   useEffect(() => {
@@ -257,7 +257,7 @@ export function progressShare(seconds, typical = STAGE_TIMES.headline.typical) {
  * is happening, the usual time with the seconds so far, and a slim bar that
  * fills over the usual time.
  */
-function ProcessingPanel({ seconds, startingUp = false }) {
+export function ProcessingPanel({ seconds, startingUp = false }) {
   return (
     <div className="processing-panel" role="status" data-starting-up={startingUp || undefined}>
       <span className="processing-icon" aria-hidden="true">

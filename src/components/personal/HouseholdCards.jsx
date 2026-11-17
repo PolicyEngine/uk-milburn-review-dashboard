@@ -302,6 +302,16 @@ export function YearBars({ series, year }) {
  *   (its form open, or its result shown)
  * @param {boolean} [props.chosen] - A household has been chosen: the cards
  *   fold into a strip of chips, the full grid a "Show all households" away
+ * @param {string} [props.subtitle] - The heading's line
+ * @param {import("react").ReactNode} [props.yoursLead] - Your household's
+ *   line, in place of the Budget's
+ * @param {boolean} [props.yearBars] - A bar for each year on each card
+ *   (false on a page with one year)
+ * @param {boolean} [props.positions] - Where each example sits in the UK
+ *   income distribution (false where none is published)
+ * @param {(example) => string} [props.figureTip] - The card figure's tip
+ * @param {(example) => import("react").ReactNode} [props.cardExtra] - More
+ *   about a card's figure, in the row under it
  */
 export default function HouseholdCards({
   examples,
@@ -317,9 +327,17 @@ export default function HouseholdCards({
   year,
   chosen = false,
   yoursSelected = false,
+  subtitle = "Enter your own household, or start from an example below.",
+  yoursLead = null,
+  yearBars = true,
+  positions = true,
+  figureTip = null,
+  cardExtra = null,
 }) {
   const catalogue = useMeasureCatalogue();
-  const distribution = useDataFile(DISTRIBUTION_FILE, parseDistribution);
+  // A page with one year and no income distribution (the Milburn review)
+  // asks for neither: no year bars, no position strip, no file fetched
+  const distribution = useDataFile(positions ? DISTRIBUTION_FILE : null, parseDistribution);
   // The measures the figures are with: those the API took, when fewer
   const positionPolicies = fill?.reduced ?? figurePolicies;
   // What the figures are with, on hover (no line above the cards): every
@@ -338,7 +356,7 @@ export default function HouseholdCards({
       {/* The page's section heading, as on every tab, with "Show all
           households" beside it once a household is chosen */}
       <div className="household-cards-head">
-        <SectionHeading icon="users" title="Choose a household" subtitle="Enter your own household, or start from an example below." />
+        <SectionHeading icon="users" title="Choose a household" subtitle={subtitle} />
         {/* At the end of the heading row, a teal button: plain to see */}
         {chosen && (
           <button
@@ -373,6 +391,7 @@ export default function HouseholdCards({
         formOpen={formOpen}
         formId={formId}
         change={yoursChange}
+        lead={yoursLead}
         onClick={() => choose(onYours)}
       />
       <div className="household-cards-grid" id="household-cards-grid" role="group" aria-label="Example households">
@@ -420,13 +439,13 @@ export default function HouseholdCards({
               <span className="household-card-result">
                 {figures ? (
                   <>
-                    <Tip content={`Change in net income in ${fiscalYearTick(year)} with ${figuresWith}`}>
+                    <Tip content={figureTip ? figureTip(example) : `Change in net income in ${fiscalYearTick(year)} with ${figuresWith}`}>
                     <span className={`household-card-figure ${tone(figures.change)}`} id={`household-card-${example.id}-result`}>
                       {Math.round(figures.change) === 0 ? "No change" : <CountUpText text={signedMoney(figures.change)} />}
                       {Math.round(figures.change) !== 0 && <span className="household-card-figure-unit"> a year</span>}
                     </span>
                     </Tip>
-                    <YearBars series={figures.series} year={year} />
+                    {yearBars && <YearBars series={figures.series} year={year} />}
                   </>
                 ) : waiting ? (
                   // Being calculated in the background: a shimmer where the
@@ -446,6 +465,7 @@ export default function HouseholdCards({
                   card keeps the same height */}
               <span className="household-card-position-row">
                 {percentile !== null && <PositionStrip percentile={percentile} yearLabel={fiscalYearTick(year)} />}
+                {cardExtra?.(example)}
               </span>
               <span className="household-card-description" id={`household-card-${example.id}-description`}>
                 {example.description}
@@ -498,7 +518,7 @@ export default function HouseholdCards({
  * calculated, your result. Pressing it opens the form below (pressed, with
  * a tick, as an example is); pressing it again closes it.
  */
-function YourHouseholdCard({ selected, formOpen, formId, change, onClick }) {
+function YourHouseholdCard({ selected, formOpen, formId, change, lead = null, onClick }) {
   // While the measures are provisional, they are the selected measures, not the Budget
   const provisional = catalogueProvisional(useMeasureCatalogue());
   const calculated = Number.isFinite(change);
@@ -519,8 +539,12 @@ function YourHouseholdCard({ selected, formOpen, formId, change, onClick }) {
         <span className="household-card-name visually-hidden">Your household</span>
         <span className="household-yours-title">Enter your own household</span>
         <span className="household-yours-lead">
-          {provisional ? "See how the selected policies change your income" : "See how the measures change your income"}
-          {", in about 30 seconds."}
+          {lead ?? (
+            <>
+              {provisional ? "See how the selected policies change your income" : "See how the measures change your income"}
+              {", in about 30 seconds."}
+            </>
+          )}
         </span>
       </span>
       <span className="household-yours-side">

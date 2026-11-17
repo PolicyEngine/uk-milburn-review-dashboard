@@ -57,7 +57,7 @@ export function largestSteps(steps) {
 }
 
 /** Each row of the waterfall: where its bar starts and ends. */
-function waterfallRows(totals, steps) {
+function waterfallRows(totals, steps, afterName = "With the policies") {
   const shownSteps = steps ?? [{ id: "all", name: "Selected policies", rounded: totals.change ?? totals.after - totals.before }];
   const stepRows = shownSteps.reduce((done, step) => {
     const from = done.length ? done[done.length - 1].to : totals.before;
@@ -66,7 +66,7 @@ function waterfallRows(totals, steps) {
   return [
     { id: "before", name: "Current law", from: null, to: totals.before, total: true },
     ...stepRows,
-    { id: "after", name: "With the policies", from: null, to: totals.after, total: true },
+    { id: "after", name: afterName, from: null, to: totals.after, total: true },
   ];
 }
 
@@ -102,12 +102,22 @@ export function waterfallScaleStart(totals, steps) {
  *   for all of them, with no "Splitting…" line (the error is shown below)
  * @param {(id: string) => string|null} [props.typeOf] - A policy's type
  *   (policyDetails.js), as the table's VAT row reads it
+ * @param {string} [props.title] - The panel's title
+ * @param {string} [props.afterName] - The last bar's name
  */
-export default function NetIncomeWaterfall({ totals, steps, yearLabel, splitFailed = false, typeOf = null }) {
+export default function NetIncomeWaterfall({
+  totals,
+  steps,
+  yearLabel,
+  splitFailed = false,
+  typeOf = null,
+  title = "How each policy changes your income",
+  afterName = "With the policies",
+}) {
   const wrapperRef = useRef(null);
   const sentenceId = useId();
   const pending = steps === null;
-  const rows = waterfallRows(totals, steps);
+  const rows = waterfallRows(totals, steps, afterName);
   const { tip, handlers } = useFloatingTooltip(
     wrapperRef,
     `${yearLabel}:${rows.map((row) => `${row.id}=${row.to}`).join(",")}`,
@@ -138,7 +148,7 @@ export default function NetIncomeWaterfall({ totals, steps, yearLabel, splitFail
       <div className="waterfall-header">
         <h3 className="forecast-tile-head waterfall-title">
           <TitleIcon name="bars" className="forecast-tile-icon" />
-          <span className="forecast-tile-name">How each policy changes your income</span>
+          <span className="forecast-tile-name">{title}</span>
         </h3>
         {!noChange && fuelDuty && (
           // The fuel duty policy also moves the VAT row in the table below
@@ -155,7 +165,7 @@ export default function NetIncomeWaterfall({ totals, steps, yearLabel, splitFail
         <ol
           className="waterfall-rows"
           aria-describedby={sentenceId}
-          aria-label={`Net income under current law and with the selected policies, ${yearLabel}: ${rows
+          aria-label={`Net income under current law and ${afterName.charAt(0).toLowerCase()}${afterName.slice(1)}, ${yearLabel}: ${rows
             .map((row) => `${row.name} ${row.total ? money(row.to) : signedMoney(row.rounded)}`)
             .join("; ")}`}
         >

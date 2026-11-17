@@ -40,12 +40,28 @@ const approxWidth = (text, fontSize) => String(text).length * fontSize * 0.56;
  * @param {Array<{id, name, kind, text}>} [props.notes] - Notes on measures'
  *   figures: an employer cost (£0 for every household) or "if received"
  * @param {string} props.yearLabel - "2029-30"
+ * @param {string} [props.title] - The card's title, in place of "Change in
+ *   net income by policy"
+ * @param {import("react").ReactNode} [props.description] - A line under it
+ * @param {string} [props.rowWord] - What a row is, for the CSV's column
+ * @param {import("react").ReactNode} [props.children] - The card's foot
  */
-export default function PolicyBars({ rows, noEffect, noEffectItems = [], underAPound = [], notes = [], yearLabel }) {
+export default function PolicyBars({
+  rows,
+  noEffect,
+  noEffectItems = [],
+  underAPound = [],
+  notes = [],
+  yearLabel,
+  title: givenTitle = null,
+  description = null,
+  rowWord = "Policy",
+  children = null,
+}) {
   const [wrapperRef, measured] = useElementWidth();
   const chartRef = useRef(null);
   const width = measured > 0 ? measured : 640;
-  const title = `Change in net income by policy, ${yearLabel}`;
+  const title = givenTitle ?? `Change in net income by policy, ${yearLabel}`;
   // Cleared when the year or the figures change, so it never shows old ones
   const { tip, handlers } = useFloatingTooltip(
     wrapperRef,
@@ -114,7 +130,7 @@ export default function PolicyBars({ rows, noEffect, noEffectItems = [], underAP
         units: "£ a year; positive values raise the household's net income",
         source: "PolicyEngine UK household calculation, Milburn review dashboard",
         columns: [
-          { key: "name", label: "Policy" },
+          { key: "name", label: rowWord },
           { key: "change", label: "Change in net income (£)", decimals: 0 },
         ],
         rows: [
@@ -132,6 +148,7 @@ export default function PolicyBars({ rows, noEffect, noEffectItems = [], underAP
             <TitleIcon name="hbars" />
             <span className="title-text">{title}</span>
           </h3>
+          {description && <p className="chart-description">{description}</p>}
         </div>
         <ChartDownloadMenu download={rows.length ? download : undefined} chartTitle={title} />
       </div>
@@ -240,6 +257,7 @@ export default function PolicyBars({ rows, noEffect, noEffectItems = [], underAP
           </p>
         ))}
       {noEffectItems.length > 0 && <NoEffectList items={noEffectItems} title="No effect on your household" />}
+      {children}
     </div>
   );
 }

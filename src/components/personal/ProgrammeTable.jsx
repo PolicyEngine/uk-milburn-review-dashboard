@@ -58,6 +58,10 @@ const changeClass = (value) => {
  * @param {Array} [props.bars] - policyRows(...).all, once the split by policy is in
  * @param {string} props.yearLabel - "2029-30"
  * @param {Object} [props.engine] - The API's versions
+ * @param {string} [props.afterLabel] - The after column's heading
+ * @param {Object} [props.runTabs] - Separate calculations to switch
+ *   between, as tabs over the table: { tabs: [{ id, label }], value,
+ *   onChange, label } (the Milburn review's runs)
  */
 // Each group in words: what "up" means for it (taxes are negative amounts,
 // so a rise in the amount is a fall in what you pay). Market income, taxes
@@ -128,6 +132,8 @@ export default function ProgrammeTable({
   yearLabel,
   engine = {},
   parameterTables,
+  afterLabel = "With the policies",
+  runTabs = null,
 }) {
   const narrow = useNarrowViewport();
   // The VAT row named by what moves it: VAT on fuel duty when only the fuel
@@ -194,7 +200,7 @@ export default function ProgrammeTable({
             { key: "group", label: "Group" },
             { key: "item", label: "Item" },
             { key: "before", label: "Current law (£)", decimals: 0 },
-            { key: "after", label: "With the policies (£)", decimals: 0 },
+            { key: "after", label: `${afterLabel} (£)`, decimals: 0 },
             { key: "change", label: "Change (£)", decimals: 0 },
           ],
           rows: [
@@ -325,10 +331,11 @@ export default function ProgrammeTable({
             <TitleIcon name="layers" />
             <span className="title-text">{title}</span>
           </h3>
-          {!showTabs && <p className="chart-description">{sentence}</p>}
+          {!showTabs && !runTabs && <p className="chart-description">{sentence}</p>}
         </div>
         <ChartDownloadMenu formats={formats} chartTitle={policyTitle} ariaLabel={`Download table: ${policyTitle}`} />
       </div>
+      {runTabs && <RunTabs {...runTabs} />}
       {showTabs && (
         <BreakdownTabs
           tabs={policyTabList}
@@ -342,7 +349,7 @@ export default function ProgrammeTable({
       {/* Each tab's one line: the Summary's sentence, or the policy's
           one-line summary (policyDetails.js; none for a measure it does
           not describe) */}
-      {showTabs && !activePolicy && !byPolicy && <p className="chart-description breakdown-tab-line">{sentence}</p>}
+      {(showTabs || runTabs) && !activePolicy && !byPolicy && <p className="chart-description breakdown-tab-line">{sentence}</p>}
       {byPolicy && (
         <p className="chart-description breakdown-tab-line">
           Each policy&apos;s change, as in the chart above, and the taxes and benefits it moves. Summary adds up the same
@@ -397,7 +404,7 @@ export default function ProgrammeTable({
               )}
               {wide && (
                 <th scope="col" className="num">
-                  With the policies
+                  {afterLabel}
                 </th>
               )}
               <th scope="col" className="num">
@@ -625,6 +632,56 @@ function BridgeTable({ bridge, setTable, title }) {
  * The Summary tab's label in the policy tabs' badge style (MeasureRowLabel,
  * compact): a list icon in a tinted circle of the same size, then its name.
  */
+/**
+ * Tabs for separate calculations of the same household (the Milburn
+ * review's runs), in the breakdown tabs' style: a WAI-ARIA tablist with
+ * automatic activation, the arrow keys (wrapping), Home and End.
+ */
+function RunTabs({ tabs, value, onChange, label = "Calculation" }) {
+  const refs = useRef({});
+  const onKeyDown = (event) => {
+    const current = tabs.findIndex((tab) => tab.id === value);
+    const last = tabs.length - 1;
+    const next = {
+      ArrowRight: current === last ? 0 : current + 1,
+      ArrowLeft: current <= 0 ? last : current - 1,
+      Home: 0,
+      End: last,
+    }[event.key];
+    if (next === undefined) return;
+    event.preventDefault();
+    onChange(tabs[next].id);
+    refs.current[tabs[next].id]?.focus();
+  };
+  return (
+    <div className="breakdown-tabs-bar">
+      <div className="breakdown-tabs" role="tablist" aria-label={label} onKeyDown={onKeyDown}>
+        {tabs.map((tab) => {
+          const selected = tab.id === value;
+          return (
+            <button
+              key={tab.id}
+              ref={(node) => {
+                refs.current[tab.id] = node;
+              }}
+              type="button"
+              role="tab"
+              id={`breakdown-run-${tab.id}`}
+              aria-selected={selected}
+              tabIndex={selected ? 0 : -1}
+              className={`breakdown-tab${selected ? " is-selected" : ""}`}
+              data-run={tab.id}
+              onClick={() => onChange(tab.id)}
+            >
+              <SummaryTabLabel label={tab.label} icon={tab.icon ?? "list"} />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function SummaryTabLabel({ label, icon = "list" }) {
   return (
     <span className="mrl mrl--compact breakdown-tab-summary" style={{ "--mrl-colour": CHART_COLOURS.highlight }}>

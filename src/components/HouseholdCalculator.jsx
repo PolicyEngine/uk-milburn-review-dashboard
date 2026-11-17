@@ -135,7 +135,7 @@ export const REGION_OPTIONS = [
 const LOCAL_AUTHORITY_HINT =
   "Your council sets your region: Scotland has its own income tax rates, and the rent estimate and housing support follow the region, not your council. We estimate Council Tax from your band and your council's Band D.";
 
-const YES_NO = [
+export const YES_NO = [
   { value: false, label: "No" },
   { value: true, label: "Yes" },
 ];
@@ -388,7 +388,7 @@ const PREFILLED = {
 // A short hint goes under its box; a long one behind an "i" by the label
 // Long notes behind the "i"; short ones under the box. A field can ask for
 // the "i" so its note never makes its row taller than the others.
-const hintPlace = (hint, place) => place ?? (hint && hint.length > 60 ? "tooltip" : "below");
+export const hintPlace = (hint, place) => place ?? (hint && hint.length > 60 ? "tooltip" : "below");
 
 const regionName = (region) => REGION_OPTIONS.find(([value]) => value === region)?.[1] ?? region;
 
@@ -481,7 +481,7 @@ export function stepSummary(fields, { answer, applies, changed, inputs, children
  * other answer in it is read, collapsed under "Other questions" until
  * opened (`optionalOpen`).
  */
-function StepGroup({ group, number, last, open, onToggle, summary, children, optional = null, optionalOpen = false, onOptionalToggle }) {
+export function StepGroup({ group, number, last, open, onToggle, summary, children, optional = null, optionalOpen = false, onOptionalToggle }) {
   const collapse = useCollapse(open);
   const headId = `household-step-${group.key}`;
   const hintId = `${headId}-hint`;
@@ -576,7 +576,7 @@ const joinedPhrases = (phrases) =>
   phrases.length > 1 ? `${phrases.slice(0, -1).join(", ")} and ${phrases[phrases.length - 1]}` : (phrases[0] ?? "");
 
 /** Whether the window matches a media query, following it as it changes. */
-function useNarrow(query) {
+export function useNarrow(query) {
   const matches = () => typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia(query).matches;
   const [narrow, setNarrow] = useState(matches);
   useEffect(() => {

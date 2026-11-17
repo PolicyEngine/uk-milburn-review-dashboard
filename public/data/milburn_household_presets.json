@@ -2249,11 +2249,11 @@
   },
   {
    "id": "retail_part_time",
-   "title": "23, part-time in retail",
-   "description": "Renting alone; 16 hours a week at the minimum wage; on Universal Credit.",
+   "title": "21, part-time in retail",
+   "description": "Renting alone; 15 hours a week at the minimum wage in retail (the report's example, para 270); on Universal Credit. In 2029-30 that pays £10,786, above the £10,000 threshold, so employer NI is reduced, not removed.",
    "icon": "briefcase",
    "household": {
-    "age": 23,
+    "age": 21,
     "employment_income": 0,
     "salary_year": 2029,
     "region": "NORTH_WEST",
@@ -2261,7 +2261,7 @@
     "council_tax": 0,
     "tenure": "RENT_PRIVATELY",
     "monthly_rent": 500,
-    "hours_worked_per_week": 16,
+    "hours_worked_per_week": 15,
     "earnings_at_minimum_wage": true,
     "employment_sector": "RETAIL"
    },
@@ -2271,10 +2271,10 @@
      "fiscal_year": "2029-30",
      "salary_used": {
       "salary_year": 2029,
-      "employment_income": 11523.2,
+      "employment_income": 10803.0,
       "partner_employment_income": null,
       "growth": 1.0,
-      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 16 hours a week, all year."
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 15 hours a week, all year."
      },
      "council_tax_used": {
       "band": "D",
@@ -2290,8 +2290,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 14479.6,
-      "reform": 14479.6,
+      "baseline": 14156.03,
+      "reform": 14156.03,
       "change": 0.0
      },
      "included": [
@@ -2331,8 +2331,8 @@
       {
        "id": "universal_credit",
        "label": "Universal Credit",
-       "baseline": 3154.83,
-       "reform": 3154.83,
+       "baseline": 3550.31,
+       "reform": 3550.31,
        "change": 0.0,
        "group": "benefit",
        "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
@@ -2356,8 +2356,8 @@
       {
        "id": "employment_income",
        "label": "Employment income",
-       "baseline": 11504.76,
-       "reform": 11504.76,
+       "baseline": 10785.71,
+       "reform": 10785.71,
        "change": 0.0,
        "group": "income",
        "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
@@ -2365,8 +2365,8 @@
         {
          "id": "salary_sacrifice_haircut",
          "label": "Pay cut for the salary sacrifice cap (current law)",
-         "baseline": -18.44,
-         "reform": -18.44,
+         "baseline": -17.28,
+         "reform": -17.28,
          "change": 0.0
         }
        ]
@@ -2389,10 +2389,10 @@
      "fiscal_year": "2029-30",
      "salary_used": {
       "salary_year": 2029,
-      "employment_income": 11523.2,
+      "employment_income": 10803.0,
       "partner_employment_income": null,
       "growth": 1.0,
-      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 16 hours a week, all year."
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 15 hours a week, all year."
      },
      "council_tax_used": {
       "band": "D",
@@ -2408,8 +2408,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 14479.6,
-      "reform": 15637.95,
+      "baseline": 14156.03,
+      "reform": 15314.38,
       "change": 1158.35
      },
      "included": [
@@ -2442,8 +2442,8 @@
       {
        "id": "universal_credit",
        "label": "Universal Credit",
-       "baseline": 3154.83,
-       "reform": 4313.19,
+       "baseline": 3550.31,
+       "reform": 4708.66,
        "change": 1158.35,
        "group": "benefit",
        "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
@@ -2467,8 +2467,8 @@
       {
        "id": "employment_income",
        "label": "Employment income",
-       "baseline": 11504.76,
-       "reform": 11504.76,
+       "baseline": 10785.71,
+       "reform": 10785.71,
        "change": 0.0,
        "group": "income",
        "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
@@ -2476,8 +2476,8 @@
         {
          "id": "salary_sacrifice_haircut",
          "label": "Pay cut for the salary sacrifice cap (current law)",
-         "baseline": -18.44,
-         "reform": -18.44,
+         "baseline": -17.28,
+         "reform": -17.28,
          "change": 0.0
         }
        ]
@@ -2500,10 +2500,10 @@
      "fiscal_year": "2029-30",
      "salary_used": {
       "salary_year": 2029,
-      "employment_income": 11523.2,
+      "employment_income": 10803.0,
       "partner_employment_income": null,
       "growth": 1.0,
-      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 16 hours a week, all year."
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 15 hours a week, all year."
      },
      "council_tax_used": {
       "band": "D",
@@ -2519,8 +2519,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 14479.6,
-      "reform": 17555.93,
+      "baseline": 14156.03,
+      "reform": 17232.36,
       "change": 3076.33
      },
      "included": [
@@ -2553,8 +2553,8 @@
       {
        "id": "universal_credit",
        "label": "Universal Credit",
-       "baseline": 3154.83,
-       "reform": 6231.17,
+       "baseline": 3550.31,
+       "reform": 6626.64,
        "change": 3076.33,
        "group": "benefit",
        "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
@@ -2578,8 +2578,8 @@
       {
        "id": "employment_income",
        "label": "Employment income",
-       "baseline": 11504.76,
-       "reform": 11504.76,
+       "baseline": 10785.71,
+       "reform": 10785.71,
        "change": 0.0,
        "group": "income",
        "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
@@ -2587,8 +2587,8 @@
         {
          "id": "salary_sacrifice_haircut",
          "label": "Pay cut for the salary sacrifice cap (current law)",
-         "baseline": -18.44,
-         "reform": -18.44,
+         "baseline": -17.28,
+         "reform": -17.28,
          "change": 0.0
         }
        ]
@@ -2611,10 +2611,10 @@
      "fiscal_year": "2029-30",
      "salary_used": {
       "salary_year": 2029,
-      "employment_income": 11523.2,
+      "employment_income": 10803.0,
       "partner_employment_income": null,
       "growth": 1.0,
-      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 16 hours a week, all year."
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 15 hours a week, all year."
      },
      "council_tax_used": {
       "band": "D",
@@ -2630,8 +2630,8 @@
       "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
      },
      "net_income": {
-      "baseline": 14479.6,
-      "reform": 14773.07,
+      "baseline": 14156.03,
+      "reform": 14449.5,
       "change": 293.48
      },
      "included": [
@@ -2664,8 +2664,8 @@
       {
        "id": "universal_credit",
        "label": "Universal Credit",
-       "baseline": 3154.83,
-       "reform": 2796.14,
+       "baseline": 3550.31,
+       "reform": 3191.61,
        "change": -358.7,
        "group": "benefit",
        "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
@@ -2689,8 +2689,8 @@
       {
        "id": "employment_income",
        "label": "Employment income",
-       "baseline": 11504.76,
-       "reform": 12156.94,
+       "baseline": 10785.71,
+       "reform": 11437.89,
        "change": 652.17,
        "group": "income",
        "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
@@ -2698,8 +2698,8 @@
         {
          "id": "salary_sacrifice_haircut",
          "label": "Pay cut for the salary sacrifice cap (current law)",
-         "baseline": -18.44,
-         "reform": -18.44,
+         "baseline": -17.28,
+         "reform": -17.28,
          "change": 0.0
         }
        ]
