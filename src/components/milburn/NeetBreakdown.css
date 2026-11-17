@@ -1,0 +1,58 @@
+/* NEET young people (Impact, Young people): the two groups side by side */
+.neet-breakdown td {
+  font-variant-numeric: tabular-nums;
+}
+
+.neet-breakdown .milburn-table tbody th {
+  min-width: 180px;
+}
+
+.neet-breakdown-figure {
+  display: block;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.neet-breakdown-withheld {
+  color: var(--c-tick);
+  font-weight: 400;
+}
+
+/* A share as a bar under its figure, on a shared 0 to 100% scale */
+.neet-breakdown-bar {
+  display: block;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 3px;
+  background: var(--c-muted-fill);
+  overflow: hidden;
+}
+
+.neet-breakdown-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--c-loss);
+}
+
+.neet-breakdown-count {
+  margin: 12px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--c-text);
+}
+
+.neet-breakdown-count a {
+  color: var(--c-gain-text);
+}
+
+.neet-breakdown .milburn-details ul {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  line-height: 1.5;
+  color: var(--c-text);
+}
+
+.neet-breakdown .milburn-details li + li {
+  margin-top: 6px;
+}

@@ -4,6 +4,7 @@ import { MeasureKeyProvider } from "./MeasureKey";
 import TrendCard from "./youngPeople/TrendCard";
 import MeasuresCard from "./youngPeople/MeasuresCard";
 import AgeChangeCard from "./age/AgeChangeCard";
+import NeetBreakdown from "./milburn/NeetBreakdown";
 import { SharesCard, YOUNG_PEOPLE_ANCHOR, useAgeImpactRows } from "./YoungPeopleSection";
 import { useNarrowViewport } from "../utils/chartTheme";
 import { isCatalogueRowDisplayable, useMeasureCatalogue } from "../utils/measureCatalogue";
@@ -101,6 +102,7 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
           </div>
         </section>
       </MeasureKeyProvider>
+      <NeetBreakdown selectedPolicies={selectedPolicies} />
       {POVERTY_FIGURES_SHOWN ? (
         <>
           <SectionHeading

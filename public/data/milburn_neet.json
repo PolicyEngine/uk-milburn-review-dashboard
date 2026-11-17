@@ -1,0 +1,58 @@
+{
+  "reform_id": "milburn_report_package",
+  "year": 2029,
+  "build": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+  "definition": "Aged 16 to 24 with no employment or self-employment income in the year and not recorded as in full-time education, under current law.",
+  "definition_notes": [
+    "A static estimate: the UC health element and PIP are removed with no replacement benefit modelled and no one moving into work.",
+    "The survey data has no NEET flag, so the group is approximated from earnings and the data's full-time education input.",
+    "The education input is true for everyone the data records as enrolled at any stage, so part-time students count as in education.",
+    "Earnings are for the whole year: someone out of work now who worked earlier in the year is not counted. A small number of people the data records as in approved training, or as working some hours with no earnings, are counted.",
+    "The ONS figure is a point-in-time Labour Force Survey estimate (April to June 2026) on its own definition; ours is a modelled population for the fiscal year shown. The two are not like for like.",
+    "Each person takes their household's change in net income, as in the dashboard's results by age. A household loses when its net income falls by more than 0.01% of its baseline.",
+    "A person personally loses a benefit when their own PIP falls, or they are the claimant with limited capability for work and work-related activity in a benefit unit whose UC health element falls. Each person is counted once.",
+    "Figures resting on fewer than 100 survey records are withheld."
+  ],
+  "min_records": 100,
+  "groups": {
+    "neet_approx": {
+      "records": 1997,
+      "population": 1072888,
+      "share_in_losing_households_pct": 19.41,
+      "people_in_losing_households": 208207,
+      "average_change_in_household_net_income": -2555.57,
+      "people_losing_uc_health_or_pip": 179654,
+      "people_losing_pip": 147338,
+      "people_losing_uc_health": 161645,
+      "records_losing_uc_health_or_pip": 340,
+      "share_losing_uc_health_or_pip_pct": 16.74
+    },
+    "other_16_24": {
+      "records": 12775,
+      "population": 6412041,
+      "share_in_losing_households_pct": 5.8,
+      "people_in_losing_households": 372157,
+      "average_change_in_household_net_income": -745.63,
+      "people_losing_uc_health_or_pip": 211833,
+      "people_losing_pip": 201464,
+      "people_losing_uc_health": 112040,
+      "records_losing_uc_health_or_pip": 389,
+      "share_losing_uc_health_or_pip_pct": 3.3
+    },
+    "all_16_24": {
+      "records": 14772,
+      "population": 7484929,
+      "share_in_losing_households_pct": 7.75,
+      "people_in_losing_households": 580365,
+      "average_change_in_household_net_income": -1005.06,
+      "people_losing_uc_health_or_pip": 391487,
+      "people_losing_pip": 348802,
+      "people_losing_uc_health": 273685,
+      "records_losing_uc_health_or_pip": 729,
+      "share_losing_uc_health_or_pip_pct": 5.23
+    }
+  },
+  "neet_approx_total": 1072888,
+  "neet_approx_share_of_16_24_pct": 14.3,
+  "ons_benchmark_id": "neet_16_24"
+}
