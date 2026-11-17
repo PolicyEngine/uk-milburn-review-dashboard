@@ -21,8 +21,8 @@ describe("display years", () => {
     expect(DISPLAY_YEARS).toEqual([2027, 2028, 2029, 2030, 2031]);
   });
 
-  it("default to 2027-28, the first shown", () => {
-    expect(DEFAULT_DISPLAY_YEAR).toBe(2027);
+  it("default to 2029-30, the first year of the report's welfare changes", () => {
+    expect(DEFAULT_DISPLAY_YEAR).toBe(2029);
     expect(DISPLAY_YEARS).toContain(DEFAULT_DISPLAY_YEAR);
   });
 
