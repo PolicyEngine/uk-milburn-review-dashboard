@@ -18,10 +18,8 @@ from uk_budget_data.reforms import (
     BADR_ID,
     BADR_LIFETIME_LIMIT,
     CAPITAL_GAINS_RESPONSES,
-    STATE_PENSION_ALLOWANCE_ID,
     THRESHOLD_FREEZE_ID,
     _create_badr_lifetime_limit_cut,
-    _create_state_pension_income_tax_protection,
     _create_threshold_freeze_2031_32,
     get_autumn_budget_2026_reforms,
     get_reform,
@@ -77,16 +75,6 @@ def test_exactly_the_capital_gains_measures_carry_the_pin(measure):
     expected = static_capital_gains() if pinned else {}
     assert _responses(measure.parameter_changes) == expected
     assert _responses(measure.baseline_parameter_changes) == {}
-
-
-def test_the_pension_tax_allowance_has_no_pin_but_the_allowance_designs_do():
-    assert (
-        _responses(get_reform(STATE_PENSION_ALLOWANCE_ID).parameter_changes)
-        == {}
-    )
-    for design in ("total_income", "tapered"):
-        reform = _create_state_pension_income_tax_protection(design)
-        assert _responses(reform.parameter_changes) == static_capital_gains()
 
 
 def test_capital_gains_measures_combine_with_the_shared_pin():

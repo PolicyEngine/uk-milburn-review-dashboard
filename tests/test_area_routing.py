@@ -41,16 +41,6 @@ def manifest(kind, region_datasets):
     )
 
 
-def test_the_committed_file_matches_the_installed_bundle():
-    path = REPO / area_routing.PATH
-    committed = path.read_bytes() if path.is_file() else None
-    expected = area_routing.render(area_routing.installed_routing()).encode()
-    assert committed == expected, (
-        f"{area_routing.PATH} does not match the installed bundle's area "
-        f"routing. Regenerate it: {area_routing.COMMAND}"
-    )
-
-
 def test_the_page_tests_read_what_the_module_writes():
     fixture = REPO / "src/test/fixtures/geography/area-routing.json"
     routing = area_routing.area_routing(

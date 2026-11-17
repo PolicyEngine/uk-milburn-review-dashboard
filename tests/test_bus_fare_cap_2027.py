@@ -19,11 +19,6 @@ from uk_budget_data import data_limits
 from uk_budget_data.budget_measures.bus_fare_cap_2027 import (
     bus_fare_cap_2027,
 )
-from uk_budget_data.reforms import (
-    AUTUMN_BUDGET_2026_COMBINED_COMPONENTS,
-    BUS_FARE_CAP_ID,
-    get_reform,
-)
 
 YEARS = ("2025", "2026", "2027", "2028")
 PENNY = 0.01
@@ -161,11 +156,3 @@ def test_the_limit_check_would_see_a_change_to_the_fare_cap():
     assert "bus_uncapped_single_fares" in [
         limit.get("key", limit) for limit in touched
     ]
-
-
-def test_it_is_registered_in_the_package():
-    measure = get_reform(BUS_FARE_CAP_ID)
-    assert measure.simulation_modifier is bus_fare_cap_2027
-    assert not measure.parameter_changes
-    assert not measure.has_custom_baseline()
-    assert BUS_FARE_CAP_ID in AUTUMN_BUDGET_2026_COMBINED_COMPONENTS

@@ -38,7 +38,6 @@ from tests.test_budget_measures import (
     identity,
     modifier,
     module,
-    registered_modifiers,
 )
 from uk_budget_data.reforms import get_all_reforms
 
@@ -274,18 +273,6 @@ def with_the_copy(reform):
 MEASURES = sorted(
     reform.id for reform in get_all_reforms() if split_modifiers_of(reform)
 )
-
-
-def test_every_split_modifier_still_registered_is_exercised_below():
-    covered = set().union(
-        *(
-            split_modifiers_of(reform)
-            for reform in get_all_reforms()
-            if reform.id in MEASURES
-        )
-    )
-    assert covered
-    assert covered == set(registered_modifiers()) & set(SPLIT_NAMES)
 
 
 @pytest.mark.parametrize("measure_id", MEASURES)

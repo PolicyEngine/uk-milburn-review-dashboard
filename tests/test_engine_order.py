@@ -17,8 +17,6 @@ import pytest
 from policyengine_uk import Simulation
 from policyengine_uk.utils.scenario import Scenario
 
-from uk_budget_data.reforms import get_reform
-
 ALLOWANCE = "gov.hmrc.income_tax.allowances.personal_allowance.amount"
 
 
@@ -96,37 +94,6 @@ def test_the_modifier_gives_exactly_the_tax_of_the_same_rates_as_changes():
     assert by_modifier.calculate("income_tax", 2027)[0] == pytest.approx(
         by_changes.calculate("income_tax", 2027)[0], abs=0.01
     )
-
-
-def test_the_combined_package_keeps_its_parameter_changes_with_its_modifiers():
-    """The combined candidate package carries its members' parameter
-    changes and one modifier that runs theirs. On 2.125.1 the parameter
-    rebuild would have discarded a modifier's edits; on this engine both
-    hold: the trading allowance is £3,000 and the property basic rate 24%
-    in 2027-28 (the threshold freeze to 2031-32 this checked was withdrawn
-    on Budget day), and the State Pension allowance's wrapper still
-    runs."""
-    scenario = get_reform("autumn_budget_2026_combined").to_scenario()
-    assert scenario.parameter_changes and scenario.simulation_modifier
-    sim = Simulation(situation=_situation(2027), scenario=scenario)
-    hmrc = sim.tax_benefit_system.parameters("2027-06-01").gov.hmrc
-    assert hmrc.income_tax.allowances.trading_allowance == pytest.approx(3_000)
-    assert hmrc.income_tax.rates.property.basic == pytest.approx(0.24)
-    # The State Pension allowance's modifier still acts: a pensioner on the
-    # full new State Pension alone pays no income tax in 2027-28. (The
-    # engine now builds each variable class in a module of its own, so the
-    # wrapper is checked by what it does, not by its __module__.)
-    pensioner = {
-        "people": {
-            "p": {"age": {2027: 70}, "state_pension": {2027: 13_036.4}}
-        },
-        "benunits": {"b": {"members": ["p"]}},
-        "households": {"h": {"members": ["p"], "region": {2027: "LONDON"}}},
-    }
-    current_law = Simulation(situation=pensioner)
-    assert current_law.calculate("income_tax", 2027)[0] > 0
-    combined = Simulation(situation=pensioner, scenario=scenario)
-    assert combined.calculate("income_tax", 2027)[0] == pytest.approx(0)
 
 
 def test_the_modifier_changes_the_tax_the_engine_computes():

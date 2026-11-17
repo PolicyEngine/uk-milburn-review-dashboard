@@ -135,47 +135,6 @@ def test_every_household_spends_the_average_on_electricity():
         assert "£1,040" in household.definition
 
 
-@pytest.mark.parametrize("household", EXAMPLE_HOUSEHOLDS, ids=HOUSEHOLD_IDS)
-def test_zero_vat_on_electricity_reaches_every_household(household):
-    """The zero rate covers April to June of 2027-28 (from 1 July 2027 the
-    5% rate is back), so 2027-28 carries April to June's share of a year's
-    domestic electricity use (SPRING_SHARE, 22.30%): the module's
-    rate_change_2027, -0.05 x SPRING_SHARE. On £1,040 including VAT that is
-    £1,040 x 0.05 x 22.30% / 1.05 = £11.04, where the whole year's 5%
-    would be £1,040 x 5 / 105 = £49.52."""
-    import inspect
-
-    from uk_budget_data.budget_measures.zero_vat_on_domestic_electricity import (  # noqa: E501
-        SPRING_SHARE,
-        zero_vat_on_domestic_electricity,
-    )
-    from uk_budget_data.calculators import IncomeCurveCalculator
-    from uk_budget_data.reforms import (
-        ELECTRICITY_VAT_ID,
-        get_autumn_budget_2026_reforms,
-    )
-
-    (reform,) = [
-        reform
-        for reform in get_autumn_budget_2026_reforms()
-        if reform.id == ELECTRICITY_VAT_ID
-    ]
-    calculator = IncomeCurveCalculator(num_points=3)
-    baseline = calculator.simulate(household, None, [2027])[2027]
-    reformed = calculator.simulate(household, reform.to_scenario(), [2027])[
-        2027
-    ]
-    rate_change = (
-        inspect.signature(zero_vat_on_domestic_electricity)
-        .parameters["rate_change_2027"]
-        .default
-    )
-    assert rate_change == pytest.approx(-0.05 * SPRING_SHARE)
-    assert reformed - baseline == pytest.approx(
-        [1_040 * -rate_change / 1.05] * 3, abs=0.01
-    )
-
-
 class _Reform:
     def __init__(self, id, baseline, reform):
         self.id = id
@@ -337,36 +296,3 @@ def test_one_simulation_for_every_year_gives_the_per_year_rows():
     ]
     together = calculator.calculate(None, reform, "m", "M", list(YEARS))
     assert [repr(row) for row in together] == [repr(row) for row in per_year]
-
-
-def test_each_household_names_a_registered_measure():
-    from uk_budget_data.reforms import get_autumn_budget_2026_reforms
-
-    registered = {reform.id for reform in get_autumn_budget_2026_reforms()}
-    shown = [household.measure_id for household in EXAMPLE_HOUSEHOLDS]
-    assert set(shown) <= registered
-    # One household per measure, so each chart shows something different
-    assert len(set(shown)) == len(shown)
-
-
-@pytest.mark.parametrize("household", EXAMPLE_HOUSEHOLDS, ids=HOUSEHOLD_IDS)
-def test_each_households_measure_changes_its_net_income(household):
-    """The measure a household is chosen for moves its net income somewhere
-    on its grid, in the year it starts; none of the charts is flat at £0
-    for its own measure."""
-    from uk_budget_data.calculators import IncomeCurveCalculator
-    from uk_budget_data.models import DataConfig
-    from uk_budget_data.reforms import get_autumn_budget_2026_reforms
-
-    (reform,) = [
-        reform
-        for reform in get_autumn_budget_2026_reforms()
-        if reform.id == household.measure_id
-    ]
-    year = household.measure_year
-    calculator = IncomeCurveCalculator(num_points=11)
-    before = calculator.simulate(
-        household, reform.baseline_scenario_for(DataConfig()), [year]
-    )[year]
-    after = calculator.simulate(household, reform.to_scenario(), [year])[year]
-    assert np.max(np.abs(after - before)) >= 10

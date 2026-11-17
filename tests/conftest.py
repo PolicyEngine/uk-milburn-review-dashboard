@@ -236,8 +236,8 @@ def pre_budget_registry(monkeypatch):
             reforms._create_employer_nics_secondary_threshold_raise,
         ),
     )
-    monkeypatch.setattr(reforms, "_AUTUMN_BUDGET_2026_REFORMS_CACHE", None)
+    monkeypatch.setattr(reforms, "_REFORMS_CACHE", None)
     monkeypatch.setattr(reforms, "_REFORM_LOOKUP_CACHE", None)
     yield
-    reforms._AUTUMN_BUDGET_2026_REFORMS_CACHE = None
+    reforms._REFORMS_CACHE = None
     reforms._REFORM_LOOKUP_CACHE = None

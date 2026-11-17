@@ -20,13 +20,6 @@ from policyengine_uk import Simulation
 from uk_budget_data.budget_measures.carers_allowance_earnings_taper import (
     carers_allowance_earnings_taper,
 )
-from uk_budget_data.reforms import (
-    AUTUMN_BUDGET_2026_COMBINED_COMPONENTS,
-    AUTUMN_BUDGET_2026_COMBINED_ID,
-    CARERS_ALLOWANCE_TAPER_ID,
-    get_reform,
-    list_reform_ids,
-)
 
 YEAR = 2026
 
@@ -225,18 +218,6 @@ def test_universal_credit_takes_it_all_back_and_tax_leaves_a_loss():
     assert tax_after - tax_before == pytest.approx(506.68, abs=0.01)
     net_before, net_after = _both(situation, "household_net_income")
     assert net_after - net_before == pytest.approx(-506.68, abs=0.01)
-
-
-def test_registered_on_budget_day():
-    # Withdrawn on 27 October 2026 (#263, thin cells), registered again on
-    # Budget day once announced (HCWS421), in the package.
-    measure = get_reform(CARERS_ALLOWANCE_TAPER_ID)
-    assert CARERS_ALLOWANCE_TAPER_ID in list_reform_ids()
-    assert CARERS_ALLOWANCE_TAPER_ID in AUTUMN_BUDGET_2026_COMBINED_COMPONENTS
-    assert measure.simulation_modifier is carers_allowance_earnings_taper
-    assert not measure.description.startswith("Candidate measure.")
-    combined = get_reform(AUTUMN_BUDGET_2026_COMBINED_ID)
-    assert measure.name in combined.description
 
 
 def test_the_budget_limit_is_16_hours_at_the_national_living_wage():

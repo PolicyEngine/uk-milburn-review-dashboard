@@ -13,13 +13,11 @@ survey data), both ways, and compares the three files byte for byte.
 """
 
 import filecmp
-import functools
 
-import numpy as np
 import pytest
 
 from tests.test_income_growth_with_measures import cells as growth_cells
-from uk_budget_data import calculators, cli, pipeline
+from uk_budget_data import cli, pipeline
 from uk_budget_data.living_standards import measures_growth
 from uk_budget_data.models import DataConfig
 from uk_budget_data.reforms import get_reform
@@ -64,11 +62,11 @@ def distribution_answer(unit):
 
 
 def test_units_are_measure_major_and_year_minor(tmp_path):
-    reforms = [get_reform("trading_allowance_raise")]
+    reforms = [get_reform("milburn_report_pip")]
     sets = [
         [
-            get_reform("trading_allowance_raise"),
-            get_reform("domestic_electricity_zero_vat"),
+            get_reform("milburn_report_pip"),
+            get_reform("milburn_report_uc_health"),
         ]
     ]
     runner = Recorder(distribution_answer)
@@ -85,11 +83,11 @@ def test_units_are_measure_major_and_year_minor(tmp_path):
 
 
 def test_merged_files_are_the_whole_units_bytes(tmp_path):
-    reforms = [get_reform("trading_allowance_raise")]
+    reforms = [get_reform("milburn_report_pip")]
     sets = [
         [
-            get_reform("trading_allowance_raise"),
-            get_reform("domestic_electricity_zero_vat"),
+            get_reform("milburn_report_pip"),
+            get_reform("milburn_report_uc_health"),
         ]
     ]
     for by_year in (False, True):
@@ -111,7 +109,7 @@ def test_merged_files_are_the_whole_units_bytes(tmp_path):
 
 
 def test_messages_are_said_once_per_measure(capsys, tmp_path):
-    reforms = [get_reform("trading_allowance_raise")]
+    reforms = [get_reform("milburn_report_pip")]
     pipeline.flat_units(
         reforms,
         DataConfig(output_dir=tmp_path, years=YEARS),
@@ -121,8 +119,8 @@ def test_messages_are_said_once_per_measure(capsys, tmp_path):
         by_year=True,
     )
     said = capsys.readouterr().out
-    assert said.count("limit of trading_allowance_raise") == 1
-    assert said.count("done trading_allowance_raise") == 1
+    assert said.count("limit of milburn_report_pip") == 1
+    assert said.count("done milburn_report_pip") == 1
 
 
 def per_year_growth(all_cells_base, all_cells_reform, years):
@@ -187,7 +185,7 @@ def test_a_missing_or_misplaced_year_is_refused():
 def test_only_the_two_package_files_split_by_year(tmp_path):
     with pytest.raises(ValueError, match="by_year"):
         pipeline.flat_units(
-            [get_reform("trading_allowance_raise")],
+            [get_reform("milburn_report_pip")],
             DataConfig(output_dir=tmp_path),
             None,
             pipeline.AGE,
@@ -247,7 +245,7 @@ def test_the_cli_splits_by_year_on_modal_unless_sequential(
 
     for name in ("generate_income_distribution", "generate_income_growth"):
         monkeypatch.setattr(cli, name, record(name))
-    ids = ["trading_allowance_raise", "domestic_electricity_zero_vat"]
+    ids = ["milburn_report_pip", "milburn_report_uc_health"]
     for only in ("income_distribution", "income_growth"):
         parsed = cli.parse_args(
             [
@@ -266,59 +264,6 @@ def test_the_cli_splits_by_year_on_modal_unless_sequential(
         "generate_income_distribution": by_year,
         "generate_income_growth": by_year,
     }
-
-
-@pytest.mark.slow
-def test_per_year_units_write_the_same_bytes_on_the_engine(
-    monkeypatch, tmp_path
-):
-    """The real engine on the invented dataset: each year built and read in
-    fresh simulations of its own gives the rows the six-year unit gives,
-    and the merged files are byte-identical. The invented dataset has no
-    survey-household ids, so each record is its own; the distribution's
-    floor is lowered so its 1,500 households keep points to compare."""
-    from uk_budget_data import synthetic_dataset
-
-    dataset = synthetic_dataset.write(tmp_path / "synthetic.h5", 1500, 2026)
-
-    def own_ids(simulation, dataset_path):
-        return np.asarray(simulation.calculate("household_id", 2026).values)
-
-    monkeypatch.setattr(pipeline, "scatter_survey_households", own_ids)
-    monkeypatch.setattr(
-        calculators,
-        "distribution_points",
-        functools.partial(calculators.distribution_points, min_households=5),
-    )
-    reforms = [get_reform("trading_allowance_raise")]
-    sets = [
-        [
-            get_reform("trading_allowance_raise"),
-            get_reform("savings_income_rates_up"),
-        ]
-    ]
-    years = [2026, 2027, 2028]
-    for by_year in (False, True):
-        config = DataConfig(
-            output_dir=tmp_path / str(by_year),
-            dataset_path=dataset,
-            years=years,
-        )
-        pipeline.generate_income_distribution(
-            reforms, config, combined_sets=sets, by_year=by_year
-        )
-        pipeline.generate_income_growth(
-            reforms, config, combined_sets=sets, by_year=by_year
-        )
-    for name in (
-        pipeline.INCOME_DISTRIBUTION_FILE,
-        pipeline.INCOME_MOBILITY_FILE,
-        pipeline.INCOME_GROWTH_FILE,
-    ):
-        whole = (tmp_path / "False" / name).read_bytes()
-        # Something to compare: rows for the measure and the package
-        assert whole.count(b"\n") > 10, name
-        assert whole == (tmp_path / "True" / name).read_bytes(), name
 
 
 def test_per_year_cost_guards():

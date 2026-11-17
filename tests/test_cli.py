@@ -34,12 +34,12 @@ class TestCLI:
             [
                 "generate",
                 "--reforms",
-                "household_energy_payment_2026",
-                "fuel_duty_rise_deferral",
+                "milburn_report_pip",
+                "milburn_report_uc_health",
             ]
         )
-        assert "household_energy_payment_2026" in args.reforms
-        assert "fuel_duty_rise_deferral" in args.reforms
+        assert "milburn_report_pip" in args.reforms
+        assert "milburn_report_uc_health" in args.reforms
 
     def test_parse_args_generate_years(self):
         """parse_args accepts years for generate."""
@@ -71,23 +71,23 @@ class TestReformSelection:
         from uk_budget_data.cli import get_reforms_from_ids
 
         reforms = get_reforms_from_ids(
-            ["household_energy_payment_2026", "fuel_duty_rise_deferral"]
+            ["milburn_report_pip", "milburn_report_uc_health"]
         )
         assert len(reforms) == 2
-        assert reforms[0].id == "household_energy_payment_2026"
-        assert reforms[1].id == "fuel_duty_rise_deferral"
+        assert reforms[0].id == "milburn_report_pip"
+        assert reforms[1].id == "milburn_report_uc_health"
 
     def test_get_reforms_from_ids_warns_unknown(self, capsys):
         """Warns about unknown reform IDs."""
         from uk_budget_data.cli import get_reforms_from_ids
 
         reforms = get_reforms_from_ids(
-            ["household_energy_payment_2026", "unknown_reform_xyz"]
+            ["milburn_report_pip", "unknown_reform_xyz"]
         )
 
         # Should only return the valid one
         assert len(reforms) == 1
-        assert reforms[0].id == "household_energy_payment_2026"
+        assert reforms[0].id == "milburn_report_pip"
 
 
 class TestLegacyGeographyFlag:
