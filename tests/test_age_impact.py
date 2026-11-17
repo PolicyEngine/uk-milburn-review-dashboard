@@ -189,7 +189,8 @@ def test_calculate_reads_the_simulations():
     assert everyone["mean_change"] == pytest.approx(-325)
 
 
-def test_only_age_impact_writes_one_file(tmp_path, monkeypatch):
+@pytest.mark.parametrize("milburn", [False, True])
+def test_only_age_impact_writes_one_file(tmp_path, monkeypatch, milburn):
     """``generate --only age_impact`` builds the runs and writes only
     age_impact.csv, for every reform and year asked for."""
     from uk_budget_data import cli, pipeline
@@ -200,8 +201,22 @@ def test_only_age_impact_writes_one_file(tmp_path, monkeypatch):
     def build(dataset_path, scenario=None):
         built.append(scenario)
         if len(built) % 2:
-            return _FakeSimulation([18_000, 50_000], [800, 9_000])
-        return _FakeSimulation([18_200, 49_500], [600, 9_000])
+            sim = _FakeSimulation([18_000, 50_000], [800, 9_000])
+        else:
+            sim = _FakeSimulation([18_200, 49_500], [600, 9_000])
+        if milburn:
+            sim.local_build = {"label": "synthetic"}
+            sim.map_result = map_households
+        return sim
+
+    def map_households(ids, source, target):
+        assert (source, target) == ("household", "person")
+        assert list(ids) == [10, 20]
+        return ids  # One household per person in this synthetic population.
+
+    monkeypatch.setattr(
+        pipeline, "scatter_survey_households", lambda *_: [10, 20]
+    )
 
     monkeypatch.setattr(pipeline, "build_microsimulation", build)
     # Stand-in simulations have no tax-benefit system to check limits on
@@ -236,6 +251,13 @@ def test_only_age_impact_writes_one_file(tmp_path, monkeypatch):
     ]
     assert (tmp_path / "winners_losers.csv").read_text() == "untouched\n"
     frame = pd.read_csv(tmp_path / "age_impact.csv")
+    if milburn:
+        assert (
+            frame["mean_change_better_off"].isna().all()
+        )  # One contributing household.
+        assert frame["mean_change_worse_off"].isna().all()
+    else:
+        assert "mean_change_worse_off" not in frame
     assert set(frame["reform_id"]) == {"a", "b"}
     assert set(frame["year"]) == {2026, 2027}
     # 16-24, 35-49 and all, for two reforms and two years

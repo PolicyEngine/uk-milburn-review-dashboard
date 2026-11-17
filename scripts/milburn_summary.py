@@ -53,7 +53,12 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     column = "mean_change_better_off" if gains else "mean_change_worse_off"
     raw = young.get(column)
     conditional = float(raw) if raw else None
-    if conditional is not None and not math.isfinite(conditional):
+    if conditional is not None and (
+        not math.isfinite(conditional)
+        or not share
+        or (conditional > 0) != gains
+        or conditional == 0
+    ):
         raise ValueError(f"{rid}: invalid {column}")
     out = {
         "id": rid,
