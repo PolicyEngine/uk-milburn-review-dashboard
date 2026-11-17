@@ -26,7 +26,7 @@ Public repository. Figures are PolicyEngine UK static microsimulation estimates 
 | Measures | Each modelled measure, and the report's proposals we cannot compute, with the reason |
 | Methodology | Data, model, what is modelled, limitations |
 
-Every PolicyEngine figure is labelled "PolicyEngine estimate"; published figures carry their source. Each person counts their whole household's change, so ages outside a measure's target change only through shared households.
+Every PolicyEngine figure is labelled "PolicyEngine estimate"; published figures carry their source. Each person counts their whole household's change, so ages outside a measure's target change only through shared households. The average gain or loss among affected 16–24s weights each young person in the relevant group by their survey weight. This figure appears only when the run records the mean for that group and clears the survey household disclosure floor. Earlier runs retain their headcounts and fiscal estimates.
 
 ## The measures
 
