@@ -966,7 +966,7 @@ MILBURN_POLICY_DETAILS.push({
     { label: "Report", icon: "file", text: "Proposes a five-year glide path, when fiscal conditions allow; end state shown." },
   ],
   affects: "21 to 24-year-olds in retail and hospitality and their employers",
-  starts: "End state",
+  starts: "Apr 2027, at £10,000",
   inForce: { from: "2027-04" },
   type: "National Insurance",
   details: [
