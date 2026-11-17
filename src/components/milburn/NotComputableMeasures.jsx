@@ -59,7 +59,12 @@ export default function NotComputableMeasures({ measures: given }) {
         title={NOT_COMPUTABLE_TITLE}
         subtitle="Listed with the reason; no estimate is shown for them anywhere on this dashboard."
       />
-      <div className="report-section policy-details-content">
+      {/* Folded by default (Vahid, 17 Nov): one line with the count */}
+      <details className="report-section policy-details-content not-computable-details">
+        <summary className="not-computable-summary">
+          <span className="not-computable-chevron" aria-hidden="true">▸</span>
+          Show the {measures.length} proposals we cannot compute
+        </summary>
         <ul className="policy-cards">
           {measures.map((measure) => (
             <PolicyCard
@@ -86,7 +91,7 @@ export default function NotComputableMeasures({ measures: given }) {
             />
           ))}
         </ul>
-      </div>
+      </details>
     </section>}
     </>
   );
