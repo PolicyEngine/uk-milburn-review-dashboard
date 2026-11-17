@@ -66,12 +66,39 @@ function builtChartFiles(): string[] {
   }
 }
 
+// The zone's public address on policyengine.org (next.config.ts basePath).
+// Canonical and social URLs resolve against metadataBase. The card image is
+// public/assets/milburn-review-og.png (drawn by scripts/og-image.jsx), given
+// in full under the base path, which metadata URLs do not get on their own.
+const SITE = 'https://www.policyengine.org';
+const PAGE_PATH = '/uk/milburn-review';
+const IMAGE = {
+  url: `${PAGE_PATH}/assets/milburn-review-og.png`,
+  width: 1200,
+  height: 630,
+  alt: 'Milburn review: young people and work. PolicyEngine UK',
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE),
   title: TITLE,
   description: DESCRIPTION,
-  // A local review build: kept out of search engines (next.config.ts sends
-  // X-Robots-Tag too)
-  robots: { index: false, follow: false },
+  alternates: { canonical: PAGE_PATH },
+  openGraph: {
+    type: 'website',
+    siteName: 'PolicyEngine',
+    locale: 'en_GB',
+    url: PAGE_PATH,
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [IMAGE],
+  },
 };
 
 export const viewport: Viewport = {

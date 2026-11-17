@@ -49,12 +49,10 @@ function dataRoute(): string {
 // server's .next is untouched.
 const artifactExport = process.env.ARTIFACT_EXPORT === '1';
 
-const basePath = artifactExport
-  ? ''
-  : process.env.NEXT_PUBLIC_BASE_PATH !== undefined
-  ? process.env.NEXT_PUBLIC_BASE_PATH
-  : '/uk/milburn-review';
-
+// The zone's path on policyengine.org, fixed: the page, its canonical and
+// its Open Graph image (src/app/layout.tsx) are all under it. The artifact
+// export alone has none.
+const basePath = artifactExport ? '' : '/uk/milburn-review';
 
 // The Household impact tab's API URL is baked in at build time: fail every
 // build that has it in the wrong form; without it, warn and show the stored
@@ -74,9 +72,6 @@ const nextConfig: NextConfig = {
   // recharts and d3 ship CJS interop and rely on browser globals; transpiling
   // them through Next's pipeline avoids ESM/CJS mismatch errors during build.
   transpilePackages: ['recharts', 'd3'],
-  // An artifact directory is named by its digest and never changes once
-  // written, so the browser may keep its files; the page still checks every
-  // byte against the manifest, which is always fetched fresh
   // The bare origin (http://localhost:3100) has no page under a base path;
   // send it to the dashboard rather than a 404.
   async redirects() {
@@ -84,21 +79,6 @@ const nextConfig: NextConfig = {
     return basePath
       ? [{ source: '/', destination: basePath, basePath: false, permanent: false }]
       : [];
-  },
-  async headers() {
-    if (artifactExport) return [];
-    return [
-      // A local review build: not for search engines (the page's robots
-      // meta says the same)
-      {
-        source: '/:path*',
-        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
-      },
-      {
-        source: '/data/artifacts/:path*',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-      },
-    ];
   },
   turbopack: {
     root: process.cwd(),
