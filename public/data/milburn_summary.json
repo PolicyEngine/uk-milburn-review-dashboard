@@ -180,6 +180,32 @@
       }
     },
     {
+      "id": "milburn_report_employer_nics_threshold",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": -0.219,
+        "2028": -0.22,
+        "2029": -0.221,
+        "2030": -0.222,
+        "2031": -0.213
+      },
+      "direction": "gain",
+      "young_people_in_losing_households": 765656,
+      "share_of_16_24_in_losing_households_pct": 10.23,
+      "average_loss_young_person_in_losing_household": -487,
+      "everyone_in_losing_households_pct": 0.0,
+      "poverty_change_pp": {
+        "rel_bhc": 0.001,
+        "rel_ahc": -0.004,
+        "abs_bhc": -0.003,
+        "abs_ahc": -0.012
+      },
+      "people_into_poverty_abs_ahc": -8279,
+      "people_into_poverty_rel_ahc": -2821,
+      "child_poverty_change_pp_rel_ahc": 0.0,
+      "people_directly_affected": 483205
+    },
+    {
       "id": "milburn_report_package",
       "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
       "saving_bn": {
