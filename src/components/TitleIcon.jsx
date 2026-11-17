@@ -335,6 +335,7 @@ const ICONS = {
   check: <path d="M20 6 9 17l-5-5" />,
   plus: <path d="M5 12h14M12 5v14" />,
   arrowRight: <path d="M5 12h14M13 6l6 6-6 6" />,
+  chevronRight: <path d="m9 6 6 6-6 6" />,
   help: (
     <>
       <circle cx="12" cy="12" r="9" />

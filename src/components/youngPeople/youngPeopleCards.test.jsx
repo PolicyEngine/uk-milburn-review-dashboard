@@ -283,10 +283,10 @@ describe("young people cards", () => {
     const description = document.querySelector(".young-people-trend .chart-description");
     expect(description.querySelector("strong")).toBeNull();
     expect(description).toHaveTextContent(
-      /^16 to 24-year-olds gain about £30 a person in 2028-29( and lose about £230 from 2029-30, when the [\w ]+ applies)?\. Other ages change only because they share a household with someone in the targeted ages\.$/,
+      /^16 to 24-year-olds gain about £30 a person in 2028-29( and lose about £230 from 2029-30, when the [\w ]+ applies)?\.$/,
     );
-    // Then, on its own line, why ages no measure targets change
-    expect(description.querySelector("[data-age-household-note]")).not.toBeNull();
+    // Why other ages change is said once on the view, on the first age card, not on this one
+    expect(description.querySelector("[data-age-household-note]")).toBeNull();
     expect(description).not.toHaveTextContent(/£ a year/);
   });
 

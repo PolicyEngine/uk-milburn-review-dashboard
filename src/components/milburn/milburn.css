@@ -285,14 +285,24 @@
   align-items: center;
   gap: 6px;
   margin: 0;
-  padding: 4px 10px;
+  padding: var(--chip-pad);
   border: 1px solid var(--c-grid);
   border-radius: 999px;
   background: var(--c-surface);
   color: var(--c-text);
   font-size: var(--fs-caption);
   font-weight: 500;
-  line-height: 1.4;
+  line-height: var(--chip-line);
+}
+
+/* One size for every chip in a row: status, year-only, source and source-link chips */
+.milburn-status-chip,
+.source-chip,
+.source-link-chip {
+  --chip-pad: 3px 10px;
+  --chip-line: 1.4;
+  box-sizing: border-box;
+  min-height: 26px;
 }
 
 .milburn-status-chip > span[aria-hidden],
@@ -718,13 +728,6 @@
   color: var(--c-notice-text);
 }
 
-.milburn-assumption-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
 .milburn-assumption-text {
   margin: 0;
   color: var(--c-text);
@@ -737,18 +740,16 @@
   font-weight: 500;
 }
 
-.milburn-assumption-year {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  color: var(--c-subtab-muted);
-  font-size: var(--fs-caption);
-}
-
 /* The 2027-28-only chip elsewhere: room above the cards it sits over */
 .milburn-year-only {
   margin: 4px 0 20px;
+}
+
+/* Beside a box's heading it is one chip in the row, with no margin of its own */
+.milburn-key-heading .milburn-year-only {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--c-text);
 }
 
 /* Return to work: this dashboard's scenario beside the review's own estimate (ReviewComparison) */
@@ -782,12 +783,12 @@
   align-items: center;
   gap: 5px;
   flex: none;
-  padding: 2px 9px;
+  padding: var(--chip-pad);
   border: 1px solid var(--c-grid);
   border-radius: 999px;
   font-size: var(--fs-caption);
-  font-weight: 600;
-  line-height: 1.5;
+  font-weight: 500;
+  line-height: var(--chip-line);
   white-space: nowrap;
 }
 
@@ -807,15 +808,48 @@
   color: var(--c-axis-title);
 }
 
-/* Under a sub-tab's heading: its charts are PolicyEngine estimates */
-.source-note {
-  display: flex;
-  flex-wrap: wrap;
+/* Where a published figure comes from: one compact chip-link, source and date (SourceLinkChip) */
+.source-link-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 6px 10px;
-  margin: 0 0 16px;
-  font-size: var(--fs-small);
+  gap: 5px;
+  max-width: 100%;
+  min-width: 0;
+  padding: var(--chip-pad);
+  border: 1px solid var(--c-grid);
+  border-radius: 999px;
+  background: var(--c-surface);
   color: var(--c-axis-title);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  line-height: var(--chip-line);
+  text-decoration: none;
+}
+
+.source-link-chip > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+}
+
+.source-link-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-link-chip.is-link {
+  color: var(--c-gain-text);
+}
+
+.source-link-chip.is-link:hover {
+  border-color: var(--c-gain);
+  background: var(--c-hover);
+}
+
+.source-link-chip.is-link:focus-visible {
+  outline: 2px solid var(--c-gain-text);
+  outline-offset: 2px;
 }
 
 /* The age charts' line on why other ages change */
@@ -923,4 +957,52 @@
   background: none;
   font: inherit;
   color: inherit;
+}
+
+/* Measures: the proposals we cannot compute, folded at first */
+.not-computable-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--c-grid);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+
+.not-computable-summary::-webkit-details-marker {
+  display: none;
+}
+
+.not-computable-summary:hover {
+  border-color: var(--c-gain);
+}
+
+.not-computable-summary:focus-visible {
+  outline: 2px solid var(--c-gain);
+  outline-offset: 2px;
+}
+
+.not-computable-chevron {
+  display: inline-block;
+  transition: transform 150ms ease-out;
+}
+
+.not-computable-details[open] .not-computable-chevron {
+  transform: rotate(90deg);
+}
+
+.not-computable-details[open] > .policy-cards {
+  margin-top: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .not-computable-chevron {
+    transition: none;
+  }
 }

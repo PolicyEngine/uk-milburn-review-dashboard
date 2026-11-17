@@ -34,6 +34,7 @@ import { provisionalNotice } from "./utils/publication/manifest";
 import { reportCopy } from "./utils/milburn/reportStatus";
 import { isLocalBuildRoute, localBuildNotice } from "./utils/milburn/localBuild";
 import LocalBuildLabel from "./components/milburn/LocalBuildLabel";
+import HouseholdExamples from "./components/milburn/HouseholdExamples";
 import { milburnDefaultMeasure } from "./utils/milburn/measureGroups";
 import { DownloadContext, policiesLabel } from "./utils/downloadContext";
 import { OPEN_VIEW_EVENT } from "./utils/methodLink";
@@ -992,7 +993,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           <SectionHeading
             icon="lifebuoy"
             title="How the policies change poverty"
-            subtitle="Change in poverty rates with the selected policies. Static."
+            subtitle="Change in poverty rates with the selected policies."
           />
           <PovertyHeadline runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} />
           {/* The change by year beside which measures move it */}
@@ -1018,7 +1019,6 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
             <div className="results-container milburn-key-wrap">
               <KeyFigures
                 runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined}
-                nameShownAbove={selectedPolicies.length === 1 && selectedPolicies.length < POLICIES.length}
               />
             </div>
           )}
@@ -1178,6 +1178,8 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         ) : value === "policies" ? (
           // Every published measure's card, whatever the band's selection
           <div className="results-container">
+            {/* Typical young people under current law and the report's runs (household calculations) */}
+            <HouseholdExamples />
             <SectionHeading
               icon="fileText"
               title="Measures we model"

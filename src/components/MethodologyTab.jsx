@@ -320,8 +320,8 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
           title="Model and measures"
           summary={
             <>
-              policyengine-uk {POLICYENGINE_UK_VERSION} and policyengine-core {POLICYENGINE_CORE_VERSION}, run
-              directly on that build: {REPLICATION_LINE}.
+              policyengine-uk {POLICYENGINE_UK_VERSION} (certified in policyengine {POLICYENGINE_VERSION}) and policyengine-core{" "}
+              {POLICYENGINE_CORE_VERSION}, run directly on that build.
             </>
           }
         >

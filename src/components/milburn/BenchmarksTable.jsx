@@ -20,7 +20,9 @@ import {
   figureShare,
   parseBenchmarks,
   splitValue,
+  valueParts,
 } from "../../utils/milburn/benchmarks";
+import { SourceLinkChip, shortSource } from "./SourceChip";
 import { usePackageTable } from "../../utils/milburn/packageRun";
 import "./milburn.css";
 import "./BenchmarksTable.css";
@@ -65,57 +67,65 @@ function useBenchmarksFile() {
   return state;
 }
 
-/** A figure's one-line notes, each behind its own icon; the file's full wording is the line's tooltip. */
-function Notes({ items }) {
-  const shown = items.filter((item) => item.text);
-  if (shown.length === 0) return null;
+/** A note that only names the figure's source again ("Resolution Foundation analysis" beside a Resolution Foundation chip). */
+export function repeatsSource(note, source) {
+  const words = String(note || "").trim().toLowerCase();
+  if (!words) return true;
+  const names = [source, shortSource(source)].map((name) => String(name || "").trim().toLowerCase()).filter(Boolean);
+  return names.some((name) => words.startsWith(name) && !/[:;]/.test(words));
+}
+
+/** The one note a card carries: what the figure's wording adds after its number, else its basis, unless that only repeats the source. */
+function cardNote(row, published, short) {
+  if (published.note) return published.note;
+  const basis = short.basis ?? row.basis;
+  return repeatsSource(basis, row.source) ? "" : basis;
+}
+
+/** A build label without its build id: "PolicyEngine, build fcfac709, 2029-30" as "2029-30". */
+export const oursLabel = (label) => String(label || "").replace(/^PolicyEngine, build [^,]+,\s*/, "");
+
+/** A figure as worded, its number large and the qualifier after it ("in 2036-37", "a year") small beside it. */
+function Value({ value }) {
+  const { main, qualifier } = valueParts(value);
   return (
-    <ul className="bm-notes">
-      {shown.map((item) => (
-        <li key={`${item.icon}-${item.text}`} title={item.full || item.text}>
-          <TitleIcon name={item.icon} bare size={13} />
-          <span>{item.text}</span>
-        </li>
-      ))}
-    </ul>
+    <span className="bm-value">
+      <span className="bm-value-main">{main}</span>
+      {qualifier && (
+        <>
+          {" "}
+          <span className="bm-qualifier">{qualifier}</span>
+        </>
+      )}
+    </span>
   );
 }
 
-/** Where a figure comes from, as chips: the source (a link), its date, a press-report badge and the PolicyEngine build. */
-function SourceChips({ row, build }) {
-  if (!row.source && !row.date && !row.pressReport && !build) return null;
+/** A card's one muted note line; the file's full wording is its tooltip. */
+function Note({ text, full }) {
+  if (!text) return null;
   return (
-    <p className="bm-chips">
-      {row.source &&
-        (row.url ? (
-          <a className="bm-chip is-link" href={row.url} target="_blank" rel="noopener noreferrer" title={row.source}>
-            <TitleIcon name="link" bare size={12} />
-            <span className="bm-chip-text">{row.source}</span>
-            <TitleIcon name="externalLink" bare size={11} />
-            <span className="visually-hidden"> (opens in a new tab)</span>
-          </a>
-        ) : (
-          <span className="bm-chip">
-            <TitleIcon name="fileText" bare size={12} />
-            <span className="bm-chip-text">{row.source}</span>
-          </span>
-        ))}
-      {row.date && (
-        <span className="bm-chip is-plain">
-          <TitleIcon name="calendar" bare size={12} />
-          {row.date}
-        </span>
-      )}
+    <p className="bm-note" title={full || text}>
+      {text}
+    </p>
+  );
+}
+
+/** A card's last line: the source and its date as one chip-link, a press-report badge, and what our own figure is. */
+function Foot({ row, ours, oursFull }) {
+  if (!row.source && !row.date && !row.pressReport && !ours) return null;
+  return (
+    <p className="bm-foot">
+      <SourceLinkChip source={row.source} url={row.url} date={row.date} />
       {row.pressReport && (
-        <span className="bm-chip is-press">
+        <span className="bm-press">
           <TitleIcon name="newspaper" bare size={12} />
           Press report
         </span>
       )}
-      {build && (
-        <span className="bm-chip is-build">
-          <TitleIcon name="calculator" bare size={12} />
-          {build}
+      {ours && (
+        <span className="bm-ours" title={oursFull || undefined}>
+          Ours: {ours}
         </span>
       )}
     </p>
@@ -163,43 +173,30 @@ function ComparePanel({ row, comparison, year }) {
   const labelRoom = Math.ceil(Math.max(...bars.map((bar) => tickTextWidth(bar.text, 12)))) + 12;
   return (
     <li className="bm-compare" data-benchmark={row.id}>
-      <div className="bm-compare-head">
-        <h4 title={row.figure}>
-          <TitleIcon name={short.icon ?? BENCHMARK_ICON} />
-          <span className="title-text">{title}</span>
-        </h4>
-        {differentBasis ? (
-          <p className="bm-gap" data-different-basis="">
-            <TitleIcon name="scale" bare size={13} />
-            <span>Not like for like: {differentBasis}</span>
-          </p>
-        ) : (
-          <p className="bm-gap">
-            <TitleIcon name={Math.abs(gap) < 0.005 ? "equal" : gap < 0 ? "arrowDown" : "arrowUp"} bare size={13} />
-            <span>
-              PolicyEngine is <strong>{gapText(gap)}</strong>
-            </span>
-          </p>
-        )}
-      </div>
-      <dl className="bm-pair">
-        <div className="bm-pair-figure">
-          <dt>
-            <span className="bm-swatch is-published" aria-hidden="true" />
-            Published
-          </dt>
-          <dd>{published.value}</dd>
-        </div>
-        <div className="bm-pair-figure is-estimate">
-          <dt>
-            <span className="bm-swatch is-estimate" aria-hidden="true" />
-            PolicyEngine estimate
-          </dt>
-          <dd>{row.estimate.fixed}</dd>
-        </div>
-      </dl>
+      <h4 title={row.figure}>
+        <TitleIcon name={short.icon ?? BENCHMARK_ICON} />
+        <span className="title-text">{title}</span>
+      </h4>
+      {/* One verdict: how the two differ, or the gap where they count the same thing */}
+      {differentBasis ? (
+        <p className="bm-verdict" data-different-basis="">
+          <TitleIcon name="scale" bare size={14} />
+          <span>Not like for like: {differentBasis}</span>
+        </p>
+      ) : (
+        <p className="bm-verdict">
+          <TitleIcon name={Math.abs(gap) < 0.005 ? "equal" : gap < 0 ? "arrowDown" : "arrowUp"} bare size={14} />
+          <span>
+            {Math.abs(gap) < 10 ? "Close: " : ""}PolicyEngine is <strong>{gapText(gap)}</strong>
+          </span>
+        </p>
+      )}
+      {/* The chart is hidden from screen readers: both figures in words */}
+      <p className="visually-hidden">
+        Published: <span>{published.value}</span>. PolicyEngine estimate: <span>{row.estimate.fixed}</span>.
+      </p>
       <div className="chart-plot bm-compare-plot" aria-hidden="true">
-        <ResponsiveContainer width="100%" height={128}>
+        <ResponsiveContainer width="100%" height={112}>
           <BarChart data={bars} layout="vertical" margin={{ top: 4, right: labelRoom, left: 0, bottom: 0 }} barCategoryGap="24%">
             <CartesianGrid {...GRID_PROPS} vertical horizontal={false} />
             <XAxis
@@ -222,14 +219,8 @@ function ComparePanel({ row, comparison, year }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <Notes
-        items={[
-          { icon: "pin", text: published.note },
-          { icon: "book", text: short.basis ?? row.basis, full: row.basis },
-          { icon: "calculator", text: short.estimateBasis ?? row.estimate.basis, full: row.estimate.basis },
-        ]}
-      />
-      <SourceChips row={row} build={row.estimate.label} />
+      <Note text={cardNote(row, published, short)} full={row.basis} />
+      <Foot row={row} ours={oursLabel(row.estimate.label)} oursFull={row.estimate.basis} />
     </li>
   );
 }
@@ -269,9 +260,9 @@ function SharePictogram({ share }) {
 }
 
 /**
- * One figure with no comparable pair as a stat tile: its icon, the figure
- * (published, or PolicyEngine's alone), a small graphic where its wording
- * is a range or a share, its notes and its source.
+ * One figure with no comparable pair as a stat tile: its icon beside the
+ * figure (published, or PolicyEngine's alone), its one-line title, a small
+ * graphic where its wording is a range or a share, one note and its source.
  */
 function StatTile({ row, estimate, yearLabel }) {
   const short = BENCHMARK_SHORT[row.id] ?? {};
@@ -279,57 +270,62 @@ function StatTile({ row, estimate, yearLabel }) {
   const hasEstimate = Boolean(row.estimate?.fixed) || estimate !== null;
   const range = figureRange(published.value);
   const share = figureShare(published.value);
+  const estimateKicker = (
+    <span className="bm-kicker">
+      <TitleIcon name="calculator" bare size={12} /> PolicyEngine estimate{!row.estimate?.fixed && yearLabel ? `, ${yearLabel}` : ""}
+    </span>
+  );
+  const estimateValue = hasEstimate ? <Value value={row.estimate.fixed || thousands(estimate)} /> : null;
+  // What our own figure is, on the last line: its short basis, else its year
+  const ours = hasEstimate ? short.estimateBasis ?? (row.estimate.fixed ? oursLabel(row.estimate.label) : row.estimate.label) : "";
   return (
     <li className={`bm-tile${published.value ? "" : " is-estimate"}`} data-benchmark={row.id}>
-      <span className="bm-tile-icon" aria-hidden="true">
-        <TitleIcon name={short.icon ?? BENCHMARK_ICON} bare size={20} />
-      </span>
-      <h4 title={row.figure}>{short.label ?? row.figure}</h4>
-      <div className="bm-tile-figures">
-        {published.value && (
+      <div className="bm-tile-head">
+        <span className="bm-tile-icon" aria-hidden="true">
+          <TitleIcon name={short.icon ?? BENCHMARK_ICON} bare size={20} />
+        </span>
+        {published.value ? (
           <p className="bm-figure">
-            <span className="bm-kicker">
-              <TitleIcon name="fileText" bare size={12} /> Published
-            </span>
-            <span className="bm-value">{published.value}</span>
+            {/* Whose figure, only where the tile carries two */}
+            {hasEstimate && (
+              <span className="bm-kicker">
+                <TitleIcon name="fileText" bare size={12} /> Published
+              </span>
+            )}
+            <Value value={published.value} />
           </p>
-        )}
-        {hasEstimate && (
-          <p className="bm-figure is-estimate">
-            <span className="bm-kicker">
-              <TitleIcon name="calculator" bare size={12} />{" "}
-              {row.estimate.fixed ? "PolicyEngine estimate" : `PolicyEngine estimate${yearLabel ? `, ${yearLabel}` : ""}`}
-            </span>
-            <span className="bm-value">{row.estimate.fixed || thousands(estimate)}</span>
-          </p>
+        ) : (
+          hasEstimate && (
+            <p className="bm-figure is-estimate">
+              {estimateKicker}
+              {estimateValue}
+            </p>
+          )
         )}
       </div>
+      <h4 title={row.figure}>{short.label ?? row.figure}</h4>
+      {published.value && hasEstimate && (
+        <p className="bm-figure is-estimate is-second">
+          {estimateKicker}
+          {estimateValue}
+        </p>
+      )}
       {range && <RangeBars points={range} />}
       {share && <SharePictogram share={share} />}
-      <Notes
-        items={[
-          { icon: "pin", text: published.note },
-          { icon: "book", text: short.basis ?? row.basis, full: row.basis },
-          hasEstimate
-            ? {
-                icon: "calculator",
-                text: short.estimateBasis ?? (row.estimate.basis || (row.estimate.fixed ? "" : row.estimate.label)),
-                full: row.estimate.basis || row.estimate.label,
-              }
-            : { icon: "calculator", text: "" },
-        ]}
-      />
-      <SourceChips row={row} build={hasEstimate && row.estimate.fixed ? row.estimate.label : ""} />
+      <Note text={published.value ? cardNote(row, published, short) : ""} full={row.basis} />
+      <Foot row={row} ours={ours} oursFull={row.estimate?.basis || row.estimate?.label} />
     </li>
   );
 }
 
 /**
  * Population impact's Benchmarks sub-tab: published figures on young
- * people and work. A figure PolicyEngine has a comparable number for is a
- * comparison chart (two bars in the pair's own unit, with the gap as a %);
- * every other figure is a stat tile under its theme, with its basis, source
- * and date, and a PolicyEngine estimate where the results have one.
+ * people and work, in sections named for the question each answers. A
+ * figure PolicyEngine has a comparable number for is a comparison chart
+ * (two bars in the pair's own unit, with one verdict line); every other
+ * figure is a stat tile, with one note, its source and date, and a
+ * PolicyEngine estimate where the results have one. Build ids are in the
+ * folded notes.
  */
 export default function BenchmarksTable() {
   const catalogue = useMeasureCatalogue();
@@ -353,63 +349,51 @@ export default function BenchmarksTable() {
   } else {
     const { data } = file;
     const yearLabel = data.year === null ? "" : fiscalYearTick(data.year);
-    const pairs = data.rows.map((row) => ({ row, comparison: comparisonFor(row) })).filter((pair) => pair.comparison);
-    const paired = new Set(pairs.map((pair) => pair.row.id));
-    const groups = benchmarkGroups(data.rows.filter((row) => !paired.has(row.id)));
+    const comparisons = new Map(data.rows.map((row) => [row.id, comparisonFor(row)]));
+    const groups = benchmarkGroups(data.rows);
+    // The builds our fixed figures come from, once, in the folded notes
+    const builds = [...new Set(data.rows.map((row) => (row.estimate?.fixed ? row.estimate.label : "")).filter(Boolean))];
     body = (
       <section className="report-section bm" aria-label="Benchmarks">
-        <p className="milburn-label" role="note">
-          <TitleIcon name="alert" bare size={14} />
-          <span>Published figures, each with its own definition and date. PolicyEngine estimates are context, not a check.</span>
-        </p>
-        {pairs.length > 0 && (
-          <div className="charts-stack">
-            <div className="bm-compare-card">
-              <div className="chart-header">
-                <div>
-                  <h3>
-                    <TitleIcon name="hbars" />
-                    <span className="title-text">Published figures beside PolicyEngine estimates</span>
-                  </h3>
-                  <p className="chart-description">
-                    Each pair on its own scale from zero. Where the two count the same thing, the gap is the PolicyEngine estimate against the published figure; where they count different things, as each basis line says, no gap is given.
-                  </p>
-                </div>
+        {groups.map((group) => {
+          const pairs = group.rows.filter((row) => comparisons.get(row.id));
+          const tiles = group.rows.filter((row) => !comparisons.get(row.id));
+          return (
+            <div key={group.key} className="bm-group" data-section={group.key}>
+              <div className="bm-group-head">
+                <h3>
+                  <TitleIcon name={group.icon} />
+                  <span className="title-text">{group.title}</span>
+                </h3>
+                <p>{group.intro}</p>
               </div>
-              <ul className="bm-compare-grid">
-                {pairs.map(({ row, comparison }) => (
-                  <ComparePanel key={row.id} row={row} comparison={comparison} year={data.year} />
-                ))}
-              </ul>
+              {pairs.length > 0 && (
+                <ul className="bm-compare-grid">
+                  {pairs.map((row) => (
+                    <ComparePanel key={row.id} row={row} comparison={comparisons.get(row.id)} year={data.year} />
+                  ))}
+                </ul>
+              )}
+              {tiles.length > 0 && (
+                <ul className="bm-tiles">
+                  {tiles.map((row) => (
+                    <StatTile
+                      key={row.id}
+                      row={row}
+                      yearLabel={yearLabel}
+                      estimate={estimateFor(row, {
+                        ageRows: age.rows,
+                        packageRows: packageAge.rows,
+                        packageKey: packageAge.key,
+                        year: data.year,
+                      })}
+                    />
+                  ))}
+                </ul>
+              )}
             </div>
-          </div>
-        )}
-        {groups.map((group) => (
-          <div key={group.key} className="bm-group" data-theme={group.key}>
-            <h3>
-              <TitleIcon name={group.icon} />
-              <span className="title-text">{group.title}</span>
-              <span className="bm-count">
-                {group.rows.length} {group.rows.length === 1 ? "figure" : "figures"}
-              </span>
-            </h3>
-            <ul className="bm-tiles">
-              {group.rows.map((row) => (
-                <StatTile
-                  key={row.id}
-                  row={row}
-                  yearLabel={yearLabel}
-                  estimate={estimateFor(row, {
-                    ageRows: age.rows,
-                    packageRows: packageAge.rows,
-                    packageKey: packageAge.key,
-                    year: data.year,
-                  })}
-                />
-              ))}
-            </ul>
-          </div>
-        ))}
+          );
+        })}
         <details className="milburn-details bm-about">
           <summary>
             <TitleIcon name="info" bare size={14} />
@@ -418,7 +402,11 @@ export default function BenchmarksTable() {
           <ul className="milburn-points">
             <li>
               <TitleIcon name="calculator" bare size={14} />
-              <span>PolicyEngine estimates are static; each names its build and year.</span>
+              <span>PolicyEngine estimates are static.{builds.length > 0 ? ` Builds: ${builds.join("; ")}.` : ""}</span>
+            </li>
+            <li>
+              <TitleIcon name="hbars" bare size={14} />
+              <span>Each pair of bars is on its own scale, from zero.</span>
             </li>
             <li>
               <TitleIcon name="scale" bare size={14} />
@@ -426,7 +414,7 @@ export default function BenchmarksTable() {
             </li>
             <li>
               <TitleIcon name="percent" bare size={14} />
-              <span>Gap: the PolicyEngine estimate less the published figure, as a % of the published figure; given only where the two count the same thing.</span>
+              <span>Gap: the PolicyEngine estimate less the published figure, as a % of the published figure; given only where the two count the same thing (“close” is within 10%).</span>
             </li>
             <li>
               <TitleIcon name="usersRound" bare size={14} />

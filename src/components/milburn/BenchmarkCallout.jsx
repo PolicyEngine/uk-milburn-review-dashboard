@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import TitleIcon from "../TitleIcon";
-import { BENCHMARKS_FILE, BENCHMARK_ICON, BENCHMARK_SHORT, parseBenchmarks, splitValue } from "../../utils/milburn/benchmarks";
+import { BENCHMARKS_FILE, BENCHMARK_ICON, BENCHMARK_SHORT, parseBenchmarks, splitValue, valueParts } from "../../utils/milburn/benchmarks";
 import { openPopulationSub, populationSubHref } from "../../utils/populationSub";
 import { REPORT_DAY, subShownOnReportDay } from "../../utils/milburn/reportDay";
-import { distinctSources } from "./SourceChip";
+import { SourceLinkChip, distinctSources } from "./SourceChip";
 import "./BenchmarkCallout.css";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -98,6 +98,44 @@ export function calloutItems(place, rows) {
 }
 
 /**
+ * Published figures as small cards, two or three to a row (one on a phone),
+ * equal heights: an icon tile, the value with its qualifier ("in 2036-37")
+ * smaller beside it, a one-line title, one muted basis line, and the source
+ * as a chip-link with its date. Each item: { id, icon, main, qualifier,
+ * label, basis, basisTitle, source, url, date }.
+ */
+export function PublishedCards({ items, ariaLabel }) {
+  return (
+    <ul className="pub-cards" aria-label={ariaLabel}>
+      {items.map((item) => (
+        <li key={item.id} className="pub-card" data-benchmark={item.id}>
+          <span className="pub-card-icon" aria-hidden="true">
+            <TitleIcon name={item.icon} bare size={18} />
+          </span>
+          <div className="pub-card-body">
+            <p className="pub-card-value">
+              <strong>{item.main}</strong>
+              {item.qualifier && <span className="pub-card-qualifier"> {item.qualifier}</span>}
+            </p>
+            <p className="pub-card-label" title={item.label}>
+              {item.label}
+            </p>
+            {item.basis && (
+              <p className="pub-card-basis" title={item.basisTitle || item.basis}>
+                {item.basis}
+              </p>
+            )}
+            <p className="pub-card-source">
+              <SourceLinkChip source={item.source} url={item.url} date={item.date} />
+            </p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/**
  * A quiet "Published figures" strip inside a headline box: for one place
  * (`finances`, `poverty` or `young`), each published figure with its icon,
  * one line on how it differs from ours, and its source and date, then a
@@ -113,38 +151,39 @@ export default function BenchmarkCallout({ place, reportDay = REPORT_DAY }) {
   const sources = distinctSources(items.map((item) => item.row.source));
   return (
     <aside className="bm-callout" aria-label="Published figures" data-place={place}>
-      {/* Folded at first (Vahid, 17 Nov): one line with the count; open for
-          the figures, their basis and sources */}
+      {/* Folded at first (Vahid, 17 Nov): a disclosure row with the count; open for
+          the figures as cards, each with its basis and source */}
       <details className="bm-callout-details">
         <summary className="bm-callout-summary">
-          <TitleIcon name="fileText" bare size={14} />
-          <span className="bm-callout-title">Published figures</span>
-          <span className="bm-callout-count">{items.length}</span>
-          <span className="bm-callout-hint" data-published-by="">
-            {sources.length ? `${sources.join(", ")}: not PolicyEngine estimates` : "As published; not PolicyEngine estimates"}
+          <span className="bm-callout-chevron" aria-hidden="true">
+            <TitleIcon name="chevronRight" bare size={16} />
           </span>
+          <span className="bm-callout-title">
+            <span className="bm-callout-show">
+              Show {items.length} published {items.length === 1 ? "figure" : "figures"}
+            </span>
+            <span className="bm-callout-hide">Hide published figures</span>
+          </span>
+          {sources.length > 0 && (
+            <span className="bm-callout-hint" data-published-by="">
+              {sources.join(", ")}
+            </span>
+          )}
         </summary>
-        <ul className="bm-callout-items" aria-label="Published figures, with sources">
-          {items.map(({ id, row, value, label, icon, differs }) => (
-            <li key={id} data-benchmark={id}>
-              <TitleIcon name={icon} bare size={15} />
-              <div>
-                <p className="bm-callout-figure">
-                  <strong>{value}</strong> <span>{label}</span>
-                </p>
-                <p className="bm-callout-basis" title={row.basis || undefined}>
-                  {differs}
-                </p>
-                <p className="bm-callout-source">
-                  <a href={row.url} target="_blank" rel="noopener noreferrer">
-                    {row.source}
-                  </a>
-                  {row.date && <span>, {row.date}</span>}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <PublishedCards
+          ariaLabel="Published figures, with sources"
+          items={items.map(({ id, row, value, label, icon, differs }) => ({
+            id,
+            icon,
+            ...valueParts(value),
+            label,
+            basis: differs,
+            basisTitle: row.basis,
+            source: row.source,
+            url: row.url,
+            date: row.date,
+          }))}
+        />
         <a
           className="bm-callout-more"
           href={populationSubHref("benchmarks")}

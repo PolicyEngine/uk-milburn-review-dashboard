@@ -53,7 +53,17 @@ import "./milburn.css";
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 /** The label the sub-tab carries. */
-export const SCENARIOS_LABEL = `Assumption: ${ENTRY_ASSUMPTION_TEXT}, microsimulated. Other tabs: static.`;
+export const SCENARIOS_LABEL = `Assumes ${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group} take 16 hours’ work at their minimum wage`;
+
+/** The lead card's one line: the year, what is removed, and the two runs compared. */
+export const entryDescription = (yearLabel, movers) =>
+  `${yearLabel}: the report’s two benefit removals, static and with ${
+    movers === null || movers === undefined ? `${ENTRY_ASSUMPTION.share} of the young people who have them` : `about ${formatPeople(movers)} young people`
+  } moving into work.`;
+
+/** What the lead card's runs remove, in its folded notes. */
+export const entryRunsNote = (fullName) =>
+  `Both runs: ${fullName}, the same two removals as the report’s benefit changes, applied from April 2027.`;
 
 const pounds = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const penceExact = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -208,7 +218,7 @@ export function EntryComparison({ summary, catalogue }) {
         id="milburn-entry-heading"
         icon="briefcase"
         title={title}
-        description={`${fullName} (the same two removals as the report’s benefit changes, applied from April 2027), ${yearLabel}: static, against ${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group} moving into work${movers !== null ? ` (about ${formatPeople(movers)} people)` : ""}.`}
+        description={entryDescription(yearLabel, movers)}
         name="quarter-moving-into-work"
         csv={csv}
         legendItems={SERIES.map((series) => ({ color: series.color, label: series.name, type: "rect" }))}
@@ -252,6 +262,9 @@ export function EntryComparison({ summary, catalogue }) {
                       {point}
                     </Point>
                   ))}
+                  <Point icon="layers" data-entry-runs="">
+                    {entryRunsNote(fullName)}
+                  </Point>
                 </ul>
               </details>
             )}
@@ -372,7 +385,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
     {
       key: "ours",
       title: OUR_SCENARIO_TITLE,
-      chip: <SourceChip />,
+      chip: null,
       figure: movers !== null ? `About ${formatPeople(movers)}` : notRun,
       side: "ours",
     },
@@ -425,7 +438,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
         id="milburn-review-heading"
         icon="scale"
         title={REVIEW_COMPARISON_TITLE}
-        description={`People moving into work: PolicyEngine's illustrative scenario for ${yearLabel} (our estimate), and the review's own modelling for ${employment.byYear} (published). ${DIFFERENT_EXERCISES_SENTENCE}`}
+        description={`People moving into work. ${DIFFERENT_EXERCISES_SENTENCE}`}
         name="beside-the-reviews-own-estimate"
         csv={csv}
         after={
@@ -450,10 +463,6 @@ export function ReviewComparison({ summary, review, catalogue }) {
                 </li>
               ))}
             </ul>
-            <p className="milburn-review-source" data-review-source-short="">
-              Source: <SourceLink href={report.url}>the review</SourceLink>
-              {report.published ? ` (${report.published})` : ""}
-            </p>
             <details className="milburn-details" data-full-comparison="">
               <summary>
                 <TitleIcon name="list" bare size={14} />
@@ -601,11 +610,6 @@ function EntryCases({ data }) {
         single
         after={
           <>
-            {same && (
-              <ul className="milburn-points" data-same-gain="">
-                <Point icon="scale">Same under current law and under the package.</Point>
-              </ul>
-            )}
             <FiguresTable>
               <table className="milburn-table">
                 <thead>
@@ -634,12 +638,17 @@ function EntryCases({ data }) {
                 </tbody>
               </table>
             </FiguresTable>
-            {paragraphs.length > 0 && (
-              <details className="milburn-details">
+            {(same || paragraphs.length > 0) && (
+              <details className="milburn-details" data-case-more="">
                 <summary>
-                  <TitleIcon name="list" bare size={14} />
-                  How the case is set up
+                  <TitleIcon name="info" bare size={14} />
+                  More info
                 </summary>
+                {same && (
+                  <ul className="milburn-points" data-same-gain="">
+                    <Point icon="scale">Same under current law and under the package.</Point>
+                  </ul>
+                )}
                 {paragraphs.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
@@ -729,7 +738,7 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null }) {
         entrants: run.entrantsToMatch[hoursId],
         perEntrant: run.exchequerGainPerEntrant[hoursId],
       }));
-      description = `${name}, ${yearLabel}: the entrants whose gains from work would match the Exchequer saving, beside the 16 to 24-year-olds in losing households.`;
+      description = `How many young people would need to move into work to match the saving, ${yearLabel}.`;
       csv = () =>
         buildChartCsv({
           title: `Break-even arithmetic: ${name}, ${yearLabel}`,
@@ -823,8 +832,7 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null }) {
               <Point icon="alert">
                 <strong>Above 100%.</strong> {MORE_ENTRANTS_THAN_GROUP}.
               </Point>
-              <Point icon="scale">{SAME_GAIN_SENTENCE}</Point>
-              <Point icon="user">The gain from work is one household case, set out above; other households gain differently.</Point>
+              <Point icon="user">{SAME_GAIN_SENTENCE} Other households gain differently.</Point>
               {reviewLine && (
                 <Point icon="info" data-review-line="">
                   The dashed line marked &ldquo;{reviewBreakEvenLabel(reviewLine)}&rdquo; is the review&rsquo;s own modelled figure for its whole package, with a mixture of
@@ -920,22 +928,23 @@ export default function BehaviouralScenarios({ selectedRun } = {}) {
         title="Return to work"
         subtitle="What changes if some non-working young people with PIP or the health element move into work."
       />
-      {/* The assumption, the link to how it was chosen, and the year it covers, in one panel */}
-      <div className="milburn-assumption" role="note">
+      {/* The assumption, the year it covers and the link to how it was chosen, in one line */}
+      <p className="milburn-assumption" role="note">
         <TitleIcon name="info" bare size={16} className="milburn-assumption-icon" />
-        <div className="milburn-assumption-body">
-          <p className="milburn-assumption-text">
-            <span>{SCENARIOS_LABEL}</span>{" "}
-            <MethodLink anchor={ENTRY_METHOD_ANCHOR}>Why 25%, and how it is run</MethodLink>
-          </p>
+        <span className="milburn-assumption-text">
+          <span>{SCENARIOS_LABEL}</span>
           {summaryState.status === "ready" && Number.isInteger(summaryState.summary.year) && (
-            <p className="milburn-assumption-year" data-year-only="">
-              <TitleIcon name="calendar" bare size={13} />
-              {yearOnlyText(summaryState.summary.year, "this tab")}
-            </p>
+            <>
+              {" · "}
+              <span data-year-only="" title={yearOnlyText(summaryState.summary.year, "this tab")}>
+                {fiscalYearTick(summaryState.summary.year)} only
+              </span>
+            </>
           )}
-        </div>
-      </div>
+          {" · "}
+          <MethodLink anchor={ENTRY_METHOD_ANCHOR}>Why 25%</MethodLink>
+        </span>
+      </p>
       {lead}
       {summaryState.status === "ready" && review && <ReviewComparison summary={summaryState.summary} review={review} catalogue={catalogue} />}
       {summaryState.status === "ready" && reviewState.status === "unavailable" && (

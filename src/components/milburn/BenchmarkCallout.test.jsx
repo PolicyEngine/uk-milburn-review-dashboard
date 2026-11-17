@@ -63,25 +63,44 @@ describe("BenchmarkCallout", () => {
     vi.stubGlobal("fetch", serve(text));
     render(<BenchmarkCallout place="poverty" reportDay={false} />);
     const strip = await screen.findByRole("complementary", { name: "Published figures" });
-    expect(within(strip).getByText("Published figures")).toBeInTheDocument();
+    // The summary row is a disclosure: a chevron, then what opening or closing it does, with the count
+    const summary = strip.querySelector("summary");
+    expect(summary.firstElementChild).toHaveClass("bm-callout-chevron");
+    expect(summary.querySelector(".bm-callout-chevron svg")).not.toBeNull();
+    expect(summary.querySelector(".bm-callout-show").textContent).toBe("Show 2 published figures");
+    expect(summary.querySelector(".bm-callout-hide").textContent).toBe("Hide published figures");
+    expect(strip.textContent).not.toContain("PolicyEngine estimate");
     const items = within(within(strip).getByRole("list", { name: "Published figures, with sources" })).getAllByRole("listitem");
     expect(items).toHaveLength(2);
     expect(items[0]).toHaveTextContent("50,000 fewer");
     expect(items[0]).toHaveTextContent("our relative figure is static");
-    expect(items[0]).toHaveTextContent("17 November 2026");
-    expect(items[0].querySelector("svg")).not.toBeNull();
-    const link = within(items[1]).getByRole("link", { name: "Resolution Foundation" });
+    // The source is one chip-link: short name and date, the full title as its tooltip
+    const review = within(items[0]).getByRole("link", { name: /^Review, annex · 17 Nov 2026/ });
+    expect(review).toHaveAttribute("title", rowOf("relative_poverty_review").source);
+    expect(review).toHaveAttribute("href", rowOf("relative_poverty_review").url);
+    expect(items[0].querySelector(".pub-card-icon svg")).not.toBeNull();
+    expect(items[0].querySelector(".pub-card-value strong").textContent).toBe("50,000 fewer");
+    const link = within(items[1]).getByRole("link", { name: /^Resolution Foundation · 13 Nov 2026/ });
     expect(link).toHaveAttribute("href", rowOf("kept_out_of_poverty").url);
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
-    expect(items[1]).toHaveTextContent("13 November 2026");
+  });
+
+  it("sets a figure's qualifier smaller beside its value", async () => {
+    vi.stubGlobal("fetch", serve(text));
+    render(<BenchmarkCallout place="finances" reportDay={false} />);
+    const strip = await screen.findByRole("complementary", { name: "Published figures" });
+    const card = strip.querySelector('[data-benchmark="review_welfare_saving_2036"]');
+    expect(card.querySelector(".pub-card-value strong").textContent).toBe("£3.6bn");
+    expect(card.querySelector(".pub-card-qualifier").textContent.trim()).toBe("in 2036-37");
+    expect(strip.querySelector(".bm-callout-show").textContent).toBe("Show 4 published figures");
   });
 
   it.each([
-    ["finances", "the review: not PolicyEngine estimates"],
-    ["poverty", "the review, Resolution Foundation: not PolicyEngine estimates"],
-    ["young", "Resolution Foundation, ONS: not PolicyEngine estimates"],
-  ])("%s: the folded line says whose figures they are", async (place, line) => {
+    ["finances", "the review"],
+    ["poverty", "the review, Resolution Foundation"],
+    ["young", "Resolution Foundation, ONS"],
+  ])("%s: the folded line lists whose figures they are", async (place, line) => {
     vi.stubGlobal("fetch", serve(text));
     render(<BenchmarkCallout place={place} reportDay={false} />);
     const strip = await screen.findByRole("complementary", { name: "Published figures" });

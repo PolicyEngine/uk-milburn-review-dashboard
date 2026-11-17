@@ -37,6 +37,7 @@ import KeyFigures, {
   RANGE_WITHOUT_SELECTION,
   REPLACEMENT_NOT_MODELLED_NOTE,
   REPLACEMENT_PARTS_NOTE,
+  STATIC_NOTE,
   keyFigureTiles,
   packageRange,
 } from "../../components/milburn/KeyFigures";
@@ -233,9 +234,13 @@ describe("KeyFigures", () => {
     expect(panel.textContent).toContain("£4.00bn");
     expect(panel.textContent).toContain("500,000");
     const region = screen.getByRole("region", { name: "Key figures" });
-    // Whose figures: ours, said in the heading
-    expect(region.querySelector(".milburn-key-heading [data-source-kind=estimate]").textContent).toBe("PolicyEngine estimates");
-    expect(region.textContent).toContain("Full abolition, no replacements");
+    // The heading carries no estimate chip and no policy chip: the run's name is for screen readers only
+    expect(region.querySelector(".milburn-key-heading [data-source-kind]")).toBeNull();
+    expect(region.querySelector(".milburn-key-heading .milburn-status-chip:not([data-year-only])")).toBeNull();
+    expect(region.querySelector(".milburn-key-heading .visually-hidden").textContent).toBe("Full abolition, no replacements");
+    // "Static" is said once, in the folded notes
+    expect(region.textContent.match(/Static/g)).toHaveLength(1);
+    expect([...region.querySelectorAll("details.milburn-details")].at(-1).textContent).toContain(STATIC_NOTE);
     // An upper bound on losses, never said of the saving
     expect(region.textContent).not.toMatch(/\(upper bound\)|upper bound on the saving/i);
     expect(region.textContent).toContain(RELATIVE_LINE_NOTE);
@@ -307,8 +312,13 @@ describe("headline tiles", () => {
     expect(poverty.textContent).toContain("300,000");
     expect(poverty.textContent).toContain("+0.50pp");
     expect(poverty.textContent).toContain("150,000");
-    expect(poverty.textContent).toContain("Static");
-    expect(poverty.querySelector(".milburn-key-heading [data-source-kind=estimate]").textContent).toBe("PolicyEngine estimates");
+    // Static and rounding: once, in the folded notes; no estimate or policy chip in the heading
+    expect(poverty.textContent.match(/Static/g)).toHaveLength(1);
+    expect(poverty.querySelector("details[data-notes] > summary").textContent).toBe("Notes and caveats");
+    expect(poverty.querySelector("details[data-notes]").textContent).toContain(STATIC_NOTE);
+    expect(STATIC_NOTE).toBe("Static: nobody changes their work or claims. Counts rounded to the nearest thousand.");
+    expect(poverty.querySelector(".milburn-key-heading [data-source-kind]")).toBeNull();
+    expect(poverty.querySelector(".milburn-key-heading .milburn-status-chip:not([data-year-only])")).toBeNull();
     // Its figures are for the summary's year whatever year is chosen: said
     expect(poverty.querySelector("[data-year-only]").textContent).toBe(yearOnlyText(2027));
     expect(yearOnlyText(2027)).toBe("2027-28 only: the year selector does not change these figures.");
@@ -321,7 +331,13 @@ describe("headline tiles", () => {
     const finances = await screen.findByRole("region", { name: "Public finances headline" });
     expect(finances.textContent).toContain("£4.00bn");
     expect(finances.textContent).toContain("Exchequer saving, 2027-28");
-    expect(finances.querySelector(".milburn-key-heading [data-source-kind=estimate]").textContent).toBe("PolicyEngine estimates");
+    expect(finances.querySelector(".milburn-key-heading [data-source-kind]")).toBeNull();
+    expect(finances.querySelector(".milburn-key-heading .milburn-status-chip")).toBeNull();
+    // The sign convention and "static": once each, in the folded notes
+    const notes = finances.querySelector("details[data-notes]");
+    expect(notes.textContent).toContain("A positive figure is a saving to the Exchequer; a negative one is a cost.");
+    expect(notes.textContent).toContain("Static: nobody changes their work or claims.");
+    expect(finances.textContent.match(/Static/g)).toHaveLength(1);
   });
 
   it("scale a bar to the largest figure in its list", () => {
@@ -398,7 +414,9 @@ describe("the published summary", () => {
     expect(entryMovers(summaryRun(published, "milburn_package"))).toBeNull();
     render(<EntryComparison summary={published} catalogue={null} />);
     const section = screen.getByRole("region", { name: "With a quarter moving into work" });
-    expect(section.textContent).toContain("25% of non-working 18 to 24-year-olds with PIP or the health element moving into work (about 83,000 people)");
+    expect(section.textContent).toContain("2029-30: the report’s two benefit removals, static and with about 83,000 young people moving into work.");
+    // The detail is in the folded notes
+    expect(section.querySelector("details [data-entry-runs]").textContent).toMatch(/^Both runs: .+, the same two removals as the report’s benefit changes, applied from April 2027\.$/);
     expect(section.textContent).toContain("Who moves: about 83,000 people, 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
   });
 
@@ -465,7 +483,7 @@ describe("EntryComparison", () => {
     expect(ENTRY_ASSUMPTION_TEXT).toBe(
       "25% of non-working 18 to 24-year-olds with PIP or the health element move into 16 hours' work a week at the minimum wage for their age",
     );
-    expect(SCENARIOS_LABEL).toBe(`Assumption: ${ENTRY_ASSUMPTION_TEXT}, microsimulated. Other tabs: static.`);
+    expect(SCENARIOS_LABEL).toBe("Assumes 25% of non-working 18 to 24-year-olds with PIP or the health element take 16 hours’ work at their minimum wage");
     expect(SAME_GAIN_SENTENCE).not.toMatch(/incentive/);
   });
 

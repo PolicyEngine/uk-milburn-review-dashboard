@@ -16,7 +16,6 @@ import {
 import { PACKAGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGroups";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
-import SourceChip from "./SourceChip";
 import { buildChartCsv } from "../../utils/chartCsv";
 import { CHART_COLOURS } from "../../utils/chartTheme";
 import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, YearOnlyChip } from "./MilburnCharts";
@@ -29,6 +28,9 @@ export const REPLACEMENT_NOT_MODELLED_NOTE =
 /** What those replacements are, as the final report names them (paragraphs 107 and 752 to 756). */
 export const REPLACEMENT_PARTS_NOTE =
   "Left out: Additional Cost Allowance (ongoing costs), local Health and Disability Fund (one-off or changing costs), Severe and Complex Needs Insurance.";
+
+/** Said once in a box's folded notes: what "static" means, and how counts are rounded. */
+export const STATIC_NOTE = "Static: nobody changes their work or claims. Counts rounded to the nearest thousand.";
 
 /** The range strip's short names for the packages, by position in PACKAGE_IDS. */
 const RANGE_NAMES = ["No replacement", "Central", "Phased"];
@@ -160,7 +162,6 @@ export function keyFigureTiles(run, year) {
       icon: "landmark",
       value: formatBn(Math.abs(saving)),
       label: `${saving >= 0 ? "Exchequer saving" : "Exchequer cost"}, ${yearLabel}`,
-      definition: "Static: no behaviour change.",
     });
   }
   if (run.youngPeopleLosing !== null) {
@@ -212,7 +213,7 @@ export function keyFigureTiles(run, year) {
  * A run the file does not list says it has not yet run. Only on the local
  * build route.
  */
-export default function KeyFigures({ runId, nameShownAbove = false }) {
+export default function KeyFigures({ runId }) {
   const catalogue = useMeasureCatalogue();
   const id = runId || DEFAULT_SUMMARY_RUN;
   const measure = catalogue.byId?.get(id);
@@ -227,16 +228,8 @@ export default function KeyFigures({ runId, nameShownAbove = false }) {
         <TitleIcon name="sparkle" />
         Key figures
       </h3>
-      <SourceChip plural />
-      {/* Already in the status line above when it is the one policy chosen */}
-      {nameShownAbove ? (
-        <p className="visually-hidden">{name}</p>
-      ) : (
-        <p className="milburn-status-chip">
-          <TitleIcon name="layers" bare size={14} />
-          {name}
-        </p>
-      )}
+      {/* The header's policy button already names the run: said once, for screen readers only */}
+      <p className="visually-hidden">{name}</p>
       {status === "ready" && <YearOnlyChip year={summary.year} />}
     </div>
   );
@@ -268,7 +261,7 @@ export default function KeyFigures({ runId, nameShownAbove = false }) {
               {tile.extra && <span className="milburn-key-extra"> {tile.extra}</span>}
             </p>
             <p className="milburn-key-label">{tile.label}</p>
-            <p className="milburn-key-definition">{tile.definition}</p>
+            {tile.definition && <p className="milburn-key-definition">{tile.definition}</p>}
           </li>
         ))}
       </ul>
@@ -308,7 +301,7 @@ export default function KeyFigures({ runId, nameShownAbove = false }) {
           </li>
           <li>
             <TitleIcon name="calendar" bare size={14} />
-            <span>Static estimates for {fiscalYearTick(summary?.year ?? 2027)}, against current law. Counts rounded to the nearest thousand.</span>
+            <span>{STATIC_NOTE}</span>
           </li>
         </ul>
       </details>

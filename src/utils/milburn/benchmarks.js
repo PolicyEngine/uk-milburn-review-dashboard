@@ -11,50 +11,55 @@ import { youngPeopleWorseOff } from "./youngPeople";
 export const BENCHMARKS_FILE = "milburn_benchmarks.json";
 
 /**
- * The themes the Benchmarks cards are grouped under, in order, each with its
- * icon (TitleIcon) and the rows it holds; a row no theme lists goes under
- * the last, "Other figures".
+ * The sections of the Benchmarks sub-tab, in order: the question each
+ * answers, a one-line introduction, its icon (TitleIcon) and the rows it
+ * holds; a row no section lists goes under the last, the review's context.
  */
-export const BENCHMARK_THEMES = [
+export const BENCHMARK_SECTIONS = [
   {
-    key: "people",
-    title: "People and caseloads",
+    key: "caseloads",
+    title: "How do our caseloads compare?",
+    intro: "Published counts of young people on the UC health element or PIP, beside our baseline caseloads.",
     icon: "usersRound",
-    ids: [
-      "neet_16_24",
-      "neet_rate_projection_2036",
-      "into_sustained_work_2036",
-      "uc_health_no_work_requirements",
-      "uc_health_element_16_24",
-      "incapacity_benefits_young",
-      "young_pip_recipients",
-      "dla_pip_16_24",
-      "package_young_people_affected",
-    ],
+    ids: ["uc_health_no_work_requirements", "uc_health_element_16_24", "young_pip_recipients", "package_young_people_affected"],
   },
   {
-    key: "spending",
-    title: "Spending and costs",
+    key: "savings",
+    title: "How do our savings compare?",
+    intro: "Published spending, savings and costs, beside our static estimates.",
     icon: "landmark",
     ids: [
-      "young_benefits_spend",
       "pip_spend_16_24",
       "uc_health_spend_16_24",
-      "incapacity_spending_18_24",
+      "employer_nics_under_25",
+      "young_benefits_spend",
       "review_welfare_saving_2036",
       "milburn_welfare_saving_10y",
-      "review_investment_2036",
-      "youth_hiring_incentives_cost",
-      "employer_nics_under_25",
     ],
   },
   {
     key: "poverty",
-    title: "Poverty and extra costs",
+    title: "Poverty",
+    intro: "The review's poverty estimate beside ours, and what the benefits do today.",
     icon: "percent",
     ids: ["relative_poverty_review", "kept_out_of_poverty", "pip_no_extra_costs"],
   },
-  { key: "other", title: "Other figures", icon: "list", ids: [] },
+  {
+    key: "context",
+    title: "Context from the review",
+    intro: "Published figures on young people, work and costs that we do not estimate.",
+    icon: "book",
+    ids: [
+      "neet_16_24",
+      "neet_rate_projection_2036",
+      "incapacity_benefits_young",
+      "dla_pip_16_24",
+      "into_sustained_work_2036",
+      "review_investment_2036",
+      "youth_hiring_incentives_cost",
+      "incapacity_spending_18_24",
+    ],
+  },
 ];
 
 /**
@@ -72,12 +77,12 @@ export const BENCHMARK_SHORT = {
   neet_rate_projection_2036: {
     label: "NEET rate the review projects for 2036-37",
     icon: "arrowDown",
-    basis: "16–24s, UK, from 13.1% in 2026-27; the review's modelling. Its ambition is around 5%",
+    basis: "16–24s, UK, from 13.1% in 2026-27; the ambition is around 5%",
   },
   into_sustained_work_2036: {
     label: "Into sustained work by 2036, the review expects",
     icon: "briefcase",
-    basis: "The review's modelling of all its recommendations",
+    basis: "All its recommendations, not the benefit changes alone",
   },
   uc_health_no_work_requirements: {
     label: "On UC health with no work requirements",
@@ -87,24 +92,22 @@ export const BENCHMARK_SHORT = {
   uc_health_element_16_24: {
     label: "16–24s receiving the UC health element",
     icon: "activity",
-    basis: "Resolution Foundation response to the review",
     estimateBasis: "Benefit units with LCWRA, every adult under 25, UK, 2027-28",
   },
   incapacity_benefits_young: {
     label: "Young people on incapacity benefits, the review says",
     icon: "lifebuoy",
-    basis: "The review's count; more than double 2012",
+    basis: "More than double the number in 2012",
   },
   young_pip_recipients: {
     label: "Young people receiving PIP",
     icon: "clipboard",
-    basis: "Resolution Foundation response to the review",
     estimateBasis: "PIP recipients aged 18 to 24, UK, 2027-28",
   },
   dla_pip_16_24: {
     label: "16–24s receiving DLA or PIP, the review says",
     icon: "layers",
-    basis: "The review's count from DWP Stat-Xplore; double 2012",
+    basis: "From DWP Stat-Xplore; double the number in 2012",
   },
   package_young_people_affected: {
     label: "Young people affected by the package",
@@ -115,19 +118,19 @@ export const BENCHMARK_SHORT = {
   young_benefits_spend: {
     label: "PIP and UC health spending on young people",
     icon: "banknote",
-    basis: "The review's figures, ages 16 to 24: PIP £3.8bn, UC LCWRA £0.92bn",
+    basis: "Ages 16 to 24: PIP £3.8bn, UC LCWRA £0.92bn",
     estimateBasis: "Static saving from the modelled package, UK; PIP from age 18",
   },
   pip_spend_16_24: {
     label: "PIP spending, ages 16 to 24",
     icon: "wallet",
-    basis: "The review's figure for 2025-26",
+    basis: "Spending in 2025-26",
     estimateBasis: "Static saving from removing PIP at 16 to 24, 2029-30, UK",
   },
   uc_health_spend_16_24: {
     label: "UC LCWRA element spending, ages 16 to 24",
     icon: "piggy",
-    basis: "The review's figure for 2025-26",
+    basis: "Spending in 2025-26",
     estimateBasis: "Static saving from removing it for under-25s, 2029-30, UK",
   },
   incapacity_spending_18_24: { label: "Incapacity benefit spending, ages 18 to 24", icon: "trend" },
@@ -155,7 +158,7 @@ export const BENCHMARK_SHORT = {
   employer_nics_under_25: {
     label: "Cost of zero employer NI for under-25s",
     icon: "building",
-    basis: "Resolution Foundation estimate; not a recommendation of the review",
+    basis: "Not a recommendation of the review",
     estimateBasis: "Static cost, 2029-30, UK",
   },
   relative_poverty_review: {
@@ -256,12 +259,23 @@ export function splitValue(value) {
   return { value: head, note: note ? note.charAt(0).toUpperCase() + note.slice(1) : "" };
 }
 
-/** The rows by theme, in the themes' order; a theme with no rows is left out. */
+/** "£3.6bn in 2036-37" as its figure and the qualifier after it ("in 2036-37", "by 2036-37", "a year"); any other wording whole. */
+export function valueParts(value) {
+  const words = String(value || "").trim();
+  const match = /^(.+?) ((?:in|by) \d{4}-\d{2}|a year)$/.exec(words);
+  return match ? { main: match[1], qualifier: match[2] } : { main: words, qualifier: "" };
+}
+
+/** The rows by section, each in its section's own order; a row no section lists goes under the last; a section with no rows is left out. */
 export function benchmarkGroups(rows) {
-  const known = new Set(BENCHMARK_THEMES.flatMap((theme) => theme.ids));
-  return BENCHMARK_THEMES.map((theme) => ({
-    ...theme,
-    rows: theme.key === "other" ? rows.filter((row) => !known.has(row.id)) : rows.filter((row) => theme.ids.includes(row.id)),
+  const known = new Set(BENCHMARK_SECTIONS.flatMap((section) => section.ids));
+  const last = BENCHMARK_SECTIONS.length - 1;
+  return BENCHMARK_SECTIONS.map((section, index) => ({
+    ...section,
+    rows: [
+      ...section.ids.map((id) => rows.find((row) => row.id === id)).filter(Boolean),
+      ...(index === last ? rows.filter((row) => !known.has(row.id)) : []),
+    ],
   })).filter((group) => group.rows.length > 0);
 }
 

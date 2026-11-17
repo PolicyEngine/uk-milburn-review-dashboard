@@ -12,8 +12,7 @@ import {
 } from "../../utils/milburn/summary";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
-import SourceChip from "./SourceChip";
-import { packageRange } from "./KeyFigures";
+import { packageRange, STATIC_NOTE } from "./KeyFigures";
 import { YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
@@ -54,29 +53,40 @@ function useHeadlineRun(runId) {
   const measure = catalogue.byId?.get(id);
   const { status, summary } = useMilburnSummary(catalogue.manifest?.snapshotSha256 ?? null);
   const run = status === "ready" ? summaryRun(summary, id) : null;
-  // One chosen policy is already named in the status line above the page
-  return { local: Boolean(catalogue.localBuild), named: Boolean(runId), name: measure ? shortNameOf(measure) : id, summary, run };
+  return { local: Boolean(catalogue.localBuild), name: measure ? shortNameOf(measure) : id, summary, run };
 }
 
-function Heading({ title, name, named, onlyYear }) {
+function Heading({ title, name, onlyYear }) {
   return (
     <div className="milburn-key-heading">
       <h3>
         <TitleIcon name="sparkle" />
         {title}
       </h3>
-      <SourceChip plural />
-      {named ? (
-        <p className="visually-hidden">{name}</p>
-      ) : (
-        <p className="milburn-status-chip">
-          <TitleIcon name="layers" bare size={14} />
-          {name}
-        </p>
-      )}
+      {/* The header's policy button already names the run: said once, for screen readers only */}
+      <p className="visually-hidden">{name}</p>
       {/* The box's figures are for this year whatever year is chosen above the page */}
       {onlyYear !== undefined && <YearOnlyChip year={onlyYear} />}
     </div>
+  );
+}
+
+/** How the Public finances figures are signed. */
+export const SAVING_SIGN_NOTE = "A positive figure is a saving to the Exchequer; a negative one is a cost.";
+
+/** What "static" means, where no counts are shown. */
+export const STATIC_SHORT_NOTE = "Static: nobody changes their work or claims.";
+
+/** A box's folded "Notes and caveats". */
+function Notes({ children }) {
+  return (
+    <details className="milburn-details" data-notes="">
+      <summary>
+        <TitleIcon name="alert" bare size={14} />
+        Notes and caveats
+      </summary>
+      <ul className="milburn-points">{children}</ul>
+    </details>
   );
 }
 
@@ -102,14 +112,14 @@ function Tile({ icon, value, extra, label, note }) {
  * figures), and labelled so. Nothing while the run or the file is missing.
  */
 export function PovertyHeadline({ runId }) {
-  const { local, name, named, summary, run } = useHeadlineRun(runId);
+  const { local, name, summary, run } = useHeadlineRun(runId);
   if (!local || !run) return null;
   const direction = (count) => (count >= 0 ? "into" : "out of");
   const lines = POVERTY_LINES.filter((line) => run.povertyPp[line.key] !== null);
   const values = lines.map((line) => run.povertyPp[line.key]);
   return (
     <section className="report-section milburn-key card" aria-label="Poverty headline">
-      <Heading title="Poverty at a glance" name={name} named={named} onlyYear={summary.year} />
+      <Heading title="Poverty at a glance" name={name} onlyYear={summary.year} />
       <ul className="milburn-key-tiles" aria-label="Figures">
         {run.peopleIntoPovertyAbsAhc !== null && (
           <Tile
@@ -158,13 +168,13 @@ export function PovertyHeadline({ runId }) {
           </ul>
         </div>
       )}
-      <ul className="milburn-points">
-        <li>
-          <TitleIcon name="alert" bare size={14} />
-          <span>Static: nobody changes their work or claims. Counts rounded to the nearest thousand.</span>
-        </li>
-      </ul>
       <BenchmarkCallout place="poverty" />
+      <Notes>
+        <li>
+          <TitleIcon name="calculator" bare size={14} />
+          <span>{STATIC_NOTE}</span>
+        </li>
+      </Notes>
     </section>
   );
 }
@@ -176,7 +186,7 @@ export function PovertyHeadline({ runId }) {
  * or the file is missing.
  */
 export function FinancesHeadline({ runId, selectedYear }) {
-  const { local, name, named, summary, run } = useHeadlineRun(runId);
+  const { local, name, summary, run } = useHeadlineRun(runId);
   if (!local || !run) return null;
   const years = Object.keys(run.savingBn).sort();
   if (!years.length) return null;
@@ -188,7 +198,7 @@ export function FinancesHeadline({ runId, selectedYear }) {
   const word = (value) => (value >= 0 ? "saving" : "cost");
   return (
     <section className="report-section milburn-key card" aria-label="Public finances headline">
-      <Heading title="Public finances at a glance" name={name} named={named} />
+      <Heading title="Public finances at a glance" name={name} />
       <div className="milburn-split">
         <ul className="milburn-key-tiles" aria-label="Figures">
           {current !== null && (
@@ -196,7 +206,6 @@ export function FinancesHeadline({ runId, selectedYear }) {
               icon="landmark"
               value={formatBn(Math.abs(current))}
               label={`Exchequer ${word(current)}, ${fiscalYearTick(Number(shown))}`}
-              note="Static: nobody changes their work or claims."
             />
           )}
         </ul>
@@ -241,13 +250,17 @@ export function FinancesHeadline({ runId, selectedYear }) {
           </div>
         )}
       </div>
-      <ul className="milburn-points">
-        <li>
-          <TitleIcon name="alert" bare size={14} />
-          <span>A positive figure is a saving to the Exchequer; a negative one is a cost.</span>
-        </li>
-      </ul>
       <BenchmarkCallout place="finances" />
+      <Notes>
+        <li>
+          <TitleIcon name="scale" bare size={14} />
+          <span>{SAVING_SIGN_NOTE}</span>
+        </li>
+        <li>
+          <TitleIcon name="calculator" bare size={14} />
+          <span>{STATIC_SHORT_NOTE}</span>
+        </li>
+      </Notes>
     </section>
   );
 }

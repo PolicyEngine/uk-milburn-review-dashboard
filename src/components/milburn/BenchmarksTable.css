@@ -1,33 +1,53 @@
-/* Benchmarks (BenchmarksTable.jsx): a card of comparison charts, one panel
-   per comparable pair, then stat tiles by theme. Colours are tokens only. */
+/* Benchmarks (BenchmarksTable.jsx): sections named for the question each
+   answers, each a grid of comparison panels and stat tiles. Rhythm: 24px
+   between sections, 16px card padding, 12px inside a card, 8px between a
+   card's lines. Colours are tokens only. */
 .bm {
   display: grid;
   gap: 24px;
   color: var(--c-axis-title);
 }
 
-.milburn-benchmarks > .bm > .milburn-label {
-  justify-self: start;
-  margin-bottom: 0;
+.bm-group {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
 }
 
-/* The comparison card: panels side by side, one under the other on a phone */
+.bm-group-head {
+  display: grid;
+  gap: 4px;
+}
+
+.bm-group-head h3 {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-size: var(--fs-card-title);
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+.bm-group-head p {
+  margin: 0;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--c-axis-title);
+}
+
 .bm-compare-grid,
-.bm-tiles,
-.bm-notes {
+.bm-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.bm-compare-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
-  gap: 20px;
-  margin-top: 8px;
-}
-
-.bm-compare {
+/* A card: equal heights along a row, the source line at the bottom */
+.bm-compare,
+.bm-tile {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -35,15 +55,12 @@
   padding: 16px;
   border: 1px solid var(--c-grid);
   border-radius: 8px;
-  background: var(--c-row-band);
+  background: var(--c-surface);
 }
 
-.bm-compare-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 12px;
+.bm-compare p,
+.bm-tile p {
+  margin: 0;
 }
 
 .bm-compare h4,
@@ -55,226 +72,105 @@
   color: var(--c-ink);
 }
 
+/* Titles: two lines at most */
+.bm-compare h4 .title-text,
+.bm-tile h4 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
 .bm-compare h4 {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   min-width: 0;
+  /* Two lines' room, so the verdicts along a row line up */
+  min-height: 2.7em;
 }
 
-/* The gap between the two figures: a neutral chip, neither a gain nor a loss */
-.bm-gap {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: var(--c-highlight-band);
-  color: var(--c-highlight);
-  font-size: var(--fs-caption);
-  white-space: nowrap;
-}
-
-.bm-gap > span[aria-hidden],
-.bm-kicker > span[aria-hidden],
-.bm-chip > span[aria-hidden] {
-  display: inline-flex;
-  flex: none;
-}
-
-/* The pair in text: the chart's legend and its values at once */
-.bm-pair {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin: 0;
-}
-
-.bm-pair-figure {
-  padding: 10px 12px;
-  border: 1px solid var(--c-grid);
-  border-radius: 8px;
-  background: var(--c-surface);
-}
-
-.bm-pair dt {
+/* The verdict: one line of plain words that wraps inside the card */
+.bm-verdict {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--fs-micro);
-  font-weight: 600;
-  color: var(--c-axis-title);
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--c-highlight-band);
+  color: var(--c-text);
+  font-size: var(--fs-small);
+  line-height: 1.4;
 }
 
-.bm-pair dd {
-  margin: 2px 0 0;
-  font-size: var(--fs-xl);
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--c-ink);
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-
-.bm-pair-figure.is-estimate dd,
-.bm-figure.is-estimate .bm-value {
-  color: var(--c-gain-text);
-}
-
-.bm-swatch {
+.bm-verdict > span[aria-hidden],
+.bm-kicker > span[aria-hidden],
+.bm-press > span[aria-hidden] {
+  display: inline-flex;
   flex: none;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
 }
 
-.bm-swatch.is-published {
-  background: var(--c-reference);
+.bm-verdict > span[aria-hidden] {
+  margin-top: 2px;
+  color: var(--c-highlight);
 }
 
-.bm-swatch.is-estimate {
-  background: var(--c-gain);
+.bm-verdict > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .bm-compare-plot {
   min-width: 0;
-  padding: 8px 8px 4px;
-  border-radius: 8px;
-  background: var(--c-surface);
 }
 
-/* Notes: an icon and one line each */
-.bm-notes {
-  display: grid;
-  gap: 6px;
+/* One muted note */
+.bm-note {
   font-size: var(--fs-caption);
   line-height: 1.45;
   color: var(--c-axis-title);
-}
-
-.bm-notes li {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  min-width: 0;
-}
-
-.bm-notes li > span[aria-hidden] {
-  display: inline-flex;
-  flex: none;
-  margin-top: 2px;
-  color: var(--c-gain-text);
-}
-
-.bm-notes li > span:last-child {
-  min-width: 0;
   overflow-wrap: anywhere;
 }
 
-/* Source chips: the source (a link), its date, a press report, the build */
-.bm-chips {
+/* Last line: the source chip, then what our own figure is */
+.bm-foot {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  margin: auto 0 0;
-  padding-top: 4px;
-  font-size: var(--fs-micro);
+  gap: 8px;
+  margin-top: auto !important;
+  font-size: var(--fs-caption);
+  line-height: 1.45;
 }
 
-.bm-chip {
+.bm-ours {
+  min-width: 0;
+  color: var(--c-subtab-muted);
+  overflow-wrap: anywhere;
+}
+
+.bm-press {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  max-width: 100%;
-  padding: 3px 9px;
-  border: 1px solid var(--c-grid);
+  padding: 2px 9px;
+  border: 1px solid var(--c-loss-border);
   border-radius: 999px;
-  background: var(--c-surface);
-  color: var(--c-axis-title);
-  line-height: 1.4;
-}
-
-.bm-chip-text {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-a.bm-chip.is-link {
-  color: var(--c-gain-text);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-a.bm-chip.is-link:hover {
-  background: var(--c-hover);
-  text-decoration: underline;
-}
-
-a.bm-chip.is-link:focus-visible {
-  outline: 2px solid var(--c-gain);
-  outline-offset: 2px;
-}
-
-.bm-chip.is-press {
-  border-color: var(--c-loss-border);
   background: var(--c-loss-soft);
   color: var(--c-loss-text);
   font-weight: 600;
 }
 
-.bm-chip.is-build {
-  border-color: transparent;
-  background: var(--c-highlight-band);
-  color: var(--c-highlight);
-}
-
-/* Themes: a heading with its icon and count, then stat tiles */
-.bm-group h3 {
+/* Stat tiles: the icon beside the figure, then the title */
+.bm-tile-head {
   display: flex;
   align-items: center;
-  margin: 0 0 12px;
-  font-size: var(--fs-card-title);
-  font-weight: 600;
-  color: var(--c-ink);
-}
-
-.bm-count {
-  margin-left: 10px;
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: var(--c-muted-fill);
-  color: var(--c-axis-title);
-  font-size: var(--fs-micro);
-  font-weight: 500;
-}
-
-.bm-tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-  gap: 16px;
-}
-
-.bm-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   min-width: 0;
-  padding: var(--card-padding, 20px);
-  border: 1px solid var(--c-grid);
-  border-top: 3px solid var(--c-reference);
-  border-radius: 8px;
-  background: var(--c-surface);
-}
-
-.bm-tile.is-estimate {
-  border-top-color: var(--c-gain);
 }
 
 .bm-tile-icon {
   display: inline-flex;
+  flex: none;
   align-items: center;
   justify-content: center;
   width: 40px;
@@ -284,16 +180,9 @@ a.bm-chip.is-link:focus-visible {
   color: var(--c-gain-text);
 }
 
-.bm-tile-figures {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-}
-
 .bm-figure {
   display: grid;
   gap: 2px;
-  margin: 0;
   min-width: 0;
 }
 
@@ -306,17 +195,33 @@ a.bm-chip.is-link:focus-visible {
   color: var(--c-axis-title);
 }
 
-.bm-figure.is-estimate .bm-kicker {
+.bm-figure.is-estimate .bm-kicker,
+.bm-figure.is-estimate .bm-value-main {
   color: var(--c-gain-text);
 }
 
 .bm-value {
+  min-width: 0;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.bm-value-main {
   font-size: var(--fs-xl);
   font-weight: 700;
-  line-height: 1.2;
   color: var(--c-ink);
   font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
+}
+
+.bm-figure.is-second .bm-value-main {
+  font-size: var(--fs-section);
+}
+
+.bm-qualifier {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--c-axis-title);
+  white-space: nowrap;
 }
 
 /* Two dated points as bars from zero */
@@ -387,16 +292,11 @@ a.bm-chip.is-link:focus-visible {
 }
 
 @media (max-width: 480px) {
-  .bm-compare {
-    padding: 12px;
-  }
-
-  .bm-pair dd,
-  .bm-value {
+  .bm-value-main {
     font-size: var(--fs-section);
   }
 
-  .bm-gap {
-    white-space: normal;
+  .bm-compare h4 {
+    min-height: 0;
   }
 }
