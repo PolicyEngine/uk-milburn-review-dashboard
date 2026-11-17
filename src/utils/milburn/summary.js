@@ -6,17 +6,17 @@
  *   { year, runs: [{ id, label, saving_bn: { "2027": … },
  *     young_people_in_losing_households,
  *     share_of_16_24_in_losing_households_pct,
- *     average_loss_young_person_in_losing_household,
+ *     mean_household_change_for_young_people_in_selected_group,
  *     everyone_in_losing_households_pct,
  *     poverty_change_pp: { rel_bhc, rel_ahc, abs_bhc, abs_ahc },
  *     people_into_poverty_abs_bhc, people_into_poverty_rel_bhc,
  *     child_poverty_change_pp_rel_bhc,
  *     break_even_share_in_work_pct: { h16, h25 },
- *     entrants_to_match_income_loss: { h16, h25 },
+ *     entrants_to_match_exchequer_saving: { h16, h25 },
  *     exchequer_gain_per_entrant: { h16, h25 }, people_directly_affected,
  *     direction: "gain"|"loss" }] }
  *
- * The break-even figures share one definition: entrants_to_match_income_loss
+ * The break-even figures share one definition: entrants_to_match_exchequer_saving
  * is the run's Exchequer saving divided by one entrant's gain from work
  * (the household case), and break_even_share_in_work_pct is those entrants
  * as a share of the young people in losing households. Above 100% there
@@ -24,11 +24,10 @@
  * people_directly_affected is the people whose own earnings or taxes
  * change: the movers in the run with a move into work.
  *
- * A "gain" run (the comparators) raises incomes: its *losing* and *loss*
- * fields hold the young people in gaining households and a negative loss
- * (an average gain), its saving is negative (a cost), and it has no
- * break-even arithmetic. Without a direction, a negative average loss marks
- * a gain run.
+ * The direction names the more common group. The historical headcount
+ * keys cover that group. Its signed mean is person-weighted and computed
+ * directly among young people in the group on new flat runs. An old
+ * summary can supply the direction and headcount only.
  *
  * The file is rewritten as national runs finish, so it is fetched afresh
  * (no cache). A run it does not list is "not yet run"; a figure it does not
@@ -96,8 +95,11 @@ export function parseSummaryRun(run) {
       if (/^\d{4}$/.test(year) && finite(value) !== null) saving[year] = value;
     }
   }
-  const averageLoss = finite(run.average_loss_young_person_in_losing_household);
-  const direction = run.direction === "gain" || run.direction === "loss" ? run.direction : averageLoss !== null && averageLoss < 0 ? "gain" : "loss";
+  const householdChange = finite(run.mean_household_change_for_young_people_in_selected_group);
+  // Older summaries used the whole age band's net change. Its sign is
+  // useful only for recovering the direction on old rows that omit it.
+  const legacyLoss = finite(run.average_loss_young_person_in_losing_household);
+  const direction = run.direction === "gain" || run.direction === "loss" ? run.direction : legacyLoss !== null && legacyLoss < 0 ? "gain" : "loss";
   return {
     id: run.id.trim(),
     direction,
@@ -105,16 +107,16 @@ export function parseSummaryRun(run) {
     savingBn: saving,
     youngPeopleLosing: finite(run.young_people_in_losing_households),
     youngShareLosingPct: finite(run.share_of_16_24_in_losing_households_pct),
-    averageLossYoung: averageLoss,
+    averageLossYoung: householdChange === null ? null : -householdChange,
     everyoneLosingPct: finite(run.everyone_in_losing_households_pct),
     povertyPp: pick(run.poverty_change_pp, ["rel_bhc", "rel_ahc", "abs_bhc", "abs_ahc"]),
     // Before housing costs: the page's default poverty measure
     peopleIntoPovertyAbs: finite(run.people_into_poverty_abs_bhc),
     peopleIntoPovertyRel: finite(run.people_into_poverty_rel_bhc),
     childPovertyPpRel: finite(run.child_poverty_change_pp_rel_bhc),
-    breakEvenSharePct: pick(run.break_even_share_in_work_pct, HOURS_KEYS),
-    entrantsToMatch: pick(run.entrants_to_match_income_loss, HOURS_KEYS),
-    exchequerGainPerEntrant: pick(run.exchequer_gain_per_entrant, HOURS_KEYS),
+    breakEvenSharePct: pick(run.entrants_to_match_exchequer_saving && run.break_even_share_in_work_pct, HOURS_KEYS),
+    entrantsToMatch: pick(run.entrants_to_match_exchequer_saving, HOURS_KEYS),
+    exchequerGainPerEntrant: pick(run.entrants_to_match_exchequer_saving && run.exchequer_gain_per_entrant, HOURS_KEYS),
     peopleDirectlyAffected: finite(run.people_directly_affected),
   };
 }

@@ -109,7 +109,6 @@ export function entryRunPoints(movers) {
     movers === null || movers === undefined ? `Who moves: an assumed ${share}.` : `Who moves: about ${formatPeople(movers)} people, an assumed ${share}.`,
     `Each moves from no work into ${ENTRY_ASSUMPTION.work}.`,
     "The Exchequer saving then counts the taxes paid on their earnings and any fall in their benefits.",
-    "The average loss covers every 16 to 24-year-old in a losing household, whether or not they move.",
   ];
 }
 
@@ -197,7 +196,7 @@ export function EntryComparison({ summary, catalogue }) {
       delta: lossDelta === null ? null : signedPounds(lossDelta),
       tone: tone(lossDelta, -1),
     },
-  ];
+  ].filter((row) => row.key !== "loss" || lossDelta !== null);
   const SERIES = [
     { name: "Static", color: CHART_COLOURS.before },
     { name: "25% move into work", color: CHART_COLOURS.after },
@@ -726,8 +725,8 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null, gainY
     const yearLabel = fiscalYearTick(summary.year);
     if (!run) {
       body = <p role="status">Not yet run: the arithmetic for {name} appears here once its national run has finished.</p>;
-    } else if (run.direction === "gain") {
-      body = <p role="status">{name} raises young people&rsquo;s household incomes, so there is no loss for work to make up: no break-even arithmetic applies.</p>;
+    } else if (BREAK_EVEN_HOURS.every(({ id }) => run.entrantsToMatch[id] === null)) {
+      body = <p role="status">No break-even calculation is available for {name}.</p>;
     } else {
       const hoursRows = BREAK_EVEN_HOURS.map(({ id: hoursId, hours }) => ({
         hours,

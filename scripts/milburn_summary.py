@@ -11,6 +11,7 @@ illustrative.
 
 import csv
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -44,22 +45,25 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     worse = float(young["pct_worse_off"]) / 100
     better = float(young["pct_better_off"]) / 100
     gains = better > worse
-    if gains:
-        worse = better
-    mean_change = float(young["mean_change"])
-    affected = people * worse
-    # Average change in household net income for a young person in an
-    # affected household (household-level loss attributed to the person).
-    loss_affected = (-mean_change / worse if worse else None)
+    share = better if gains else worse
+    affected = people * share
+    # Only new flat runs have this conditional, person-weighted mean.
+    # Even a run with no material gainers can have small changes in its
+    # unchanged group, so legacy means cannot recover it by division.
+    column = "mean_change_better_off" if gains else "mean_change_worse_off"
+    raw = young.get(column)
+    conditional = float(raw) if raw else None
+    if conditional is not None and not math.isfinite(conditional):
+        raise ValueError(f"{rid}: invalid {column}")
     out = {
         "id": rid,
         "label": build["label"],
         "saving_bn": {str(y): round(v, 3) for y, v in sorted(budget.items())},
         "direction": "gain" if gains else "loss",
         "young_people_in_losing_households": round(affected),
-        "share_of_16_24_in_losing_households_pct": round(worse * 100, 2),
-        "average_loss_young_person_in_losing_household": (
-            round(loss_affected) if loss_affected is not None else None
+        "share_of_16_24_in_losing_households_pct": round(share * 100, 2),
+        "mean_household_change_for_young_people_in_selected_group": (
+            round(conditional) if conditional is not None else None
         ),
         "everyone_in_losing_households_pct": round(
             float(ages["all"]["pct_worse_off"]), 2
@@ -109,7 +113,9 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     # (a single 22-year-old renter with LCWRA); a household with PIP or a
     # partner gains differently, so this is an order of magnitude, not an
     # estimate.
-    if loss_affected and loss_affected > 0 and not gains and scenarios:
+    # With offsetting gains the net fiscal saving does not stand for the
+    # losses of the losing group. This exercise needs no conditional mean.
+    if worse > 0 and better == 0 and budget.get(YEAR, 0) > 0 and scenarios:
         cases = scenarios.get("entry_cases", [])
         saving = budget.get(YEAR, 0) * 1e9
         entrants = {
@@ -122,7 +128,7 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
         out["break_even_share_in_work_pct"] = {
             k: round(100 * v / affected, 1) for k, v in entrants.items()
         }
-        out["entrants_to_match_income_loss"] = {
+        out["entrants_to_match_exchequer_saving"] = {
             k: round(v) for k, v in entrants.items()
         }
         out["exchequer_gain_per_entrant"] = {
@@ -144,18 +150,20 @@ def main():
     )
     w = sys.stdout.write
     w(
-        "| Measure | Saving 2029-30 | 16-24s in losing households |"
-        " Avg loss (losing hh) | Absolute AHC poverty |"
+        "| Measure | Saving 2029-30 | 16-24s in the selected group |"
+        " Mean household income change in that group | Absolute AHC poverty |"
         " Entrants needed, share of 16-24s in losing households 16h / 25h |\n"
     )
     w("|---|---|---|---|---|---|\n")
     for r in results:
         be = r.get("break_even_share_in_work_pct", {})
+        mean = r["mean_household_change_for_young_people_in_selected_group"]
+        mean_text = "—" if mean is None else f"£{mean:+,}"
         w(
             f"| {r['id']} | £{r['saving_bn'][str(YEAR)]:.2f}bn |"
             f" {r['young_people_in_losing_households']/1000:.0f}k"
-            f" ({r['share_of_16_24_in_losing_households_pct']:.1f}%) |"
-            f" £{r['average_loss_young_person_in_losing_household'] or 0:,} |"
+            f" ({r['share_of_16_24_in_losing_households_pct']:.1f}% {r['direction']}) |"
+            f" {mean_text} |"
             f" {r['poverty_change_pp']['abs_ahc']:+.2f}pp"
             f" ({r['people_into_poverty_abs_ahc']/1000:.0f}k) |"
             f" {be.get('h16', '–')}% / {be.get('h25', '–')}% |\n"

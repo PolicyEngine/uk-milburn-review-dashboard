@@ -199,7 +199,7 @@ export function keyFigureTiles(run, year) {
       value: formatPounds(Math.abs(run.averageLossYoung)),
       extra: "a year",
       label: `Their average household ${gain ? "gain" : "loss"}`,
-      definition: "Per household, not per person.",
+      definition: `Annual change in household income, averaged over 16–24s in households that ${gain ? "gain" : "lose"}.`,
     });
   }
   // Absolute poverty first: its line is fixed in real terms, while the

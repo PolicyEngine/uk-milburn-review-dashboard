@@ -452,7 +452,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
               items={[
                 [
                   "Microsimulated",
-                  `The full abolition package (the same two removals as the report’s benefit changes, applied from April 2027) is run again on the assumption that ${ENTRY_ASSUMPTION_TEXT}, chosen at random, and set beside the static package: the saving, poverty and average loss.`,
+                  `The full abolition package (the same two removals as the report’s benefit changes, applied from April 2027) is run again on the assumption that ${ENTRY_ASSUMPTION_TEXT}, chosen at random, and compared with the static package on the Exchequer saving and poverty.`,
                 ],
                 [
                   "Why 25%",

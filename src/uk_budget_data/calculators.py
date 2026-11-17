@@ -1180,6 +1180,10 @@ class AgeImpactCalculator(BaseCalculator):
     no row, so thin cells are never published.
     """
 
+    def __init__(self, young_survey_households=None):
+        # Optional for Milburn flat outputs. Receipted age tables keep their schema.
+        self.young_survey_households = young_survey_households
+
     def calculate(
         self,
         baseline,
@@ -1218,6 +1222,8 @@ class AgeImpactCalculator(BaseCalculator):
                 "own_change": own_change,
             }
         )
+        if self.young_survey_households is not None:
+            frame["survey_household"] = self.young_survey_households
         return self.calculate_from_dataframe(
             reform_id, reform_name, year, frame
         )
@@ -1289,7 +1295,57 @@ class AgeImpactCalculator(BaseCalculator):
                     ),
                 }
             )
+            if label == "16-24" and "survey_household" in frame:
+                rows[-1].update(
+                    self._young_conditional_means(
+                        members,
+                        better,
+                        worse,
+                        change,
+                        weight,
+                        frame["survey_household"].to_numpy(),
+                    )
+                )
         return rows
+
+    @staticmethod
+    def _young_conditional_means(
+        members, better, worse, change, weight, survey
+    ):
+        from uk_budget_data.publication.disclosure_floor import (
+            SURVEY_HOUSEHOLD_FLOOR,
+        )
+
+        # The existing band mean includes both directions and changes below
+        # the threshold. Its weighted total is observable from the flat row.
+        participating = members & (weight > 0)
+        groups = {
+            "mean_change_better_off": participating & better,
+            "mean_change_worse_off": participating & worse,
+        }
+        result = dict.fromkeys(groups)
+        hidden = participating & (change != 0)
+        visible = {}
+        for name, group in groups.items():
+            if len(np.unique(survey[group])) >= SURVEY_HOUSEHOLD_FLOOR:
+                visible[name] = group
+                hidden = hidden & ~group
+        # Subtracting the released groups from the band total must not
+        # reveal a change attributable to just one or two survey households.
+        # Withhold one companion only when that residual is thin.
+        if (
+            visible
+            and 0 < len(np.unique(survey[hidden])) < SURVEY_HOUSEHOLD_FLOOR
+        ):
+            companion = min(
+                visible, key=lambda name: weight[visible[name]].sum()
+            )
+            del visible[companion]
+        for name, group in visible.items():
+            result[name] = float(
+                MicroSeries(change[group], weights=weight[group]).mean()
+            )
+        return result
 
 
 # The income distribution: the percentiles published, and the floor on

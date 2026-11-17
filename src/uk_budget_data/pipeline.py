@@ -710,17 +710,33 @@ def run_flat_unit(unit: FlatUnit) -> FlatOutcome:
             ):
                 warn(gap.reason)
     survey = None
-    if unit.tables & {"household_scatter", "income_distribution"}:
+    milburn_age = isinstance(
+        getattr(baseline, "local_build", None), dict
+    ) and (flat or "age_impact" in unit.tables)
+    if milburn_age or unit.tables & {
+        "household_scatter",
+        "income_distribution",
+    }:
         survey = scatter_survey_households(baseline, dataset_path)
+    young_survey_households = (
+        baseline.map_result(survey, "household", "person")
+        if milburn_age
+        else None
+    )
 
     # Every table is read while the watch runs, from the same two runs.
     with data_limits.observing(baseline, reformed) as observed:
         if flat:
-            outcome.result = ReformProcessor(reform, config).process(
+            processor = ReformProcessor(reform, config)
+            if milburn_age:
+                processor.age_calc = AgeImpactCalculator(
+                    young_survey_households
+                )
+            outcome.result = processor.process(
                 baseline, reformed, baseline_scenario
             )
         elif "age_impact" in unit.tables:
-            calculator = AgeImpactCalculator()
+            calculator = AgeImpactCalculator(young_survey_households)
             for year in config.years:
                 outcome.age_rows.extend(
                     calculator.calculate(

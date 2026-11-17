@@ -14,7 +14,7 @@
       "direction": "gain",
       "young_people_in_losing_households": 2857105,
       "share_of_16_24_in_losing_households_pct": 38.17,
-      "average_loss_young_person_in_losing_household": -2827,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.0,
       "poverty_change_pp": {
         "rel_bhc": 0.132,
@@ -43,7 +43,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 580365,
       "share_of_16_24_in_losing_households_pct": 7.75,
-      "average_loss_young_person_in_losing_household": 12962,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 2.02,
       "poverty_change_pp": {
         "rel_bhc": 0.366,
@@ -62,7 +62,7 @@
         "h16": 97.4,
         "h25": 76.7
       },
-      "entrants_to_match_income_loss": {
+      "entrants_to_match_exchequer_saving": {
         "h16": 565316,
         "h25": 445024
       },
@@ -84,7 +84,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 580365,
       "share_of_16_24_in_losing_households_pct": 7.75,
-      "average_loss_young_person_in_losing_household": 7258,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 2.02,
       "poverty_change_pp": {
         "rel_bhc": 0.028,
@@ -103,7 +103,7 @@
         "h16": 55.2,
         "h25": 43.4
       },
-      "entrants_to_match_income_loss": {
+      "entrants_to_match_exchequer_saving": {
         "h16": 320255,
         "h25": 252109
       },
@@ -125,7 +125,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 561867,
       "share_of_16_24_in_losing_households_pct": 7.51,
-      "average_loss_young_person_in_losing_household": 11586,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 1.94,
       "poverty_change_pp": {
         "rel_bhc": 0.129,
@@ -139,19 +139,7 @@
       "people_into_poverty_abs_bhc": 176067,
       "people_into_poverty_rel_bhc": 89782,
       "child_poverty_change_pp_rel_bhc": -0.018,
-      "people_directly_affected": 82781,
-      "break_even_share_in_work_pct": {
-        "h16": 103.5,
-        "h25": 81.5
-      },
-      "entrants_to_match_income_loss": {
-        "h16": 581746,
-        "h25": 457957
-      },
-      "exchequer_gain_per_entrant": {
-        "h16": 4227.0,
-        "h25": 9438.18
-      }
+      "people_directly_affected": 82781
     },
     {
       "id": "milburn_package_phased",
@@ -166,7 +154,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 468612,
       "share_of_16_24_in_losing_households_pct": 6.26,
-      "average_loss_young_person_in_losing_household": 12834,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 1.71,
       "poverty_change_pp": {
         "rel_bhc": 0.228,
@@ -185,7 +173,7 @@
         "h16": 97.5,
         "h25": 76.7
       },
-      "entrants_to_match_income_loss": {
+      "entrants_to_match_exchequer_saving": {
         "h16": 456728,
         "h25": 359542
       },
@@ -207,7 +195,7 @@
       "direction": "gain",
       "young_people_in_losing_households": 765656,
       "share_of_16_24_in_losing_households_pct": 10.23,
-      "average_loss_young_person_in_losing_household": -487,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.0,
       "poverty_change_pp": {
         "rel_bhc": 0.001,
@@ -236,7 +224,7 @@
       "direction": "gain",
       "young_people_in_losing_households": 765656,
       "share_of_16_24_in_losing_households_pct": 10.23,
-      "average_loss_young_person_in_losing_household": -299,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.0,
       "poverty_change_pp": {
         "rel_bhc": 0.001,
@@ -265,7 +253,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 580365,
       "share_of_16_24_in_losing_households_pct": 7.75,
-      "average_loss_young_person_in_losing_household": 12962,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 2.02,
       "poverty_change_pp": {
         "rel_bhc": 0.366,
@@ -284,7 +272,7 @@
         "h16": 97.4,
         "h25": 76.7
       },
-      "entrants_to_match_income_loss": {
+      "entrants_to_match_exchequer_saving": {
         "h16": 565316,
         "h25": 445024
       },
@@ -306,7 +294,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 341034,
       "share_of_16_24_in_losing_households_pct": 4.56,
-      "average_loss_young_person_in_losing_household": 12710,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 1.27,
       "poverty_change_pp": {
         "rel_bhc": 0.11,
@@ -325,7 +313,7 @@
         "h16": 98.3,
         "h25": 77.4
       },
-      "entrants_to_match_income_loss": {
+      "entrants_to_match_exchequer_saving": {
         "h16": 335108,
         "h25": 263801
       },
@@ -347,7 +335,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 583106,
       "share_of_16_24_in_losing_households_pct": 7.79,
-      "average_loss_young_person_in_losing_household": 11304,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 2.03,
       "poverty_change_pp": {
         "rel_bhc": 0.352,
@@ -361,19 +349,7 @@
       "people_into_poverty_abs_bhc": 319944,
       "people_into_poverty_rel_bhc": 246077,
       "child_poverty_change_pp_rel_bhc": 0.516,
-      "people_directly_affected": 0,
-      "break_even_share_in_work_pct": {
-        "h16": 84.2,
-        "h25": 66.2
-      },
-      "entrants_to_match_income_loss": {
-        "h16": 490689,
-        "h25": 386276
-      },
-      "exchequer_gain_per_entrant": {
-        "h16": 4227.0,
-        "h25": 9438.18
-      }
+      "people_directly_affected": 0
     },
     {
       "id": "milburn_report_pip",
@@ -388,7 +364,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 557321,
       "share_of_16_24_in_losing_households_pct": 7.45,
-      "average_loss_young_person_in_losing_household": 10497,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 1.96,
       "poverty_change_pp": {
         "rel_bhc": 0.247,
@@ -407,7 +383,7 @@
         "h16": 79.2,
         "h25": 62.3
       },
-      "entrants_to_match_income_loss": {
+      "entrants_to_match_exchequer_saving": {
         "h16": 441375,
         "h25": 347456
       },
@@ -429,7 +405,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 403968,
       "share_of_16_24_in_losing_households_pct": 5.4,
-      "average_loss_young_person_in_losing_household": 4793,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 1.26,
       "poverty_change_pp": {
         "rel_bhc": 0.058,
@@ -443,19 +419,7 @@
       "people_into_poverty_abs_bhc": 48804,
       "people_into_poverty_rel_bhc": 40547,
       "child_poverty_change_pp_rel_bhc": 0.088,
-      "people_directly_affected": 0,
-      "break_even_share_in_work_pct": {
-        "h16": 33.8,
-        "h25": 26.6
-      },
-      "entrants_to_match_income_loss": {
-        "h16": 136685,
-        "h25": 107600
-      },
-      "exchequer_gain_per_entrant": {
-        "h16": 4227.0,
-        "h25": 9438.18
-      }
+      "people_directly_affected": 0
     },
     {
       "id": "milburn_report_youth_allowance_combined",
@@ -470,7 +434,7 @@
       "direction": "gain",
       "young_people_in_losing_households": 545350,
       "share_of_16_24_in_losing_households_pct": 7.29,
-      "average_loss_young_person_in_losing_household": -1724,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.01,
       "poverty_change_pp": {
         "rel_bhc": -0.005,
@@ -499,7 +463,7 @@
       "direction": "gain",
       "young_people_in_losing_households": 158959,
       "share_of_16_24_in_losing_households_pct": 2.12,
-      "average_loss_young_person_in_losing_household": -1093,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.01,
       "poverty_change_pp": {
         "rel_bhc": -0.001,
@@ -528,7 +492,7 @@
       "direction": "gain",
       "young_people_in_losing_households": 421780,
       "share_of_16_24_in_losing_households_pct": 5.64,
-      "average_loss_young_person_in_losing_household": -1693,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.0,
       "poverty_change_pp": {
         "rel_bhc": -0.002,
@@ -557,7 +521,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 557321,
       "share_of_16_24_in_losing_households_pct": 7.45,
-      "average_loss_young_person_in_losing_household": 4976,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 1.96,
       "poverty_change_pp": {
         "rel_bhc": -0.05,
@@ -576,7 +540,7 @@
         "h16": 39.5,
         "h25": 31.1
       },
-      "entrants_to_match_income_loss": {
+      "entrants_to_match_exchequer_saving": {
         "h16": 220007,
         "h25": 173192
       },
@@ -598,7 +562,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 649235,
       "share_of_16_24_in_losing_households_pct": 8.67,
-      "average_loss_young_person_in_losing_household": 11314,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 2.37,
       "poverty_change_pp": {
         "rel_bhc": 0.337,
@@ -617,7 +581,7 @@
         "h16": 87.4,
         "h25": 68.8
       },
-      "entrants_to_match_income_loss": {
+      "entrants_to_match_exchequer_saving": {
         "h16": 567413,
         "h25": 446674
       },
@@ -639,7 +603,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 557321,
       "share_of_16_24_in_losing_households_pct": 7.45,
-      "average_loss_young_person_in_losing_household": 10497,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 1.96,
       "poverty_change_pp": {
         "rel_bhc": 0.247,
@@ -658,7 +622,7 @@
         "h16": 79.2,
         "h25": 62.3
       },
-      "entrants_to_match_income_loss": {
+      "entrants_to_match_exchequer_saving": {
         "h16": 441375,
         "h25": 347456
       },
@@ -680,7 +644,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 235678,
       "share_of_16_24_in_losing_households_pct": 3.15,
-      "average_loss_young_person_in_losing_household": 4720,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.71,
       "poverty_change_pp": {
         "rel_bhc": 0.012,
@@ -694,19 +658,7 @@
       "people_into_poverty_abs_bhc": 8281,
       "people_into_poverty_rel_bhc": 8281,
       "child_poverty_change_pp_rel_bhc": 0.009,
-      "people_directly_affected": 0,
-      "break_even_share_in_work_pct": {
-        "h16": 30.5,
-        "h25": 24.0
-      },
-      "entrants_to_match_income_loss": {
-        "h16": 71840,
-        "h25": 56553
-      },
-      "exchequer_gain_per_entrant": {
-        "h16": 4227.0,
-        "h25": 9438.18
-      }
+      "people_directly_affected": 0
     },
     {
       "id": "uc_health_element_removed_under_25",
@@ -721,7 +673,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 403968,
       "share_of_16_24_in_losing_households_pct": 5.4,
-      "average_loss_young_person_in_losing_household": 4793,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 1.26,
       "poverty_change_pp": {
         "rel_bhc": 0.058,
@@ -735,19 +687,7 @@
       "people_into_poverty_abs_bhc": 48804,
       "people_into_poverty_rel_bhc": 40547,
       "child_poverty_change_pp_rel_bhc": 0.088,
-      "people_directly_affected": 0,
-      "break_even_share_in_work_pct": {
-        "h16": 33.8,
-        "h25": 26.6
-      },
-      "entrants_to_match_income_loss": {
-        "h16": 136685,
-        "h25": 107600
-      },
-      "exchequer_gain_per_entrant": {
-        "h16": 4227.0,
-        "h25": 9438.18
-      }
+      "people_directly_affected": 0
     },
     {
       "id": "uc_health_element_removed_under_25_new_claims",
@@ -762,7 +702,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 94794,
       "share_of_16_24_in_losing_households_pct": 1.27,
-      "average_loss_young_person_in_losing_household": 2583,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.3,
       "poverty_change_pp": {
         "rel_bhc": 0.008,
@@ -776,19 +716,7 @@
       "people_into_poverty_abs_bhc": 5324,
       "people_into_poverty_rel_bhc": 5325,
       "child_poverty_change_pp_rel_bhc": 0.009,
-      "people_directly_affected": 0,
-      "break_even_share_in_work_pct": {
-        "h16": 16.8,
-        "h25": 13.2
-      },
-      "entrants_to_match_income_loss": {
-        "h16": 15927,
-        "h25": 12538
-      },
-      "exchequer_gain_per_entrant": {
-        "h16": 4227.0,
-        "h25": 9438.18
-      }
+      "people_directly_affected": 0
     },
     {
       "id": "uc_health_element_removed_under_25_severe_kept",
@@ -803,7 +731,7 @@
       "direction": "loss",
       "young_people_in_losing_households": 284147,
       "share_of_16_24_in_losing_households_pct": 3.8,
-      "average_loss_young_person_in_losing_household": 5066,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.86,
       "poverty_change_pp": {
         "rel_bhc": 0.053,
@@ -817,19 +745,7 @@
       "people_into_poverty_abs_bhc": 44427,
       "people_into_poverty_rel_bhc": 37066,
       "child_poverty_change_pp_rel_bhc": 0.098,
-      "people_directly_affected": 0,
-      "break_even_share_in_work_pct": {
-        "h16": 35.3,
-        "h25": 27.8
-      },
-      "entrants_to_match_income_loss": {
-        "h16": 100248,
-        "h25": 78916
-      },
-      "exchequer_gain_per_entrant": {
-        "h16": 4227.0,
-        "h25": 9438.18
-      }
+      "people_directly_affected": 0
     },
     {
       "id": "youth_allowance_at_25_plus_rate",
@@ -844,7 +760,7 @@
       "direction": "gain",
       "young_people_in_losing_households": 1147710,
       "share_of_16_24_in_losing_households_pct": 15.33,
-      "average_loss_young_person_in_losing_household": -1209,
+      "mean_household_change_for_young_people_in_selected_group": null,
       "everyone_in_losing_households_pct": 0.01,
       "poverty_change_pp": {
         "rel_bhc": -0.041,

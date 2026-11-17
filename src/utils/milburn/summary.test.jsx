@@ -117,7 +117,10 @@ describe("parseSummary", () => {
   it("reads a gain run's direction, and infers it from a negative loss when absent", () => {
     expect(summaryRun(summary, "youth_allowance_at_25_plus_rate").direction).toBe("gain");
     const inferred = parseSummary({ year: 2027, runs: [{ id: "x", average_loss_young_person_in_losing_household: -5 }] });
-    expect(summaryRun(inferred, "x").direction).toBe("gain");
+    const legacy = summaryRun(inferred, "x");
+    expect(legacy.direction).toBe("gain");
+    expect(legacy.averageLossYoung).toBeNull();
+    expect(keyFigureTiles(legacy, 2027).some((tile) => tile.key === "loss")).toBe(false);
   });
 });
 
@@ -429,7 +432,7 @@ describe("BreakEven", () => {
     vi.stubGlobal("fetch", fixtureFetch());
     const catalogue = await localCatalogue();
     const { unmount } = render(<BreakEven runId="youth_allowance_at_25_plus_rate" catalogue={catalogue} />);
-    expect(await screen.findByText(/no break-even arithmetic applies/)).toBeTruthy();
+    expect(await screen.findByText(/No break-even calculation is available/)).toBeTruthy();
     expect(screen.queryByRole("table")).toBeNull();
     unmount();
     render(<BreakEven runId="milburn_package_central" catalogue={catalogue} />);
@@ -462,8 +465,8 @@ describe("the published summary", () => {
     const full = summaryRun(published, "milburn_package");
     // The 2029-30 entry case (milburn_scenarios.json) against the 2029-30 saving
     expect(full.breakEvenSharePct).toEqual({ h16: 97.4, h25: 76.7 });
-    // Above 100% still occurs, so its wording is still shown
-    expect(summaryRun(published, "milburn_package_entry_25pct").breakEvenSharePct.h16).toBeGreaterThan(100);
+    // Net savings cannot represent the losing group's losses on a mixed run.
+    expect(summaryRun(published, "milburn_package_entry_25pct").breakEvenSharePct.h16).toBeNull();
   });
 
   it("counts the entry run's movers from its own results, and none in a static run", () => {
@@ -484,8 +487,8 @@ describe("the published summary", () => {
     expect(rows[1].textContent).toContain("£4.80bn");
     expect(rows[2].textContent).toContain("+0.49pp (about 342,000 people)");
     expect(rows[2].textContent).toContain("+0.25pp (about 176,000 people)");
-    expect(rows[3].textContent).toContain("£12,962");
-    expect(rows[3].textContent).toContain("£11,586");
+    expect(within(screen.getByRole("table")).queryByText(/Average loss/)).toBeNull();
+    expect(screen.queryByText(/£11,586/)).toBeNull();
   });
 });
 
