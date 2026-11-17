@@ -281,20 +281,19 @@ export default function KeyFigures({ runId, nameShownAbove = false }) {
       {/* Under the tiles, once the run has figures to set them beside */}
       {status === "ready" && summaryRun(summary, id) && <BenchmarkCallout place="young" />}
       {status === "ready" && <RangeStrip summary={summary} selectedId={id} />}
-      {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
-        <ul className="milburn-points">
-          <li data-poverty-note="">
-            <TitleIcon name="percent" bare size={14} />
-            <span>{relativePovertySentence(summaryRun(summary, id))}</span>
-          </li>
-        </ul>
-      )}
       <details className="milburn-details">
         <summary>
           <TitleIcon name="alert" bare size={14} />
           Notes and caveats
         </summary>
         <ul className="milburn-points">
+          {/* Relative poverty, folded with the notes (Vahid, 17 Nov) */}
+          {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
+            <li data-poverty-note="">
+              <TitleIcon name="percent" bare size={14} />
+              <span>{relativePovertySentence(summaryRun(summary, id))}</span>
+            </li>
+          )}
           <li>
             <TitleIcon name="scale" bare size={14} />
             <span>{RELATIVE_LINE_NOTE}</span>
