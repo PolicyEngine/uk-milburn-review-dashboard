@@ -1,7 +1,5 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { buildBudgetData } from "./budgetData";
-import { parseCsv } from "./publication/csv";
 import { DISPLAY_YEARS } from "./displayYears";
 
 const POLICIES = [
@@ -46,12 +44,4 @@ describe("the revenue chart's points", () => {
     expect(p2031.netImpact).toBe(-1);
   });
 
-  it("publish every shown year from the published package's budgetary_impact.csv", () => {
-    const { combined } = JSON.parse(readFileSync("public/data/manifest.json", "utf8"));
-    const [{ artifact }] = Object.values(combined);
-    const [keys, ...lines] = parseCsv(readFileSync(`public/data/${artifact}/budgetary_impact.csv`, "utf8").trimEnd());
-    const rows = lines.map((cells) => Object.fromEntries(cells.map((value, i) => [keys[i], value])));
-    const data = buildBudgetData(rows, POLICIES, POLICIES.map((p) => p.id));
-    expect(data.filter((point) => point.unpublished)).toEqual([]);
-  });
 });

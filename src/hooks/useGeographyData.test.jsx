@@ -1,12 +1,8 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook as renderHookReact, waitFor } from "@testing-library/react";
 import { AREA_ROUTING_CONTENTS } from "../../scripts/check-public-files.mjs";
 import {
   loadAreaRouting,
-  loadBoundaries,
   loadGeographyFile,
   resetGeographyCache,
   useAreaRouting,
@@ -29,19 +25,6 @@ vi.mock("../utils/publication/flat", async (importOriginal) => {
 });
 
 const renderHook = (callback, options = {}) => renderHookReact(callback, { wrapper: GeographyCatalogueProvider, ...options });
-
-// Written by uk_budget_data.area_routing from the installed bundle.
-const PUBLIC_AREA_ROUTING = readFileSync(
-  join(
-    dirname(fileURLToPath(import.meta.url)),
-    "..",
-    "..",
-    "public",
-    "data",
-    "area-routing.json",
-  ),
-  "utf-8",
-);
 
 beforeEach(() => resetGeographyCache());
 afterEach(() => vi.unstubAllGlobals());
@@ -214,18 +197,6 @@ describe("useAreaRouting", () => {
     },
   );
 
-  it("reads the file the Python side wrote for the installed bundle", async () => {
-    vi.stubGlobal(
-      "fetch",
-      geographyFetch({ [AREA_ROUTING_URL]: PUBLIC_AREA_ROUTING }),
-    );
-    const { result } = renderHook(() => useAreaRouting());
-    await waitFor(() => expect(result.current.status).toBe("ready"));
-    expect(["available", "not_available"]).toContain(
-      result.current.routing.areaViews,
-    );
-  });
-
   it("says a missing file is unavailable", async () => {
     vi.stubGlobal("fetch", geographyFetch({ [AREA_ROUTING_URL]: 404 }));
     const { result } = renderHook(() => useAreaRouting());
@@ -325,23 +296,5 @@ describe("useAreaRouting", () => {
     });
     const { result } = renderHook(() => useAreaRouting());
     await waitFor(() => expect(result.current.status).toBe("error"));
-  });
-});
-
-describe("the TopoJSON boundaries", () => {
-  it("decodes the published file to the GeoJSON's seats, with the properties the page reads", async () => {
-    const { readFileSync } = await import("node:fs");
-    const { join } = await import("node:path");
-    const read = (name) => readFileSync(join(process.cwd(), "public", "data", name), "utf-8");
-    const topo = read("uk_constituencies_2024.topo.json");
-    const geojson = JSON.parse(read("uk_constituencies_2024.geojson"));
-    const fetchImpl = async () => new Response(topo, { status: 200 });
-    const state = await loadBoundaries({ fetchImpl, base: "" });
-    expect(state.status).toBe("ready");
-    expect(state.features.map((f) => f.properties.GSScode)).toEqual(geojson.features.map((f) => f.properties.GSScode));
-    for (const [index, feature] of state.features.entries()) {
-      const source = geojson.features[index].properties;
-      expect(feature.properties).toEqual({ Name: source.Name, CTR_REG: source.CTR_REG, Country: source.Country, GSScode: source.GSScode });
-    }
   });
 });

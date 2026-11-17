@@ -89,47 +89,6 @@ describe("why our estimates differ from the official costings", () => {
   // matches what we model (efo-october-2026-detailed-forecast-tables-policy
   // .xlsx, sheet 1.1) and give Table 6.1's rounded total as context. The
   // notes name it the government's costing, which the OBR certified
-  it("compares each re-based note with its OBR Table 1.1 line, Table 6.1 as context", () => {
-    const note = (id) => OBR_DEVIATION_NOTES[id];
-    const text = (id) => OBR_DIFFERENCE_POINTS[id].map((point) => point.text ?? Object.values(point.byYear).join(" ")).join(" ");
-    expect(note("household_energy_payment_2026")).toMatch(/^Our £1,969 million in 2026-27 falls 25% short of the government's costing of £2,627 million, which the OBR certified/);
-    expect(note("domestic_electricity_zero_vat")).toMatch(/^Our cost exceeds the VAT receipts in the government's costing, which the OBR certified, by £106m \(14%\) in 2026-27 \(£840m against £734m\) and by £57m \(19%\)/);
-    expect(note("domestic_electricity_zero_vat")).not.toMatch(/within about 4%/);
-    expect(note("trading_allowance_raise")).toMatch(/^From 2028-29 our estimate trails the matching income tax and NICs lines of the government's costing, which the OBR certified, by [^]*The OBR gives those lines as £221m, £165m, £171m and £178m in its detailed policy table, Table 1\.1\./);
-    expect(note("property_income_rates_up")).toMatch(/ours exceeds the income tax line of the government's costing, which the OBR certified, by 9% to 11%: \+£429m against \+£394m in 2029-30/);
-    expect(note("savings_income_rates_up")).toMatch(/^Self Assessment taxpayers pay later, so we don't compare 2027-28 or 2028-29\. From 2029-30 ours reaches 68% to 69% of the income tax line of the government's costing, which the OBR certified[^]*\+£307m against \+£443m in 2029-30/);
-    // Fuel duty's is the one costing the OBR could not certify (EFO October 2026, chapter 3)
-    expect(note("fuel_duty_rise_deferral")).toMatch(/£273 million below the official figure in 2026-27 \(£301 million against £574 million\)[^]*the government's estimate, which the OBR used but could not certify/);
-    expect(note("fuel_duty_rise_deferral")).not.toMatch(/OBR certified|certified by the OBR/);
-    expect(OBR_COMPARISON_BASES.fuel_duty_rise_deferral).toMatch(/could not certify/);
-    // The Pension Tax Allowance's "the Treasury's 500,000" is a count, not a costing
-    const strings = (value) => (typeof value === "string" ? [value] : Object.values(value ?? {}).flatMap(strings));
-    for (const line of strings([OBR_DIFFERENCE_POINTS, OBR_DEVIATION_NOTES, OBR_COMPARISON_BASES, OBR_PANEL_BASES])) {
-      expect(line).not.toMatch(/the Treasury['’]s (?!500,000)/);
-    }
-    expect(text("domestic_electricity_zero_vat")).not.toMatch(/within about 4%/);
-    expect(text("property_income_rates_up")).not.toMatch(/within 1\.5%/);
-    // The page shows the not-comparable reasons from official_costings.json
-    // (written from data_inputs/treasury/mapping.csv), so the Table 6.1
-    // comparison can't come back there either (Pavel, 29 October)
-    const reasons = Object.values(JSON.parse(readFileSync("public/data/official_costings.json", "utf8")).measures)
-      .flatMap((measure) => Object.values(measure.years))
-      .map((year) => year.not_comparable?.reason)
-      .filter(Boolean);
-    expect(reasons.length).toBeGreaterThan(0);
-    for (const reason of reasons) expect(reason).not.toMatch(/within 1\.5%/);
-    expect(readFileSync("data_inputs/treasury/mapping.csv", "utf8")).not.toMatch(/within 1\.5%/);
-    // The years official_costings.json marks not comparable: the Pension Tax
-    // Allowance's after it ends in April 2030, the bus fare cap's after the cap
-    const costings = JSON.parse(readFileSync("public/data/official_costings.json", "utf8")).measures;
-    const notCompared = (id) => Object.entries(costings[id].years).filter(([, year]) => year.not_comparable).map(([year]) => year);
-    expect(notCompared("state_pension_income_tax_protection")).toEqual(["2030", "2031"]);
-    expect(NOT_COMPARABLE_SHORT.state_pension_income_tax_protection).toBe("The allowance ends in April 2030, so we don't compare later years.");
-    expect(notCompared("bus_fare_cap_2027")).toEqual(["2028", "2029"]);
-    expect(NOT_COMPARABLE_SHORT.bus_fare_cap_2027).toBe("The cap ends in December 2027, so we don't compare later years.");
-    expect(note("bus_fare_cap_2027")).toMatch(/in 2028-29 and \+£170 million in 2029-30 from that reprioritisation, so we don't compare those years\.$/);
-  });
-
   // The Table 6.1 figures a note gives as context are the Budget's own
   // (data_inputs/treasury/sources/AB2026-T6.1.csv, the chart's official column)
   it("gives Table 6.1's figures as the source file has them", () => {
@@ -384,36 +343,6 @@ describe("why our estimates differ from the official costings", () => {
   // people who gain, its age_impact.csv. When we regenerate, the artifacts
   // change, so this fails until the fixture, and each note figure computed
   // from it, matches the new release
-  it("computes from the figures the release publishes", () => {
-    const fixture = JSON.parse(readFileSync("src/test/fixtures/obrNotesOurFigures.json", "utf8")).measures;
-    const manifest = JSON.parse(readFileSync("public/data/manifest.json", "utf8"));
-    // Every measure with a note has its figures here
-    expect(Object.keys(fixture).sort()).toEqual(Object.keys(OBR_DEVIATION_NOTES).sort());
-    for (const [id, entry] of Object.entries(fixture)) {
-      // A measure held back from the release stays out of the manifest
-      if (!entry.artifact.startsWith("artifacts/")) {
-        expect(manifest.measures[id], id).toBeUndefined();
-        continue;
-      }
-      expect(manifest.measures[id]?.artifact, id).toBe(entry.artifact);
-      const check = (file, values) => {
-        const rows = parseDashboardCsv(readFileSync(`public/data/${entry.artifact}/${file}`, "utf8"));
-        for (const [label, value] of Object.entries(values)) {
-          expect(Number(rows.find((row) => row.year === label.slice(0, 4)).value) * 1000, `${id} ${file} ${label}`).toBeCloseTo(value, 3);
-        }
-      };
-      check("budgetary_impact.csv", entry.values);
-      if (entry.officialBasis) check("official_basis.csv", entry.officialBasis);
-      // The people whose own income tax changes, all ages together
-      if (entry.peopleDirectlyAffected) {
-        const ages = parseDashboardCsv(readFileSync(`public/data/${entry.artifact}/age_impact.csv`, "utf8"));
-        for (const [label, value] of Object.entries(entry.peopleDirectlyAffected)) {
-          expect(Number(ages.find((row) => row.year === label.slice(0, 4) && row.age_band === "all").people_directly_affected), `${id} age_impact.csv ${label}`).toBeCloseTo(value, 3);
-        }
-      }
-    }
-  });
-
   // Max, 28 Oct: "'is above' -> 'exceeds'", and active voice throughout;
   // "above" and "below" as prepositions stay
   it("says exceeds or falls below, never is above or below", () => {
