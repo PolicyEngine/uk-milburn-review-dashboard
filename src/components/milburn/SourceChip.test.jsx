@@ -36,7 +36,7 @@ describe("SourceChip", () => {
 
   it("says why ages no measure targets change", () => {
     const { container } = render(<AgeHouseholdNote />);
-    expect(container.textContent).toBe(AGE_HOUSEHOLD_NOTE);
-    expect(AGE_HOUSEHOLD_NOTE).toBe("Only people in the targeted ages lose the benefit; other ages change because they share a household with someone who does.");
+    expect(container.textContent.trim()).toBe(AGE_HOUSEHOLD_NOTE);
+    expect(AGE_HOUSEHOLD_NOTE).toBe("Other ages change only because they share a household with someone in the targeted ages.");
   });
 });

@@ -4,7 +4,6 @@ import { MeasureKeyProvider } from "./MeasureKey";
 import TrendCard from "./youngPeople/TrendCard";
 import MeasuresCard from "./youngPeople/MeasuresCard";
 import AgeChangeCard from "./age/AgeChangeCard";
-import { ChartsSourceNote } from "./milburn/SourceChip";
 import { SharesCard, YOUNG_PEOPLE_ANCHOR, useAgeImpactRows } from "./YoungPeopleSection";
 import { useNarrowViewport } from "../utils/chartTheme";
 import { isCatalogueRowDisplayable, useMeasureCatalogue } from "../utils/measureCatalogue";
@@ -93,7 +92,6 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
           title="How each age group's income changes"
           subtitle="The average change for each age group, this year and over time; choose the group in any card's Options."
         />
-        <ChartsSourceNote />
         <section className="report-section young-people-section" aria-label="How each age group's income changes">
           {/* The shared key is in Average change by age's legend row
               (keyInLegend), level with Change by year's line chips */}

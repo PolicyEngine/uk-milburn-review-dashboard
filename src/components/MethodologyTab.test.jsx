@@ -100,7 +100,7 @@ describe("MethodologyTab", () => {
   it("says why ages no measure targets change, under Results by age", () => {
     const { container } = renderTab();
     expect(container.querySelector(`#${METHOD_SECTIONS.young}`).textContent).toContain(
-      "Other agesOnly people in the targeted ages lose the benefit; other ages change because they share a household with someone who does.",
+      "Other agesOther ages change only because they share a household with someone in the targeted ages.",
     );
   });
 

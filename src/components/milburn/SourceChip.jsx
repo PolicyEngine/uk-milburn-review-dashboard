@@ -6,7 +6,7 @@ export const CHARTS_ARE_ESTIMATES = "Charts show PolicyEngine estimates (static 
 
 /** Why the age charts move for ages no measure targets (HBAI convention). */
 export const AGE_HOUSEHOLD_NOTE =
-  "Only people in the targeted ages lose the benefit; other ages change because they share a household with someone who does.";
+  "Other ages change only because they share a household with someone in the targeted ages.";
 
 /**
  * A publisher's name as a chip or a list says it: the review's report, annex
@@ -53,9 +53,10 @@ export function ChartsSourceNote() {
 /** The age charts' one line on why other ages change, on its own line at the end of a card's description. */
 export function AgeHouseholdNote() {
   return (
-    <span className="age-household-note" data-age-household-note="">
-      <TitleIcon name="house" bare size={13} />
-      <span>{AGE_HOUSEHOLD_NOTE}</span>
+    // Read as part of the card's description, one paragraph (Vahid, 17 Nov)
+    <span className="age-household-note age-household-note--inline" data-age-household-note="">
+      {" "}
+      {AGE_HOUSEHOLD_NOTE}
     </span>
   );
 }

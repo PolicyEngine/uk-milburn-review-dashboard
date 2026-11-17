@@ -26,6 +26,8 @@ import { PACKAGE_PARTS } from "../../utils/milburn/measureGroups";
 // The card's About this chart (the measures with no effect join its caveats)
 const MEASURES_INFO = {
   method: AGE_METHOD,
+  // Folded into About this chart (Vahid, 17 Nov), not under the rows
+  caveats: ["Each part of a package is its own run, so the parts need not add up to the package."],
 };
 
 /** "Aged 16 to 24", "Aged under 16", "Aged 65 and over". */
@@ -233,12 +235,6 @@ export function PolicyStrip({ rows, id, year, band, partsShown }) {
             </li>
           ))}
         </ul>
-      )}
-      {partsShown && (
-        <p className="measure-strip-note">
-          <TitleIcon name="layers" bare size={14} />
-          <span>Each part is its own run, so the parts need not add up to the package.</span>
-        </p>
       )}
     </div>
   );

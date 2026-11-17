@@ -913,3 +913,14 @@
   font-weight: 600;
   color: var(--c-axis-title);
 }
+
+/* The age note as the end of a card's description: plain inline text */
+.age-household-note.age-household-note--inline {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
