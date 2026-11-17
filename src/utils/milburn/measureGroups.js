@@ -16,6 +16,9 @@ export const MILBURN_DISPLAY_NAMES = Object.freeze({
   milburn_report_package: "The report's benefit changes (no replacement modelled)",
   milburn_report_uc_health: "UC health top-up removed for under-25s",
   milburn_report_pip: "PIP removed for 18 to 24-year-olds",
+  // The pre-report runs with the same names as the report's, told apart
+  uc_health_element_removed_under_25: "UC health element removed under 25 (from April 2027)",
+  pip_removed_under_25: "PIP removed for 18 to 24-year-olds (from April 2027)",
   milburn_report_employer_nics_threshold: "Employer NI threshold £10,000 for 21 to 24s in retail and hospitality",
   milburn_package: "Full abolition, no replacements (upper bound)",
   milburn_package_central: "Central variant: severe cases kept, PIP at half rate",

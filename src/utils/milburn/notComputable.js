@@ -29,6 +29,51 @@ const EDUCATION = { label: "Education and skills", icon: "cap" };
 
 export const NOT_COMPUTABLE_MEASURES = [
   {
+    // Report 6.5, para 748: higher for young people living independently,
+    // care leavers and the estranged included; no amount is given (the
+    // annex's own modelling proxies it with the 25-and-over rate)
+    id: "youth_allowance_higher_rate",
+    name: "Higher Youth Allowance for those living independently",
+    summary: "A higher Youth Allowance for under-25s living independently, including care leavers and estranged young people.",
+    affects: "Under-25s on Universal Credit living independently",
+    category: BENEFITS,
+    kind: "A higher rate of an existing benefit.",
+    notModelled: "The report gives no amount for the higher rate.",
+    visual: {
+      kind: "split",
+      caption: "Which Youth Allowance rate a young person gets",
+      root: [{ icon: "user", label: "A young person on Youth Allowance" }],
+      test: { icon: "house", label: "Living independently", unknown: "No amount given" },
+      branches: [
+        { answer: "No", icon: "wallet", label: "Standard young person's rate" },
+        { answer: "Yes", icon: "wallet", label: "Higher rate", tone: "gain", plus: true },
+      ],
+      alt: "A young person living independently would get a higher Youth Allowance than the standard young person's rate. The report gives no amount for it.",
+    },
+  },
+  {
+    // Report 6.5, para 749: a work allowance for everyone on the Youth
+    // Allowance in work; no amount is given
+    id: "youth_allowance_work_allowance",
+    name: "Work allowance for every young person in work",
+    summary: "Young claimants in work keep earnings up to a work allowance before the allowance falls.",
+    affects: "Under-25s on Universal Credit in paid work",
+    category: BENEFITS,
+    kind: "A change to how earnings reduce a benefit.",
+    notModelled: "The report gives no amount for the work allowance.",
+    visual: {
+      kind: "split",
+      caption: "How earnings reduce the Youth Allowance",
+      root: [{ icon: "user", label: "A young person in work" }],
+      test: { icon: "coins", label: "Earnings below the work allowance", unknown: "No amount given" },
+      branches: [
+        { answer: "No", icon: "trend", label: "Allowance tapers" },
+        { answer: "Yes", icon: "wallet", label: "Allowance kept in full", tone: "gain", plus: true },
+      ],
+      alt: "Every young person on the Youth Allowance in work would keep earnings up to a work allowance before the allowance falls. The report gives no amount for it.",
+    },
+  },
+  {
     // Report 6.5, paras 750, 751, 754 and 755: replaces PIP under 25;
     // government-run, non-means-tested; the gateway's design is left to
     // further work

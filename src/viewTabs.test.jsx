@@ -171,6 +171,8 @@ describe("the view tabs", () => {
     expect(within(modelled).getAllByRole("listitem")).toHaveLength(1);
     const notComputable = within(panel).getByRole("region", { name: reportCopy().notComputableTitle });
     expect(within(notComputable).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual([
+      "Higher Youth Allowance for those living independently",
+      "Work allowance for every young person in work",
       "Additional Cost Allowance",
       "Severe and Complex Needs Insurance",
       "Local Health and Disability Fund",

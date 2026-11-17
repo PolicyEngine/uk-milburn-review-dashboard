@@ -1,7 +1,3 @@
-import { useMeasureCatalogue } from "../../utils/measureCatalogue";
-import { NOT_YET_RUN } from "../../utils/milburn/localBuild";
-import TitleIcon from "../TitleIcon";
-import "./milburn.css";
 
 /**
  * The local build's label, near the figures of every view on the local
@@ -11,17 +7,8 @@ import "./milburn.css";
  * verified route.
  */
 export default function LocalBuildLabel() {
-  const catalogue = useMeasureCatalogue();
-  const local = catalogue.localBuild;
-  if (!local) return null;
-  // The build and versions are in About this dashboard and Methodology; this
-  // line shows only runs not yet made, which have no figures (Vahid, 17 Nov)
-  const pending = catalogue.measures.filter((measure) => measure.availability?.reason === NOT_YET_RUN);
-  if (!pending.length) return null;
-  return (
-    <p className="milburn-label milburn-build-label" role="note" data-local-build="">
-      <TitleIcon name="alert" bare size={14} />
-      <span>{`${NOT_YET_RUN}: ${pending.map((measure) => measure.name).join(", ")}.`}</span>
-    </p>
-  );
+  // Nothing on the Impact pages (Vahid, 17 Nov): the build and versions are in
+  // About and Methodology, and runs not yet made are listed on the Measures
+  // tab ("Measures not yet run"), not as a banner over the figures
+  return null;
 }

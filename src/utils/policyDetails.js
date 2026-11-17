@@ -994,6 +994,9 @@ for (const [id, base] of Object.entries(REPORT_RUN_OF)) {
     starts: "Apr 2029",
     inForce: { from: "2029-04" },
     details: (from.details ?? []).map((line) => line.replace(/2027-28/g, "2029-30").replace(/April 2027/g, "April 2029")),
+    ...(id === "milburn_report_package"
+      ? { summary: "Removes the UC health element for under-25s and PIP for 18 to 24-year-olds.", affects: "Under-25s with the health element; 18 to 24s with PIP" }
+      : {}),
   });
 }
 

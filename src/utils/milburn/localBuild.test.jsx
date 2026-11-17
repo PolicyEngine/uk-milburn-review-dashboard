@@ -244,9 +244,8 @@ describe("the label and the Policies lists", () => {
         <NotComputableMeasures />
       </MeasureCatalogueProvider>,
     );
-    // The build and versions are in About and Methodology, not on this line
-    expect(screen.getByRole("note").textContent).not.toContain(LABEL);
-    expect(screen.getByRole("note").textContent).toContain("Not yet run: ");
+    // No banner over the figures: runs not yet made are listed on the Measures tab
+    expect(screen.queryByRole("note")).toBeNull();
     const pending = screen.getByRole("region", { name: NOT_YET_RUN_TITLE });
     expect(pending.textContent).toContain("Employer NICs zero rate extended to under-25s");
     expect(pending.textContent).not.toContain("PIP removed for 18 to 24-year-olds");
