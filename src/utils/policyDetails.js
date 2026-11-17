@@ -1084,6 +1084,66 @@ MILBURN_POLICY_DETAILS.push(
   },
 );
 
+// The report's child DLA to 18 (para 760), and its work allowance for young
+// people in work (para 749) at an assumed amount: illustrative
+MILBURN_POLICY_DETAILS.push(
+  {
+    id: "milburn_report_child_dla_to_18",
+    shortName: "Child DLA extended to 18",
+    noun: "child Disability Living Allowance extended to 18",
+    sentence: "keeping 16 and 17-year-olds on child Disability Living Allowance",
+    summary: "Keeps 16 and 17-year-olds on child DLA, not PIP, at the equivalent award level.",
+    points: [
+      { label: "Who", icon: "users", text: "16 and 17-year-olds with a PIP award, outside Scotland." },
+      { label: "Rates", icon: "coins", text: "The paired DLA and PIP rates are equal." },
+      // Report 6.5, para 760
+      { label: "Not shown", icon: "scale", text: "Awards that would differ without reassessment at 16." },
+    ],
+    affects: "16 and 17-year-olds receiving PIP",
+    starts: "Apr 2029",
+    inForce: { from: "2029-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      // Report 6.5, para 760
+      "The report proposes extending child Disability Living Allowance from 16 to 18 (paragraph 760).",
+      "PIP daily living, standard or enhanced, becomes DLA care, middle or highest; mobility becomes DLA mobility, lower or higher.",
+      "Each pair has the same weekly amount, so the swap changes no award and has no budgetary effect.",
+      "The data hold awards after the reassessment at 16, not before it, so its effect is not estimated.",
+      "Scottish records are unchanged: Child Disability Payment already runs to 18.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-pip", place: "change", from: 16, share: 0, dlaTo: 18, ratesNote: true },
+  },
+  {
+    id: "milburn_report_youth_allowance_work_allowance",
+    shortName: "Work allowance for under-25s in work (illustrative)",
+    noun: "an illustrative work allowance for under-25s in work",
+    sentence: "giving every under-25 Universal Credit claim with earnings a work allowance",
+    summary: "Gives every under-25 UC claim a work allowance, at the current amounts: our assumption.",
+    points: [
+      { label: "Who", icon: "users", text: "UC claims, every claimant under 25, with earnings." },
+      { label: "Amount", icon: "coins", text: "Assumed: the current work allowance, lower with housing costs." },
+      // Report 6.5, para 749
+      { label: "Report", icon: "file", text: "Proposes a work allowance; gives no amount." },
+    ],
+    affects: "Under-25 UC claims in paid work, without a work allowance today",
+    starts: "Apr 2029",
+    inForce: { from: "2029-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      // Report 6.5, para 749
+      "The report proposes a work allowance for everyone on the Youth Allowance in work (paragraph 749), with no amount.",
+      "The amount is our assumption: the current Universal Credit work allowance, uprated each year.",
+      "Claims with a child or limited capability for work have a work allowance already and are unchanged.",
+      "The 55% taper and the standard allowance are unchanged.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-standard-allowance", place: "change", workAllowance: true, ratesNote: true },
+  },
+);
+
 const DETAILS_BY_ID = Object.fromEntries([
   ...POLICY_DETAILS.map(({ id, name: _name, description: _description, writtenFor, ...fields }) => [id, { writtenFor, fields }]),
   ...MILBURN_POLICY_DETAILS.map(({ id, ...fields }) => [id, { writtenFor: undefined, fields }]),

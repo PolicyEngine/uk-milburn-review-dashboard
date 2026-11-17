@@ -134,10 +134,11 @@ export function savingInYear(run, year) {
 
 const people = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 });
 
-/** A count of people, rounded to the nearest thousand ("578,000"); "under 1,000" below that. */
+/** A count of people, rounded to the nearest thousand ("578,000"); "under 1,000" below that; "0" for none at all (a run that changes no income). */
 export function formatPeople(value) {
   if (finite(value) === null) return "";
   const n = Math.abs(value);
+  if (n === 0) return "0";
   if (n < 1000) return "under 1,000";
   return people.format(Math.round(n / 1000) * 1000);
 }

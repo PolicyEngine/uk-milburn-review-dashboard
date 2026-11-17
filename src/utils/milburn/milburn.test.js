@@ -221,7 +221,7 @@ describe("the benchmark charts", () => {
 describe("the measures we cannot compute", () => {
   it("lists the final report's, each with a reason and no estimate", () => {
     expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.id)).toEqual([
-      "youth_allowance_work_allowance",
+      "child_dla_to_18",
       "additional_cost_allowance",
       "severe_complex_needs_insurance",
       "health_and_disability_fund",

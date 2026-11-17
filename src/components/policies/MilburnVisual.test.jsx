@@ -156,6 +156,35 @@ describe("MilburnVisual", () => {
     expect(container).toHaveTextContent("+£90 a month");
   });
 
+  it("child DLA to 18: 16 and 17 marked as changed at full height, the paired rates PIP's own", () => {
+    const { container } = show("milburn_report_child_dla_to_18");
+    expect(image()).toHaveAccessibleName(/Ages 16 to 17: child Disability Living Allowance under the measure, instead of Personal Independence Payment, at the same weekly amounts.*about £79 or £119.*about £31 or £83.*Aged 18 and over: PIP, unchanged\.$/);
+    expect(container.querySelectorAll(".mviz-age-bar.is-some")).toHaveLength(2);
+    // Nothing is removed: no nil bar, no outline of a higher amount behind
+    expect(container.querySelectorAll(".mviz-age-bar.is-nil")).toHaveLength(0);
+    expect(container.querySelectorAll(".mviz-age-ghost")).toHaveLength(0);
+    const view = milburnVisualView(details.milburn_report_child_dla_to_18.visual, "The measure");
+    expect(view.bands.map((band) => [band.title, band.text])).toEqual([
+      ["16 to 17", "DLA, same amounts"],
+      ["18 and over", "PIP, unchanged"],
+    ]);
+    expect(view.caption).toMatch(/, at 2027-28 rates$/);
+    // A swap that does not end above its first age, or with a share kept, draws nothing
+    expect(milburnVisualView({ ...details.milburn_report_child_dla_to_18.visual, dlaTo: 16 }, "The measure")).toBeNull();
+    expect(milburnVisualView({ ...details.milburn_report_child_dla_to_18.visual, share: 0.5 }, "The measure")).toBeNull();
+  });
+
+  it("work allowance: none today, the current amounts under the measure, said to be our assumption", () => {
+    const { container } = show("milburn_report_youth_allowance_work_allowance");
+    expect(image()).toHaveAccessibleName(/Current law: none.*Under the measure: £442 for a claim with a housing costs element; £735 for a claim without one, so the award is up to £243 or £404 a month higher\. These are the current work allowance amounts, our assumption: the report gives none\. The 55% taper is unchanged\.$/);
+    expect(container.querySelectorAll(".mviz-column")).toHaveLength(4);
+    // The note is the award's rise (55% of the allowance), not the allowance
+    expect(container).toHaveTextContent("Award up to +£243 a month");
+    expect(container).toHaveTextContent("Award up to +£404 a month");
+    expect(MILBURN_RATES.workAllowance.withHousing).toBeLessThan(MILBURN_RATES.workAllowance.withoutHousing);
+    expect(details.milburn_report_youth_allowance_work_allowance.summary).toMatch(/our assumption/);
+  });
+
   it("employer National Insurance: 0% under 21 already, 21 to 24 under the measure", () => {
     const { container } = show("employer_nics_zero_under_25");
     expect(image()).toHaveAccessibleName(/Under 21: 0% already\. Ages 21 to 24: 0% under the measure, instead of 15%.*earnings up to £50,270 a year/);
@@ -189,7 +218,7 @@ describe("the measures we cannot compute (NotComputableVisual)", () => {
 
   it("gives each a diagram of a known kind, in words and icons, never a figure", async () => {
     const { NOT_COMPUTABLE_MEASURES, NotComputableVisual, NOT_COMPUTABLE_KINDS } = await load();
-    expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.visual.kind)).toEqual(["split", "swap", "split", "split", "split", "split", "offers", "split", "offers", "offers"]);
+    expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.visual.kind)).toEqual(["swap", "swap", "split", "split", "split", "split", "offers", "split", "offers", "offers"]);
     for (const measure of NOT_COMPUTABLE_MEASURES) {
       expect(Object.keys(NOT_COMPUTABLE_KINDS), measure.id).toContain(measure.visual.kind);
       expect(JSON.stringify(measure.visual), measure.id).not.toMatch(/[£%\d]/);

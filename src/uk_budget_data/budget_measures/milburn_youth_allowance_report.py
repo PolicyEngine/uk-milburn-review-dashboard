@@ -46,6 +46,8 @@ REPORT_FIRST_WELFARE_YEAR = 2029
 # "eligible people aged under 25").
 YOUTH_ALLOWANCE_AGE_LIMIT = 25
 MONTHS = 12
+# ``work_allowance_monthly`` value for the year's statutory amounts.
+CURRENT_WORK_ALLOWANCE = "current"
 
 
 def _in_force(period, start_year, end_year):
@@ -88,7 +90,12 @@ def youth_allowance_report(
     Given ``(with housing costs element, without)`` monthly amounts, a
     young claim with no work allowance today (no child and no limited
     capability for work, reg. 22) gets one at those amounts; a claim that
-    already has one keeps the statutory amount. The taper is unchanged.
+    already has one keeps the statutory amount. Given
+    ``CURRENT_WORK_ALLOWANCE``, the amounts are the statutory ones of the
+    year (``means_test.work_allowance``: the lower with a housing costs
+    element, the higher without), so they are uprated as those are. The
+    taper is unchanged, and a claim that is neither young nor entitled
+    under reg. 22 has no allowance, as now.
 
     Everything that reads the allowance follows it: the maximum amount, the
     award and the benefit cap (the higher allowance counts towards it).
@@ -97,7 +104,8 @@ def youth_allowance_report(
         # Above 25 the "young" rate would be taken from claimants who have
         # the 25-and-over one today, which the report does not propose.
         raise ValueError("age_limit must be a whole age from 19 to 25")
-    if work_allowance_monthly is not None:
+    statutory_amounts = work_allowance_monthly == CURRENT_WORK_ALLOWANCE
+    if work_allowance_monthly is not None and not statutory_amounts:
         with_housing, without_housing = (
             float(amount) for amount in work_allowance_monthly
         )
@@ -148,16 +156,31 @@ def youth_allowance_report(
             return current | young
 
         def amount(benunit, period, parameters):
-            current = _call_formula(native_amount, benunit, period, parameters)
-            if not _in_force(period, start_year, end_year):
-                return current
             statutory = _call_formula(
                 native_eligible, benunit, period, parameters
             )
+            # The engine pays the amount only to an eligible claim
+            # (``defined_for``); the replacement formula is not masked for
+            # it, so the mask is applied here.
+            current = np.where(
+                statutory,
+                _call_formula(native_amount, benunit, period, parameters),
+                0,
+            )
+            if not _in_force(period, start_year, end_year):
+                return current
             young, _ = _young_claim(benunit, period, age_limit)
             housing = benunit("uc_housing_costs_element", period) > 0
-            new = MONTHS * np.where(housing, with_housing, without_housing)
-            return np.where(young & ~statutory, new, current)
+            if statutory_amounts:
+                table = parameters(
+                    period
+                ).gov.dwp.universal_credit.means_test.work_allowance
+                monthly = np.where(
+                    housing, table.with_housing, table.without_housing
+                )
+            else:
+                monthly = np.where(housing, with_housing, without_housing)
+            return np.where(young & ~statutory, MONTHS * monthly, current)
 
         _replace_formula(sim, "is_uc_work_allowance_eligible", eligible)
         _replace_formula(sim, "uc_work_allowance", amount)
@@ -172,3 +195,19 @@ def milburn_report_youth_allowance(sim):
     """
     design.check_report_design()
     return youth_allowance_report(sim, start_year=design.REPORT_START_YEAR)
+
+
+def milburn_report_youth_allowance_work_allowance(sim):
+    """Illustrative: the report's work allowance for "everyone in receipt
+    of the Youth Allowance who is in employment" (para 749), which has no
+    amount, taken to be the current Universal Credit work allowance (our
+    assumption). From ``design.REPORT_START_YEAR`` a claim whose claimants
+    are all under 25 and that has no work allowance today gets the year's
+    statutory one. The standard allowance is not changed here."""
+    design.check_report_design()
+    return youth_allowance_report(
+        sim,
+        start_year=design.REPORT_START_YEAR,
+        independent_at_25_plus_rate=False,
+        work_allowance_monthly=CURRENT_WORK_ALLOWANCE,
+    )

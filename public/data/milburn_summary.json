@@ -180,6 +180,32 @@
       }
     },
     {
+      "id": "milburn_report_child_dla_to_18",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": 0.0,
+        "2028": 0.0,
+        "2029": 0.0,
+        "2030": 0.0,
+        "2031": 0.0
+      },
+      "direction": "loss",
+      "young_people_in_losing_households": 0,
+      "share_of_16_24_in_losing_households_pct": 0.0,
+      "average_loss_young_person_in_losing_household": null,
+      "everyone_in_losing_households_pct": 0.0,
+      "poverty_change_pp": {
+        "rel_bhc": 0.0,
+        "rel_ahc": 0.0,
+        "abs_bhc": 0.0,
+        "abs_ahc": 0.0
+      },
+      "people_into_poverty_abs_ahc": 0,
+      "people_into_poverty_rel_ahc": 0,
+      "child_poverty_change_pp_rel_ahc": 0.0,
+      "people_directly_affected": 0
+    },
+    {
       "id": "milburn_report_employer_nics_threshold",
       "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
       "saving_bn": {
@@ -407,6 +433,32 @@
       "people_into_poverty_abs_ahc": -7164,
       "people_into_poverty_rel_ahc": -5442,
       "child_poverty_change_pp_rel_ahc": -0.015,
+      "people_directly_affected": 0
+    },
+    {
+      "id": "milburn_report_youth_allowance_work_allowance",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": 0.0,
+        "2028": 0.0,
+        "2029": -0.456,
+        "2030": -0.463,
+        "2031": -0.458
+      },
+      "direction": "gain",
+      "young_people_in_losing_households": 421780,
+      "share_of_16_24_in_losing_households_pct": 5.64,
+      "average_loss_young_person_in_losing_household": -1693,
+      "everyone_in_losing_households_pct": 0.0,
+      "poverty_change_pp": {
+        "rel_bhc": -0.002,
+        "rel_ahc": -0.029,
+        "abs_bhc": -0.021,
+        "abs_ahc": -0.017
+      },
+      "people_into_poverty_abs_ahc": -11877,
+      "people_into_poverty_rel_ahc": -20436,
+      "child_poverty_change_pp_rel_ahc": -0.009,
       "people_directly_affected": 0
     },
     {

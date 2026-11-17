@@ -18,6 +18,12 @@
  *   rates are 2026-27's; 2027-28 is the model's uprating: a projection;
  * - standard allowance, a month: gov/dwp/universal_credit/
  *   standard_allowance/amount.yaml, 2027-28 likewise a projection;
+ * - work allowance, a month: gov/dwp/universal_credit/means_test/
+ *   work_allowance/{with_housing,without_housing}.yaml (£427 and £710 in
+ *   2026-27), 2027-28 likewise a projection;
+ * - DLA weekly rates: gov/dwp/dla/self_care/{middle,higher}.yaml and
+ *   gov/dwp/dla/mobility/{lower,higher}.yaml, the same amounts as the PIP
+ *   rates they are paired with (the child DLA card draws PIP's);
  * - employer National Insurance: gov/hmrc/national_insurance/class_1/
  *   rates/employer.yaml (15%), secondary_zero_rate_age_limits/
  *   under_21_group.yaml (21) and relevant_apprentice.yaml (25), and
@@ -46,6 +52,8 @@ export const MILBURN_RATES = Object.freeze({
   },
   // A month
   standardAllowance: { singleUnder25: 353.17, single25Plus: 443.21, coupleUnder25: 551.11, couple25Plus: 695.71 },
+  // A month
+  workAllowance: { withHousing: 441.94, withoutHousing: 734.85 },
   employerNics: { rate: 0.15, zeroRateBelowAge: 21, apprenticeZeroRateBelowAge: 25, upperSecondaryThreshold: 50270, secondaryThreshold: 5000 },
 });
 
@@ -122,6 +130,32 @@ export function pipView(visual, name) {
   const share = visual?.share;
   if (!isAge(from) || from < 16 || from >= UPPER_AGE || !(share === 0 || share === 0.5)) return null;
   const { dailyLiving, mobility } = MILBURN_RATES.pip;
+  // The report's child DLA to 18: from `from` to under `dlaTo` the award is
+  // paid as DLA at the paired level, whose weekly amounts are PIP's
+  if (visual.dlaTo !== undefined) {
+    const to = visual.dlaTo;
+    if (!isAge(to) || to <= from || to > UPPER_AGE || share !== 0) return null;
+    const band = `${from} to ${to - 1}`;
+    return {
+      caption: `Disability benefit paid, by age, ${ratesYearText(visual)}`,
+      ages: cells(16, (age) => ({ before: 1, after: 1, some: age >= from && age < to })),
+      key: [["some", "Child DLA, not PIP"], ["after", "PIP, unchanged"]],
+      bands: [
+        { from, to: to - 1, title: band, text: "DLA, same amounts", tone: "cut" },
+        { from: to, to: LAST_AGE, title: `${to} and over`, text: "PIP, unchanged", tone: "kept" },
+      ],
+      chips: [
+        { icon: "hand", when: "Care, was daily living, a week", value: `About ${wholePounds(dailyLiving.standard)} or ${wholePounds(dailyLiving.enhanced)}` },
+        { icon: "move", when: "Mobility, a week", value: `About ${wholePounds(mobility.standard)} or ${wholePounds(mobility.enhanced)}` },
+      ],
+      alt:
+        `${name}: the disability benefit paid, by age, ${ratesYearText(visual)}. ` +
+        `Ages ${band}: child Disability Living Allowance under the measure, instead of Personal Independence Payment, at the same weekly amounts: ` +
+        `care at the middle or highest rate, about ${wholePounds(dailyLiving.standard)} or ${wholePounds(dailyLiving.enhanced)}, for standard or enhanced daily living; ` +
+        `mobility at the lower or higher rate, about ${wholePounds(mobility.standard)} or ${wholePounds(mobility.enhanced)}, for standard or enhanced mobility. ` +
+        `Aged ${to} and over: PIP, unchanged.`,
+    };
+  }
   const ages = cells(16, (age) => ({ before: 1, after: age >= from && age < UPPER_AGE ? share : 1 }));
   const outcome = share ? "Half" : "£0";
   return {
@@ -220,6 +254,7 @@ export function employerNicsView(visual, name) {
  * the higher rate is for claims with a housing costs element only.
  */
 export function standardAllowanceView(visual, name) {
+  if (visual?.workAllowance === true) return workAllowanceView(visual, name);
   const housing = visual?.housingCosts === true;
   const when = ratesYearText(visual);
   const { singleUnder25, single25Plus, coupleUnder25, couple25Plus } = MILBURN_RATES.standardAllowance;
@@ -246,6 +281,46 @@ export function standardAllowanceView(visual, name) {
       pairs.map((pair) => `For ${pair.words}: ${wholePounds(pair.after)} instead of ${wholePounds(pair.before)}, ${wholePounds(gain(pair))} more`).join("; ") +
       "." +
       (housing ? " Claims without a housing costs element keep the under-25 rate." : ""),
+  };
+}
+
+/**
+ * The illustrative work allowance (`visual.workAllowance` on the standard
+ * allowance kind): an under-25 claim with no child and no limited
+ * capability for work has none today; under the measure it has the
+ * current amounts, the lower with a housing costs element.
+ */
+// The Universal Credit taper (gov/dwp/universal_credit/means_test/reduction_rate.yaml)
+const TAPER = 0.55;
+
+function workAllowanceView(visual, name) {
+  const when = ratesYearText(visual);
+  const { withHousing, withoutHousing } = MILBURN_RATES.workAllowance;
+  if (!(withHousing > 0 && withoutHousing > withHousing)) return null;
+  const pairs = [
+    { label: "With housing costs", words: "a claim with a housing costs element", after: withHousing },
+    { label: "Without housing costs", words: "a claim without one", after: withoutHousing },
+  ];
+  return {
+    caption: `Work allowance for an under-25 claim with no child or health condition, a month, ${when}`,
+    max: withoutHousing,
+    key: [["after", "Earnings kept before the award falls"]],
+    groups: pairs.map((pair) => ({
+      label: pair.label,
+      // The award rises by the taper's share of the earnings no longer counted
+      note: `Award up to +${wholePounds(TAPER * pair.after)} a month`,
+      columns: [
+        { label: "Now", text: wholePounds(0), parts: [] },
+        { label: "Measure", text: wholePounds(pair.after), parts: [{ value: pair.after, tone: "after" }] },
+      ],
+    })),
+    chips: [{ icon: "coins", when: "Taper above the allowance", value: `${percent(TAPER)}, unchanged` }],
+    alt:
+      `${name}: the Universal Credit work allowance for a claim in which every claimant is under 25, with no child and no limited capability for work, a month, ${when} (about). ` +
+      `Current law: none, so every pound of earnings reduces the award. Under the measure: ` +
+      pairs.map((pair) => `${wholePounds(pair.after)} for ${pair.words}`).join("; ") +
+      `, so the award is up to ${pairs.map((pair) => wholePounds(TAPER * pair.after)).join(" or ")} a month higher` +
+      `. These are the current work allowance amounts, our assumption: the report gives none. The ${percent(TAPER)} taper is unchanged.`,
   };
 }
 

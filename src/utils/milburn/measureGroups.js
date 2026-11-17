@@ -23,6 +23,8 @@ export const MILBURN_DISPLAY_NAMES = Object.freeze({
   milburn_report_youth_allowance_independent: "Higher Youth Allowance for under-25s living independently",
   milburn_report_package_phased: "The report's benefit changes, phased in over five years",
   milburn_report_employer_nics_threshold_glide_path: "Employer NI threshold for 21 to 24s, phased in over five years",
+  milburn_report_child_dla_to_18: "Child DLA extended to 18",
+  milburn_report_youth_allowance_work_allowance: "Work allowance for under-25s in work (illustrative)",
   milburn_package: "Full abolition, no replacements",
   milburn_package_central: "Central variant: severe cases kept, PIP at half rate",
   milburn_package_phased: "Full abolition, phased as claimants are reassessed",
@@ -44,6 +46,8 @@ export const MILBURN_SELECTOR_SUMMARIES = Object.freeze({
   milburn_report_youth_allowance_independent: "The 25-and-over UC rate for under-25s with housing costs, from April 2029",
   milburn_report_employer_nics_threshold: "Employers pay NI above £10,000, not £5,000; the end state",
   milburn_report_employer_nics_threshold_glide_path: "£6,000 in 2027-28, rising £1,000 a year to £10,000",
+  milburn_report_child_dla_to_18: "16 and 17-year-olds on child DLA, not PIP, at equal rates, from April 2029",
+  milburn_report_youth_allowance_work_allowance: "Every under-25 UC claim gets the current work allowance (our assumption), from April 2029",
   pip_halved_under_25: "Half of PIP kept at 18 to 24, a stand-in for the new allowance",
   employer_nics_zero_under_25: "No employer NI for any under-25, an option the report does not propose",
 });
@@ -73,6 +77,7 @@ export const MILBURN_GROUPS = Object.freeze([
       "milburn_report_uc_health",
       "milburn_report_pip",
       "milburn_report_youth_allowance_independent",
+      "milburn_report_youth_allowance_work_allowance",
       "milburn_report_employer_nics_threshold",
       "milburn_report_employer_nics_threshold_glide_path",
     ],
@@ -97,7 +102,7 @@ export const MILBURN_GROUPS = Object.freeze([
     hidden: true,
     ids: ["uc_health_element_removed_under_22", "uc_health_element_removed_under_25_severe_kept", "pip_removed_16_to_24", "youth_allowance_at_25_plus_rate"],
   },
-  { id: HIDDEN_GROUP, label: null, hidden: true, ids: ["milburn_package_entry_25pct", "uc_health_element_removed_under_25_new_claims"] },
+  { id: HIDDEN_GROUP, label: null, hidden: true, ids: ["milburn_package_entry_25pct", "uc_health_element_removed_under_25_new_claims", "milburn_report_child_dla_to_18"] },
 ]);
 
 /**

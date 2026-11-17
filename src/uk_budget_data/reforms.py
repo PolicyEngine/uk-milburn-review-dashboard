@@ -1772,6 +1772,8 @@ MILBURN_PROMOTED_IDS: tuple[str, ...] = (
     "milburn_report_youth_allowance_independent",
     "milburn_report_package_phased",
     "milburn_report_employer_nics_threshold_glide_path",
+    "milburn_report_child_dla_to_18",
+    "milburn_report_youth_allowance_work_allowance",
 )
 
 _SCOTLAND_INCLUDED = (
@@ -2179,6 +2181,66 @@ def _create_milburn_report_employer_nics_threshold_glide_path() -> Reform:
     )
 
 
+# The report's child DLA to 18 (para 760) and, illustratively, its work
+# allowance for young people in work (para 749, which gives no amount: the
+# current Universal Credit work allowance is our assumption). Both from
+# April 2029. milburn_child_dla_report.py, milburn_youth_allowance_report.py
+from uk_budget_data.budget_measures.milburn_child_dla_report import (  # noqa: E402
+    milburn_child_dla_report,
+)
+from uk_budget_data.budget_measures.milburn_youth_allowance_report import (  # noqa: E402
+    milburn_report_youth_allowance_work_allowance as _youth_work_allowance,
+)
+
+MILBURN_REPORT_CHILD_DLA_ID = "milburn_report_child_dla_to_18"
+MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_ID = (
+    "milburn_report_youth_allowance_work_allowance"
+)
+
+
+def _create_milburn_report_child_dla_to_18() -> Reform:
+    return Reform(
+        id=MILBURN_REPORT_CHILD_DLA_ID,
+        name="Child Disability Living Allowance extended to 18",
+        description=(
+            "From April 2029, 16 and 17-year-olds stay on child Disability "
+            "Living Allowance (DLA) instead of moving to Personal "
+            "Independence Payment (PIP) at 16 (report para 760). Modelled as "
+            "a swap at the equivalent award level: PIP daily living at the "
+            "standard or enhanced rate becomes the DLA care component at "
+            "the middle or highest rate, and PIP mobility at the standard "
+            "or enhanced rate becomes DLA mobility at the lower or higher "
+            "rate. Each pair has the same weekly amount, so awards do not "
+            "change in the model. The data do not record who would keep, "
+            "lose or change an award without the reassessment at 16, so "
+            "that effect is not estimated. Scottish records are left as "
+            "they are: Child Disability Payment is already paid to 18."
+        ),
+        simulation_modifier=milburn_child_dla_report,
+    )
+
+
+def _create_milburn_report_youth_allowance_work_allowance() -> Reform:
+    return Reform(
+        id=MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_ID,
+        name="Work allowance for under-25s in work (illustrative)",
+        description=(
+            "From April 2029 every Universal Credit claim in which all "
+            "claimants are under 25 has a work allowance: earnings below it "
+            "do not reduce the award. The report proposes a work allowance "
+            "for everyone on the Youth Allowance who is in employment (para "
+            "749) and gives no amount. The amount here is our assumption: "
+            "the current Universal Credit work allowance, the lower rate "
+            "for claims with a housing costs element and the higher rate "
+            "for those without, uprated each year. Claims that already "
+            "have a work allowance (with a child or limited capability for "
+            "work) keep it, and the 55% taper and the standard allowance "
+            "are unchanged."
+        ),
+        simulation_modifier=_youth_work_allowance,
+    )
+
+
 _RESERVED_IDS = frozenset(
     {
         MILBURN_REPORT_PACKAGE_ID,
@@ -2194,6 +2256,8 @@ _RESERVED_IDS = frozenset(
         MILBURN_REPORT_EMPLOYER_NICS_THRESHOLD_ID,
         MILBURN_REPORT_YOUTH_ALLOWANCE_INDEPENDENT_ID,
         MILBURN_REPORT_EMPLOYER_NICS_GLIDE_PATH_ID,
+        MILBURN_REPORT_CHILD_DLA_ID,
+        MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_ID,
     }
 )
 
@@ -2209,6 +2273,8 @@ _RESERVED_FACTORIES = (
     _create_milburn_report_employer_nics_threshold,
     _create_milburn_report_youth_allowance_independent,
     _create_milburn_report_employer_nics_threshold_glide_path,
+    _create_milburn_report_child_dla_to_18,
+    _create_milburn_report_youth_allowance_work_allowance,
 )
 
 

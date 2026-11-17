@@ -39,6 +39,8 @@ The report's measures, from April 2029, when the report's welfare savings start 
 | `milburn_report_youth_allowance_independent` | Higher Youth Allowance for under-25s living independently: the 25-and-over rate where the claim has a housing element, the review's own proxy (annex, section 8) | running | |
 | `milburn_report_package_phased` | The package phased in: new 18-year-olds at once, existing claimants at an assumed 45% a year (about 95% within five years, para 773) | running | |
 | `milburn_report_employer_nics_threshold_glide_path` | The NI threshold in assumed equal steps, £6,000 in 2027-28 to £10,000 in 2031-32 | running | |
+| `milburn_report_youth_allowance_work_allowance` | Illustrative: a work allowance for every under-25 UC claim (para 749 gives no amount), at the current UC work allowance amounts, the lower with a housing element: our assumption | £0.46bn cost | 422,000 (gain) |
+| `milburn_report_child_dla_to_18` | Child DLA extended to 18 (para 760): PIP at 16 and 17 swapped for DLA at the equivalent level, whose rates are equal; the effect of avoiding reassessment at 16 is not estimated | £0.00bn | 0 |
 
 Comparators modelled before the report (from April 2027): `pip_halved_under_25` (a stand-in for the Additional Cost Allowance, whose rates the report does not set) and `employer_nics_zero_under_25` (the option the report considers and does not propose, para 268). The other pre-report runs stay in `public/data/milburn/` and load by link, but the selector does not offer them.
 

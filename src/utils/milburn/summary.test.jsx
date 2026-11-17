@@ -188,6 +188,8 @@ describe("formatting", () => {
     expect(formatBn(4.486)).toBe("£4.49bn");
     expect(formatPeople(578166)).toBe("578,000");
     expect(formatPeople(400)).toBe("under 1,000");
+    // None at all is said as none: the child DLA run changes no income
+    expect(formatPeople(0)).toBe("0");
     expect(formatSignedPp(0.225)).toBe("+0.23pp");
     expect(formatSignedPp(-0.184)).toBe("−0.18pp");
   });

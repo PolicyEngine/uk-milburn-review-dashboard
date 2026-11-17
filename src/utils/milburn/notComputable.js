@@ -10,9 +10,10 @@ const COPY = reportCopy();
  * the pre-report list, and are the page's list on every data route: the
  * pipeline's registry (uk_budget_data.reforms.NOT_COMPUTABLE_MEASURES)
  * still holds the pre-report four until it is brought into line. Not
- * listed: the Youth Allowance's independent rate and work allowance, and
- * the higher employer National Insurance threshold at 21 to 24, which the
- * pipeline is modelling with stated assumptions.
+ * listed: the Youth Allowance's independent rate and work allowance (the
+ * latter at an assumed amount, illustratively), child DLA to 18 and the
+ * higher employer National Insurance threshold at 21 to 24, which the
+ * pipeline models with stated assumptions.
  *
  * They have no estimate anywhere on the page: never £0, which would read
  * as an estimate of no effect. A `summary` may state the report's own
@@ -29,25 +30,23 @@ const EDUCATION = { label: "Education and skills", icon: "cap" };
 
 export const NOT_COMPUTABLE_MEASURES = [
   {
-    // Report 6.5, para 749: a work allowance for everyone on the Youth
-    // Allowance in work; no amount is given
-    id: "youth_allowance_work_allowance",
-    name: "Work allowance for every young person in work",
-    summary: "Young claimants in work keep earnings up to a work allowance before the allowance falls.",
-    affects: "Under-25s on Universal Credit in paid work",
+    // Report para 760: 16 and 17-year-olds stay on DLA instead of moving to
+    // PIP. The national run (milburn_report_child_dla_to_18) gives exactly
+    // £0: the paired DLA and PIP rates are identical, so the switch changes
+    // no payment; the aim, sparing a reassessment at 16, is not in the data
+    id: "child_dla_to_18",
+    name: "Child DLA extended to 18",
+    summary: "16 and 17-year-olds stay on Disability Living Allowance instead of moving to PIP.",
+    affects: "Disabled 16 and 17-year-olds",
     category: BENEFITS,
-    kind: "A change to how earnings reduce a benefit.",
-    notModelled: "The report gives no amount for the work allowance.",
+    kind: "A change to when a benefit switches.",
+    notModelled: "DLA and PIP pay the same amounts, so the switch changes no payment; its effect on reassessment is not in the data.",
     visual: {
-      kind: "split",
-      caption: "How earnings reduce the Youth Allowance",
-      root: [{ icon: "user", label: "A young person in work" }],
-      test: { icon: "coins", label: "Earnings below the work allowance", unknown: "No amount given" },
-      branches: [
-        { answer: "No", icon: "trend", label: "Allowance tapers" },
-        { answer: "Yes", icon: "wallet", label: "Allowance kept in full", tone: "gain", plus: true },
-      ],
-      alt: "Every young person on the Youth Allowance in work would keep earnings up to a work allowance before the allowance falls. The report gives no amount for it.",
+      kind: "swap",
+      caption: "Disability benefit for older teenagers",
+      before: { when: "Today", icon: "wallet", label: "PIP", facts: ["Same rates"] },
+      after: { when: "Proposed", icon: "wallet", label: "DLA kept longer", facts: ["Same rates"], unknowns: ["Reassessment"] },
+      alt: "Today young people move from DLA to PIP as older teenagers; the proposal keeps them on DLA until adulthood. The two pay the same amounts, so no payment changes.",
     },
   },
   {

@@ -160,6 +160,9 @@ it("describes each Milburn candidate measure in one neutral line, applied whatev
     "milburn_report_youth_allowance_independent",
     "milburn_report_package_phased",
     "milburn_report_employer_nics_threshold_glide_path",
+    // Child DLA to 18, and the work allowance at an assumed amount
+    "milburn_report_child_dla_to_18",
+    "milburn_report_youth_allowance_work_allowance",
   ];
   expect(MILBURN_POLICY_DETAILS.map((entry) => entry.id)).toEqual(ids);
   for (const entry of MILBURN_POLICY_DETAILS) {

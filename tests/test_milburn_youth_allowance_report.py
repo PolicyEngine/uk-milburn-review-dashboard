@@ -220,6 +220,42 @@ def test_a_work_allowance_leaves_statutory_ones_and_over_25s_alone():
     assert change(older, **arguments)[0] == change(older, **arguments)[1]
 
 
+def test_the_illustrative_work_allowance_is_the_years_statutory_one(
+    monkeypatch,
+):
+    table = forecast_parameters().gov.dwp.universal_credit.means_test
+    day = f"{YEAR}-04-30"
+    with_housing = table.work_allowance.with_housing(day)
+    without_housing = table.work_allowance.without_housing(day)
+    assert 0 < with_housing < without_housing
+    monkeypatch.setattr(design, "REPORT_START_YEAR", YEAR)
+    measure = ya.milburn_report_youth_allowance_work_allowance
+    # Renting: the lower amount, all of it below £8,000 of earnings.
+    before, after = change(single(22, employment_income=8_000), measure)
+    assert after - before == pytest.approx(0.55 * 12 * with_housing, abs=0.05)
+    allowances = change(
+        single(22, employment_income=8_000),
+        measure,
+        variable="uc_work_allowance",
+    )
+    assert allowances == pytest.approx((0, 12 * with_housing), abs=0.05)
+    # No housing costs element: the higher amount; no standard allowance
+    # change with it.
+    home = single(22, rent=0, employment_income=8_000)
+    assert change(home, measure, variable="uc_work_allowance") == pytest.approx(
+        (0, 12 * without_housing), abs=0.05
+    )
+    standard = change(home, measure, variable="uc_standard_allowance")
+    assert standard[0] == standard[1]
+    # No earnings, a child (a statutory allowance already) and 26: unchanged.
+    for other in (
+        single(22),
+        with_child(single(23, employment_income=8_000)),
+        single(26, employment_income=8_000),
+    ):
+        assert change(other, measure)[0] == change(other, measure)[1]
+
+
 def test_the_report_measure_reads_the_design_start_year(monkeypatch):
     monkeypatch.setattr(design, "REPORT_START_YEAR", YEAR)
     before, after = change(single(22), ya.milburn_report_youth_allowance)
