@@ -562,6 +562,68 @@ class HouseholdAnswersRequest(BaseModel):
         ),
     )
 
+    # The Milburn review calculator's questions (HouseholdAnswers). Left
+    # out, each sets nothing, so every other household is as before.
+    limited_capability_for_work_related_activity: bool = Field(
+        default=False,
+        description=(
+            "Whether the head has limited capability for work and "
+            "work-related activity (policyengine-uk's "
+            "uc_limited_capability_for_WRA): the Universal Credit health "
+            "element"
+        ),
+    )
+    partner_limited_capability_for_work_related_activity: bool = False
+    new_claimant_health_element: bool = Field(
+        default=False,
+        description=(
+            "Whether the health element is paid at the rate for claims made "
+            "from April 2026 (policyengine-uk's "
+            "uc_receives_new_claimant_health_element). Left out: the "
+            "protected (earlier) rate"
+        ),
+    )
+    pip_daily_living: Literal[household_impact.PIP_AWARDS] = "NONE"
+    pip_mobility: Literal[household_impact.PIP_AWARDS] = "NONE"
+    partner_pip_daily_living: Literal[household_impact.PIP_AWARDS] = "NONE"
+    partner_pip_mobility: Literal[household_impact.PIP_AWARDS] = "NONE"
+    lives_with_parents: bool = Field(
+        default=False,
+        description=(
+            "A young person in their parents' home: their own benefit unit "
+            "and household with no rent and no Council Tax; the parents' "
+            "income and housing costs are not part of the calculation"
+        ),
+    )
+    employment_sector: Literal[tuple(household_impact.EMPLOYMENT_SECTORS)] = (
+        Field(
+            default="OTHER",
+            description=(
+                "The head's job's sector: RETAIL (SIC division 47) or "
+                "HOSPITALITY (division 56), for the employer National Insurance "
+                "threshold for 21 to 24s in those sectors"
+            ),
+        )
+    )
+    hours_worked_per_week: Optional[float] = Field(
+        default=None, ge=0, le=100, description="The head's paid hours a week"
+    )
+    earnings_at_minimum_wage: bool = Field(
+        default=False,
+        description=(
+            "Pay the head the engine's minimum wage for their age in the "
+            "year, for hours_worked_per_week, in place of employment_income"
+        ),
+    )
+
+    @model_validator(mode="after")
+    def _minimum_wage_needs_hours(self):
+        if self.earnings_at_minimum_wage and not self.hours_worked_per_week:
+            raise ValueError(
+                "earnings_at_minimum_wage needs hours_worked_per_week"
+            )
+        return self
+
     def answers(self) -> household_impact.HouseholdAnswers:
         values = self.model_dump()
         values["children"] = tuple(

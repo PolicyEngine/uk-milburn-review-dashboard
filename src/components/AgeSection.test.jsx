@@ -54,7 +54,7 @@ describe("By age's cards share one age group", async () => {
     window.history.replaceState({}, "", "/?sub=age&age=16-24");
     render(<AgeSection selectedPolicies={[]} selectedYear={2027} policies={[]} />);
     const pills = () => screen.getAllByRole("button", { name: /^Options:/ });
-    // Three while the winners and losers shares are withheld (povertyFigures.js)
+    // Three while the gains and losses shares are withheld (povertyFigures.js)
     expect(pills()).toHaveLength(POVERTY_FIGURES_SHOWN ? 4 : 3);
     for (const pill of pills()) expect(pill.getAttribute("aria-label")).toMatch(/^Options: 16 to 24/);
     // Choose 25 to 34 in the second card (Change by year)
@@ -72,7 +72,7 @@ describe("By age's cards share one age group", async () => {
     window.history.replaceState({}, "", "/?sub=age&age=all");
     render(<AgeSection selectedPolicies={[]} selectedYear={2027} policies={[]} />);
     const pills = screen.getAllByRole("button", { name: /^Options:/ });
-    // Average change by age, Change by year, Effect of each policy, Winners and losers
+    // Average change by age, Change by year, Effect of each policy, Gains and losses
     // By age opens Compare with on 25 to 34; with All ages chosen there too,
     // the pill reads All ages once
     expect(pills[2].getAttribute("aria-label")).toMatch(/25 to 34/);

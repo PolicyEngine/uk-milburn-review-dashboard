@@ -124,7 +124,7 @@ describe("the page's verified publication catalogue", () => {
     render(<App />);
     const view = "methodology-view";
     expect(await screen.findByTestId(view)).toBeInTheDocument();
-    expect(within(screen.getByRole("tablist", { name: "Views" })).getAllByRole("tab")).toHaveLength(3);
+    expect(within(screen.getByRole("tablist", { name: "Views" })).getAllByRole("tab")).toHaveLength(4);
     // The default view is mounted from the first render and kept, hidden,
     // since #128; the open view says nothing about Budget results
     expect(within(screen.getByRole("tabpanel")).queryByText("No results are published yet")).toBeNull();

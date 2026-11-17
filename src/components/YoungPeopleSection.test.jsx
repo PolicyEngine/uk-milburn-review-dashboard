@@ -210,8 +210,8 @@ describe("YoungPeopleSection", () => {
     ).toBeInTheDocument();
     expect(screen.queryByText(/young people aged 16 to 24 in the UK/)).not.toBeInTheDocument();
     expect(screen.queryByText(/directly affected/)).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 3, name: /Winners and losers, 2029-30/ })).toBeInTheDocument();
-    // Winners and losers opens on the age groups, the chosen one marked
+    expect(screen.getByRole("heading", { level: 3, name: /Gains and losses, 2029-30/ })).toBeInTheDocument();
+    // Gains and losses opens on the age groups, the chosen one marked
     // (round 3); single years are in Options
     expect(screen.queryByText(/at each age from 16 to 24\./)).toBeNull();
     // By age group: the shared rows chart, 16 to 24 in bold (no background
@@ -228,7 +228,7 @@ describe("YoungPeopleSection", () => {
     expect(shares.querySelectorAll("[role='columnheader']")).toHaveLength(2);
   });
 
-  it("keeps Winners and losers' view when the age group changes (AGE11, round 3)", async () => {
+  it("keeps Gains and losses' view when the age group changes (AGE11, round 3)", async () => {
     // The bands and the single ages 16 to 34 (with none, By single year of
     // age is disabled: ageSelectionRule.test.jsx)
     const rows = ["16-24", "25-34", "all", ...Array.from({ length: 19 }, (_, i) => String(16 + i))].map((band) => ({

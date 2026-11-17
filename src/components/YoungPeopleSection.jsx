@@ -91,7 +91,7 @@ const SHARES_DESCRIPTION =
 const sharesSingleDescription = ([first, last]) =>
   `Share of people who gain or lose (a change over 0.01%), at each age from ${first} to ${last >= SINGLE_AGE_TOP ? "90 and over" : last}.`;
 
-/** The two views of "Average change by age" (and Pensioners' Winners and losers). */
+/** The two views of "Average change by age" (and Pensioners' Gains and losses). */
 export const AGE_VIEWS = [
   { value: "band", label: "By age group" },
   { value: "single", label: "By single year of age" },
@@ -769,8 +769,8 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
         .map((group) => visibleSegments({ group: group.label, key: group.key, ...pick(group.row) }, OUTCOME_KEYS))
     : [];
 
-  const title = `Winners and losers, ${yearLabel}`;
-  const exportName = `age-winners-losers-${single ? "single-age-" : ""}${selectedYear}`;
+  const title = `Gains and losses, ${yearLabel}`;
+  const exportName = `age-gains-losses-${single ? "single-age-" : ""}${selectedYear}`;
   const exportOptions = {
     title,
     description,
@@ -785,8 +785,8 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
   const csvText = () =>
     buildChartCsv({
       title: perMeasure
-        ? `Winners, losers and no change, people aged ${groupLabel}, by policy on its own, ${yearLabel}`
-        : `Winners, losers and no change by ${single ? "single year of age" : "age group"}, ${yearLabel}`,
+        ? `Gains, losses and no change, people aged ${groupLabel}, by policy on its own, ${yearLabel}`
+        : `Gains, losses and no change by ${single ? "single year of age" : "age group"}, ${yearLabel}`,
       units: "% of people in the group; a change of more than 0.01% of household net income",
       columns: [
         { key: "group", label: perMeasure ? "Policy" : single ? "Age" : "Age group" },
@@ -1002,10 +1002,10 @@ function YoungPeopleSection({ selectedPolicies, selectedYear, policies }) {
           <SectionHeading
             id="young-people-who-gains"
             icon="userPlus"
-            title="Winners and losers, and which policies drive them"
+            title="Gains and losses, and which policies drive them"
             subtitle="How many young people gain or lose, and from which policies."
           />
-          <section className="report-section young-people-section" aria-label="Winners and losers, and which policies drive them">
+          <section className="report-section young-people-section" aria-label="Gains and losses, and which policies drive them">
             <div className="charts-grid">
               <MeasuresCard {...props} height={narrow ? 460 : 400} />
               <SharesCard {...props} height={narrow ? 340 : 400} />

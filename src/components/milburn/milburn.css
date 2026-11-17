@@ -204,7 +204,7 @@
   line-height: 1.55;
 }
 
-/* Return to work's lead comparison and break-even arithmetic (BehaviouralScenarios.jsx) */
+/* Moves into work's lead comparison and break-even arithmetic (BehaviouralScenarios.jsx) */
 .milburn-entry,
 .milburn-breakeven {
   padding: var(--card-padding, 20px);
@@ -401,7 +401,7 @@
   font-weight: 600;
 }
 
-/* Return to work: cards with an icon heading and a short lead */
+/* Moves into work (illustrative): cards with an icon heading and a short lead */
 .milburn-scenarios > .report-section,
 .milburn-scenarios > .milburn-card {
   margin-bottom: 24px;
@@ -708,7 +708,7 @@
   color: var(--c-text);
 }
 
-/* Return to work: the assumption, its Methodology link and the year it
+/* Moves into work (illustrative): the assumption, its Methodology link and the year it
    covers, in one quiet panel set apart from the cards below */
 .milburn-assumption {
   display: flex;
@@ -752,7 +752,7 @@
   color: var(--c-text);
 }
 
-/* Return to work: this dashboard's scenario beside the review's own estimate (ReviewComparison) */
+/* Moves into work (illustrative): this dashboard's scenario beside the review's own estimate (ReviewComparison) */
 .milburn-review .milburn-review-table th,
 .milburn-review .milburn-review-table td {
   white-space: normal;
@@ -868,7 +868,7 @@
   color: var(--c-gain-text);
 }
 
-/* Return to work: the two exercises as cards side by side, stacked on a phone (ReviewComparison) */
+/* Moves into work (illustrative): the two exercises as cards side by side, stacked on a phone (ReviewComparison) */
 .milburn-versus {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

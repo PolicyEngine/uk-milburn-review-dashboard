@@ -41,7 +41,7 @@ describe("withholdingProblems on the age table (issue 340)", () => {
   const ages = { withheld_cells: [{ table: "age_impact", year: 2027, groups: ["70", "90+"] }] };
   const ageRow = (age_band) => ({ reform_id: "m", reform_name: "M", year: 2027, age_band, mean_change: 1 });
 
-  it("accepts withheld age rows left out, with no winners and losers complement", () => {
+  it("accepts withheld age rows left out, with no gains and losses complement", () => {
     expect(withholdingProblems({ age_impact: ["65+", "all", "40"].map(ageRow) }, ages)).toEqual([]);
     expect(withholdingProblems({}, ages)).toEqual([]);
     expect(withholdingProblems({}, ages, { partial: true })).toEqual([]);

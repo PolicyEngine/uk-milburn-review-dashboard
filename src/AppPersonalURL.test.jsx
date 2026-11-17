@@ -86,7 +86,7 @@ describe("a later snapshot keeps the reader's selection", () => {
 
   it("opens an old Household calculator link on Impact with its one policy", async () => {
     const calls = [];
-    open("/?tab=household&policies=beta", await serve(), calls);
+    open("/?tab=personal&policies=beta", await serve(), calls);
     await waitFor(() => expect(chosenName()).toBeTruthy());
     expect(screen.getByRole("tab", { name: "Impact" })).toHaveAttribute("aria-selected", "true");
     expect(new URLSearchParams(window.location.search).get("tab")).toBe("dashboard");

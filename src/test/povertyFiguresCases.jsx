@@ -19,7 +19,7 @@ import { downloadMenus } from "./downloadMenus";
 
 // What only a poverty or people-affected figure (or its description) says
 const POVERTY_TEXT = /poverty/i;
-const PEOPLE_AFFECTED_TEXT = /People affected|of people move|Winners and losers|better off|worse off/;
+const PEOPLE_AFFECTED_TEXT = /People affected|of people move|Gains and losses|better off|worse off/;
 
 /**
  * The fixture's age rows with single years 0 to 90+ for ALPHA and BETA but
@@ -115,17 +115,17 @@ export function describePovertyFigures(shown, { files, catalogueRef, ageRowsRef 
       const { default: AgeSection } = await import("../components/AgeSection");
       window.history.replaceState({}, "", "/?sub=age&age=16-24");
       const { container } = render(<AgeSection selectedPolicies={[]} selectedYear={2027} policies={[]} />);
-      expect(screen.queryAllByRole("heading", { name: /Winners and losers/ }).length > 0).toBe(shown);
+      expect(screen.queryAllByRole("heading", { name: /Gains and losses/ }).length > 0).toBe(shown);
       expect(screen.getByRole("heading", { level: 3, name: /Effect of each policy/ })).toBeInTheDocument();
       const names = downloadMenus(container).map((menu) => menu.name ?? "");
-      expect(names.some((name) => /Winners and losers/.test(name))).toBe(shown);
+      expect(names.some((name) => /Gains and losses/.test(name))).toBe(shown);
       if (!shown) expect(container.textContent).not.toMatch(PEOPLE_AFFECTED_TEXT);
     });
 
     it.each([
       ["16-24", ".young-people-shares"],
       ["all", ".young-people-shares"],
-    ])(`By age (?age=%s) ${either("shows", "leaves out")} Winners and losers in its age-group fallback, and keeps Effect of each policy`, async (age, selector) => {
+    ])(`By age (?age=%s) ${either("shows", "leaves out")} Gains and losses in its age-group fallback, and keeps Effect of each policy`, async (age, selector) => {
       const { default: AgeSection } = await import("../components/AgeSection");
       const { fixture, rows } = packageWithoutSingleAges();
       const catalogue = buildMeasureCatalogue(fixture);
@@ -150,7 +150,7 @@ export function describePovertyFigures(shown, { files, catalogueRef, ageRowsRef 
       expect(screen.getByRole("heading", { level: 3, name: /Effect of each policy/ })).toBeInTheDocument();
       expect(container.querySelectorAll(".measure-dumbbell-row, [class*='measure-dumbbell']").length).toBeGreaterThan(0);
       const names = downloadMenus(container).map((menu) => menu.name ?? "");
-      expect(names.some((name) => /Winners and losers/.test(name))).toBe(shown);
+      expect(names.some((name) => /Gains and losses/.test(name))).toBe(shown);
       if (!shown) {
         expect(container.textContent).not.toMatch(PEOPLE_AFFECTED_TEXT);
         expect(container.textContent).not.toMatch(POVERTY_TEXT);

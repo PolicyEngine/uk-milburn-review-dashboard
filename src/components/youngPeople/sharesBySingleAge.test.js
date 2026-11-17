@@ -19,7 +19,7 @@ const ROWS = [
   row("a", "20"),
 ];
 
-describe("Winners and losers by single year of age (Pavel's review, AGE5 and AGE10)", () => {
+describe("Gains and losses by single year of age (Pavel's review, AGE5 and AGE10)", () => {
   it("covers the chosen group's own ages: 16 to 24 is 16 to 24", () => {
     const shares = sharesBySingleAge(ROWS, POLICIES, ["a", "b"], 2027, "package", groupAges("16-24", 2027));
     expect(shares.groups.map((group) => group.label)).toEqual(["16", "17", "18", "19", "20", "21", "22", "23", "24"]);

@@ -25,7 +25,7 @@ export const SKELETON_SUB_TABS = {
     // Only while the poverty figures are shown (povertyFigures.js)
     ...(POVERTY_FIGURES_SHOWN ? [{ value: "poverty", label: "Poverty", icon: "percent" }] : []),
     { value: "finances", label: "Public finances", icon: "landmark" },
-    { value: "scenarios", label: "Return to work", icon: "sliders" },
+    { value: "scenarios", label: "Moves into work (illustrative)", icon: "sliders" },
     { value: "benchmarks", label: "Benchmarks", icon: "scale" },
     // Less the sub-tabs the report-day switch hides (milburn/reportDay.js)
   ].filter((tab) => subShownOnReportDay(tab.value)),
@@ -42,13 +42,16 @@ const LAYOUTS = {
     { icon: "usersRound", title: "How each age group's income changes", cards: [["lines", "wide"], ["bars"], ["bars"]] },
   ],
   "dashboard:scenarios": [
-    { icon: "sliders", title: "Return to work", subtitle: "The package with some young people on PIP or the health element moving into work, microsimulated, beside the static estimate.", cards: [["text", "wide"]] },
+    { icon: "sliders", title: "Moves into work (illustrative)", subtitle: "The package with some young people on PIP or the health element moving into work, microsimulated, beside the static estimate.", cards: [["text", "wide"]] },
   ],
   "dashboard:benchmarks": [
     { icon: "scale", title: "Benchmarks", subtitle: "Published figures on young people, work and health-related benefits.", cards: [["text", "wide"]] },
   ],
   "dashboard:poverty": [
     { icon: "lifebuoy", title: "How the policies change poverty", subtitle: "With the selected policies.", cards: [["bars"], ["bars"]] },
+  ],
+  household: [
+    { icon: "users", title: "Household impact", subtitle: "Young people in 2029-30 under current law and under the report's runs, by exact household calculation.", cards: [["text"], ["text"], ["text"]] },
   ],
   policies: [
     { icon: "fileText", title: "Measures we model", subtitle: reportCopy().measuresPlaceholderSubtitle, cards: [["text", "wide"], ["text", "wide"], ["text", "wide"]] },

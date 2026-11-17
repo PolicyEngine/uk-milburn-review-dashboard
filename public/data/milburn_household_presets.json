@@ -1,0 +1,3953 @@
+{
+ "year": 2029,
+ "fiscal_year": "2029-30",
+ "label": "PolicyEngine household calculation, 2029-30",
+ "build": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+ "engine": {
+  "policyengine": "6.20.2",
+  "policyengine-uk": "2.177.7",
+  "policyengine-core": "3.34.10",
+  "uk_budget_data": "0.1.0"
+ },
+ "runs": [
+  {
+   "key": "package",
+   "policies": [
+    "milburn_report_uc_health",
+    "milburn_report_pip"
+   ],
+   "name": "The report's package",
+   "kind": "package",
+   "description": "The Universal Credit health element and PIP removed for under-25s, run together. Its two parts are each removal on its own."
+  },
+  {
+   "key": "youth_allowance",
+   "policies": [
+    "milburn_report_youth_allowance_independent"
+   ],
+   "name": "Higher Youth Allowance",
+   "kind": "separate",
+   "description": "A separate run: under-25 claims with a housing costs element (the review's proxy for living independently) get the standard allowance for those aged 25 and over."
+  },
+  {
+   "key": "work_allowance",
+   "policies": [
+    "milburn_report_youth_allowance_work_allowance"
+   ],
+   "name": "Work allowance (illustrative)",
+   "kind": "illustrative",
+   "description": "A separate, illustrative run: the report proposes a work allowance for young people in work but gives no amount; the amount here is our assumption, the current Universal Credit work allowance."
+  },
+  {
+   "key": "employer_ni",
+   "policies": [
+    "milburn_report_employer_nics_threshold"
+   ],
+   "name": "Employer NI threshold",
+   "kind": "separate",
+   "description": "A separate run: employers pay National Insurance from £10,000 a year, not £5,000, for 21 to 24-year-olds in retail and hospitality. The model passes the saving to pay."
+  }
+ ],
+ "assumptions": [
+  "Renters pay £500 a month to a private landlord; the stored examples are in the North West.",
+  "A young person living with their parents is modelled as their own household with no rent: the parents' income and housing costs are not part of the calculation.",
+  "Council Tax and Council Tax Reduction are left out.",
+  "Benefit rates, the minimum wage and tax thresholds are the engine's for 2029-30, on the OBR forecast; every award is claimed in full, all year.",
+  "The report's replacement payments (such as its additional cost allowance) are not modelled, so nothing is paid in place of the health element or PIP.",
+  "Each run is compared with current law for the same household. The Youth Allowance, work allowance and employer National Insurance runs are separate: they are not added to the package or to each other.",
+  "Hours, wages (other than the employer National Insurance saving, which the model passes to pay) and housing costs are held fixed; no behavioural response is modelled."
+ ],
+ "examples": [
+  {
+   "id": "with_parents_health",
+   "title": "20, living with parents",
+   "description": "Health condition (new claim) and standard-rate PIP daily living; no earnings.",
+   "icon": "house",
+   "household": {
+    "age": 20,
+    "employment_income": 0,
+    "salary_year": 2029,
+    "region": "NORTH_WEST",
+    "claims_universal_credit": true,
+    "council_tax": 0,
+    "lives_with_parents": true,
+    "limited_capability_for_work_related_activity": true,
+    "new_claimant_health_element": true,
+    "pip_daily_living": "STANDARD"
+   },
+   "results": {
+    "package": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 11324.33,
+      "reform": 4363.49,
+      "change": -6960.84
+     },
+     "included": [
+      "milburn_report_pip",
+      "milburn_report_uc_health"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_pip",
+        "name": "PIP removed for 18 to 24-year-olds",
+        "change": -4353.72,
+        "status": "affected"
+       },
+       {
+        "id": "milburn_report_uc_health",
+        "name": "UC health element removed for under-25s",
+        "change": -2607.12,
+        "status": "affected"
+       }
+      ],
+      "combined": -6960.84,
+      "sum_of_singles": -6960.84,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 7150.61,
+       "reform": 4543.49,
+       "change": -2607.12,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 2607.12,
+         "reform": 0.0,
+         "change": -2607.12
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 0.0,
+       "change": -4353.72,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 0.0,
+         "change": -4353.72
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "youth_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 11324.33,
+      "reform": 11324.33,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_independent"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_independent",
+        "name": "Higher Youth Allowance for under-25s living independently",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 7150.61,
+       "reform": 7150.61,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 2607.12,
+         "reform": 2607.12,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "work_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 11324.33,
+      "reform": 11324.33,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_work_allowance"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_work_allowance",
+        "name": "Work allowance for under-25s in work (illustrative)",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 7150.61,
+       "reform": 7150.61,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 2607.12,
+         "reform": 2607.12,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "employer_ni": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 11324.33,
+      "reform": 11324.33,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_employer_nics_threshold"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_employer_nics_threshold",
+        "name": "Employer NI threshold of £10,000 for 21 to 24s in retail and hospitality",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 7150.61,
+       "reform": 7150.61,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 2607.12,
+         "reform": 2607.12,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    }
+   }
+  },
+  {
+   "id": "renting_health",
+   "title": "22, renting alone",
+   "description": "Health condition (protected claim) and enhanced-rate PIP daily living; no earnings.",
+   "icon": "key",
+   "household": {
+    "age": 22,
+    "employment_income": 0,
+    "salary_year": 2029,
+    "region": "NORTH_WEST",
+    "claims_universal_credit": true,
+    "council_tax": 0,
+    "tenure": "RENT_PRIVATELY",
+    "monthly_rent": 500,
+    "limited_capability_for_work_related_activity": true,
+    "pip_daily_living": "ENHANCED"
+   },
+   "results": {
+    "package": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 22398.18,
+      "reform": 9302.45,
+      "change": -13095.73
+     },
+     "included": [
+      "milburn_report_pip",
+      "milburn_report_uc_health"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_pip",
+        "name": "PIP removed for 18 to 24-year-olds",
+        "change": -7566.08,
+        "status": "affected"
+       },
+       {
+        "id": "milburn_report_uc_health",
+        "name": "UC health element removed for under-25s",
+        "change": -5529.65,
+        "status": "affected"
+       }
+      ],
+      "combined": -13095.73,
+      "sum_of_singles": -13095.73,
+      "residual": -0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 16073.15,
+       "reform": 9482.45,
+       "change": -6590.69,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 0.0,
+         "change": -5529.65
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 4938.96,
+         "change": -1061.04
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 6505.04,
+       "reform": 0.0,
+       "change": -6505.04,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 6505.04,
+         "reform": 0.0,
+         "change": -6505.04
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "youth_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 22398.18,
+      "reform": 23556.53,
+      "change": 1158.35
+     },
+     "included": [
+      "milburn_report_youth_allowance_independent"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_independent",
+        "name": "Higher Youth Allowance for under-25s living independently",
+        "change": 1158.35,
+        "status": "affected"
+       }
+      ],
+      "combined": 1158.35,
+      "sum_of_singles": 1158.35,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 16073.15,
+       "reform": 17231.5,
+       "change": 1158.35,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 5701.84,
+         "change": 1158.35
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 6505.04,
+       "reform": 6505.04,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 6505.04,
+         "reform": 6505.04,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "work_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 22398.18,
+      "reform": 22398.18,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_work_allowance"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_work_allowance",
+        "name": "Work allowance for under-25s in work (illustrative)",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 16073.15,
+       "reform": 16073.15,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 6505.04,
+       "reform": 6505.04,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 6505.04,
+         "reform": 6505.04,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "employer_ni": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 22398.18,
+      "reform": 22398.18,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_employer_nics_threshold"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_employer_nics_threshold",
+        "name": "Employer NI threshold of £10,000 for 21 to 24s in retail and hospitality",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 16073.15,
+       "reform": 16073.15,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 6505.04,
+       "reform": 6505.04,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 6505.04,
+         "reform": 6505.04,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    }
+   }
+  },
+  {
+   "id": "renting_health_25",
+   "title": "25, renting alone",
+   "description": "As the 22-year-old, but aged 25: above the report's age limit.",
+   "icon": "armchair",
+   "household": {
+    "age": 25,
+    "employment_income": 0,
+    "salary_year": 2029,
+    "region": "NORTH_WEST",
+    "claims_universal_credit": true,
+    "council_tax": 0,
+    "tenure": "RENT_PRIVATELY",
+    "monthly_rent": 500,
+    "limited_capability_for_work_related_activity": true,
+    "pip_daily_living": "ENHANCED"
+   },
+   "results": {
+    "package": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 23556.53,
+      "reform": 23556.53,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_pip",
+      "milburn_report_uc_health"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_pip",
+        "name": "PIP removed for 18 to 24-year-olds",
+        "change": 0.0,
+        "status": "not_affected"
+       },
+       {
+        "id": "milburn_report_uc_health",
+        "name": "UC health element removed for under-25s",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 17231.5,
+       "reform": 17231.5,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 5701.84,
+         "reform": 5701.84,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 6505.04,
+       "reform": 6505.04,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 6505.04,
+         "reform": 6505.04,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "youth_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 23556.53,
+      "reform": 23556.53,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_independent"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_independent",
+        "name": "Higher Youth Allowance for under-25s living independently",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 17231.5,
+       "reform": 17231.5,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 5701.84,
+         "reform": 5701.84,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 6505.04,
+       "reform": 6505.04,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 6505.04,
+         "reform": 6505.04,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "work_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 23556.53,
+      "reform": 23556.53,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_work_allowance"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_work_allowance",
+        "name": "Work allowance for under-25s in work (illustrative)",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 17231.5,
+       "reform": 17231.5,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 5701.84,
+         "reform": 5701.84,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 6505.04,
+       "reform": 6505.04,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 6505.04,
+         "reform": 6505.04,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "employer_ni": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 23556.53,
+      "reform": 23556.53,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_employer_nics_threshold"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_employer_nics_threshold",
+        "name": "Employer NI threshold of £10,000 for 21 to 24s in retail and hospitality",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 17231.5,
+       "reform": 17231.5,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 5701.84,
+         "reform": 5701.84,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 6505.04,
+       "reform": 6505.04,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 6505.04,
+         "reform": 6505.04,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    }
+   }
+  },
+  {
+   "id": "college_17",
+   "title": "17, at college",
+   "description": "Lives with parents; standard-rate PIP daily living; no earnings or Universal Credit.",
+   "icon": "graduate",
+   "household": {
+    "age": 17,
+    "employment_income": 0,
+    "salary_year": 2029,
+    "region": "NORTH_WEST",
+    "claims_universal_credit": false,
+    "council_tax": 0,
+    "lives_with_parents": true,
+    "pip_daily_living": "STANDARD"
+   },
+   "results": {
+    "package": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 4173.72,
+      "reform": 4173.72,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_pip",
+      "milburn_report_uc_health"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_pip",
+        "name": "PIP removed for 18 to 24-year-olds",
+        "change": 0.0,
+        "status": "not_affected"
+       },
+       {
+        "id": "milburn_report_uc_health",
+        "name": "UC health element removed for under-25s",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "youth_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 4173.72,
+      "reform": 4173.72,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_independent"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_independent",
+        "name": "Higher Youth Allowance for under-25s living independently",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "work_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 4173.72,
+      "reform": 4173.72,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_work_allowance"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_work_allowance",
+        "name": "Work allowance for under-25s in work (illustrative)",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "employer_ni": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 4173.72,
+      "reform": 4173.72,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_employer_nics_threshold"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_employer_nics_threshold",
+        "name": "Employer NI threshold of £10,000 for 21 to 24s in retail and hospitality",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    }
+   }
+  },
+  {
+   "id": "couple_partner_health",
+   "title": "23, with a partner aged 27",
+   "description": "Renting; the partner has a health condition; no earnings.",
+   "icon": "family",
+   "household": {
+    "age": 23,
+    "employment_income": 0,
+    "salary_year": 2029,
+    "region": "NORTH_WEST",
+    "claims_universal_credit": true,
+    "council_tax": 0,
+    "tenure": "RENT_PRIVATELY",
+    "monthly_rent": 500,
+    "has_partner": true,
+    "partner_age": 27,
+    "partner_employment_income": 0,
+    "partner_limited_capability_for_work_related_activity": true
+   },
+   "results": {
+    "package": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": 0.0,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 20299.9,
+      "reform": 20299.9,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_pip",
+      "milburn_report_uc_health"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_pip",
+        "name": "PIP removed for 18 to 24-year-olds",
+        "change": 0.0,
+        "status": "not_affected"
+       },
+       {
+        "id": "milburn_report_uc_health",
+        "name": "UC health element removed for under-25s",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 20479.9,
+       "reform": 20479.9,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 8950.25,
+         "reform": 8950.25,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "youth_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": 0.0,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 20299.9,
+      "reform": 20299.9,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_independent"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_independent",
+        "name": "Higher Youth Allowance for under-25s living independently",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 20479.9,
+       "reform": 20479.9,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 8950.25,
+         "reform": 8950.25,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "work_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": 0.0,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 20299.9,
+      "reform": 20299.9,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_work_allowance"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_work_allowance",
+        "name": "Work allowance for under-25s in work (illustrative)",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 20479.9,
+       "reform": 20479.9,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 8950.25,
+         "reform": 8950.25,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "employer_ni": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": 0.0,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 20299.9,
+      "reform": 20299.9,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_employer_nics_threshold"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_employer_nics_threshold",
+        "name": "Employer NI threshold of £10,000 for 21 to 24s in retail and hospitality",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 20479.9,
+       "reform": 20479.9,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 8950.25,
+         "reform": 8950.25,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    }
+   }
+  },
+  {
+   "id": "retail_part_time",
+   "title": "23, part-time in retail",
+   "description": "Renting alone; 16 hours a week at the minimum wage; on Universal Credit.",
+   "icon": "briefcase",
+   "household": {
+    "age": 23,
+    "employment_income": 0,
+    "salary_year": 2029,
+    "region": "NORTH_WEST",
+    "claims_universal_credit": true,
+    "council_tax": 0,
+    "tenure": "RENT_PRIVATELY",
+    "monthly_rent": 500,
+    "hours_worked_per_week": 16,
+    "earnings_at_minimum_wage": true,
+    "employment_sector": "RETAIL"
+   },
+   "results": {
+    "package": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 11523.2,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 16 hours a week, all year."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 14479.6,
+      "reform": 14479.6,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_pip",
+      "milburn_report_uc_health"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_pip",
+        "name": "PIP removed for 18 to 24-year-olds",
+        "change": 0.0,
+        "status": "not_affected"
+       },
+       {
+        "id": "milburn_report_uc_health",
+        "name": "UC health element removed for under-25s",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 3154.83,
+       "reform": 3154.83,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 4938.96,
+         "reform": 4938.96,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "employment_income",
+       "label": "Employment income",
+       "baseline": 11504.76,
+       "reform": 11504.76,
+       "change": 0.0,
+       "group": "income",
+       "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
+       "children": [
+        {
+         "id": "salary_sacrifice_haircut",
+         "label": "Pay cut for the salary sacrifice cap (current law)",
+         "baseline": -18.44,
+         "reform": -18.44,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "youth_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 11523.2,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 16 hours a week, all year."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 14479.6,
+      "reform": 15637.95,
+      "change": 1158.35
+     },
+     "included": [
+      "milburn_report_youth_allowance_independent"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_independent",
+        "name": "Higher Youth Allowance for under-25s living independently",
+        "change": 1158.35,
+        "status": "affected"
+       }
+      ],
+      "combined": 1158.35,
+      "sum_of_singles": 1158.35,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 3154.83,
+       "reform": 4313.19,
+       "change": 1158.35,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 5701.84,
+         "change": 1158.35
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 4938.96,
+         "reform": 4938.96,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "employment_income",
+       "label": "Employment income",
+       "baseline": 11504.76,
+       "reform": 11504.76,
+       "change": 0.0,
+       "group": "income",
+       "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
+       "children": [
+        {
+         "id": "salary_sacrifice_haircut",
+         "label": "Pay cut for the salary sacrifice cap (current law)",
+         "baseline": -18.44,
+         "reform": -18.44,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "work_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 11523.2,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 16 hours a week, all year."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 14479.6,
+      "reform": 17555.93,
+      "change": 3076.33
+     },
+     "included": [
+      "milburn_report_youth_allowance_work_allowance"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_work_allowance",
+        "name": "Work allowance for under-25s in work (illustrative)",
+        "change": 3076.33,
+        "status": "affected"
+       }
+      ],
+      "combined": 3076.33,
+      "sum_of_singles": 3076.33,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 3154.83,
+       "reform": 6231.17,
+       "change": 3076.33,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 4938.96,
+         "reform": 4938.96,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "employment_income",
+       "label": "Employment income",
+       "baseline": 11504.76,
+       "reform": 11504.76,
+       "change": 0.0,
+       "group": "income",
+       "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
+       "children": [
+        {
+         "id": "salary_sacrifice_haircut",
+         "label": "Pay cut for the salary sacrifice cap (current law)",
+         "baseline": -18.44,
+         "reform": -18.44,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "employer_ni": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 11523.2,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 16 hours a week, all year."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 14479.6,
+      "reform": 14773.07,
+      "change": 293.48
+     },
+     "included": [
+      "milburn_report_employer_nics_threshold"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_employer_nics_threshold",
+        "name": "Employer NI threshold of £10,000 for 21 to 24s in retail and hospitality",
+        "change": 293.48,
+        "status": "affected"
+       }
+      ],
+      "combined": 293.48,
+      "sum_of_singles": 293.48,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 3154.83,
+       "reform": 2796.14,
+       "change": -358.7,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 4938.96,
+         "reform": 4938.96,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "employment_income",
+       "label": "Employment income",
+       "baseline": 11504.76,
+       "reform": 12156.94,
+       "change": 652.17,
+       "group": "income",
+       "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
+       "children": [
+        {
+         "id": "salary_sacrifice_haircut",
+         "label": "Pay cut for the salary sacrifice cap (current law)",
+         "baseline": -18.44,
+         "reform": -18.44,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    }
+   }
+  },
+  {
+   "id": "hospitality_health",
+   "title": "24, in hospitality with PIP",
+   "description": "Renting alone; 20 hours a week at the minimum wage; health condition and standard-rate PIP daily living.",
+   "icon": "hardHat",
+   "household": {
+    "age": 24,
+    "employment_income": 0,
+    "salary_year": 2029,
+    "region": "NORTH_WEST",
+    "claims_universal_credit": true,
+    "council_tax": 0,
+    "tenure": "RENT_PRIVATELY",
+    "monthly_rent": 500,
+    "hours_worked_per_week": 20,
+    "earnings_at_minimum_wage": true,
+    "employment_sector": "HOSPITALITY",
+    "limited_capability_for_work_related_activity": true,
+    "pip_daily_living": "STANDARD"
+   },
+   "results": {
+    "package": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 14404.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 20 hours a week, all year."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 29566.45,
+      "reform": 18622.04,
+      "change": -10944.41
+     },
+     "included": [
+      "milburn_report_pip",
+      "milburn_report_uc_health"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_pip",
+        "name": "PIP removed for 18 to 24-year-olds",
+        "change": -5414.76,
+        "status": "affected"
+       },
+       {
+        "id": "milburn_report_uc_health",
+        "name": "UC health element removed for under-25s",
+        "change": -5529.65,
+        "status": "affected"
+       }
+      ],
+      "combined": -10944.41,
+      "sum_of_singles": -10944.41,
+      "residual": -0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "income_tax",
+       "label": "Income Tax",
+       "baseline": 362.19,
+       "reform": 362.19,
+       "change": 0.0,
+       "group": "tax",
+       "note": "Includes the High Income Child Benefit Charge, so Child Benefit is shown before it.",
+       "children": [
+        {
+         "id": "earned_income_tax",
+         "label": "On earnings",
+         "baseline": 362.19,
+         "reform": 362.19,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "national_insurance",
+       "label": "Employee National Insurance",
+       "baseline": 144.88,
+       "reform": 144.88,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 11518.84,
+       "reform": 4928.15,
+       "change": -6590.69,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 0.0,
+         "change": -5529.65
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 4938.96,
+         "change": -1061.04
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 0.0,
+       "change": -4353.72,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 0.0,
+         "change": -4353.72
+        }
+       ]
+      },
+      {
+       "id": "employment_income",
+       "label": "Employment income",
+       "baseline": 14380.95,
+       "reform": 14380.95,
+       "change": 0.0,
+       "group": "income",
+       "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
+       "children": [
+        {
+         "id": "salary_sacrifice_haircut",
+         "label": "Pay cut for the salary sacrifice cap (current law)",
+         "baseline": -23.05,
+         "reform": -23.05,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "youth_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 14404.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 20 hours a week, all year."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 29566.45,
+      "reform": 30724.8,
+      "change": 1158.35
+     },
+     "included": [
+      "milburn_report_youth_allowance_independent"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_independent",
+        "name": "Higher Youth Allowance for under-25s living independently",
+        "change": 1158.35,
+        "status": "affected"
+       }
+      ],
+      "combined": 1158.35,
+      "sum_of_singles": 1158.35,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "income_tax",
+       "label": "Income Tax",
+       "baseline": 362.19,
+       "reform": 362.19,
+       "change": 0.0,
+       "group": "tax",
+       "note": "Includes the High Income Child Benefit Charge, so Child Benefit is shown before it.",
+       "children": [
+        {
+         "id": "earned_income_tax",
+         "label": "On earnings",
+         "baseline": 362.19,
+         "reform": 362.19,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "national_insurance",
+       "label": "Employee National Insurance",
+       "baseline": 144.88,
+       "reform": 144.88,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 11518.84,
+       "reform": 12677.2,
+       "change": 1158.35,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 5701.84,
+         "change": 1158.35
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "employment_income",
+       "label": "Employment income",
+       "baseline": 14380.95,
+       "reform": 14380.95,
+       "change": 0.0,
+       "group": "income",
+       "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
+       "children": [
+        {
+         "id": "salary_sacrifice_haircut",
+         "label": "Pay cut for the salary sacrifice cap (current law)",
+         "baseline": -23.05,
+         "reform": -23.05,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "work_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 14404.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 20 hours a week, all year."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 29566.45,
+      "reform": 29566.45,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_work_allowance"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_work_allowance",
+        "name": "Work allowance for under-25s in work (illustrative)",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "income_tax",
+       "label": "Income Tax",
+       "baseline": 362.19,
+       "reform": 362.19,
+       "change": 0.0,
+       "group": "tax",
+       "note": "Includes the High Income Child Benefit Charge, so Child Benefit is shown before it.",
+       "children": [
+        {
+         "id": "earned_income_tax",
+         "label": "On earnings",
+         "baseline": 362.19,
+         "reform": 362.19,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "national_insurance",
+       "label": "Employee National Insurance",
+       "baseline": 144.88,
+       "reform": 144.88,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 11518.84,
+       "reform": 11518.84,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "employment_income",
+       "label": "Employment income",
+       "baseline": 14380.95,
+       "reform": 14380.95,
+       "change": 0.0,
+       "group": "income",
+       "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
+       "children": [
+        {
+         "id": "salary_sacrifice_haircut",
+         "label": "Pay cut for the salary sacrifice cap (current law)",
+         "baseline": -23.05,
+         "reform": -23.05,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "employer_ni": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 14404.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Pay at the minimum wage for your age in 2029-30 (£13.85 an hour), for 20 hours a week, all year."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 29566.45,
+      "reform": 29777.75,
+      "change": 211.3
+     },
+     "included": [
+      "milburn_report_employer_nics_threshold"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_employer_nics_threshold",
+        "name": "Employer NI threshold of £10,000 for 21 to 24s in retail and hospitality",
+        "change": 211.3,
+        "status": "affected"
+       }
+      ],
+      "combined": 211.3,
+      "sum_of_singles": 211.3,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "income_tax",
+       "label": "Income Tax",
+       "baseline": 362.19,
+       "reform": 492.63,
+       "change": 130.43,
+       "group": "tax",
+       "note": "Includes the High Income Child Benefit Charge, so Child Benefit is shown before it.",
+       "children": [
+        {
+         "id": "earned_income_tax",
+         "label": "On earnings",
+         "baseline": 362.19,
+         "reform": 492.63,
+         "change": 130.43
+        }
+       ]
+      },
+      {
+       "id": "national_insurance",
+       "label": "Employee National Insurance",
+       "baseline": 144.88,
+       "reform": 197.05,
+       "change": 52.17,
+       "group": "tax"
+      },
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 11518.84,
+       "reform": 11260.58,
+       "change": -258.26,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_lcwra_element",
+         "label": "Health element (LCWRA)",
+         "baseline": 5529.65,
+         "reform": 5529.65,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "pip",
+       "label": "Personal Independence Payment",
+       "baseline": 4353.72,
+       "reform": 4353.72,
+       "change": 0.0,
+       "group": "benefit",
+       "children": [
+        {
+         "id": "pip_daily_living",
+         "label": "Daily living",
+         "baseline": 4353.72,
+         "reform": 4353.72,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "employment_income",
+       "label": "Employment income",
+       "baseline": 14380.95,
+       "reform": 15033.13,
+       "change": 652.17,
+       "group": "income",
+       "note": "The £2,000 salary sacrifice cap from April 2029 is existing law (Budget 2025), so it is the same before and after the measures. policyengine-uk assumes employers recover the cap's extra employer National Insurance by cutting every employee's pay by a set share, whether or not they use salary sacrifice: the pay cut row, a negative amount.",
+       "children": [
+        {
+         "id": "salary_sacrifice_haircut",
+         "label": "Pay cut for the salary sacrifice cap (current law)",
+         "baseline": -23.05,
+         "reform": -23.05,
+         "change": 0.0
+        }
+       ]
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    }
+   }
+  },
+  {
+   "id": "lone_parent",
+   "title": "19, lone parent",
+   "description": "One child aged 1; renting; on Universal Credit; no earnings.",
+   "icon": "baby",
+   "household": {
+    "age": 19,
+    "employment_income": 0,
+    "salary_year": 2029,
+    "region": "NORTH_WEST",
+    "claims_universal_credit": true,
+    "council_tax": 0,
+    "tenure": "RENT_PRIVATELY",
+    "monthly_rent": 500,
+    "children": [
+     {
+      "age": 1
+     }
+    ]
+   },
+   "results": {
+    "package": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 15880.29,
+      "reform": 15880.29,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_pip",
+      "milburn_report_uc_health"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_pip",
+        "name": "PIP removed for 18 to 24-year-olds",
+        "change": 0.0,
+        "status": "not_affected"
+       },
+       {
+        "id": "milburn_report_uc_health",
+        "name": "UC health element removed for under-25s",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 14524.85,
+       "reform": 14524.85,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_child_element",
+         "label": "Child element",
+         "baseline": 3981.35,
+         "reform": 3981.35,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "child_benefit",
+       "label": "Child Benefit",
+       "baseline": 1535.44,
+       "reform": 1535.44,
+       "change": 0.0,
+       "group": "benefit"
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [
+      {
+       "age": 1,
+       "in_education": null,
+       "claimant_or_partner": false,
+       "counts_for_child_benefit": true,
+       "counts_for_universal_credit": true
+      }
+     ],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "youth_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 15880.29,
+      "reform": 17038.64,
+      "change": 1158.35
+     },
+     "included": [
+      "milburn_report_youth_allowance_independent"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_independent",
+        "name": "Higher Youth Allowance for under-25s living independently",
+        "change": 1158.35,
+        "status": "affected"
+       }
+      ],
+      "combined": 1158.35,
+      "sum_of_singles": 1158.35,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 14524.85,
+       "reform": 15683.2,
+       "change": 1158.35,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 5701.84,
+         "change": 1158.35
+        },
+        {
+         "id": "uc_child_element",
+         "label": "Child element",
+         "baseline": 3981.35,
+         "reform": 3981.35,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "child_benefit",
+       "label": "Child Benefit",
+       "baseline": 1535.44,
+       "reform": 1535.44,
+       "change": 0.0,
+       "group": "benefit"
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [
+      {
+       "age": 1,
+       "in_education": null,
+       "claimant_or_partner": false,
+       "counts_for_child_benefit": true,
+       "counts_for_universal_credit": true
+      }
+     ],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "work_allowance": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 15880.29,
+      "reform": 15880.29,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_youth_allowance_work_allowance"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_youth_allowance_work_allowance",
+        "name": "Work allowance for under-25s in work (illustrative)",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 14524.85,
+       "reform": 14524.85,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_child_element",
+         "label": "Child element",
+         "baseline": 3981.35,
+         "reform": 3981.35,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "child_benefit",
+       "label": "Child Benefit",
+       "baseline": 1535.44,
+       "reform": 1535.44,
+       "change": 0.0,
+       "group": "benefit"
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [
+      {
+       "age": 1,
+       "in_education": null,
+       "claimant_or_partner": false,
+       "counts_for_child_benefit": true,
+       "counts_for_universal_credit": true
+      }
+     ],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    },
+    "employer_ni": {
+     "year": 2029,
+     "fiscal_year": "2029-30",
+     "salary_used": {
+      "salary_year": 2029,
+      "employment_income": 0.0,
+      "partner_employment_income": null,
+      "growth": 1.0,
+      "note": "Salary as entered for 2029, grown to 2029-30 with the OBR average earnings index."
+     },
+     "council_tax_used": {
+      "band": "D",
+      "council_tax": 0.0,
+      "source": "entered",
+      "note": "As entered."
+     },
+     "state_pension_used": {
+      "state_pension_age": 67,
+      "full_new_state_pension": 13816.4,
+      "state_pension": null,
+      "partner_state_pension": null,
+      "note": "At State Pension age, the State Pension as entered, or else the full new State Pension for 2029-30."
+     },
+     "net_income": {
+      "baseline": 15880.29,
+      "reform": 15880.29,
+      "change": 0.0
+     },
+     "included": [
+      "milburn_report_employer_nics_threshold"
+     ],
+     "not_modelled": [],
+     "by_policy": {
+      "measures": [
+       {
+        "id": "milburn_report_employer_nics_threshold",
+        "name": "Employer NI threshold of £10,000 for 21 to 24s in retail and hospitality",
+        "change": 0.0,
+        "status": "not_affected"
+       }
+      ],
+      "combined": 0.0,
+      "sum_of_singles": 0.0,
+      "residual": 0.0,
+      "method": "Each measure's change is that measure switched to its Budget setting, with every other selected measure held at pre-Budget law, against the same baseline. The combined change switches them all at once. The residual is the combined change minus the sum of the single changes: what the measures do together beyond what each does alone."
+     },
+     "programmes": [
+      {
+       "id": "tv_licence",
+       "label": "TV licence",
+       "baseline": 180.0,
+       "reform": 180.0,
+       "change": 0.0,
+       "group": "tax"
+      },
+      {
+       "id": "universal_credit",
+       "label": "Universal Credit",
+       "baseline": 14524.85,
+       "reform": 14524.85,
+       "change": 0.0,
+       "group": "benefit",
+       "note": "Before the benefit cap, which is its own row. Elements are before the earnings taper.",
+       "children": [
+        {
+         "id": "uc_standard_allowance",
+         "label": "Standard allowance",
+         "baseline": 4543.49,
+         "reform": 4543.49,
+         "change": 0.0
+        },
+        {
+         "id": "uc_child_element",
+         "label": "Child element",
+         "baseline": 3981.35,
+         "reform": 3981.35,
+         "change": 0.0
+        },
+        {
+         "id": "uc_housing_costs_element",
+         "label": "Housing costs element",
+         "baseline": 6000.0,
+         "reform": 6000.0,
+         "change": 0.0
+        }
+       ]
+      },
+      {
+       "id": "child_benefit",
+       "label": "Child Benefit",
+       "baseline": 1535.44,
+       "reform": 1535.44,
+       "change": 0.0,
+       "group": "benefit"
+      }
+     ],
+     "not_in_breakdown": [],
+     "dependants": [
+      {
+       "age": 1,
+       "in_education": null,
+       "claimant_or_partner": false,
+       "counts_for_child_benefit": true,
+       "counts_for_universal_credit": true
+      }
+     ],
+     "dependants_note": "Who counts as a child follows policyengine-uk: everyone under 16, and a 16- to 19-year-old in full-time non-advanced education (school or college) begun before 19. Child Benefit counts such a young person until 20; Universal Credit stops at the 1 September after their 19th birthday, so a 19-year-old counts for Child Benefit but not Universal Credit.",
+     "area": {
+      "region": "NORTH_WEST",
+      "brma": "CENTRAL_GREATER_MANCHESTER",
+      "brma_source": "region default",
+      "local_authority": "MANCHESTER",
+      "local_authority_source": "region default"
+     },
+     "sweep": null
+    }
+   }
+  }
+ ]
+}

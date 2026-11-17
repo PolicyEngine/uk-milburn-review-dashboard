@@ -16,11 +16,12 @@ Private repository. Figures are PolicyEngine UK static microsimulation estimates
 
 | Tab | Content |
 |---|---|
-| Impact: Young people | Key figures, average change by age, change by year, effect of each measure, winners and losers |
+| Impact: Young people | Key figures, average change by age, change by year, effect of each measure, gains and losses |
 | Impact: Poverty | Absolute and relative poverty, before and after housing costs |
 | Impact: Public finances | Exchequer effect by year |
-| Impact: Return to work | An illustrative move into work (25% of non-working 18 to 24-year-olds with PIP or the health element), beside the review's own estimate of 440,000 into sustained work by 2036 |
-| Impact: Benchmarks | Published figures (the review, its annex and data tables, the Resolution Foundation, ONS, IFS) beside our estimates |
+| Impact: Moves into work (illustrative) | An assumed move into work (25% of non-working 18 to 24-year-olds with PIP or the health element, an assumption, not an estimate), set apart from the review's own estimate of 440,000 into sustained work by 2036 |
+| Impact: Benchmarks | Published figures (the review, its annex and data tables, the Resolution Foundation, ONS, IFS) beside our estimates on the same basis (ages, area, year and measure), with our savings shown apart |
+| Household impact (`?tab=household`) | One young person's household in 2029-30 under current law and under the report's runs: the package (with its health element and PIP parts) and, separately, the higher Youth Allowance, the work allowance (illustrative) and the employer NI threshold, with a breakdown by programme. Eight stored examples load from `public/data/milburn_household_presets.json` with no API; a custom household needs the household API |
 | Measures | Each modelled measure, and the report's proposals we cannot compute, with the reason |
 | Methodology | Data, model, what is modelled, limitations |
 
@@ -30,16 +31,16 @@ Every PolicyEngine figure is labelled "PolicyEngine estimate"; published figures
 
 The report's measures, from April 2029, when the report's welfare savings start (analytical annex, section 1). Static estimates for 2029-30, against current law.
 
-| Run id | Measure | Exchequer, 2029-30 | 16–24s in affected households |
+| Run id | Measure | Exchequer, 2029-30 (cash terms) | 16–24s in households whose income changes |
 |---|---|---|---|
-| `milburn_report_package` | UC health element removed for under-25s and PIP removed for 18 to 24-year-olds, together; no replacement payments modelled, so losses are an upper bound | £4.67bn saving | 580,000 (lose) |
-| `milburn_report_uc_health` | UC health element removed for under-25s (para 748) | £1.13bn saving | 404,000 (lose) |
-| `milburn_report_pip` | PIP removed for 18 to 24-year-olds (paras 752–757) | £3.64bn saving | 557,000 (lose) |
-| `milburn_report_employer_nics_threshold` | Employer NI threshold £5,000 → £10,000 for 21 to 24-year-olds in retail and hospitality (SIC 47, 55, 56), end state (paras 269–270) | £0.22bn cost | 766,000 (gain) |
-| `milburn_report_youth_allowance_independent` | Higher Youth Allowance for under-25s living independently: the 25-and-over rate where the claim has a housing element, the review's own proxy (annex, section 8) | running | |
-| `milburn_report_package_phased` | The package phased in: new 18-year-olds at once, existing claimants at an assumed 45% a year (about 95% within five years, para 773) | running | |
-| `milburn_report_employer_nics_threshold_glide_path` | The NI threshold in assumed equal steps, £6,000 in 2027-28 to £10,000 in 2031-32 | running | |
-| `milburn_report_youth_allowance_work_allowance` | Illustrative: a work allowance for every under-25 UC claim (para 749 gives no amount), at the current UC work allowance amounts, the lower with a housing element: our assumption | £0.46bn cost | 422,000 (gain) |
+| `milburn_report_package` | UC health element removed for under-25s and PIP removed for 18 to 24-year-olds, together; no replacement payments modelled, so losses are an upper bound | £4.67bn saving | 580,000 |
+| `milburn_report_uc_health` | UC health element removed for under-25s (para 748) | £1.13bn saving | 404,000 |
+| `milburn_report_pip` | PIP removed for 18 to 24-year-olds (paras 752–757) | £3.64bn saving | 557,000 |
+| `milburn_report_employer_nics_threshold` | Employer NI threshold £5,000 → £10,000 for 21 to 24-year-olds in retail and hospitality (SIC 47, 55, 56), end state from an assumed April 2027, cost net of tax on the higher pay (paras 269–270) | £0.22bn cost | 766,000 |
+| `milburn_report_youth_allowance_independent` | Higher Youth Allowance for under-25s living independently: the 25-and-over rate where the claim has a housing element, the review's own proxy (annex, section 8) | £0.13bn cost | 159,000 |
+| `milburn_report_package_phased` | The package phased in: new 18-year-olds at once, existing claimants at an assumed 45% a year (about 95% within five years, para 773) | £2.77bn saving | 341,000 |
+| `milburn_report_employer_nics_threshold_glide_path` | The NI threshold in assumed equal steps, £6,000 in 2027-28 to £10,000 in 2031-32 | £0.14bn cost | 766,000 |
+| `milburn_report_youth_allowance_work_allowance` | Illustrative: a work allowance for every under-25 UC claim (para 749 gives no amount), at the current UC work allowance amounts, the lower with a housing element: our assumption | £0.46bn cost | 422,000 |
 | `milburn_report_child_dla_to_18` | Child DLA extended to 18 (para 760): PIP at 16 and 17 swapped for DLA at the equivalent level, whose rates are equal; the effect of avoiding reassessment at 16 is not estimated | £0.00bn | 0 |
 
 Comparators modelled before the report (from April 2027): `pip_halved_under_25` (a stand-in for the Additional Cost Allowance, whose rates the report does not set) and `employer_nics_zero_under_25` (the option the report considers and does not propose, para 268). The other pre-report runs stay in `public/data/milburn/` and load by link, but the selector does not offer them.
@@ -71,6 +72,23 @@ rsync -a --delete ~/milburn-runs/<date>/<id>/ public/data/milburn/<id>/         
 .venv/bin/uk-budget-data milburn-measures --output public/data/milburn_measures.json
 ```
 
+Household impact tab: the eight stored examples are precomputed through the household API's own code path (`src/uk_budget_data/milburn_household.py`, about five minutes, no Hugging Face token):
+
+```bash
+.venv/bin/python scripts/precompute_milburn_household_presets.py   # writes public/data/milburn_household_presets.json
+HOUSEHOLD_WORKERS=2 PORT=8010 uv run uk-budget-api                  # a local API for custom households
+NEXT_PUBLIC_HOUSEHOLD_API_URL=http://localhost:8010/api/household-impact bun run dev
+```
+
+Custom households on a deployed page use the Modal app `uk-milburn-household` (no warm schedule, scales to zero, at most 10 workers; see the docstring of `src/uk_budget_data/modal_household.py`). Not deployed yet:
+
+```bash
+HOUSEHOLD_MODAL_APP=uk-milburn-household uv run --with modal modal deploy src/uk_budget_data/modal_household.py
+uv run --with modal modal app stop -y uk-milburn-household          # stop it
+```
+
+Then build the page with `NEXT_PUBLIC_HOUSEHOLD_API_URL=https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact` (the URL follows the production app's label pattern; check it in the deploy's output).
+
 Tests and lint: `bunx vitest run --pool=forks`, `bunx eslint src`, `.venv/bin/pytest tests/test_milburn_design.py tests/test_milburn_measures.py -n 2`.
 
 Claude artifact build: `python3 scripts/artifact_export.py` stages a static copy in `artifact-export/publish/`.
@@ -80,7 +98,7 @@ Claude artifact build: `python3 scripts/artifact_export.py` stages a static copy
 | Switch | Effect |
 |---|---|
 | `REPORT_PUBLISHED` in `src/utils/milburn/reportStatus.js` (on) | The wording for after the final report |
-| `REPORT_DAY` in `src/utils/milburn/reportDay.js` (off) | Hides Return to work and Benchmarks |
+| `REPORT_DAY` in `src/utils/milburn/reportDay.js` (off) | Hides Moves into work (illustrative) and Benchmarks |
 | `DEFAULT_DISPLAY_YEAR` in `src/utils/displayYears.js` (2029) | The year the page opens on |
 
 ## Status

@@ -33,7 +33,7 @@ function writeGroup(group) {
  * address as ?age=) drives every card, its focus, comparisons and
  * sentences. The cards: average change by age group, change by year,
  * change by single year of age, the effect of each policy on the group
- * against all ages, and the shares who gain and lose (winners and losers).
+ * against all ages, and the shares who gain and lose (gains and losses).
  * The shares are people affected, so they are left out while those figures
  * are withheld (povertyFigures.js); the effect of each policy stays.
  */
@@ -108,10 +108,10 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
           <SectionHeading
             id="age-who-gains"
             icon="userPlus"
-            title="Winners and losers, and which policies drive them"
+            title="Gains and losses, and which policies drive them"
             subtitle={`How many ${subject.toLowerCase()} gain or lose, and from which policies.`}
           />
-          <section className="report-section young-people-section" aria-label="Winners and losers, and which policies drive them">
+          <section className="report-section young-people-section" aria-label="Gains and losses, and which policies drive them">
             <div className="charts-grid">
               {/* 16 to 24 (the default group) against 25 to 34 at first */}
               <MeasuresCard {...props} defaultCompare="25-34" height={narrow ? 460 : 400} />

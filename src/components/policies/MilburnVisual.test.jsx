@@ -128,8 +128,8 @@ describe("MilburnVisual", () => {
     const glide = details.milburn_report_employer_nics_threshold_glide_path.visual;
     const path = milburnVisualView(glide, "The measure");
     expect(path.bands[1]).toMatchObject({ title: "21 to 24", text: "From £10,000 by 2031-32, was £5,000" });
-    expect(path.chips[0]).toEqual({ icon: "file-clock", when: "2027-28 to 2031-32", value: "£6,000, rising £1,000 a year" });
-    expect(path.alt).toContain("in steps: £6,000 in 2027-28, rising £1,000 a year.");
+    expect(path.chips[0]).toEqual({ icon: "file-clock", when: "2027-28 to 2031-32 (assumed)", value: "£6,000, rising £1,000 a year" });
+    expect(path.alt).toContain("in assumed steps: £6,000 in 2027-28, rising £1,000 a year.");
     expect(milburnVisualView({ ...glide, glide: { ...glide.glide, from: 7000 } }, "The measure")).toBeNull();
     // Phased: 45% a year from the April 2028 cohort, as a share of the report's package from 2029-30
     vi.stubGlobal("fetch", vi.fn(async () => new Response(PUBLISHED_SUMMARY, { status: 200 })));

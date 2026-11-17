@@ -37,6 +37,23 @@ A test app (same code, no warm schedule, scales to zero):
         uv run --with modal modal deploy src/uk_budget_data/modal_household.py
     uv run --with modal modal app stop -y uk-budget-household-speedtest
 
+The Milburn review dashboard's calculator (the Household impact tab) is
+its own app, ``uk-milburn-household``: the same code, no warm schedule,
+``MIN_CONTAINERS`` 0 so it scales to zero and costs nothing while idle, at
+most 10 ``Household`` containers, and warm jobs that run the tab's four
+report runs for 2029-30 (``milburn_household.RUNS``). No Hugging Face token: each
+household is built from the answers.
+
+    HOUSEHOLD_MODAL_APP=uk-milburn-household \
+        uv run --with modal modal deploy src/uk_budget_data/modal_household.py
+    uv run --with modal modal app stop -y uk-milburn-household   # when done
+
+Its URL should be https://policyengine--uk-milburn-household-web.us-east.modal.run
+(the production app's label pattern; check the deploy's output). Build the
+page with ``NEXT_PUBLIC_HOUSEHOLD_API_URL`` set to that URL plus
+``/api/household-impact`` for custom households (the stored examples need
+no API). A cold start answers 503 with Retry-After; the page retries.
+
 Warm schedule (approved by Vahid, 27 October 2026, about $108 in all):
 ``warm_schedule`` runs every 10 minutes and sets how many ``Household`` and
 ``Web`` containers stay warm from ``household_warm.WARM_WINDOWS`` (UK time):
@@ -63,6 +80,9 @@ import modal
 PRODUCTION_APP = "uk-budget-household"
 APP_NAME = os.environ.get("HOUSEHOLD_MODAL_APP", PRODUCTION_APP)
 PRODUCTION = APP_NAME == PRODUCTION_APP
+# The Milburn review dashboard's calculator app (see the docstring)
+MILBURN_APP = "uk-milburn-household"
+MILBURN = APP_NAME == MILBURN_APP
 # One core: a simulation runs on one thread, so a second core would add
 # cost, not speed. Memory from the measured peak of one worker (about
 # 0.4 GB) with headroom.
@@ -75,7 +95,11 @@ TIMEOUT_SECONDS = 300
 # price while idle. 40, approved by Vahid for the 26-28 October 2026 Budget
 # window (the live app was raised to 40 at runtime on 26 October; a deploy
 # applies this value, so it must match). Back to 12 after 17 November.
-MAX_CONTAINERS = int(os.environ.get("HOUSEHOLD_MODAL_MAX_CONTAINERS", "40"))
+# The Milburn app's ceiling is 10: four runs of about three simulations
+# each per household.
+MAX_CONTAINERS = int(
+    os.environ.get("HOUSEHOLD_MODAL_MAX_CONTAINERS", "10" if MILBURN else "40")
+)
 # What the deploy keeps warm, none by default. On the production app,
 # warm_schedule (below) sets both warm counts from
 # household_warm.warm_target within 10 minutes, so this lasts only until its
@@ -178,14 +202,42 @@ def build_image() -> modal.Image:
 app = modal.App(APP_NAME, image=build_image())
 
 
+def milburn_warm_jobs() -> list:
+    """The current-law side and each of the Milburn tab's four report runs'
+    sides (milburn_household.RUNS), for its first stored example in
+    2029-30."""
+    from uk_budget_data import household_impact as hi
+    from uk_budget_data import milburn_household as mh
+    from uk_budget_data.api import HouseholdAnswersRequest
+
+    answers = HouseholdAnswersRequest.model_validate(
+        mh.EXAMPLES[0]["household"]
+    ).answers()
+    job = hi.household_entities(answers, mh.YEAR) + (mh.YEAR,)
+    jobs = []
+    for run in mh.RUNS:
+        sides = hi.measure_sides(run["policies"])
+        if not jobs:
+            jobs.append((*job, sides.before))
+        jobs.append((*job, sides.after))
+        if len(sides.included) > 1:
+            jobs += [
+                (*job, sides.singles[id_], None, True)
+                for id_ in sides.included
+            ]
+    return jobs
+
+
 def warm_jobs() -> list:
     """One run of every side the calculator asks for, for the default
     household: the before and after sides, each measure's single, and the
     sweep's axes. Run as a container starts, they build and keep the
     engine's parameter caches for each side, so a request's first run of a
-    side does not pay for that."""
+    side does not pay for that. The Milburn app warms its own runs."""
     from uk_budget_data import household_impact as hi
 
+    if MILBURN:
+        return milburn_warm_jobs()
     year = 2027
     people, benunit, household = hi.household_entities(
         hi.HouseholdAnswers(), year

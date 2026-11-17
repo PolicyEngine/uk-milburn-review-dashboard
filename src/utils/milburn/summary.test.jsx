@@ -295,7 +295,7 @@ describe("KeyFigures", () => {
     const rows = within(strip).getAllByRole("row");
     // The fixture lists only the report's package of the range's runs: the others are left out
     expect(rows).toHaveLength(2);
-    expect(rows[1].textContent).toBe("No replacement£4.50bnabout 290,000");
+    expect(rows[1].textContent).toBe("Full removal£4.50bnabout 290,000");
     // Not a package: no row is picked out, and nothing is said to be selected
     const region = screen.getByRole("region", { name: "Key figures" });
     expect(region.textContent).toContain(RANGE_WITHOUT_SELECTION);
@@ -440,11 +440,11 @@ describe("BreakEven", () => {
 describe("the published summary", () => {
   const published = parseSummary(JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8")));
 
-  it("gives the packages' range: the report's package, the pre-report central variant and the report's phased run", () => {
+  it("gives the packages' range: full removal, the pre-report partial removal and the phased run", () => {
     expect(packageRange(published).map((row) => row.id)).toEqual(["milburn_report_package", "milburn_package_central", "milburn_report_package_phased"]);
     expect(packageRange(published).map(({ name, saving, poverty }) => [name, saving, poverty])).toEqual([
-      ["No replacement", "£4.67bn", "about 342,000"],
-      ["Central", "£2.64bn", "about 99,000"],
+      ["Full removal", "£4.67bn", "about 342,000"],
+      ["Partial removal", "£2.64bn", "about 99,000"],
       ["Phased", "£2.77bn", "about 156,000"],
     ]);
   });
@@ -470,13 +470,13 @@ describe("the published summary", () => {
     expect(entryMovers(summaryRun(published, "milburn_package"))).toBeNull();
     render(<EntryComparison summary={published} catalogue={null} />);
     const section = screen.getByRole("region", { name: "With a quarter moving into work" });
-    expect(section.textContent).toContain("2029-30: the report’s two benefit removals, static and with about 83,000 young people moving into work.");
+    expect(section.textContent).toContain("2029-30: the report’s two benefit removals, static and with about 83,000 young people assumed to move into work (an assumed 25%).");
     // The detail is in the folded notes
     expect(section.querySelector("details [data-entry-runs]").textContent).toMatch(/^Both runs: .+, the same two removals as the report’s benefit changes, applied from April 2027\.$/);
-    expect(section.textContent).toContain("Who moves: about 83,000 people, 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
+    expect(section.textContent).toContain("Who moves: about 83,000 people, an assumed 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
   });
 
-  it("leads Return to work with the 25% entry run against the static package", () => {
+  it("leads Moves into work (illustrative) with the 25% entry run against the static package", () => {
     render(<EntryComparison summary={published} catalogue={null} />);
     const rows = within(screen.getByRole("table")).getAllByRole("row");
     expect(rows[1].textContent).toContain("£4.67bn");
@@ -531,7 +531,7 @@ describe("EntryComparison", () => {
     expect(section.textContent).toContain(ENTRY_RUN_HEADING);
     for (const point of entryRunPoints(70400)) expect(section.textContent).toContain(point);
     expect(entryRunPoints(70400)[0]).toContain("about 70,000 people");
-    expect(entryRunPoints(null)[0]).toBe("Who moves: 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
+    expect(entryRunPoints(null)[0]).toBe("Who moves: an assumed 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
     expect(section.textContent).not.toMatch(/Why the effect is small|worse off|young people who lose/);
   });
 

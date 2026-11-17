@@ -134,7 +134,9 @@ describe("MethodologyTab", () => {
   it("says young LCWRA claimants mostly also get PIP, and how the caseloads compare with DWP's", () => {
     const { container } = renderTab();
     expect(container.textContent).toContain("About nine in ten young claimants with limited capability for work and work-related activity (LCWRA) in the data also get PIP");
-    expect(container.textContent).toContain("about 23% above DWP's figure");
+    expect(container.textContent).toContain("sits 1.5% above DWP's figure");
+    expect(container.textContent).not.toContain("23% above");
+    expect(container.textContent).toContain("the young average award is lower than the published figures");
   });
 
   it("switches views from its links, in place", () => {

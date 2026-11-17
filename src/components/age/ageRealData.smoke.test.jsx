@@ -78,7 +78,7 @@ afterEach(() => {
 const chartRows = (container) =>
   [...container.querySelectorAll('[data-testid="chart-rows"]')].map((node) => JSON.parse(node.dataset.rows));
 const KEYS = ["netChange", "net", ...BANDS, "all"];
-// The winners and losers charts draw shares; a thin single age is left out
+// The gains and losses charts draw shares; a thin single age is left out
 // on its own, so shares count as drawn but are not checked for half drawing
 const SHARES = ["pct_better_off", "pct_unchanged", "pct_worse_off"];
 const drawnValue = (point) =>
@@ -106,11 +106,11 @@ describe.skipIf(!STAGED)("By age on the staged publication", () => {
       </MeasureCatalogueProvider>,
     );
     await screen.findByRole("heading", { name: /Average change by age/ });
-    for (const title of [/Average change by age/, /Change by year/, /Effect of each policy/, ...(POVERTY_FIGURES_SHOWN ? [/Winners and losers/] : [])]) {
+    for (const title of [/Average change by age/, /Change by year/, /Effect of each policy/, ...(POVERTY_FIGURES_SHOWN ? [/Gains and losses/] : [])]) {
       expect(screen.getByRole("heading", { level: 3, name: title })).toBeInTheDocument();
     }
     // The shares who gain and lose are withheld for now (povertyFigures.js)
-    if (!POVERTY_FIGURES_SHOWN) expect(screen.queryByRole("heading", { name: /Winners and losers/ })).toBeNull();
+    if (!POVERTY_FIGURES_SHOWN) expect(screen.queryByRole("heading", { name: /Gains and losses/ })).toBeNull();
     expect(errors).not.toHaveBeenCalled();
     expect(container.textContent).not.toMatch(/NaN|undefined|£null/);
     const reason = /not published|not yet published|No figures for this selection|no published results|changes no household|No effect|unavailable/i;

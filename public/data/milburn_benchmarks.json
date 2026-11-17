@@ -1,6 +1,6 @@
 {
   "title": "Benchmarks: published figures on young people, work and health-related benefits",
-  "note": "Reference figures from the review (From a Welfare State to a Working State, 17 November 2026) and other sources, as published, each with its own definitions, coverage and date. Where PolicyEngine has a comparable figure, it is shown beside the published one with its build and year.",
+  "note": "Reference figures from the review (From a Welfare State to a Working State, 17 November 2026) and other sources, as published, each with its own definitions, coverage and date. Where PolicyEngine has a figure on the same basis (the same ages, area, year and measure), it is shown beside the published one with its build and year; the review's own estimates, which include replacement awards and employment effects, are shown without one.",
   "policyengine_estimate_year": 2029,
   "rows": [
     {
@@ -29,7 +29,7 @@
       "id": "uc_health_no_work_requirements",
       "figure": "Young people on Universal Credit health with no work requirements",
       "value": "260,000",
-      "basis": "Resolution Foundation analysis",
+      "basis": "Basis not published: the Resolution Foundation gives no age range, date or source. Its own count four days later, people aged 16 to 24 receiving the health element, is a third lower (176,000). The nearest official count, DWP's Universal Credit claimants aged 16 to 24 with no work requirements in Great Britain, averaged 294,566 in 2025 and covers every reason, not only health",
       "source": "Resolution Foundation",
       "url": "https://www.resolutionfoundation.org/comment/youve-got-mail-finally-your-milburn-cram-sheet-inside/",
       "date": "13 November 2026",
@@ -45,7 +45,12 @@
       "url": "https://www.resolutionfoundation.org/press-releases/government-must-match-milburns-ambition-to-properly-invest-in-young-people/",
       "date": "17 November 2026",
       "press_report": false,
-      "policyengine_estimate": null
+      "policyengine_estimate": {
+        "value": "233,407",
+        "basis": "People aged 16 to 24 receiving the Universal Credit health element, Great Britain, 2025 (2025-26 rules), at the build's calibrated weights",
+        "label": "PolicyEngine, build fcfac709, 2025",
+        "note": "Why ours is higher: claimants the data's UC take-up draw adds carry the element where they receive PIP, so 91% of young recipients in the build also get PIP, against 63% (110,000 of 176,000) in the Resolution Foundation's figures"
+      }
     },
     {
       "id": "incapacity_benefits_young",
@@ -68,9 +73,10 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "347,000",
-        "basis": "PIP recipients aged 18 to 24, UK; 16 and 17-year-olds are not counted",
-        "label": "PolicyEngine, build fcfac709, 2027-28 baseline caseload"
+        "value": "406,919",
+        "basis": "People aged 16 to 24 receiving PIP, England and Wales, 2025, at the build's calibrated weights. DWP's 2025 count for the same group is 407,505 (England 384,150, Wales 23,355)",
+        "label": "PolicyEngine, build fcfac709, 2025",
+        "note": "DWP's 2025 count for the same ages and area: 407,505. The published 450,000 is current (November 2026), so it includes the caseload's growth since 2025"
       }
     },
     {
@@ -113,16 +119,22 @@
     {
       "id": "young_benefits_spend",
       "figure": "Spending on PIP and Universal Credit health for young people",
-      "value": "£4.7bn in 2025-26; £1.7bn in 2019-20, forecast at £8.8bn in 2036-37",
-      "basis": "The review's figures for ages 16 to 24 (paragraph 114): PIP of £3.8bn and the Universal Credit LCWRA element of £0.92bn in 2025-26",
+      "value": "£4.7bn a year; £1.7bn in 2019-20, forecast at £8.8bn in 2036-37",
+      "basis": "The review's figures for ages 16 to 24 in 2025-26 (paragraph 114): PIP of £3.8bn and the Universal Credit LCWRA element of £0.92bn",
       "source": "From a Welfare State to a Working State",
       "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
+        "value": "£4.44bn a year",
+        "basis": "Spending in 2025 (2025-26 rules), cash terms: PIP at ages 16 to 24 in England and Wales (£3.27bn) and the Universal Credit health element for young claimants in Great Britain (£1.18bn)",
+        "label": "PolicyEngine, build fcfac709, 2025, cash terms",
+        "note": "Close because two gaps offset: PIP is 14% lower than the review's figure and the health element 28% higher"
+      },
+      "policyengine_saving": {
         "value": "£4.67bn a year",
-        "basis": "Static saving in 2029-30 from removing the UC health element for under-25s and PIP for ages 18 to 24, UK: the Exchequer saving, including knock-on effects on other benefits (such as carer benefits and the UC housing element), so not the same as spending on PIP and the health element; PIP at 16 and 17 is not removed",
-        "label": "PolicyEngine, build fcfac709, 2029-30"
+        "label": "Our saving from removing them, 2029-30, cash terms",
+        "basis": "Static Exchequer saving in 2029-30 from removing the UC health element for under-25s and PIP for ages 18 to 24, UK, cash terms, including knock-on effects on other benefits (such as carer benefits and the UC housing element): a saving, not spending; PIP at 16 and 17 is not removed"
       }
     },
     {
@@ -135,9 +147,15 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
+        "value": "£3.27bn a year",
+        "basis": "PIP spending on people aged 16 to 24, England and Wales, 2025 (2025-26 rules), cash terms",
+        "label": "PolicyEngine, build fcfac709, 2025, cash terms",
+        "note": "Why ours is lower: the caseload matches DWP's 2025 count, but the review's figure is for the 2025-26 financial year and the build's average award is lower (about £8,000 a year, against the Resolution Foundation's £8,400)"
+      },
+      "policyengine_saving": {
         "value": "£4.68bn a year",
-        "basis": "Static Exchequer saving from removing PIP for ages 16 to 24 in 2029-30, UK, including knock-on effects on other benefits (such as carer benefits and the UC housing element), so not the same as PIP spending; £3.64bn for ages 18 to 24",
-        "label": "PolicyEngine, build fcfac709, 2029-30"
+        "label": "Our saving from removing PIP at 16 to 24, 2029-30, cash terms",
+        "basis": "Static Exchequer saving from removing PIP for ages 16 to 24 in 2029-30, UK, cash terms, including knock-on effects on other benefits (such as carer benefits and the UC housing element), so not the same as PIP spending; £3.64bn for ages 18 to 24"
       }
     },
     {
@@ -150,9 +168,15 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
+        "value": "£1.18bn a year",
+        "basis": "Universal Credit health element spending on young claimants, Great Britain, 2025 (2025-26 rules), cash terms",
+        "label": "PolicyEngine, build fcfac709, 2025, cash terms",
+        "note": "Why ours is higher: the same excess as in the caseload, where the build has about a third more young people receiving the element than published counts"
+      },
+      "policyengine_saving": {
         "value": "£1.13bn a year",
-        "basis": "Static saving from removing the UC health element for under-25s in 2029-30, UK",
-        "label": "PolicyEngine, build fcfac709, 2029-30"
+        "label": "Our saving from removing it for under-25s, 2029-30, cash terms",
+        "basis": "Static Exchequer saving from removing the UC health element for under-25s in 2029-30, UK, cash terms"
       }
     },
     {
@@ -164,11 +188,7 @@
       "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-analytical-annex",
       "date": "17 November 2026",
       "press_report": false,
-      "policyengine_estimate": {
-        "value": "£2.64bn to £4.67bn a year",
-        "basis": "Static saving in 2029-30, UK: from the pre-report central variant (severe cases kept, PIP at half rate) to the report's package, full removal of the UC health element for under-25s and PIP for ages 18 to 24, with every existing claimant reached from April 2029",
-        "label": "PolicyEngine, build fcfac709, 2029-30"
-      }
+      "policyengine_estimate": null
     },
     {
       "id": "milburn_welfare_saving_10y",
@@ -218,15 +238,21 @@
       "id": "employer_nics_under_25",
       "figure": "Cost of a zero employer National Insurance rate for under-25s",
       "value": "£5.1bn a year; about £132,000 per extra job",
-      "basis": "Resolution Foundation estimate, based on 2026 data; not a recommendation of the review, which proposes a higher employer National Insurance threshold for workers aged 21 to 24 instead",
+      "basis": "Resolution Foundation estimate (Take a chance on me, 29 June 2026, Figure 10, as corrected on 2 September): the gross fiscal cost in 2025-26, in 2025-26 prices, of scrapping employer National Insurance for under-25s on top of the existing zero rate for under-21s, with 38,500 extra young workers. Not a recommendation of the review, which proposes a higher employer National Insurance threshold for workers aged 21 to 24 instead",
       "source": "Resolution Foundation",
       "url": "https://www.resolutionfoundation.org/comment/can-milburn-rise-to-the-scale-of-britains-neets-challenge/",
       "date": "11 November 2026",
       "press_report": false,
       "policyengine_estimate": {
+        "value": "£5.85bn a year",
+        "basis": "Gross static cost in 2025-26 of a zero employer National Insurance rate for under-25s, on top of the existing zero rate for under-21s, UK, cash terms",
+        "label": "PolicyEngine, build fcfac709, 2025-26, cash terms",
+        "note": "Why ours is higher: the build has about 10% fewer payroll employees aged 18 to 24 than HMRC's count, so the difference points to pay per young employee, which is not a calibration target"
+      },
+      "policyengine_saving": {
         "value": "£4.65bn a year",
-        "basis": "Static cost of a zero employer National Insurance rate for under-25s in 2029-30, UK",
-        "label": "PolicyEngine, build fcfac709, 2029-30"
+        "label": "Our net cost, 2029-30, cash terms",
+        "basis": "Static cost of a zero employer National Insurance rate for under-25s in 2029-30, UK, cash terms, net of the income tax and National Insurance on the higher pay that employers' saving passes into"
       }
     },
     {
@@ -238,11 +264,7 @@
       "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-analytical-annex",
       "date": "17 November 2026",
       "press_report": false,
-      "policyengine_estimate": {
-        "value": "260,000 more",
-        "basis": "People in relative poverty after housing costs in 2029-30, UK: static effect of removing the UC health element for under-25s and PIP for ages 18 to 24, with no replacement benefit and no one moving into work",
-        "label": "PolicyEngine, build fcfac709, 2029-30"
-      }
+      "policyengine_estimate": null
     },
     {
       "id": "kept_out_of_poverty",

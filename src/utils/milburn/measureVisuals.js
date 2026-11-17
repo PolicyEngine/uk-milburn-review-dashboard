@@ -212,14 +212,14 @@ export function employerNicsView(visual, name) {
         { from: limit, to: LAST_AGE, title: `${limit} and over`, text: `From ${wholePounds(secondaryThreshold)}`, tone: "kept" },
       ],
       chips: [
-        ...(glide ? [{ icon: "file-clock", when: `${fiscalYear(glide.firstYear)} to ${fiscalYear(glide.lastYear)}`, value: `${wholePounds(glide.from)}, rising ${wholePounds(glide.step)} a year` }] : []),
+        ...(glide ? [{ icon: "file-clock", when: `${fiscalYear(glide.firstYear)} to ${fiscalYear(glide.lastYear)} (assumed)`, value: `${wholePounds(glide.from)}, rising ${wholePounds(glide.step)} a year` }] : []),
         { icon: "coins", when: "Rate above the threshold", value: `${percent(rate)}, unchanged` },
         { icon: "cap", when: `Apprentices under ${apprenticeZeroRateBelowAge}`, value: "0% already" },
       ],
       alt:
         `${name}: the earnings from which employers pay National Insurance, by the employee's age. ` +
         `Under ${zeroRateBelowAge}: 0% already. Ages ${band} in retail and hospitality: from ${wholePounds(threshold)} a year under the measure${glide ? ` by ${fiscalYear(glide.lastYear)}` : ""}, instead of ${wholePounds(secondaryThreshold)}` +
-        (glide ? `, in steps: ${wholePounds(glide.from)} in ${fiscalYear(glide.firstYear)}, rising ${wholePounds(glide.step)} a year. ` : ". ") +
+        (glide ? `, in assumed steps: ${wholePounds(glide.from)} in ${fiscalYear(glide.firstYear)}, rising ${wholePounds(glide.step)} a year. ` : ". ") +
         `Aged ${limit} and over, and other sectors: from ${wholePounds(secondaryThreshold)}, unchanged. ` +
         `The ${percent(rate)} rate is unchanged; apprentices under ${apprenticeZeroRateBelowAge} have a zero rate already.`,
     };

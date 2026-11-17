@@ -1,5 +1,5 @@
 /**
- * Return to work's entry cases, read from public/data/milburn_scenarios.json,
+ * Moves into work's entry cases, read from public/data/milburn_scenarios.json,
  * which the pipeline writes.
  * Its shape:
  *

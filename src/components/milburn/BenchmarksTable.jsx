@@ -43,9 +43,9 @@ const SERIES = {
 export const compareTick = (unit) => (value) =>
   unit === "bn" ? `£${value.toLocaleString("en-GB")}bn` : value === 0 ? "0" : `${(value / 1000).toLocaleString("en-GB")}k`;
 
-/** The gap in words: "10.77% lower", "3.00% higher", "the same". */
+/** The gap in words, to the nearest whole per cent: "14% lower", "33% higher", "within 1%". */
 export const gapText = (gapPct) =>
-  Math.abs(gapPct) < 0.005 ? "the same" : `${Math.abs(gapPct).toFixed(2)}% ${gapPct < 0 ? "lower" : "higher"}`;
+  Math.round(Math.abs(gapPct)) === 0 ? "within 1%" : `${Math.round(Math.abs(gapPct))}% ${gapPct < 0 ? "lower" : "higher"}`;
 
 function useBenchmarksFile() {
   const [state, setState] = useState({ status: "loading", data: null });
@@ -156,7 +156,7 @@ const COMPARE_BAR_SHAPE = barShape(["value"], { layout: "vertical" });
  * between them as a % of the published figure, and both figures in text
  * (the chart is hidden from screen readers).
  */
-function ComparePanel({ row, comparison, year }) {
+function ComparePanel({ row, comparison }) {
   const short = BENCHMARK_SHORT[row.id] ?? {};
   const title = short.label ?? row.figure;
   const published = splitValue(row.value);
@@ -168,7 +168,7 @@ function ComparePanel({ row, comparison, year }) {
   const tick = compareTick(comparison.unit);
   const gap = comparison.gapPct;
   // A pair that counts different things is drawn without a gap
-  const differentBasis = differentBasisFor(row.id, year);
+  const differentBasis = differentBasisFor(row.id);
   // Room right of the plot for the longest bar's own label
   const labelRoom = Math.ceil(Math.max(...bars.map((bar) => tickTextWidth(bar.text, 12)))) + 12;
   return (
@@ -185,7 +185,7 @@ function ComparePanel({ row, comparison, year }) {
         </p>
       ) : (
         <p className="bm-verdict">
-          <TitleIcon name={Math.abs(gap) < 0.005 ? "equal" : gap < 0 ? "arrowDown" : "arrowUp"} bare size={14} />
+          <TitleIcon name={Math.round(Math.abs(gap)) === 0 ? "equal" : gap < 0 ? "arrowDown" : "arrowUp"} bare size={14} />
           <span>
             {Math.abs(gap) < 10 ? "Close: " : ""}PolicyEngine is <strong>{gapText(gap)}</strong>
           </span>
@@ -219,7 +219,23 @@ function ComparePanel({ row, comparison, year }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
+      {/* Why the two differ, where the file says */}
+      {row.estimate.note && (
+        <p className="bm-why" data-gap-note="">
+          <TitleIcon name="info" bare size={13} />
+          <span>{row.estimate.note}</span>
+        </p>
+      )}
       <Note text={cardNote(row, published, short)} full={row.basis} />
+      {/* Our saving from a measure, apart from the pair: never set against spending */}
+      {row.saving && (
+        <p className="bm-separate" data-separate="" title={row.saving.basis || undefined}>
+          <TitleIcon name="calculator" bare size={13} />
+          <span>
+            {row.saving.label}: <strong>{row.saving.value}</strong>
+          </span>
+        </p>
+      )}
       <Foot row={row} ours={oursLabel(row.estimate.label)} oursFull={row.estimate.basis} />
     </li>
   );
@@ -359,7 +375,7 @@ export default function BenchmarksTable() {
               {pairs.length > 0 && (
                 <ul className="bm-compare-grid">
                   {pairs.map((row) => (
-                    <ComparePanel key={row.id} row={row} comparison={comparisons.get(row.id)} year={data.year} />
+                    <ComparePanel key={row.id} row={row} comparison={comparisons.get(row.id)} />
                   ))}
                 </ul>
               )}
@@ -399,11 +415,11 @@ export default function BenchmarksTable() {
             </li>
             <li>
               <TitleIcon name="scale" bare size={14} />
-              <span>They can count a different group or area from the published figure beside them.</span>
+              <span>Where a pair still differs in date or area, it says so and gives no gap. Our savings from the measures are shown apart, never against spending.</span>
             </li>
             <li>
               <TitleIcon name="percent" bare size={14} />
-              <span>Gap: the PolicyEngine estimate less the published figure, as a % of the published figure; given only where the two count the same thing (“close” is within 10%).</span>
+              <span>Gap: the PolicyEngine estimate less the published figure, as a % of the published figure, to the nearest whole per cent; given only where the two count the same ages, area, year and measure (“close” is within 10%).</span>
             </li>
             <li>
               <TitleIcon name="usersRound" bare size={14} />

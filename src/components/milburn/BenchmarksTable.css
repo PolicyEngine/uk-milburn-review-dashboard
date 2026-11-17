@@ -131,6 +131,36 @@
   overflow-wrap: anywhere;
 }
 
+/* Why a pair differs, and our saving from a measure, apart from the pair */
+.bm-why,
+.bm-separate {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: var(--fs-caption);
+  line-height: 1.45;
+  color: var(--c-text);
+}
+
+.bm-why > span[aria-hidden],
+.bm-separate > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  margin-top: 2px;
+  color: var(--c-axis-title);
+}
+
+.bm-why > span:last-child,
+.bm-separate > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.bm-separate {
+  padding-top: 6px;
+  border-top: 1px dashed var(--c-grid);
+}
+
 /* Last line: the source chip, then what our own figure is */
 .bm-foot {
   display: flex;

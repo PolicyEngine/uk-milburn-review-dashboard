@@ -9,7 +9,7 @@ import { REPORT_DAY, subShownOnReportDay } from "../utils/milburn/reportDay";
  * Impact's sub-tabs; the first, Young people (?sub=age, the age-group view
  * opened on 16 to 24), is the default. Poverty is left out while the
  * poverty figures are withheld (povertyFigures.js), so ?sub=poverty opens
- * the default. Return to work (?sub=scenarios) and Benchmarks set the
+ * the default. Moves into work (illustrative) (?sub=scenarios) and Benchmarks set the
  * static results beside a move into work and published figures; both are
  * left out while the report-day switch is on (utils/milburn/reportDay.js),
  * so their links open the default too.
@@ -19,7 +19,7 @@ export function populationSubTabs({ reportDay = REPORT_DAY } = {}) {
     { value: "age", label: "Young people", icon: "usersRound" },
     { value: "poverty", label: "Poverty", icon: "percent" },
     { value: "finances", label: "Public finances", icon: "landmark" },
-    { value: "scenarios", label: "Return to work", icon: "sliders" },
+    { value: "scenarios", label: "Moves into work (illustrative)", icon: "sliders" },
     { value: "benchmarks", label: "Benchmarks", icon: "scale" },
   ]
     .filter((tab) => POVERTY_FIGURES_SHOWN || tab.value !== "poverty")

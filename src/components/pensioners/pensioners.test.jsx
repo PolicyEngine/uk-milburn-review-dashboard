@@ -194,7 +194,7 @@ describe("PensionersSection", () => {
     expect(await screen.findByRole("heading", { name: /Change per pensioner by year/ })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Change by age, 2027-28/ })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Effect of each policy, 2027-28/ })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Winners and losers, 2027-28/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Gains and losses, 2027-28/ })).toBeInTheDocument();
     expect(document.body.textContent.match(/at State Pension age or over/g)).toHaveLength(1);
     // The dumbbell's rows: pensioners' figure for each policy
     expect(

@@ -9,7 +9,7 @@
 import { POVERTY_FIGURES_SHOWN } from "./povertyFigures";
 import { subShownOnReportDay } from "./milburn/reportDay";
 
-export const BOOT_TABS = Object.freeze(["dashboard", "policies", "methodology"]);
+export const BOOT_TABS = Object.freeze(["dashboard", "household", "policies", "methodology"]);
 export const BOOT_SUBS = Object.freeze({
   // Poverty only while its figures are shown (povertyFigures.js), as PopulationImpactView
   // Less the sub-tabs the report-day switch hides (milburn/reportDay.js)

@@ -183,7 +183,7 @@ export function localBuildParts(measuresFile, runs = {}) {
     }
   }
   const ran = Object.keys(tablesByKey).sort();
-  const label = labels.size === 1 ? [...labels][0] : labels.size ? [...labels].sort().join("; ") : measuresFile.build;
+  const label = labels.size ? combinedLabel([...labels]) : measuresFile.build;
   const snapshotSha256 = `local-build-${fingerprint(JSON.stringify([ran, Object.keys(failures).sort(), ran.map((id) => tablesByKey[id].record), ran.map((id) => tablesByKey[id].budgetary_impact)]))}`;
   const localBuild = {
     label,
@@ -279,6 +279,24 @@ export function localTableRows(catalogue, table, isShown) {
   const failures = keys.filter((key) => !Array.isArray(catalogue.tablesByKey[key][table]));
   const rows = keys.flatMap((key) => catalogue.tablesByKey[key][table] ?? []).filter((row) => isShown(catalogue, row.reform_id, row.year));
   return { rows, failures };
+}
+
+/**
+ * The runs' build labels as one. Labels that differ only in the
+ * policyengine release that certified them (the pre-report runs say 6.20.1,
+ * the report's 6.20.2, on the same engine and data) are one label naming
+ * both releases and saying so; any other mix is listed in full.
+ */
+export function combinedLabel(labels) {
+  const distinct = [...new Set(labels)].sort();
+  if (distinct.length <= 1) return distinct[0] ?? "";
+  const release = /^(.*certified in policyengine )(\d+\.\d+\.\d+)$/;
+  const parts = distinct.map((label) => release.exec(label));
+  if (parts.every(Boolean) && new Set(parts.map((part) => part[1])).size === 1) {
+    const versions = parts.map((part) => part[2]).sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+    return `${parts[0][1]}${versions.slice(0, -1).join(", ")} and ${versions.at(-1)} (the same engine and data)`;
+  }
+  return distinct.join("; ");
 }
 
 /**

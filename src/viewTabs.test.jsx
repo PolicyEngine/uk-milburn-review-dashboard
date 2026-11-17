@@ -39,12 +39,13 @@ const visible = (pill) => !pill.classList.contains("is-hidden") && !pill.hasAttr
 const shown = (pill) => visible(pill) && !pill.classList.contains("is-inactive") && !pill.querySelector('.band-control[aria-disabled="true"]');
 
 describe("the view tabs", () => {
-  it("are three tabs under the band, in order, with no view pill in the band", async () => {
+  it("are four tabs under the band, in order, with no view pill in the band", async () => {
     // The bare address is the landing page (landing.test.jsx)
     window.history.replaceState({}, "", "/?tab=dashboard");
     const { container } = await renderApp();
     expect(tabs().map((tab) => tab.textContent)).toEqual([
       "Impact",
+      "Household impact",
       "Measures",
       "Methodology",
     ]);
@@ -72,6 +73,7 @@ describe("the view tabs", () => {
     const { container } = await renderApp();
     const expected = {
       dashboard: [true, true],
+      household: [false, false],
       outlook: [false, false],
       policies: [false, false],
       methodology: [false, false],
@@ -115,7 +117,7 @@ describe("the view tabs", () => {
     // Review of 15439f4, finding 2: the default follows the publication,
     // and a chosen selection survives a view without the policy pill
     const search = () => new URLSearchParams(window.location.search);
-    const tabParam = { dashboard: "dashboard", outlook: "outlook", policies: "policies", methodology: "methodology" };
+    const tabParam = { dashboard: "dashboard", household: "household", outlook: "outlook", policies: "policies", methodology: "methodology" };
     const { unmount } = await renderApp();
     VIEWS.forEach((view, index) => {
       fireEvent.click(tabs()[index]);
@@ -132,8 +134,9 @@ describe("the view tabs", () => {
 
   it("open the view an old or new link names", async () => {
     for (const [url, label] of [
-      // The Household calculator was removed: its old links open Impact
-      ["/?tab=household", "Impact"],
+      // The Autumn Budget's Household calculator link opens Impact; ?tab=household
+      // is now the Milburn Household impact tab
+      ["/?tab=household", "Household impact"],
       ["/?tab=personal", "Impact"],
       // The Autumn Budget's Pre-measures forecast is not in this dashboard
       ["/?tab=outlook", "Impact"],
@@ -149,7 +152,7 @@ describe("the view tabs", () => {
       unmount();
     }
     expect(viewFromLocation({ search: "?tab=personal", hash: "" })).toBe("dashboard");
-    expect(viewFromLocation({ search: "?tab=household", hash: "" })).toBe("dashboard");
+    expect(viewFromLocation({ search: "?tab=household", hash: "" })).toBe("household");
     expect(viewFromLocation({ search: "?tab=living", hash: "#young-people" })).toBe("dashboard");
     expect(viewFromLocation({ search: "?tab=young", hash: "" })).toBe("dashboard");
     expect(viewFromLocation({ search: "?tab=outlook&sub=baseline", hash: "" })).toBe("dashboard");
@@ -210,7 +213,7 @@ describe("the view tabs", () => {
     expect(tabs()[1]).toHaveFocus();
     fireEvent.keyDown(list, { key: "ArrowLeft" });
     fireEvent.keyDown(list, { key: "ArrowLeft" });
-    expect(tabs()[2]).toHaveAttribute("aria-selected", "true");
+    expect(tabs()[3]).toHaveAttribute("aria-selected", "true");
     fireEvent.keyDown(list, { key: "Home" });
     expect(tabs()[0]).toHaveAttribute("aria-selected", "true");
     fireEvent.keyDown(list, { key: "End" });
@@ -257,7 +260,7 @@ describe("the view tabs", () => {
       // Only while the poverty figures are shown (povertyFigures.js)
       ...(POVERTY_FIGURES_SHOWN ? ["Poverty"] : []),
       "Public finances",
-      "Return to work",
+      "Moves into work (illustrative)",
       "Benchmarks",
     ]);
     expect(subTabs()[0]).toHaveAttribute("aria-selected", "true");
@@ -367,7 +370,7 @@ describe("the view tabs", () => {
       "Data",
       "Model and measures",
       "Impact",
-      "Return to work and benchmarks",
+      "Moves into work and benchmarks",
       "Limitations",
     ]) {
       expect(within(panel).getByRole("heading", { level: 2, name })).toBeInTheDocument();

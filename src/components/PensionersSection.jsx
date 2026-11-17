@@ -629,7 +629,7 @@ export function PensionerSharesCard({ catalogue, rows, policies, selectedPolicie
           ),
         )
     : [];
-  const title = `Winners and losers, ${yearLabel}`;
+  const title = `Gains and losses, ${yearLabel}`;
   const description = perMeasure
     ? `Share of people who gain or lose (a change over 0.01%), ${groupLabel.toLowerCase()}, each selected policy on its own.`
     : single
@@ -637,7 +637,7 @@ export function PensionerSharesCard({ catalogue, rows, policies, selectedPolicie
     : "Share of people who gain or lose (a change over 0.01%): pensioners, people under State Pension age and all ages.";
   const download = {
     chartRef,
-    name: `pensioners-winners-losers-${single ? "single-age-" : ""}${year}`,
+    name: `pensioners-gains-losses-${single ? "single-age-" : ""}${year}`,
     exportOptions: {
       title,
       description,
@@ -648,10 +648,10 @@ export function PensionerSharesCard({ catalogue, rows, policies, selectedPolicie
     csv: () =>
       buildChartCsv({
         title: perMeasure
-          ? `Winners, losers and no change, ${groupLabel.toLowerCase()}, each policy on its own, ${yearLabel}`
+          ? `Gains, losses and no change, ${groupLabel.toLowerCase()}, each policy on its own, ${yearLabel}`
           : single
-          ? `Winners, losers and no change by single year of age, pensioners, ${yearLabel}`
-          : `Winners, losers and no change, pensioners and others, ${yearLabel}`,
+          ? `Gains, losses and no change by single year of age, pensioners, ${yearLabel}`
+          : `Gains, losses and no change, pensioners and others, ${yearLabel}`,
         units: `% of people in the group; a change of more than 0.01% of household net income; pensioners are aged ${pensionerAge(year)} and over`,
         columns: [
           { key: "group", label: perMeasure ? "Policy" : single ? "Age" : "Group" },
@@ -841,10 +841,10 @@ function PensionersSection({ selectedPolicies, selectedYear, policies }) {
       <SectionHeading
         id="pensioners-who-gains"
         icon="userPlus"
-        title="Winners and losers, and which policies drive them"
+        title="Gains and losses, and which policies drive them"
         subtitle="How many pensioners gain or lose, and from which policies."
       />
-      <section className="report-section young-people-section" aria-label="Winners and losers, and which policies drive them">
+      <section className="report-section young-people-section" aria-label="Gains and losses, and which policies drive them">
         <div className="charts-grid">
           <MeasuresCard {...props} height={narrow ? 460 : 400} />
           <PensionerSharesCard {...props} height={narrow ? 260 : 400} />

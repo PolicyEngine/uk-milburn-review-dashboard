@@ -38,13 +38,13 @@ function LandingBox({ tab, sub, icon, title, description, onOpen }) {
  * The three ways in, in order: [tab, sub, icon, title, line]. While the
  * measures are provisional, the policies box names them as modelled
  * measures, not the Budget's contents. A box whose sub-tab the report-day
- * switch hides (utils/milburn/reportDay.js: Return to work) goes with it.
+ * switch hides (utils/milburn/reportDay.js: Moves into work (illustrative)) goes with it.
  * The measures box's line is the report-status switch's
  * (utils/milburn/reportStatus.js).
  */
 export const landingBoxes = ({ reportDay = REPORT_DAY, published = REPORT_PUBLISHED } = {}) => [
   ["dashboard", "age", "usersRound", "Young people", "Who gains or loses, and the cost"],
-  ["dashboard", "scenarios", "sliders", "Return to work", "The package if some young people move into work"],
+  ["dashboard", "scenarios", "sliders", "Moves into work (illustrative)", "The package if some young people move into work"],
   ["policies", undefined, "list", "Measures we model", reportCopy(published).measuresBoxLine],
 ].filter(([, sub]) => subShownOnReportDay(sub, reportDay));
 

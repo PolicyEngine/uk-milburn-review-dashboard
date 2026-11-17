@@ -4,7 +4,7 @@
  * section 5), until they are checked against it.
  *
  * While REPORT_DAY is true the page leaves out:
- * - Impact's Return to work sub-tab (?sub=scenarios) and its landing box;
+ * - Impact's Moves into work (illustrative) sub-tab (?sub=scenarios) and its landing box;
  * - Impact's Benchmarks sub-tab (?sub=benchmarks).
  * A link to either then opens Impact's default sub-tab, as any unknown
  * ?sub= does. Nothing else changes, and no data file is touched.
@@ -15,7 +15,7 @@
  * can read it too.
  */
 
-// Flip this one line: true hides Return to work and Benchmarks
+// Flip this one line: true hides Moves into work (illustrative) and Benchmarks
 export const REPORT_DAY = false;
 
 /** Impact's sub-tabs left out while the switch is on. */

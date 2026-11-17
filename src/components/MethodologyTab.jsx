@@ -50,7 +50,7 @@ export const METHOD_CONTENTS = [
   { id: METHOD_SECTIONS.data, title: "Data", icon: Database, titleIcon: "database" },
   { id: METHOD_SECTIONS.model, title: "Model and measures", icon: Calculator, titleIcon: "calculator" },
   { id: METHOD_SECTIONS.population, title: "Impact", icon: ChartColumn, titleIcon: "bars" },
-  { id: METHOD_SECTIONS.scenarios, title: "Return to work and benchmarks", icon: SlidersHorizontal, titleIcon: "sliders" },
+  { id: METHOD_SECTIONS.scenarios, title: "Moves into work and benchmarks", icon: SlidersHorizontal, titleIcon: "sliders" },
   { id: METHOD_SECTIONS.limitations, title: "Limitations", icon: Info, titleIcon: "book" },
 ];
 
@@ -83,7 +83,7 @@ export const REPORT_PROPOSALS = [
  */
 export const REPORT_MODELLED = [
   "Modelled: the health element removed for under-25s and PIP removed for 18 to 24-year-olds, each alone and together, from April 2029; and the £10,000 employer National Insurance threshold for 21 to 24-year-olds in retail and hospitality, at its end state.",
-  "Modelled with stated assumptions: the higher Youth Allowance for young people living independently, at the 25-and-over rate for under-25 claims with a housing costs element (the review’s own proxy, analytical annex, section 8); the benefit changes phased in, with people turning 18 moved at once and an assumed 45% of the remaining claimants each year; and the threshold raised in assumed equal steps from £6,000 in 2027-28 to £10,000 in 2031-32; the Youth Allowance’s work allowance, for which the report gives no amount, at the current Universal Credit work allowance; and child Disability Living Allowance kept to 18 at the equivalent award level, which changes no award. Each is listed on the Measures tab as not yet run until its results are published.",
+  "Modelled with stated assumptions: the higher Youth Allowance for young people living independently, at the 25-and-over rate for under-25 claims with a housing costs element (the review’s own proxy, analytical annex, section 8); the benefit changes phased in, with people turning 18 moved at once and an assumed 45% of the remaining claimants each year; and the threshold raised in assumed equal steps from £6,000 in 2027-28 to £10,000 in 2031-32; the Youth Allowance’s work allowance, for which the report gives no amount, at the current Universal Credit work allowance; and child Disability Living Allowance kept to 18 at the equivalent award level, which changes no award.",
   "Comparators, from April 2027: PIP at half rate, a stand-in for the Additional Cost Allowance, for which the report gives no rates; and no employer National Insurance for any under-25, an option the report considers and does not propose (paragraph 268).",
   "Not modelled: the Additional Cost Allowance itself, the Health and Disability Fund, Severe and Complex Needs Insurance, the duty to engage and the Guarantees.",
 ];
@@ -109,13 +109,13 @@ const REPORT_DESIGN_LIMITATIONS = [
  * the report's design.
  */
 export const milburnLimitations = (published = REPORT_PUBLISHED) => [
-  ["Static", "The main figures hold behaviour fixed: nobody changes their work, hours, claims or education because of a measure. The Return to work sub-tab shows the package with a move into work separately."],
+  ["Static", "The main figures hold behaviour fixed: nobody changes their work, hours, claims or education because of a measure. The Moves into work (illustrative) sub-tab shows the package with a move into work separately."],
   ["No NEET variable", "The data have no variable for being not in education, employment or training (NEET), so no figure here is for NEETs as such."],
   ["PIP in Scotland", "Adult Disability Payment records in Scotland are held as PIP in the data, so PIP figures for Scotland use ADP records."],
   ["New-claimant health element rate", "Which Universal Credit health element rate a new claimant receives is assigned by a random draw that does not depend on age. New claimants since April 2026 receive the lower health element (£217.26 a month, £2,607 a year) rather than £442.10 a month, so removing it takes less from them."],
-  ["Few young claimant records", "The results rest on roughly 500 to 650 survey records of young claimants, so the pattern across individual income deciles and single years of age is noisy; national totals are steadier than any one decile or age."],
+  ["Few young claimant households", "The results rest on roughly 500 to 650 survey households with young claimants, so the pattern across individual income deciles and single years of age is noisy; national totals are steadier than any one decile or age."],
   ["Overlapping losses", "About nine in ten young claimants with limited capability for work and work-related activity (LCWRA) in the data also get PIP, so the package stacks both losses on largely the same people. Per-person losses are an upper bound and headcounts a lower bound."],
-  ["Caseloads against DWP", "The all-age LCWRA stock in the data is about 23% above DWP's figure. The PIP caseload aged 18 to 24 is low but its award mix is high (more enhanced awards), which roughly offsets in cost."],
+  ["Caseloads against published counts", "On build fcfac709 the number of Universal Credit households with the LCWRA element, all ages, is a calibration target and sits 1.5% above DWP's figure, but LCWRA by age is not: the data hold about a third more people aged 16 to 24 receiving the health element than the Resolution Foundation counts (233,000 in Great Britain in 2025, against 176,000), as claimants added by the take-up draw carry LCWRA where they receive PIP. PIP at ages 16 to 24 in England and Wales matches DWP's 2025 count (407,000), but the young average award is lower than the published figures (about £8,000 a year, against £8,400), so young PIP spending is about 14% below the review's. The data also hold about 10% fewer payroll employees aged 18 to 24 than HMRC's count. Caseloads in later years grow with population only."],
   ...(published
     ? REPORT_DESIGN_LIMITATIONS
     : [["No replacement in the upper bound", "The full abolition package (upper bound) includes no replacement fund, cost allowance or insurance payment. The central variant stands in for a smaller allowance with PIP at half rate."]]),
@@ -443,10 +443,10 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
 
         <MethodSection
           id={METHOD_SECTIONS.scenarios}
-          title="Return to work and benchmarks"
+          title="Moves into work and benchmarks"
           summary="The package with a move into work, microsimulated, and published figures to set the results beside."
         >
-          <Topic id="method-behavioural-scenarios" title="Return to work" preview="Microsimulated move into work · Entry cases · Break-even">
+          <Topic id="method-behavioural-scenarios" title="Moves into work (illustrative)" preview="Microsimulated move into work · Entry cases · Break-even">
             <FactList
               items={[
                 [
@@ -455,7 +455,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
                 ],
                 [
                   "Why 25%",
-                  "An illustrative share, not an estimate: no published study gives the share of young PIP or health element claimants who would move into work if these benefits were removed. A quarter is large enough to show the direction and rough size of the effect; the break-even chart shows the share that would be needed to match the Exchequer saving.",
+                  "An assumption, not an estimate: no published study gives the share of young PIP or health element claimants who would move into work if these benefits were removed, so the 25% is chosen for illustration and says nothing about how large the effect would be. The figures show how the results change if that many moved; the break-even chart shows the share that would be needed to match the Exchequer saving.",
                 ],
                 [
                   "Who moves",
@@ -490,8 +490,11 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
           <Topic id="method-benchmarks" title="Benchmarks" preview="Published figures · Sources · PolicyEngine estimates beside them">
             <p className="method-more">
               Published figures from the review, the ONS, the Resolution Foundation and the IFS, each with its basis, source
-              and date. Where PolicyEngine has a comparable figure, it sits beside it, labelled with its build and
-              year; the two can count different groups or areas, so the estimate is context, not a check.
+              and date. Where PolicyEngine has a figure for the same ages, area, year and measure (build fcfac709 for
+              2025, money in cash terms), it sits beside it with the gap to the nearest whole per cent and a line on why
+              the two differ; a pair that still differs in date or area says so and gives no gap. Our savings from the
+              measures are shown apart, never against published spending, and the review&rsquo;s own estimates, which
+              include replacement awards and employment effects, have no PolicyEngine figure beside them.
             </p>
           </Topic>
         </MethodSection>

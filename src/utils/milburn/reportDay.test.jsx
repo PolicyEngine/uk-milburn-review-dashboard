@@ -1,7 +1,7 @@
 /**
  * The report-day switch (reportDay.js), in both states: off, the page has
- * every sub-tab and landing box; on, Return to work and Benchmarks are left
- * out of Impact's sub-tabs, Return to work's box is left off the landing
+ * every sub-tab and landing box; on, Moves into work (illustrative) and Benchmarks are left
+ * out of Impact's sub-tabs, Moves into work's box is left off the landing
  * page and the About drawer, and a link to either opens the default.
  *
  * No case pins which state the file is in today, so flipping REPORT_DAY
@@ -26,7 +26,7 @@ afterEach(() => {
 });
 
 describe("the switch", () => {
-  it("is a boolean, and hides exactly Return to work and Benchmarks", () => {
+  it("is a boolean, and hides exactly Moves into work (illustrative) and Benchmarks", () => {
     expect(typeof REPORT_DAY).toBe("boolean");
     expect(REPORT_DAY_HIDDEN_SUBS).toEqual(["scenarios", "benchmarks"]);
   });
@@ -48,26 +48,26 @@ describe("the switch", () => {
 });
 
 describe("Impact's sub-tabs", () => {
-  it("off: Young people, Poverty, Public finances, Return to work, Benchmarks", () => {
+  it("off: Young people, Poverty, Public finances, Moves into work (illustrative), Benchmarks", () => {
     expect(values(populationSubTabs({ reportDay: false }))).toEqual([...ALWAYS, "scenarios", "benchmarks"]);
-    expect(populationSubTabs({ reportDay: false }).map((tab) => tab.label).slice(-2)).toEqual(["Return to work", "Benchmarks"]);
+    expect(populationSubTabs({ reportDay: false }).map((tab) => tab.label).slice(-2)).toEqual(["Moves into work (illustrative)", "Benchmarks"]);
   });
 
-  it("on: Return to work and Benchmarks are left out, the rest keep their order", () => {
+  it("on: Moves into work (illustrative) and Benchmarks are left out, the rest keep their order", () => {
     expect(values(populationSubTabs({ reportDay: true }))).toEqual(ALWAYS);
   });
 });
 
 describe("the landing boxes", () => {
-  it("off: Young people, Return to work, the measures", () => {
+  it("off: Young people, Moves into work (illustrative), the measures", () => {
     expect(landingBoxes({ reportDay: false }).map(([tab, sub, , title]) => [tab, sub, title])).toEqual([
       ["dashboard", "age", "Young people"],
-      ["dashboard", "scenarios", "Return to work"],
+      ["dashboard", "scenarios", "Moves into work (illustrative)"],
       ["policies", undefined, "Measures we model"],
     ]);
   });
 
-  it("on: Return to work's box is left out", () => {
+  it("on: Moves into work's box is left out", () => {
     expect(landingBoxes({ reportDay: true }).map(([tab, sub, , title]) => [tab, sub, title])).toEqual([
       ["dashboard", "age", "Young people"],
       ["policies", undefined, "Measures we model"],
@@ -78,7 +78,7 @@ describe("the landing boxes", () => {
     const expected = ["?tab=dashboard&sub=age", ...(reportDay ? [] : ["?tab=dashboard&sub=scenarios"]), "?tab=policies"];
     const { unmount } = render(<LandingBoxes onOpen={() => {}} reportDay={reportDay} />);
     expect(hrefs()).toEqual(expected);
-    expect(screen.queryByText("Return to work") === null).toBe(reportDay);
+    expect(screen.queryByText("Moves into work (illustrative)") === null).toBe(reportDay);
     unmount();
     render(<LandingBoxes onOpen={() => {}} list reportDay={reportDay} />);
     expect(hrefs()).toEqual(expected);
@@ -99,17 +99,17 @@ describe.each([[false], [true]])("the page with REPORT_DAY = %s", (on) => {
   };
   const tabNames = () => screen.getAllByRole("tab").map((tab) => tab.textContent);
 
-  it(`${on ? "leaves out" : "has"} the Return to work and Benchmarks sub-tabs`, async () => {
+  it(`${on ? "leaves out" : "has"} the Moves into work (illustrative) and Benchmarks sub-tabs`, async () => {
     const { PopulationImpactView, tabs } = await load();
     expect(values(tabs)).toEqual([...ALWAYS, ...(on ? [] : ["scenarios", "benchmarks"])]);
     render(<PopulationImpactView>{(sub) => <p>{`panel ${sub}`}</p>}</PopulationImpactView>);
     await screen.findAllByRole("tab");
-    expect(tabNames().includes("Return to work")).toBe(!on);
+    expect(tabNames().includes("Moves into work (illustrative)")).toBe(!on);
     expect(tabNames().includes("Benchmarks")).toBe(!on);
     expect(tabNames()).toHaveLength(ALWAYS.length + (on ? 0 : 2));
   });
 
-  it.each([["scenarios", "Return to work"], ["benchmarks", "Benchmarks"]])(`?sub=%s opens ${on ? "the default, Young people" : "%s"}`, async (sub, label) => {
+  it.each([["scenarios", "Moves into work (illustrative)"], ["benchmarks", "Benchmarks"]])(`?sub=%s opens ${on ? "the default, Young people" : "%s"}`, async (sub, label) => {
     window.history.replaceState({}, "", `/?tab=dashboard&sub=${sub}`);
     const { PopulationImpactView } = await load();
     render(<PopulationImpactView>{(open) => <p>{`panel ${open}`}</p>}</PopulationImpactView>);
@@ -118,7 +118,7 @@ describe.each([[false], [true]])("the page with REPORT_DAY = %s", (on) => {
     expect(screen.queryByText(`panel ${on ? sub : "age"}`)).toBeNull();
   });
 
-  it(`${on ? "leaves out" : "has"} Return to work's landing box`, async () => {
+  it(`${on ? "leaves out" : "has"} Moves into work's landing box`, async () => {
     const { LandingBoxes } = await load();
     render(<LandingBoxes onOpen={() => {}} />);
     expect(hrefs().includes("?tab=dashboard&sub=scenarios")).toBe(!on);

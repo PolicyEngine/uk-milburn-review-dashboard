@@ -96,6 +96,10 @@ from uk_budget_data.reforms import (
     EMPLOYER_NICS_UNDER_25_ID,
     MACHINE_GAMES_DUTY_FROM,
     MACHINE_GAMES_DUTY_ID,
+    MILBURN_CENTRAL_COMPONENTS,
+    MILBURN_CENTRAL_ID,
+    MILBURN_REPORT_PACKAGE_COMPONENTS,
+    MILBURN_REPORT_PACKAGE_ID,
     TRADING_ALLOWANCE_FROM,
     UC_HEALTH_UNDER_25_NEW_CLAIMS_ID,
     WARM_HOME_DISCOUNT_ID,
@@ -131,6 +135,13 @@ STUDENT_LOAN_PLANS = tuple(plan.name for plan in StudentLoanPlan)
 BRMAS = tuple(name.name for name in BRMAName)
 LOCAL_AUTHORITIES = tuple(name.name for name in LocalAuthority)
 COUNCIL_TAX_BANDS = tuple(band.name for band in CouncilTaxBand)
+# PIP award levels, as policyengine-uk's pip_dl_category and pip_m_category
+PIP_AWARDS = ("NONE", "STANDARD", "ENHANCED")
+# The head's job's sector, as its SIC 2007 division (policyengine-uk's
+# sic_industry_division), for the employer National Insurance threshold
+# for 21 to 24s in retail (division 47) and hospitality (55 and 56): food
+# and beverage service (56) stands for hospitality. OTHER sets nothing.
+EMPLOYMENT_SECTORS = {"OTHER": None, "RETAIL": 47, "HOSPITALITY": 56}
 
 # Where a household with no Broad Rental Market Area given is placed:
 # policyengine-uk's own default, its region's BRMA with the most
@@ -409,6 +420,12 @@ PROGRAMMES = (
                 "benunit",
             ),
             _row(
+                "uc_lcwra_element",
+                "Health element (LCWRA)",
+                "uc_LCWRA_element",
+                "benunit",
+            ),
+            _row(
                 "uc_child_element",
                 "Child element",
                 "uc_child_element",
@@ -447,6 +464,17 @@ PROGRAMMES = (
         note=(
             "As paid, after any overlapping benefit such as the State "
             "Pension. Universal Credit counts it as income, pound for pound."
+        ),
+    ),
+    Programme(
+        "pip",
+        "Personal Independence Payment",
+        "benefit",
+        "pip",
+        "person",
+        children=(
+            _row("pip_daily_living", "Daily living", "pip_dl", "person"),
+            _row("pip_mobility", "Mobility", "pip_m", "person"),
         ),
     ),
     Programme(
@@ -657,6 +685,12 @@ CARER_ROWS = frozenset({"carers_allowance", "uc_carer_element"})
 # Likewise the self-employment row: shown only for a household that gives
 # self-employment receipts or expenses (``HouseholdAnswers``).
 TRADING_ROWS = frozenset({"self_employment_income"})
+# And the health rows the Milburn calculator asks about: the Universal
+# Credit health element only for a household with an adult with limited
+# capability for work-related activity, PIP only for one with an award
+# (``HouseholdAnswers.has_health_element``, ``has_pip``).
+HEALTH_ELEMENT_ROWS = frozenset({"uc_lcwra_element"})
+PIP_ROWS = frozenset({"pip"})
 
 
 # Measures in the national figures that the household breakdown can't
@@ -785,6 +819,14 @@ NET_INCOME_PARTS = (
 )
 
 
+# The combined packages the household calculation runs as their members
+# (measure_sides): the report's package is its two removals together.
+PACKAGE_MEMBERS = {
+    MILBURN_REPORT_PACKAGE_ID: MILBURN_REPORT_PACKAGE_COMPONENTS,
+    MILBURN_CENTRAL_ID: MILBURN_CENTRAL_COMPONENTS,
+}
+
+
 def measure_ids() -> list[str]:
     """The measures the household calculation accepts: every registered
     single measure (the combined measure is the sum of these)."""
@@ -892,12 +934,62 @@ class HouseholdAnswers:
     # between the trading allowance and the actual expenses.
     self_employment_receipts: float = 0
     self_employment_expenses: float = 0
+    # The Milburn review calculator's questions (``MILBURN_ANSWERS``). Each
+    # is set on the household only when answered, so every other household
+    # (and its run's key) is exactly as before.
+    # Limited capability for work and work-related activity (policyengine-
+    # uk's uc_limited_capability_for_WRA): the Universal Credit health
+    # element, for the head and the partner
+    limited_capability_for_work_related_activity: bool = False
+    partner_limited_capability_for_work_related_activity: bool = False
+    # Whether the claim's health element is paid at the rate for claims
+    # made from April 2026 (policyengine-uk's
+    # uc_receives_new_claimant_health_element); False is the protected
+    # (earlier) rate
+    new_claimant_health_element: bool = False
+    # PIP awards: NONE, STANDARD or ENHANCED (pip_dl_category, pip_m_category)
+    pip_daily_living: str = "NONE"
+    pip_mobility: str = "NONE"
+    partner_pip_daily_living: str = "NONE"
+    partner_pip_mobility: str = "NONE"
+    # A young person living in their parents' home: modelled as their own
+    # benefit unit and household with no rent and no Council Tax (their
+    # parents' income and housing costs are not part of the calculation)
+    lives_with_parents: bool = False
+    # The head's job's sector, for the employer National Insurance
+    # threshold for 21 to 24s in retail and hospitality: OTHER, RETAIL (SIC
+    # division 47) or HOSPITALITY (division 56, food and beverage service)
+    employment_sector: str = "OTHER"
+    # The head's hours of paid work a week (policyengine-uk's hours_worked,
+    # a year's hours); None: not asked
+    hours_worked_per_week: Optional[float] = None
+    # Pay the head at the engine's minimum wage for their age in the year
+    # calculated, for hours_worked_per_week: employment_income is then
+    # minimum wage x hours x 52 in that year, not grown from salary_year
+    earnings_at_minimum_wage: bool = False
 
     @property
     def self_employed(self) -> bool:
         return bool(
             self.self_employment_receipts or self.self_employment_expenses
         )
+
+    @property
+    def has_health_element(self) -> bool:
+        return self.limited_capability_for_work_related_activity or (
+            self.has_partner
+            and self.partner_limited_capability_for_work_related_activity
+        )
+
+    @property
+    def has_pip(self) -> bool:
+        awards = [self.pip_daily_living, self.pip_mobility]
+        if self.has_partner:
+            awards += [
+                self.partner_pip_daily_living,
+                self.partner_pip_mobility,
+            ]
+        return any(award != "NONE" for award in awards)
 
 
 # policyengine-uk's age-derived education stage
@@ -948,14 +1040,48 @@ def earnings_growth(from_year: int, to_year: int) -> float:
     return float(index(f"{to_year}-01-01") / index(f"{from_year}-01-01"))
 
 
+@lru_cache(maxsize=128)
+def minimum_wage(age: int, year: int) -> float:
+    """The engine's minimum wage an hour for a non-apprentice of ``age`` in
+    ``year``, on the forecast every run uses (policyengine-uk's
+    ``minimum_wage``), to the penny."""
+    from policyengine_uk import Simulation
+
+    from uk_budget_data.forecast import with_forecast
+
+    simulation = Simulation(
+        situation={
+            "people": {"person": {"age": {str(year): age}}},
+            "benunits": {"benunit": {"members": ["person"]}},
+            "households": {"household": {"members": ["person"]}},
+        },
+        scenario=with_forecast(None),
+    )
+    return round(float(simulation.calculate("minimum_wage", year)[0]), 2)
+
+
+def minimum_wage_pay(answers: HouseholdAnswers, year: int) -> float:
+    """The head's pay in ``year`` at the minimum wage for their age, for
+    their hours a week, all year."""
+    return round(
+        minimum_wage(answers.age, year)
+        * (answers.hours_worked_per_week or 0)
+        * WEEKS_IN_YEAR,
+        2,
+    )
+
+
 def salaries_in(answers: HouseholdAnswers, year: int) -> tuple[float, float]:
     """The head's and partner's employment income in ``year``: as entered
-    for ``salary_year``, grown with average earnings."""
+    for ``salary_year``, grown with average earnings; the head's at the
+    minimum wage for their hours when ``earnings_at_minimum_wage``."""
     growth = earnings_growth(answers.salary_year, year)
-    return (
-        answers.employment_income * growth,
-        answers.partner_employment_income * growth,
+    head = (
+        minimum_wage_pay(answers, year)
+        if answers.earnings_at_minimum_wage
+        else answers.employment_income * growth
     )
+    return (head, answers.partner_employment_income * growth)
 
 
 def full_new_state_pension(year: int) -> float:
@@ -1262,6 +1388,20 @@ def household_entities(
         # Only for a carer, so a non-carer's household is exactly as before
         # (no care_hours: policyengine-uk's default, 0)
         people[0]["care_hours"] = answers.care_hours_per_week
+    _health_inputs(
+        people[0],
+        answers.limited_capability_for_work_related_activity,
+        answers.pip_daily_living,
+        answers.pip_mobility,
+    )
+    if EMPLOYMENT_SECTORS[answers.employment_sector] is not None:
+        people[0]["sic_industry_division"] = EMPLOYMENT_SECTORS[
+            answers.employment_sector
+        ]
+    if answers.hours_worked_per_week is not None:
+        people[0]["hours_worked"] = (
+            answers.hours_worked_per_week * WEEKS_IN_YEAR
+        )
     if answers.has_partner:
         people.append(
             {
@@ -1278,6 +1418,12 @@ def household_entities(
             people[-1]["state_pension_reported"] = reported_state_pension(
                 partner_pension, pension_year
             )
+        _health_inputs(
+            people[-1],
+            answers.partner_limited_capability_for_work_related_activity,
+            answers.partner_pip_daily_living,
+            answers.partner_pip_mobility,
+        )
     children = [child_inputs(child) for child in answers.children]
     if children and answers.monthly_childcare:
         # The household's childcare, on its first child, as policyengine-uk
@@ -1296,18 +1442,28 @@ def household_entities(
                 "current_education", education_by_age(person["age"])
             )
     benunit = {"would_claim_uc": answers.claims_universal_credit}
+    if answers.new_claimant_health_element and answers.has_health_element:
+        benunit["uc_receives_new_claimant_health_element"] = True
     household = {
         "region": answers.region,
         "tenure_type": answers.tenure,
-        "rent": answers.monthly_rent * 12 if answers.tenure in RENTING else 0,
+        "rent": (
+            answers.monthly_rent * 12
+            if answers.tenure in RENTING and not answers.lives_with_parents
+            else 0
+        ),
         "council_tax": (
-            answers.council_tax
-            if answers.council_tax is not None
-            else estimated_council_tax(
-                answers.region,
-                answers.council_tax_band,
-                answers.salary_year if year is None else year,
-                answers.local_authority,
+            0
+            if answers.lives_with_parents
+            else (
+                answers.council_tax
+                if answers.council_tax is not None
+                else estimated_council_tax(
+                    answers.region,
+                    answers.council_tax_band,
+                    answers.salary_year if year is None else year,
+                    answers.local_authority,
+                )
             )
         ),
         "council_tax_band": answers.council_tax_band,
@@ -1331,6 +1487,9 @@ def household_entities(
         household["machine_games_standard_rate_net_takings"] = (
             answers.higher_stake_machine_losses
         )
+    if answers.lives_with_parents:
+        # No tenure of their own: policyengine-uk's default, with no rent
+        del household["tenure_type"]
     if answers.brma is not None:
         household["brma"] = answers.brma
     household["local_authority"] = (
@@ -1339,6 +1498,19 @@ def household_entities(
         else DEFAULT_LOCAL_AUTHORITY[answers.region]
     )
     return people, benunit, household
+
+
+def _health_inputs(
+    person: dict, lcwra: bool, pip_daily_living: str, pip_mobility: str
+) -> None:
+    """An adult's health answers as policyengine-uk inputs, each only when
+    answered, so every other household is exactly as before."""
+    if lcwra:
+        person["uc_limited_capability_for_WRA"] = True
+    if pip_daily_living != "NONE":
+        person["pip_dl_category"] = pip_daily_living
+    if pip_mobility != "NONE":
+        person["pip_m_category"] = pip_mobility
 
 
 def py_reform_dict(changes: Optional[dict]) -> dict:
@@ -1477,8 +1649,15 @@ def measure_sides(
             f"Not a measure the calculation knows: {', '.join(unknown)}"
         )
     config = config or DataConfig()
+    # A combined package runs as its members (its own modifier is a
+    # closure no worker process can find), each listed once
+    expanded = [
+        member
+        for id_ in reform_ids
+        for member in PACKAGE_MEMBERS.get(id_, (id_,))
+    ]
     measures = member_order(
-        [get_reform(id_) for id_ in dict.fromkeys(reform_ids)]
+        [get_reform(id_) for id_ in dict.fromkeys(expanded)]
     )
     sides = merged_changes(measures, config)
     before = _side(
@@ -2307,8 +2486,11 @@ def calculate_household_impact(
     combined = reform_net - base_net
 
     identity = runtime_identity()
-    hidden = (frozenset() if answers.is_carer else CARER_ROWS) | (
-        frozenset() if answers.self_employed else TRADING_ROWS
+    hidden = (
+        (frozenset() if answers.is_carer else CARER_ROWS)
+        | (frozenset() if answers.self_employed else TRADING_ROWS)
+        | (frozenset() if answers.has_health_element else HEALTH_ELEMENT_ROWS)
+        | (frozenset() if answers.has_pip else PIP_ROWS)
     )
     result = {
         "year": year,
@@ -2321,8 +2503,18 @@ def calculate_household_impact(
             ),
             "growth": round(earnings_growth(answers.salary_year, year), 6),
             "note": (
-                f"Salary as entered for {answers.salary_year}, grown to "
-                f"{fiscal_year(year)} with the OBR average earnings index."
+                (
+                    "Pay at the minimum wage for your age in "
+                    f"{fiscal_year(year)} (£{minimum_wage(answers.age, year):.2f} "
+                    f"an hour), for {answers.hours_worked_per_week:g} hours "
+                    "a week, all year."
+                )
+                if answers.earnings_at_minimum_wage
+                else (
+                    f"Salary as entered for {answers.salary_year}, grown to "
+                    f"{fiscal_year(year)} with the OBR average earnings "
+                    "index."
+                )
             ),
         },
         "council_tax_used": {

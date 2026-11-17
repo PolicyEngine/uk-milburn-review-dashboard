@@ -75,7 +75,7 @@ const NOT_YET_PUBLISHED = new Set([
   "/data/constituency.csv",
   "/data/release-index.json",
   "/data/official_costings.json",
-  // Written by the pipeline: until then Return to work says its entry cases are unavailable
+  // Written by the pipeline: until then Moves into work (illustrative) says its entry cases are unavailable
   "/data/milburn_scenarios.json",
 ]);
 
@@ -96,7 +96,7 @@ const LOADED = {
   // Impact opens on Young people, which reads the age table (below)
   dashboard: (panel) => within(panel).findAllByText(/Results by age are not available/),
   // Impact's other sub-tabs, by ?sub=
-  // Return to work: led by the microsimulated run from milburn_summary.json
+  // Moves into work (illustrative): led by the microsimulated run from milburn_summary.json
   scenarios: (panel) => within(panel).findAllByRole("heading", { name: "With a quarter moving into work" }),
   benchmarks: (panel) => within(panel).findAllByRole("listitem"),
   // Population impact's Poverty while its figures are shown; while they are
@@ -113,6 +113,8 @@ const LOADED = {
   // Every published measure's card, whatever the band's selection
   policies: (panel) => within(panel).findAllByRole("listitem"),
   methodology: (panel) => within(panel).findAllByRole("heading"),
+  // The stored examples' cards (milburn_household_presets.json), no API
+  household: (panel) => within(panel).findAllByRole("button", { name: /living with parents/ }),
 };
 
 // React's act() warning is a jsdom test artefact (state set after an
@@ -198,7 +200,7 @@ afterEach(() => {
 
 // What a withheld poverty or people-affected figure would say (povertyFigures.js),
 // and the views that must say none of it
-const WITHHELD_TEXT = /poverty|people affected|of people move|winners and losers|better off|worse off/i;
+const WITHHELD_TEXT = /poverty|people affected|of people move|gains and losses|better off|worse off/i;
 const WITHHELD_IN = new Set(["dashboard", "age", "finances", "povertyFallback"]);
 
 // Each tab by its address, and Population impact's other sub-tabs:
@@ -208,7 +210,7 @@ const CASES = [
   ...VIEWS.map((v) => [v.label, v.value, `/?tab=${v.value}`, v.label]),
   ["Population impact: Young people", "age", "/?sub=age", "Young people"],
   // Unless the report-day switch hides them (utils/milburn/reportDay.js)
-  ...(subShownOnReportDay("scenarios") ? [["Population impact: Return to work", "scenarios", "/?sub=scenarios", "Return to work"]] : []),
+  ...(subShownOnReportDay("scenarios") ? [["Population impact: Moves into work (illustrative)", "scenarios", "/?sub=scenarios", "Moves into work (illustrative)"]] : []),
   ...(subShownOnReportDay("benchmarks") ? [["Population impact: Benchmarks", "benchmarks", "/?sub=benchmarks", "Benchmarks"]] : []),
   POVERTY_FIGURES_SHOWN
     ? ["Population impact: Poverty", "poverty", "/?sub=poverty", "Poverty"]

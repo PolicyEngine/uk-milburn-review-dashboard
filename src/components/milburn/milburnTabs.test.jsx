@@ -50,7 +50,7 @@ const serve = ({ scenarios = fixture, summary = summaryText, review = reviewFigu
     return body === null ? { ok: false, status: 404, json: async () => null } : { ok: true, status: 200, json: async () => JSON.parse(body) };
   });
 
-describe("Return to work", () => {
+describe("Moves into work (illustrative)", () => {
   it("leads with the microsimulated entry run, then the entry cases and the break-even arithmetic, with no slider", async () => {
     vi.stubGlobal("fetch", serve());
     const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");
@@ -58,10 +58,10 @@ describe("Return to work", () => {
     expect(await screen.findByRole("region", { name: "With a quarter moving into work" })).toBeInTheDocument();
     expect(await screen.findByRole("region", { name: "One young person moving into work" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Break-even arithmetic" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Return to work" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Moves into work (illustrative)" })).toBeInTheDocument();
     expect(screen.queryByRole("slider")).toBeNull();
     // The assumption names the group that moves, and the tab says its figures are for one year
-    const tab = screen.getByRole("heading", { name: "Return to work" }).closest(".milburn-scenarios");
+    const tab = screen.getByRole("heading", { name: "Moves into work (illustrative)" }).closest(".milburn-scenarios");
     // in one line: the assumption, the year, the link
     expect(tab.querySelector(".milburn-assumption").textContent).toBe(
       "Assumes 25% of non-working 18 to 24-year-olds with PIP or the health element take 16 hours’ work at their minimum wage · 2027-28 only · Why 25%",
@@ -105,16 +105,18 @@ describe("Return to work", () => {
     expect(published.employment.by_year).toBe(2036);
     const row = (key) => [...section.querySelector(`tr[data-row="${key}"]`).children].map((cell) => cell.textContent);
     // The fixture’s entry run moves 70,400 people in 2027-28
-    expect(row("people")).toEqual(["People moving into work", "About 70,000", "About 440,000"]);
+    // Ours is labelled as following from the assumed share, not as an estimate
+    expect(row("people")).toEqual(["People moving into work", "About 70,000, assumed (25% of the group), not estimated", "About 440,000"]);
     expect(row("when")).toEqual(["When", "2027-28", "By 2036"]);
     expect(row("who")[1]).toBe("25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random");
     expect(row("method")[1]).toBe("Microsimulation with an assumed move into work; the entry rate is assumed for illustration, not estimated");
     expect(row("method")[2]).toBe(published.employment.method);
     expect(row("work")[2]).toBe(published.employment.hours);
     expect(row("neet")).toEqual(["NEET rate, 16 to 24-year-olds", "Not modelled", "13.1% in 2026/27 to 6.8% in 2036/37; 13.4% in 2036/37 without the reforms; the review’s ambition is around 5%"]);
-    // Two cards say whose figure each is: ours an estimate, the review's published
+    // Two cards say whose figure each is: ours an assumption, the review's published
     const card = (side) => section.querySelector(`.milburn-versus-card[data-side="${side}"]`);
-    expect(card("ours").querySelector("h4").textContent).toBe("PolicyEngine: illustrative scenario");
+    expect(card("ours").querySelector("h4").textContent).toBe("PolicyEngine: assumed move into work (25%)");
+    expect(card("ours").querySelector(".milburn-versus-caption").textContent).toBe("people assumed to move into work: an assumed 25%, not an estimate");
     // Ours carries no chip (its title names PolicyEngine); the published one keeps its source label
     expect(card("ours").querySelector("[data-source-kind]")).toBeNull();
     expect(card("ours").querySelector(".milburn-versus-figure").textContent).toBe("About 70,000");
@@ -131,8 +133,10 @@ describe("Return to work", () => {
       }
     }
     expect(card("theirs").querySelector('[data-card-row="neet"]').textContent).toBe("NEET rate: 13.1% to 6.8% by 2036/37; ambition around 5%");
-    // The bars say whose each is
-    expect(section.querySelector("[data-single-chart] [role=img]").getAttribute("aria-label")).toMatch(/PolicyEngine estimate, 2027-28: about 70,000\. The review \(published\), by 2036: about 440,000/);
+    // No bars on one axis: an assumed figure is not drawn against the review's estimate
+    expect(section.querySelector("[data-single-chart]")).toBeNull();
+    expect(section.querySelector("[role=img]")).toBeNull();
+    expect(section.textContent).toContain("not drawn on one scale");
     // No source line in view: the table and the full citation, with its link, are folded away
     expect(section.querySelector("[data-review-source-short]")).toBeNull();
     expect(section.textContent).not.toContain("Source: the review");
@@ -220,17 +224,18 @@ describe("Benchmarks", () => {
     expect(screen.getByText("100,000")).toBeInTheDocument();
     expect(screen.queryByText("30,000")).toBeNull();
     // Fixed PolicyEngine figures beside the published ones, each saying what ours is; the build id is in the folded notes, once
-    for (const [published, estimate] of [["450,000", "347,000"]]) {
+    for (const [published, estimate, ours] of [
+      ["450,000", "406,919", "Ours: 2025"],
+      ["176,000", "233,407", "Ours: 2025"],
+      ["£5.1bn a year", "£5.85bn a year", "Ours: 2025-26, cash terms"],
+    ]) {
       const row = screen.getByText(published).closest("li");
       expect(row.textContent).toContain(estimate);
-      // A caseload is the 2027-28 baseline's, and says so; the savings are 2029-30's
-      expect(row.querySelector(".bm-ours").textContent).toBe("Ours: 2027-28 baseline caseload");
+      expect(row.querySelector(".bm-ours").textContent).toBe(ours);
       expect(row.textContent).not.toContain("build fcfac709");
     }
-    expect(screen.getByText("£4.65bn a year").closest("li").querySelector(".bm-ours").textContent).toBe("Ours: 2029-30");
-    expect(screen.getByText("£4.65bn a year").closest("li").textContent).toContain("£5.1bn a year");
     const about = screen.getByText("About these figures").closest("details");
-    expect(about.textContent).toContain("Builds: PolicyEngine, build fcfac709, 2027-28 baseline caseload; PolicyEngine, build fcfac709, 2029-30.");
+    expect(about.textContent).toContain("Builds: PolicyEngine, build fcfac709, 2025; PolicyEngine, build fcfac709, 2025, cash terms; PolicyEngine, build fcfac709, 2025-26, cash terms.");
     expect(document.querySelectorAll(".bm-group [data-benchmark]").length).toBeGreaterThan(0);
     for (const each of document.querySelectorAll(".bm-group [data-benchmark]")) expect(each.textContent, each.dataset.benchmark).not.toContain("build fcfac709");
     // Each card has one source chip (source and date) and at most one note; none repeats the source
@@ -242,36 +247,50 @@ describe("Benchmarks", () => {
     // Sections are named for the question each answers, each with one line under it
     expect([...document.querySelectorAll(".bm-group")].map((group) => [group.dataset.section, group.querySelector("h3").textContent])).toEqual([
       ["caseloads", "How do our caseloads compare?"],
-      ["savings", "How do our savings compare?"],
+      ["spending", "How does our spending compare?"],
+      ["review", "The review's own estimates"],
       ["poverty", "Poverty"],
       ["context", "Context from the review"],
     ]);
     for (const group of document.querySelectorAll(".bm-group")) expect(group.querySelector(".bm-group-head p").textContent).toBeTruthy();
-    // Each comparable pair is a comparison panel with its gap as a % of the published figure
+    // Each comparable pair is a comparison panel with its gap as a % of the published figure, to the nearest whole per cent
     const region = screen.getByRole("region", { name: "Benchmarks" });
     expect([...region.querySelectorAll(".bm-compare")].map((panel) => panel.dataset.benchmark)).toEqual([
+      "uc_health_element_16_24",
       "young_pip_recipients",
       "pip_spend_16_24",
       "uc_health_spend_16_24",
+      "young_benefits_spend",
       "employer_nics_under_25",
     ]);
-    expect(screen.getByText("£4.65bn a year").closest("li").textContent).toContain("PolicyEngine is 8.82% lower");
-    // A pair that counts different things says so, with no gap between the two
-    for (const [published, difference] of [
-      ["£4.68bn a year", "a saving in 2029-30 against spending in 2025-26"],
-      ["£1.13bn a year", "a saving in 2029-30 against spending in 2025-26"],
-      ["450,000", "ours leaves out 16 and 17-year-olds"],
+    for (const [id, gap] of [
+      ["uc_health_element_16_24", "PolicyEngine is 33% higher"],
+      ["pip_spend_16_24", "PolicyEngine is 14% lower"],
+      ["uc_health_spend_16_24", "PolicyEngine is 28% higher"],
+      ["young_benefits_spend", "Close: PolicyEngine is 6% lower"],
+      ["employer_nics_under_25", "PolicyEngine is 15% higher"],
     ]) {
-      const panel = screen.getByText(published).closest("li");
-      expect(panel.textContent, published).toContain(`Not like for like: ${difference}`);
-      expect(panel.textContent, published).not.toMatch(/PolicyEngine is|% (higher|lower)/);
+      expect(card(id).querySelector(".bm-verdict").textContent, id).toBe(gap);
+      // Why the two differ, said on the card
+      expect(card(id).querySelector("[data-gap-note]").textContent, id).toBeTruthy();
     }
+    // No two-decimal gap anywhere
+    expect(region.textContent).not.toMatch(/\d\.\d\d% (higher|lower)/);
+    expect(region.textContent).not.toContain("8.82%");
+    // A pair that still counts different things says so, with no gap between the two
+    const pip = card("young_pip_recipients");
+    expect(pip.textContent).toContain("Not like for like: ours is England and Wales in 2025; the published figure is current, for November 2026");
+    expect(pip.textContent).not.toMatch(/PolicyEngine is|% (higher|lower)/);
+    expect(pip.querySelector("[data-gap-note]").textContent).toContain("407,505");
+    // Our savings are shown apart and labelled as savings; the employer NI figure as a net cost
+    expect(card("pip_spend_16_24").querySelector("[data-separate]").textContent).toBe("Our saving from removing PIP at 16 to 24, 2029-30, cash terms: £4.68bn a year");
+    expect(card("uc_health_spend_16_24").querySelector("[data-separate]").textContent).toBe("Our saving from removing it for under-25s, 2029-30, cash terms: £1.13bn a year");
+    expect(card("young_benefits_spend").querySelector("[data-separate]").textContent).toBe("Our saving from removing them, 2029-30, cash terms: £4.67bn a year");
+    expect(card("employer_nics_under_25").querySelector("[data-separate]").textContent).toBe("Our net cost, 2029-30, cash terms: £4.65bn a year");
     // Every other figure is a stat tile under its section, once, with its source and date
     expect([...region.querySelectorAll(".bm-tile")].map((tile) => tile.dataset.benchmark)).toEqual([
       "uc_health_no_work_requirements",
-      "uc_health_element_16_24",
       "package_young_people_affected",
-      "young_benefits_spend",
       "review_welfare_saving_2036",
       "milburn_welfare_saving_10y",
       "relative_poverty_review",
@@ -286,6 +305,9 @@ describe("Benchmarks", () => {
       "youth_hiring_incentives_cost",
       "incapacity_spending_18_24",
     ]);
+    // The RF figure with no published basis says so, with no PolicyEngine figure
+    expect(card("uc_health_no_work_requirements").querySelector(".bm-note").textContent).toMatch(/^Basis not published/);
+    expect(card("uc_health_no_work_requirements").querySelector(".is-estimate")).toBeNull();
     // Every row of the file is on the page once
     expect(region.querySelectorAll("[data-benchmark]").length).toBe(JSON.parse(benchmarks).rows.length);
     // The review's own figures link to the review, with its date
@@ -296,13 +318,14 @@ describe("Benchmarks", () => {
     );
     // The chip is short; the full title is the link's tooltip
     expect(within(saving).getByRole("link")).toHaveAttribute("title", "From a Welfare State to a Working State");
-    // A figure on another basis is a tile with the PolicyEngine range beside it, not a gap
+    // The review's own estimates are tiles with no PolicyEngine figure beside them
     const annual = card("review_welfare_saving_2036");
     expect(annual.querySelector(".bm-value").textContent).toBe("£3.6bn in 2036-37");
-    expect(annual.textContent).toContain("£2.64bn to £4.67bn a year");
-    expect(annual.textContent).not.toContain("PolicyEngine is");
+    expect(annual.textContent).not.toContain("£2.64bn to £4.67bn a year");
+    expect(annual.querySelector(".is-estimate")).toBeNull();
     const poverty = screen.getByText("50,000 fewer").closest("li");
-    expect(poverty.textContent).toContain("260,000 more");
+    expect(poverty.textContent).not.toContain("260,000 more");
+    expect(poverty.querySelector(".is-estimate")).toBeNull();
     // The page's notes are folded away
     expect(screen.getByText("About these figures").closest("details")).not.toHaveAttribute("open");
     // Rows without a source are gone, and no link carries a stray %20 or points elsewhere than its label

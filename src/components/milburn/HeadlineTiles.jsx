@@ -12,7 +12,7 @@ import {
 } from "../../utils/milburn/summary";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
-import { fallbackRunLine, packageRange, REPLACEMENT_NOT_MODELLED_NOTE, STATIC_NOTE } from "./KeyFigures";
+import { CASH_TERMS_NOTE, fallbackRunLine, packageRange, REPLACEMENT_NOT_MODELLED_NOTE, STATIC_NOTE } from "./KeyFigures";
 import { YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
@@ -210,6 +210,7 @@ export function FinancesHeadline({ runId, selectedYear }) {
               icon="landmark"
               value={formatBn(Math.abs(current))}
               label={`Exchequer ${word(current)}, ${fiscalYearTick(Number(shown))}`}
+              note={CASH_TERMS_NOTE}
             />
           )}
         </ul>
@@ -236,7 +237,7 @@ export function FinancesHeadline({ runId, selectedYear }) {
           <div className="milburn-meter">
             <h4>
               <TitleIcon name="layers" bare size={14} />
-              Package range, {fiscalYearTick(summary.year)}
+              Package range (our designs), {fiscalYearTick(summary.year)}
             </h4>
             <ul>
               {range.map((row, index) => (

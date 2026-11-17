@@ -9,11 +9,12 @@ const COPY = reportCopy();
  * 2026; the section each comes from is cited on its entry). They replace
  * the pre-report list, and are the page's list on every data route: the
  * pipeline's registry (uk_budget_data.reforms.NOT_COMPUTABLE_MEASURES)
- * still holds the pre-report four until it is brought into line. Not
- * listed: the Youth Allowance's independent rate and work allowance (the
- * latter at an assumed amount, illustratively), child DLA to 18 and the
- * higher employer National Insurance threshold at 21 to 24, which the
- * pipeline models with stated assumptions.
+ * holds the same ten, by id and in this order, for milburn_measures.json.
+ * Not listed: the Youth Allowance's independent rate and work allowance
+ * (the latter at an assumed amount, illustratively) and the higher
+ * employer National Insurance threshold at 21 to 24, which the pipeline
+ * models with stated assumptions. Child DLA to 18 is listed although it
+ * has a run, as that run changes no payment.
  *
  * They have no estimate anywhere on the page: never £0, which would read
  * as an estimate of no effect. A `summary` may state the report's own

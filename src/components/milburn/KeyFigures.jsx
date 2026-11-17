@@ -38,11 +38,17 @@ export function fallbackRunLine(name) {
 export const REPLACEMENT_PARTS_NOTE =
   "Left out: Additional Cost Allowance (ongoing costs), local Health and Disability Fund (one-off or changing costs), Severe and Complex Needs Insurance.";
 
+/** Beside our £ figures: they are cash, where the review's sit in 2026-27 prices. */
+export const CASH_TERMS_NOTE = "Cash terms; the review’s figures are in 2026-27 prices.";
+
 /** Said once in a box's folded notes: what "static" means, and how counts are rounded. */
 export const STATIC_NOTE = "Static: nobody changes their work or claims. Counts rounded to the nearest thousand.";
 
-/** The range strip's short names for its runs, by position in RANGE_IDS. */
-const RANGE_NAMES = ["No replacement", "Central", "Phased"];
+/**
+ * The range strip's short names for its runs, by position in RANGE_IDS: what
+ * each run does, never "central", which would read as a best estimate.
+ */
+const RANGE_NAMES = ["Full removal", "Partial removal", "Phased"];
 
 /**
  * The packages' range, whatever run is selected: each package's saving and
@@ -66,17 +72,17 @@ export function packageRange(summary) {
 
 /** Under the range's title when the run shown above is one of the packages. */
 export const RANGE_WITH_SELECTION =
-  "The packages side by side; the one shown above is in full colour. Central is the pre-report variant: the report has no such run.";
+  "Our designs, side by side; the one shown above is in full colour. Partial removal (severe cases kept, PIP at half rate) is a pre-report run from April 2027: the report has no such run.";
 
 /** Under the range's title when the run shown above is not a package: nothing is picked out. */
 export const RANGE_WITHOUT_SELECTION =
-  "The report’s package, its phased run and the pre-report central variant (the report has no such run), for context.";
+  "Our designs, for context: the report’s health element and PIP changes with no replacement, the same phased in, and a pre-report partial removal (severe cases kept, PIP at half rate) that the report has no run for.";
 
 function RangeStrip({ summary, selectedId }) {
   const rows = packageRange(summary);
   if (!rows.length) return null;
   const yearLabel = fiscalYearTick(summary.year);
-  const title = `Package range, ${yearLabel}`;
+  const title = `Package range (our designs), ${yearLabel}`;
   // The selected package at full strength, the others faded; all at full
   // strength, and none said to be selected, when the selection is not one
   // of the packages
@@ -173,6 +179,7 @@ export function keyFigureTiles(run, year) {
       icon: "landmark",
       value: formatBn(Math.abs(saving)),
       label: `${saving >= 0 ? "Exchequer saving" : "Exchequer cost"}, ${yearLabel}`,
+      definition: CASH_TERMS_NOTE,
     });
   }
   if (run.youngPeopleLosing !== null) {

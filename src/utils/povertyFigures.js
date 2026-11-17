@@ -11,7 +11,7 @@
  * - Population impact has no Poverty sub-tab; ?sub=poverty opens the
  *   default sub-tab, Public finances (bootView.js, SubTabs.jsx), and the
  *   Pre-measures forecast's Poverty sub-tab has no link to it;
- * - By age has no winners and losers shares (the share of each age group
+ * - By age has no gains and losses shares (the share of each age group
  *   who gain or lose), and so no download of them;
  * - the household calculator's Your place tip has no share of people who
  *   move up or down a percentile, and income_mobility.csv, which only that

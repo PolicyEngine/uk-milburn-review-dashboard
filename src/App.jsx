@@ -34,7 +34,6 @@ import { provisionalNotice } from "./utils/publication/manifest";
 import { reportCopy } from "./utils/milburn/reportStatus";
 import { isLocalBuildRoute, localBuildNotice } from "./utils/milburn/localBuild";
 import LocalBuildLabel from "./components/milburn/LocalBuildLabel";
-import HouseholdExamples from "./components/milburn/HouseholdExamples";
 import { milburnDefaultMeasure } from "./utils/milburn/measureGroups";
 import { DownloadContext, policiesLabel } from "./utils/downloadContext";
 import { OPEN_VIEW_EVENT } from "./utils/methodLink";
@@ -53,6 +52,7 @@ const PovertyMeasuresRow = lazyView(chartViews, (m) => m.PovertyMeasuresRow);
 const PolicyCards = lazyView(() => import("./components/PolicyCards"));
 const NotComputableMeasures = lazyView(() => import("./components/milburn/NotComputableMeasures"));
 const MethodologyTab = lazyView(() => import("./components/MethodologyTab"));
+const MilburnHouseholdTab = lazyView(() => import("./components/milburn/MilburnHouseholdTab"));
 const BehaviouralScenarios = lazyView(chartViews, (m) => m.BehaviouralScenarios);
 const BenchmarksTable = lazyView(() => import("./components/milburn/BenchmarksTable"));
 const KeyFigures = lazyView(() => import("./components/milburn/KeyFigures"));
@@ -70,6 +70,7 @@ const VIEW_CODE = {
   "dashboard:benchmarks": [BenchmarksTable],
   policies: [PolicyCards, NotComputableMeasures],
   methodology: [MethodologyTab],
+  household: [MilburnHouseholdTab],
 };
 
 /** Load every view's code (tests: views then render without suspending). */
@@ -103,6 +104,8 @@ function viewFallback(value) {
 // they were ("dashboard", "policies"); only the labels changed.
 export const VIEWS = [
   { value: "dashboard", label: "Impact", year: true, policies: true },
+  // One household under current law and the report's runs, 2029-30
+  { value: "household", label: "Household impact", year: false, policies: false },
   { value: "policies", label: "Measures", year: false, policies: false },
   { value: "methodology", label: "Methodology", year: false, policies: false },
 ];
@@ -116,8 +119,9 @@ export const POLICIES_INACTIVE = "Policy choices don't change this tab";
 
 // Old ?tab= values still opened by shared links, and the view each is now;
 // the address is rewritten to the new value. The Household calculator tab
-// was removed: its links open Impact.
-const VIEW_ALIASES = { personal: "dashboard", household: "dashboard" };
+// was removed: its links open Impact. ?tab=household is now the Milburn
+// Household impact tab.
+const VIEW_ALIASES = { personal: "dashboard" };
 const viewKey = (tab) => VIEW_ALIASES[tab] ?? tab;
 
 // The view under the landing page, and the one an address with no ?tab=
@@ -371,6 +375,8 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     const params = new URLSearchParams(window.location.search);
     if (landing) params.delete("tab");
     else params.set("tab", activeTab);
+    // The Household impact tab's example (?example=) is its own
+    if (landing || activeTab !== "household") params.delete("example");
     if (!unavailable) {
       // A chosen selection, an empty one included, stays in the address on
       // every view, so a later snapshot's remount restores exactly it: a
@@ -1178,8 +1184,6 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         ) : value === "policies" ? (
           // Every published measure's card, whatever the band's selection
           <div className="results-container">
-            {/* Typical young people under current law and the report's runs (household calculations) */}
-            <HouseholdExamples />
             <SectionHeading
               icon="fileText"
               title="Measures we model"
@@ -1200,6 +1204,8 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
           </div>
         ) : value === "methodology" ? (
           <MethodologyTab onShowTab={handleTabChange} />
+        ) : value === "household" ? (
+          <MilburnHouseholdTab />
         ) : (
           // Impact and its sub-tabs (populationPanel)
           // Hidden under the landing page, it leaves the address alone

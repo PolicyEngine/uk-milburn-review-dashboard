@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { packageStaticBn, parseScenarios } from "./scenarios";
 import { youngPeopleWorseOff } from "./youngPeople";
 import { packageKeyOf, packageYearShown } from "./packageRun";
-import { BENCHMARK_SHORT, comparisonFor, estimateFor, figureNumber, figureRange, figureShare, parseBenchmarks } from "./benchmarks";
+import { BENCHMARK_SHORT, DIFFERENT_BASIS, comparisonFor, differentBasis, estimateFor, figureNumber, figureRange, figureShare, parseBenchmarks } from "./benchmarks";
 import { NOT_COMPUTABLE_MEASURES } from "./notComputable";
 import { CALCULATOR_ONLY_MEASURES, withCalculatorOnly } from "../calculatorOnlyMeasures";
 
@@ -103,39 +103,46 @@ describe("the benchmarks file", () => {
     for (const row of parsed.rows) if (row.url) expect(row.url, row.id).not.toContain("%20");
   });
 
-  it("fills a PolicyEngine estimate only where the verified results have one", () => {
-    // The package's figure is worked out from the results; seven rows carry a
-    // fixed figure from the named build; every other row is blank
+  it("fills a PolicyEngine estimate only where it is on the same basis, and keeps our savings apart", () => {
+    // The package's figure is worked out from the results; six rows carry a
+    // fixed figure from the named build, like for like (issue #1); every other row is blank
     expect(parsed.rows.filter((row) => row.estimate).map((row) => row.id)).toEqual([
+      "uc_health_element_16_24",
       "young_pip_recipients",
       "package_young_people_affected",
       "young_benefits_spend",
       "pip_spend_16_24",
       "uc_health_spend_16_24",
-      "review_welfare_saving_2036",
       "employer_nics_under_25",
-      "relative_poverty_review",
     ]);
     for (const row of parsed.rows.filter((each) => each.estimate?.fixed)) {
-      // The savings and poverty figures are 2029-30's; the caseloads are the 2027-28 baseline's, and say so
-      const caseload = row.id === "young_pip_recipients";
-      expect(row.estimate.label, row.id).toBe(caseload ? "PolicyEngine, build fcfac709, 2027-28 baseline caseload" : "PolicyEngine, build fcfac709, 2029-30");
+      // Each is for 2025 (2025-26 rules), the published figures' own year; money in cash terms
+      expect(row.estimate.label, row.id).toMatch(/^PolicyEngine, build fcfac709, 2025(-26)?(, cash terms)?$/);
+      if (/£/.test(row.estimate.fixed)) expect(row.estimate.label, row.id).toMatch(/cash terms$/);
+      expect(row.estimate.note, row.id).toBeTruthy();
       expect(estimateFor(row, { ageRows: [], packageRows: [], packageKey: null, year: 2027 })).toBeNull();
     }
-    // The UC health caseload (benefit units with LCWRA, a check script's rows) is not shown: published figures only
-    for (const id of ["uc_health_no_work_requirements", "uc_health_element_16_24"]) expect(parsed.rows.find((row) => row.id === id).estimate, id).toBeNull();
-    // Our savings are Exchequer savings with knock-on effects, never called spending
-    for (const id of ["young_benefits_spend", "pip_spend_16_24"]) {
-      const basis = parsed.rows.find((row) => row.id === id).estimate.basis;
-      expect(basis, id).toMatch(/Exchequer saving/);
-      expect(basis, id).toMatch(/knock-on effects on other benefits/);
-      expect(basis, id).not.toMatch(/the spending the modelled package removes/);
-    }
-    expect(parsed.rows.find((row) => row.id === "employer_nics_under_25").estimate.fixed).toBe("£4.65bn a year");
-    expect(parsed.rows.find((row) => row.id === "young_benefits_spend").estimate.fixed).toBe("£4.67bn a year");
-    expect(parsed.rows.find((row) => row.id === "review_welfare_saving_2036").estimate.fixed).toBe("£2.64bn to £4.67bn a year");
+    // The figures from build fcfac709 (issue #1), as given
+    const fixed = (id) => parsed.rows.find((row) => row.id === id).estimate.fixed;
+    expect(fixed("uc_health_element_16_24")).toBe("233,407");
+    expect(fixed("young_pip_recipients")).toBe("406,919");
+    expect(fixed("young_benefits_spend")).toBe("£4.44bn a year");
+    expect(fixed("pip_spend_16_24")).toBe("£3.27bn a year");
+    expect(fixed("uc_health_spend_16_24")).toBe("£1.18bn a year");
+    expect(fixed("employer_nics_under_25")).toBe("£5.85bn a year");
+    // The RF figure with no published basis, and the review's own estimates, have no PolicyEngine pair
+    for (const id of ["uc_health_no_work_requirements", "relative_poverty_review", "review_welfare_saving_2036"]) expect(parsed.rows.find((row) => row.id === id).estimate, id).toBeNull();
+    expect(parsed.rows.find((row) => row.id === "uc_health_no_work_requirements").basis).toMatch(/^Basis not published/);
+    // Our savings are kept apart, labelled as savings (or a net cost), never set against spending
+    const saving = (id) => parsed.rows.find((row) => row.id === id).saving;
+    expect(parsed.rows.filter((row) => row.saving).map((row) => row.id)).toEqual(["young_benefits_spend", "pip_spend_16_24", "uc_health_spend_16_24", "employer_nics_under_25"]);
+    expect(saving("young_benefits_spend")).toMatchObject({ value: "£4.67bn a year", label: "Our saving from removing them, 2029-30, cash terms" });
+    expect(saving("pip_spend_16_24").value).toBe("£4.68bn a year");
+    expect(saving("uc_health_spend_16_24").value).toBe("£1.13bn a year");
+    expect(saving("employer_nics_under_25")).toMatchObject({ value: "£4.65bn a year", label: "Our net cost, 2029-30, cash terms" });
+    expect(saving("employer_nics_under_25").basis).toMatch(/net of the income tax and National Insurance on the higher pay/);
+    for (const id of ["young_benefits_spend", "pip_spend_16_24"]) expect(saving(id).basis, id).toMatch(/Exchequer saving[\s\S]*knock-on effects on other benefits/);
     expect(parsed.year).toBe(2029);
-    expect(parsed.rows.find((row) => row.id === "relative_poverty_review").estimate.fixed).toBe("260,000 more");
     const ucRow = { id: "x", estimate: { package: false, reformId: "uc_health_element_removed_under_25", metric: "young_people_worse_off" } };
     const neetRow = parsed.rows.find((row) => row.id === "neet_16_24");
     const packageRow = parsed.rows.find((row) => row.id === "package_young_people_affected");
@@ -175,32 +182,35 @@ describe("the benchmark charts", () => {
 
   it("pair a published figure with a fixed estimate in the same unit, with the gap as a % of the published figure", () => {
     expect(parsed.rows.filter((each) => comparisonFor(each)).map((each) => each.id)).toEqual([
+      "uc_health_element_16_24",
       "young_pip_recipients",
+      "young_benefits_spend",
       "pip_spend_16_24",
       "uc_health_spend_16_24",
       "employer_nics_under_25",
     ]);
-    const recipients = comparisonFor(row("young_pip_recipients"));
-    expect(recipients.gapPct).toBeCloseTo(((347000 - 450000) / 450000) * 100, 10);
+    // The gaps issue #1 gives, like for like: +33%, -6%, -14%, +28%, +15%
+    const gap = (id) => Math.round(comparisonFor(row(id)).gapPct);
+    expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 233407 });
+    expect(gap("uc_health_element_16_24")).toBe(33);
+    expect(gap("young_benefits_spend")).toBe(-6);
+    expect(gap("pip_spend_16_24")).toBe(-14);
+    expect(gap("uc_health_spend_16_24")).toBe(28);
     const nics = comparisonFor(row("employer_nics_under_25"));
-    expect(nics).toMatchObject({ unit: "bn", published: 5.1, estimate: 4.65, publishedText: "£5.1bn", estimateText: "£4.65bn" });
-    expect(nics.gapPct).toBeCloseTo(((4.65 - 5.1) / 5.1) * 100, 10);
-    // The review's spending by benefit, ages 16 to 24, beside the static saving from removing each
-    const pip = comparisonFor(row("pip_spend_16_24"));
-    expect(pip).toMatchObject({ unit: "bn", published: 3.8, estimate: 4.68 });
-    expect(pip.gapPct).toBeCloseTo(((4.68 - 3.8) / 3.8) * 100, 10);
-    expect(comparisonFor(row("uc_health_spend_16_24"))).toMatchObject({ unit: "bn", published: 0.92, estimate: 1.13, publishedText: "£0.92bn" });
-    expect(comparisonFor(row("uc_health_element_16_24"))).toBeNull();
-    expect(comparisonFor(row("young_pip_recipients"))).toMatchObject({ unit: "count", published: 450000, estimate: 347000 });
-    // A figure for another year, price base or policy design stays a tile: its wording is not one plain number
-    for (const id of ["young_benefits_spend", "review_welfare_saving_2036", "relative_poverty_review"]) {
-      expect(row(id).estimate.fixed, id).toBeTruthy();
-      expect(comparisonFor(row(id)), id).toBeNull();
-    }
+    expect(nics).toMatchObject({ unit: "bn", published: 5.1, estimate: 5.85, publishedText: "£5.1bn", estimateText: "£5.85bn" });
+    expect(gap("employer_nics_under_25")).toBe(15);
+    expect(comparisonFor(row("young_pip_recipients"))).toMatchObject({ unit: "count", published: 450000, estimate: 406919 });
+    // Like-for-like pairs print their gap; the PIP caseload still differs in date and area, and says so
+    expect(Object.keys(DIFFERENT_BASIS)).toEqual(["young_pip_recipients"]);
+    expect(differentBasis("young_pip_recipients")).toMatch(/England and Wales in 2025/);
+    for (const id of ["uc_health_element_16_24", "young_benefits_spend", "pip_spend_16_24", "uc_health_spend_16_24", "employer_nics_under_25"]) expect(differentBasis(id), id).toBeNull();
+    // A figure for another year, price base or policy design stays a tile with no PolicyEngine pair
+    for (const id of ["review_welfare_saving_2036", "relative_poverty_review"]) expect(comparisonFor(row(id)), id).toBeNull();
     // Different units, or no fixed estimate, are never paired
     expect(comparisonFor({ value: "260,000", estimate: { fixed: "£4.43bn a year" } })).toBeNull();
     expect(comparisonFor(row("package_young_people_affected"))).toBeNull();
     expect(comparisonFor(row("neet_16_24"))).toBeNull();
+    expect(comparisonFor(row("uc_health_no_work_requirements"))).toBeNull();
   });
 
   it("read a dated range and a share from their wording", () => {

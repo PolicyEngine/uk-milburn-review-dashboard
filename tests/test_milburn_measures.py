@@ -292,12 +292,20 @@ def test_the_registry_holds_the_milburn_measures_only():
 
 def test_not_computable_measures_carry_a_reason_and_no_reform():
     ids = {m.id for m in NOT_COMPUTABLE_MEASURES}
-    assert ids == {
-        "severe_conditions_higher_rate",
+    # The final report's list, as the page shows it (notComputable.js)
+    assert [m.id for m in NOT_COMPUTABLE_MEASURES] == [
+        "child_dla_to_18",
         "additional_cost_allowance",
+        "severe_complex_needs_insurance",
+        "health_and_disability_fund",
         "youth_conditionality",
-        "youth_guarantee_expansion",
-    }
+        "care_leaver_transition_allowance",
+        "opportunity_guarantee",
+        "employer_hiring_payments",
+        "apprenticeship_target",
+        "further_education_places",
+    ]
+    assert len(ids) == 10
     for measure in NOT_COMPUTABLE_MEASURES:
         assert measure.status == "not_computable" and measure.reason
         assert get_reform(measure.id) is None

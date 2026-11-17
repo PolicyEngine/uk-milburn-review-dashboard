@@ -1,4 +1,4 @@
-// Winners and losers, one row per measure (each measure's own published
+// Gains and losses, one row per measure (each measure's own published
 // shares; never added up): the measure's name, wrapped to two lines and
 // never clipped, a 100% bar (better off, unchanged, worse off) and the
 // ▲ better off and ▼ worse off shares in two fixed right-aligned columns.
@@ -36,7 +36,7 @@ export default function MeasureSharesChart({ rows, groupLabel, yearLabel, emphas
   const worseDecimals = shareDecimals(rows.map(({ row }) => row.pct_worse_off ?? 0));
   return (
     <div className="msc-wrap">
-    <div ref={ref} className="msc" role="table" aria-label={`Winners and losers, ${groupLabel}, each policy on its own, ${yearLabel}`}>
+    <div ref={ref} className="msc" role="table" aria-label={`Gains and losses, ${groupLabel}, each policy on its own, ${yearLabel}`}>
       <div className="msc-row msc-head" role="row">
         <span className="msc-label" />
         <span className="msc-bar-cell" />

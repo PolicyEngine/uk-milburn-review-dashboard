@@ -966,13 +966,14 @@ MILBURN_POLICY_DETAILS.push({
     { label: "Report", icon: "file", text: "Proposes a five-year glide path, when fiscal conditions allow; end state shown." },
   ],
   affects: "21 to 24-year-olds in retail and hospitality and their employers",
-  starts: "Apr 2027, at £10,000",
+  starts: "Apr 2027 (assumed), at £10,000",
   inForce: { from: "2027-04" },
   type: "National Insurance",
   details: [
     "Static: employers' total cost of employment is held fixed, so the saving passes to pay; hiring does not respond.",
+    "Its cost is net of the income tax and National Insurance paid on the higher pay.",
     "Retail is SIC division 47 and hospitality divisions 55 and 56, by the main job.",
-    "The report gives no start date, phasing amounts or costing.",
+    "The report gives no start date, phasing amounts or costing: the April 2027 start is our assumption.",
   ],
   // The threshold moves, not the rate: the chart says so (employerNicsView)
   visual: { kind: "milburn-employer-nics", place: "change", limit: 25, threshold: 10000 },
@@ -1035,9 +1036,9 @@ MILBURN_POLICY_DETAILS.push(
   },
   {
     id: "milburn_report_package_phased",
-    shortName: "The report's benefit changes, phased in",
-    noun: "the report's benefit changes, phased in over five years",
-    sentence: "phasing in the report's benefit changes as claimants are reassessed",
+    shortName: "Health element and PIP removal, phased in",
+    noun: "the health element and PIP removal, phased in over five years",
+    sentence: "phasing in the health element and PIP removal as claimants are reassessed",
     summary: "The report's health element and PIP changes, phased in as claimants are reassessed.",
     points: [
       { label: "New entrants", icon: "users", text: "Turning 18 from April 2028: reached at once." },
@@ -1066,15 +1067,16 @@ MILBURN_POLICY_DETAILS.push(
     summary: "Raises the employer NI threshold in yearly steps to £10,000 by 2031-32.",
     points: [
       { label: "Who", icon: "users", text: "Employees aged 21 to 24, main job in retail or hospitality." },
-      { label: "Steps", icon: "clock", text: "£6,000 in 2027-28, rising £1,000 a year." },
+      { label: "Steps", icon: "clock", text: "Assumed: £6,000 in 2027-28, rising £1,000 a year." },
       { label: "Rate", icon: "coins", text: "15% rate unchanged; only the threshold moves." },
     ],
     affects: "21 to 24-year-olds in retail and hospitality and their employers",
-    starts: "Apr 2027",
+    starts: "Apr 2027 (assumed)",
     inForce: { from: "2027-04" },
     type: "National Insurance",
     details: [
       "Static: employers' total cost of employment is held fixed, so the saving passes to pay; hiring does not respond.",
+      "Its cost is net of the income tax and National Insurance paid on the higher pay.",
       "Retail is SIC division 47 and hospitality divisions 55 and 56, by the main job.",
       // Report, paras 269 to 271
       "The report proposes a five-year glide path (paragraphs 269 to 271); equal steps and the 2027 start are assumed.",

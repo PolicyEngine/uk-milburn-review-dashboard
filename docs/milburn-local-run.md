@@ -8,9 +8,12 @@ data build the review uses.
 ## The build
 
 > **Since 16 November 2026 the runs use a certified build.** policyengine
-> 6.20.1 (policyengine.py PR 759) certifies Microcosm build `fcfac709` with
-> policyengine-uk 2.177.7 and core 3.34.10, so `pyproject.toml` depends on
-> `policyengine[uk]>=6.20.1` with no engine override, and
+> 6.20.1 (policyengine.py PR 759) first certified Microcosm build `fcfac709`
+> with policyengine-uk 2.177.7 and core 3.34.10; the project now depends on
+> `policyengine[uk]>=6.20.2`, which certifies the same build, engine and
+> data. The pre-report runs' `model_build.json` files still record 6.20.1
+> and the report runs 6.20.2: the figures are on the same engine and data.
+> There is no engine override, and
 > `local_build.bundle_certifies()` checks the file against the installed
 > bundle. Sections below that describe the uncertified build `6f918b81`
 > (engine override, "not in a policyengine.py release", refused bundle) are
@@ -20,8 +23,8 @@ data build the review uses.
 |---|---|
 | Data | Microcosm build `uk-frs-calibration-attempt-20261115T104657Z-fcfac709`, `microcosm_uk_2024_25.h5`, SHA-256 `301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90` |
 | Engine | policyengine-uk 2.177.7, policyengine-core 3.34.10 (pinned by the bundle) |
-| Bundle | policyengine 6.20.1, whose UK data release certifies this build |
-| Label carried into outputs | `build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1` |
+| Bundle | policyengine 6.20.2, whose UK data release certifies this build |
+| Label carried into outputs | `build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2` |
 
 Fetch the file once (it reads the Hugging Face CLI token; nothing is printed):
 

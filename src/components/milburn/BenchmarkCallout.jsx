@@ -20,13 +20,13 @@ export const BENCHMARK_PLACES = {
   finances: [
     {
       id: "review_welfare_saving_2036",
-      differs: "In 2026-27 prices, with replacement awards and an employment effect; ours is static, for earlier years.",
+      differs: "In 2026-27 prices, with replacement awards and an employment effect; ours is static, in cash terms.",
     },
     {
       id: "milburn_welfare_saving_10y",
       // The figure already names the year the card's title ends on
       label: "Cumulative welfare savings the review estimates",
-      differs: "Eight years summed, 2029-30 to 2036-37, in 2026-27 prices; ours are single-year figures.",
+      differs: "Eight years summed, 2029-30 to 2036-37, in 2026-27 prices; ours are single years, in cash terms.",
     },
     {
       id: "pip_spend_16_24",

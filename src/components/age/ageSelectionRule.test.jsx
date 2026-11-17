@@ -475,7 +475,7 @@ describe("Average change by age when the package withholds every single age", ()
   });
 });
 
-describe("Winners and losers when the package withholds every single age", () => {
+describe("Gains and losses when the package withholds every single age", () => {
   // As Average change by age above: the members have single years, the
   // package none; its age bands are published
   const packageWithoutSingleAges = () => withSingleAges(measureCatalogueFixture({ held: false }), COMBINED);
@@ -498,7 +498,7 @@ describe("Winners and losers when the package withholds every single age", () =>
     window.history.replaceState(null, "", `/?age=${age}`);
     const { container } = await renderAge(packageWithoutSingleAges(), [ALPHA, BETA]);
     const card = container.querySelector(selector);
-    // Withheld for now (povertyFigures.js): no Winners and losers card, in
+    // Withheld for now (povertyFigures.js): no Gains and losses card, in
     // its fallback too; PovertyFiguresShown.test.jsx checks it comes back
     if (!POVERTY_FIGURES_SHOWN) {
       expect(card).toBeNull();

@@ -256,3 +256,14 @@ describe("the label and the Policies lists", () => {
     expect(notComputable.textContent).not.toContain("The data hold no severe conditions flag");
   });
 });
+
+describe("the runs' build labels", () => {
+  it("names both releases once where runs differ only in the release that certified the same build", async () => {
+    const { combinedLabel } = await import("./localBuild");
+    const base = "build fcfac709, policyengine-uk 2.177.7, certified in policyengine ";
+    expect(combinedLabel([`${base}6.20.2`, `${base}6.20.1`, `${base}6.20.2`])).toBe(`${base}6.20.1 and 6.20.2 (the same engine and data)`);
+    expect(combinedLabel([`${base}6.20.2`])).toBe(`${base}6.20.2`);
+    // Any other mix is listed in full
+    expect(combinedLabel([`${base}6.20.2`, "build abc, policyengine-uk 2.1.0, certified in policyengine 6.19.0"])).toContain("; ");
+  });
+});

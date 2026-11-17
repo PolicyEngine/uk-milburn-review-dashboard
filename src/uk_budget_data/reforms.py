@@ -1492,51 +1492,107 @@ class NotComputableMeasure:
     status: str = "not_computable"
 
 
+# The final report's measures the page lists but cannot compute, in the
+# page's order and words (src/utils/milburn/notComputable.js).
 NOT_COMPUTABLE_MEASURES = (
     NotComputableMeasure(
-        id="severe_conditions_higher_rate",
-        name="Higher health element for severe conditions",
+        id="child_dla_to_18",
+        name="Child DLA extended to 18",
         description=(
-            "A higher Universal Credit health element for claimants who "
-            "meet the severe conditions criteria."
+            "16 and 17-year-olds stay on Disability Living Allowance "
+            "instead of moving to PIP (report paragraph 760)."
         ),
         reason=(
-            "The data hold no severe conditions flag, so the claimants it "
-            "would reach cannot be identified."
+            "DLA and PIP pay the same amounts, so the switch changes no "
+            "payment; its effect on reassessment is not in the data."
         ),
     ),
     NotComputableMeasure(
         id="additional_cost_allowance",
-        name="Additional cost allowance",
+        name="Additional Cost Allowance",
         description=(
-            "A new allowance towards the extra costs of disability, "
-            "replacing PIP for young people."
+            "A national, non-means-tested allowance for established, "
+            "ongoing disability costs, replacing PIP for young people."
         ),
-        reason="Its rules (eligibility, rates) have not been set out.",
+        reason="Its eligibility and rates are not in the model.",
+    ),
+    NotComputableMeasure(
+        id="severe_complex_needs_insurance",
+        name="Severe and Complex Needs Insurance",
+        description=(
+            "A stable long-term income, above today's maximum benefit "
+            "rates, where paid work is not realistic."
+        ),
+        reason=(
+            "The data cannot identify who would qualify, and its rate is "
+            "not in the model."
+        ),
+    ),
+    NotComputableMeasure(
+        id="health_and_disability_fund",
+        name="Local Health and Disability Fund",
+        description=(
+            "Local payments for one-off or changing disability costs, "
+            "decided by the Youth Opportunity Service."
+        ),
+        reason=(
+            "Awards are at local discretion, with no rule to apply to "
+            "households."
+        ),
     ),
     NotComputableMeasure(
         id="youth_conditionality",
-        name="Conditionality for young people",
+        name="Duty to engage",
         description=(
-            "Work-related requirements and sanctions for young Universal "
-            "Credit claimants."
+            "Persistent refusal to engage can end in loss of the Youth "
+            "Allowance."
         ),
-        reason=(
-            "Its effect works through behaviour (job search, sanctions), "
-            "which a static model does not capture."
-        ),
+        reason="It works through behaviour, which a static model omits.",
     ),
     NotComputableMeasure(
-        id="youth_guarantee_expansion",
-        name="Youth Guarantee expansion",
+        id="care_leaver_transition_allowance",
+        name="Care Leaver Transition Allowance",
         description=(
-            "More training, job and work experience places for young people "
-            "under the Youth Guarantee."
+            "A six-month weekly allowance for care leavers who are NEET or "
+            "at serious risk."
         ),
-        reason=(
-            "It is a spending programme, not a tax or benefit rule the "
-            "model applies to households."
+        reason="The model's data do not identify care leavers.",
+    ),
+    NotComputableMeasure(
+        id="opportunity_guarantee",
+        name="Opportunity Guarantee",
+        description=(
+            "A legal right to education, training or work, with a paid "
+            "six-month job as backstop."
         ),
+        reason="An entitlement to places, not a tax or benefit rule.",
+    ),
+    NotComputableMeasure(
+        id="employer_hiring_payments",
+        name="Hiring payments to employers",
+        description=(
+            "Payments to employers for hiring a young person who has been "
+            "out of work and education for six months."
+        ),
+        reason="Its effect is on hiring, which a static model omits.",
+    ),
+    NotComputableMeasure(
+        id="apprenticeship_target",
+        name="Apprenticeship target",
+        description=(
+            "More apprenticeship starts for under-25s a year by 2036, with "
+            "pre-apprenticeship places."
+        ),
+        reason="A target for places, not a tax or benefit rule.",
+    ),
+    NotComputableMeasure(
+        id="further_education_places",
+        name="Further education places",
+        description=(
+            "More 18 to 24-year-olds in further education each year, over "
+            "the decade."
+        ),
+        reason="A spending programme, not a tax or benefit rule.",
     ),
 )
 
@@ -1646,7 +1702,7 @@ def _phasing_text(
 def _create_milburn_package_phased() -> Reform:
     return Reform(
         id=MILBURN_PHASED_ID,
-        name="Milburn package, phased as claimants are reassessed",
+        name="Health element and PIP removal from April 2027, phased as claimants are reassessed",
         description=(
             "The health element and PIP removals for young people, reaching "
             + _phasing_text()
@@ -1658,7 +1714,7 @@ def _create_milburn_package_phased() -> Reform:
 def _create_milburn_package_entry_25pct() -> Reform:
     return Reform(
         id=MILBURN_ENTRY_ID,
-        name="Milburn package with an illustrative move into work",
+        name="Health element and PIP removal from April 2027, with an illustrative move into work",
         description=(
             "The full package, with a randomly chosen quarter of affected "
             f"young people who do not work (aged {_PIP_BAND}, with PIP or "
@@ -1697,7 +1753,7 @@ _MEASURE_FACTORIES = (
 def _create_milburn_package(
     members: list[Reform],
     package_id: str = None,
-    name: str = "Milburn package (combined)",
+    name: str = "Health element and PIP removal for young people, from April 2027 (combined)",
     description: str = None,
 ) -> Reform:
     """One simulation of the package's measures.
@@ -2014,7 +2070,7 @@ def _create_milburn_report_package_phased() -> Reform:
         )
     return Reform(
         id=MILBURN_REPORT_PHASED_ID,
-        name="Milburn report package, phased as claimants are reassessed",
+        name="Health element and PIP removal from April 2029, phased as claimants are reassessed",
         description=(
             "The report's health element and PIP changes for young people, "
             "reaching " + reach + _report_without_employer_nics_text()
@@ -2031,7 +2087,7 @@ def _create_milburn_report_package_entry_25pct() -> Reform:
     )
     return Reform(
         id=MILBURN_REPORT_ENTRY_ID,
-        name="Milburn report package with an illustrative move into work",
+        name="Health element and PIP removal from April 2029, with an illustrative move into work",
         description=(
             "The report package, with a randomly chosen quarter of affected "
             f"young people who do not work (aged {band}, with PIP or "
@@ -2302,7 +2358,7 @@ def _get_reforms() -> list[Reform]:
             _create_milburn_package(
                 central,
                 package_id=MILBURN_CENTRAL_ID,
-                name="Milburn package, central variant (combined)",
+                name="Health element removal with severe cases kept and PIP at half rate, from April 2027 (combined)",
                 description=(
                     f"The health element removal for {_UNDER} with severe "
                     f"cases kept, and PIP at half rate for {_PIP_PEOPLE} "
@@ -2338,11 +2394,12 @@ def _get_reserved() -> dict[str, Reform]:
         report = _create_milburn_package(
             members,
             package_id=MILBURN_REPORT_PACKAGE_ID,
-            name="Milburn report package (combined)",
+            name="Health element and PIP removal for young people, from April 2029 (combined)",
             description=(
-                "The report's changes modelled here, simulated together "
+                "Two of the report's benefit changes, simulated together "
                 f"with their interactions{_report_replacements_text()}: "
-                f"{'; '.join(names)}."
+                f"{'; '.join(names)}. The report's other modelled measures, "
+                "such as the higher Youth Allowance, are separate runs."
             ),
         )
         # Not the cached lookup: this can run while _get_reforms is still
@@ -2351,7 +2408,7 @@ def _get_reserved() -> dict[str, Reform]:
         from_16 = _create_milburn_package(
             [listed[i] for i in MILBURN_PACKAGE_16_TO_24_COMPONENTS],
             package_id=MILBURN_PACKAGE_16_TO_24_ID,
-            name="Milburn package with PIP from 16 (combined)",
+            name="Health element removal and PIP removal from age 16, from April 2027 (combined)",
             description=(
                 f"The health element removal for {_UNDER} (all claimants) "
                 "and the PIP removal for 16 to 24-year-olds simulated "

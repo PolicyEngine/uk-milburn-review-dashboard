@@ -1,11 +1,13 @@
 /**
  * Benchmarks: published reference figures (public/data/milburn_benchmarks.json,
  * static, written by hand), each with its source, beside a PolicyEngine
- * estimate where there is a comparable figure: either worked out from the
- * results (`run`/`reform_id` with a `metric`) or a fixed figure from a named
- * build (`value`, with its `basis` and `label`).
+ * estimate where there is a figure on the same basis: either worked out from
+ * the results (`run`/`reform_id` with a `metric`) or a fixed figure from a
+ * named build (`value`, with its `basis`, `label` and an optional `note` on
+ * why the two differ). A row may also carry our saving from a measure
+ * (`policyengine_saving`), shown apart and labelled as a saving, never set
+ * against published spending.
  */
-import { yearLabel } from "../displayYears";
 import { youngPeopleWorseOff } from "./youngPeople";
 
 export const BENCHMARKS_FILE = "milburn_benchmarks.json";
@@ -19,30 +21,30 @@ export const BENCHMARK_SECTIONS = [
   {
     key: "caseloads",
     title: "How do our caseloads compare?",
-    intro: "Published counts of young people on the UC health element or PIP, beside our baseline PIP caseload.",
+    intro: "Published counts of young people on the UC health element or PIP, beside ours for the same ages, for 2025.",
     icon: "usersRound",
     ids: ["uc_health_no_work_requirements", "uc_health_element_16_24", "young_pip_recipients", "package_young_people_affected"],
   },
   {
-    key: "savings",
-    title: "How do our savings compare?",
-    intro: "Published spending, savings and costs, beside our static estimates.",
+    key: "spending",
+    title: "How does our spending compare?",
+    intro: "Published spending and costs for 2025-26, beside ours for the same year in cash terms; our savings from the measures are shown apart on each card.",
     icon: "landmark",
-    ids: [
-      "pip_spend_16_24",
-      "uc_health_spend_16_24",
-      "employer_nics_under_25",
-      "young_benefits_spend",
-      "review_welfare_saving_2036",
-      "milburn_welfare_saving_10y",
-    ],
+    ids: ["pip_spend_16_24", "uc_health_spend_16_24", "young_benefits_spend", "employer_nics_under_25"],
+  },
+  {
+    key: "review",
+    title: "The review's own estimates",
+    intro: "These include replacement awards, a Youth Allowance, a work allowance and more young people in work, in 2026-27 prices; our static runs include none of them, so no PolicyEngine figure is set beside them.",
+    icon: "scale",
+    ids: ["review_welfare_saving_2036", "milburn_welfare_saving_10y", "relative_poverty_review"],
   },
   {
     key: "poverty",
     title: "Poverty",
-    intro: "The review's poverty estimate beside ours, and what the benefits do today.",
+    intro: "What the benefits do for young people today, as published.",
     icon: "percent",
-    ids: ["relative_poverty_review", "kept_out_of_poverty", "pip_no_extra_costs"],
+    ids: ["kept_out_of_poverty", "pip_no_extra_costs"],
   },
   {
     key: "context",
@@ -87,10 +89,12 @@ export const BENCHMARK_SHORT = {
   uc_health_no_work_requirements: {
     label: "On UC health with no work requirements",
     icon: "heartPulse",
+    basis: "Basis not published: no age range, date or source given",
   },
   uc_health_element_16_24: {
     label: "16–24s receiving the UC health element",
     icon: "activity",
+    estimateBasis: "Ages 16 to 24, Great Britain, 2025",
   },
   incapacity_benefits_young: {
     label: "Young people on incapacity benefits, the review says",
@@ -100,7 +104,7 @@ export const BENCHMARK_SHORT = {
   young_pip_recipients: {
     label: "Young people receiving PIP",
     icon: "clipboard",
-    estimateBasis: "PIP recipients aged 18 to 24, UK, 2027-28",
+    estimateBasis: "Ages 16 to 24, England and Wales, 2025",
   },
   dla_pip_16_24: {
     label: "16–24s receiving DLA or PIP, the review says",
@@ -116,27 +120,26 @@ export const BENCHMARK_SHORT = {
   young_benefits_spend: {
     label: "PIP and UC health spending on young people",
     icon: "banknote",
-    basis: "Ages 16 to 24: PIP £3.8bn, UC LCWRA £0.92bn",
-    estimateBasis: "Static Exchequer saving, with knock-on effects on other benefits, UK; PIP from age 18",
+    basis: "2025-26, ages 16 to 24: PIP £3.8bn, UC LCWRA £0.92bn",
+    estimateBasis: "Spending in 2025, cash terms: PIP in England and Wales, the health element in Great Britain",
   },
   pip_spend_16_24: {
     label: "PIP spending, ages 16 to 24",
     icon: "wallet",
     basis: "Spending in 2025-26",
-    estimateBasis: "Static Exchequer saving from removing PIP at 16 to 24, with knock-on effects on other benefits, 2029-30, UK",
+    estimateBasis: "Spending in 2025, England and Wales, cash terms",
   },
   uc_health_spend_16_24: {
     label: "UC LCWRA element spending, ages 16 to 24",
     icon: "piggy",
     basis: "Spending in 2025-26",
-    estimateBasis: "Static saving from removing it for under-25s, 2029-30, UK",
+    estimateBasis: "Spending in 2025, Great Britain, cash terms",
   },
   incapacity_spending_18_24: { label: "Incapacity benefit spending, ages 18 to 24", icon: "trend" },
   review_welfare_saving_2036: {
     label: "Annual welfare saving the review estimates",
     icon: "scale",
     basis: "2026-27 prices, UK; replacement awards, a Youth Allowance and a work allowance included",
-    estimateBasis: "Static, 2029-30: central variant to full removal",
   },
   milburn_welfare_saving_10y: {
     label: "Cumulative welfare savings by 2036-37",
@@ -156,39 +159,32 @@ export const BENCHMARK_SHORT = {
   employer_nics_under_25: {
     label: "Cost of zero employer NI for under-25s",
     icon: "building",
-    basis: "Not a recommendation of the review",
-    estimateBasis: "Static cost, 2029-30, UK",
+    basis: "Gross cost in 2025-26; not a recommendation of the review",
+    estimateBasis: "Gross static cost, 2025-26, UK, cash terms",
   },
   relative_poverty_review: {
     label: "Relative poverty after housing costs, the review estimates",
     icon: "house",
     basis: "Once fully rolled out, with 440,000 more young people in work",
-    estimateBasis: "Static, 2029-30: full removal, no replacement benefit or move into work",
   },
   kept_out_of_poverty: { label: "Kept out of poverty by UC health and/or PIP", icon: "shield" },
   pip_no_extra_costs: { label: "Young PIP claimants reporting no extra costs", icon: "receipt" },
 };
 
 /**
- * Pairs whose two figures count different things, by row id, with the
+ * Pairs whose two figures still count different things, by row id, with the
  * difference in a few words: drawn side by side, with no gap between them
- * (a gap to two decimal places would read as a check on the published
- * figure). The other pairs measure the same thing and keep their gap.
- * A saving's year is the file's own (`policyengine_estimate_year`), never
- * typed here: `differentBasis(id, year)` gives the words.
+ * (a gap would read as a check on the published figure). The other pairs
+ * are like for like (the same ages, area, year and measure) and keep their
+ * gap, to the nearest whole per cent.
  */
-const savingAgainstSpending = (year) => `a saving${Number.isInteger(year) ? ` in ${yearLabel(year)}` : ""} against spending in 2025-26`;
-
 export const DIFFERENT_BASIS = Object.freeze({
-  young_pip_recipients: "ours leaves out 16 and 17-year-olds",
-  pip_spend_16_24: savingAgainstSpending,
-  uc_health_spend_16_24: savingAgainstSpending,
+  young_pip_recipients: "ours is England and Wales in 2025; the published figure is current, for November 2026",
 });
 
-/** How a pair's two figures differ, in a few words, or null for a like-for-like pair; `year` is the estimates' year (the file's). */
-export function differentBasis(id, year) {
-  const words = Object.hasOwn(DIFFERENT_BASIS, id) ? DIFFERENT_BASIS[id] : null;
-  return typeof words === "function" ? words(year) : words;
+/** How a pair's two figures differ, in a few words, or null for a like-for-like pair. */
+export function differentBasis(id) {
+  return Object.hasOwn(DIFFERENT_BASIS, id) ? DIFFERENT_BASIS[id] : null;
 }
 
 /** The icon of a figure with none of its own. */
@@ -277,6 +273,12 @@ export function benchmarkGroups(rows) {
 
 const text = (value) => (typeof value === "string" ? value : "");
 
+/** A row's saving or net cost from a measure, shown apart from the pair: null without a value and a label. */
+function separateFigure(value) {
+  if (!value || typeof value.value !== "string" || !value.value.trim() || typeof value.label !== "string" || !value.label.trim()) return null;
+  return { value: value.value.trim(), label: value.label.trim(), basis: text(value.basis) };
+}
+
 /** The file, checked: null without a list of rows. */
 export function parseBenchmarks(json) {
   if (!json || typeof json !== "object" || !Array.isArray(json.rows)) return null;
@@ -297,6 +299,7 @@ export function parseBenchmarks(json) {
               fixed: row.policyengine_estimate.value.trim(),
               basis: text(row.policyengine_estimate.basis),
               label: text(row.policyengine_estimate.label),
+              note: text(row.policyengine_estimate.note),
             }
           : row.policyengine_estimate && (row.policyengine_estimate.run === "package" || typeof row.policyengine_estimate.reform_id === "string")
           ? {
@@ -306,6 +309,7 @@ export function parseBenchmarks(json) {
               label: text(row.policyengine_estimate.label),
             }
           : null,
+      saving: separateFigure(row.policyengine_saving),
     }));
   return {
     title: text(json.title),

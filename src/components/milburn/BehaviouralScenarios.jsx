@@ -58,8 +58,10 @@ export const SCENARIOS_LABEL = `Assumes ${ENTRY_ASSUMPTION.share} of ${ENTRY_ASS
 /** The lead card's one line: the year, what is removed, and the two runs compared. */
 export const entryDescription = (yearLabel, movers) =>
   `${yearLabel}: the report’s two benefit removals, static and with ${
-    movers === null || movers === undefined ? `${ENTRY_ASSUMPTION.share} of the young people who have them` : `about ${formatPeople(movers)} young people`
-  } moving into work.`;
+    movers === null || movers === undefined
+      ? `${ENTRY_ASSUMPTION.share} of the young people who have them assumed to move into work`
+      : `about ${formatPeople(movers)} young people assumed to move into work (an assumed ${ENTRY_ASSUMPTION.share})`
+  }.`;
 
 /** What the lead card's runs remove, in its folded notes. */
 export const entryRunsNote = (fullName) =>
@@ -104,7 +106,7 @@ export const ENTRY_RUN_HEADING = "What the run changes";
 export function entryRunPoints(movers) {
   const share = `${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group}, chosen at random`;
   return [
-    movers === null || movers === undefined ? `Who moves: ${share}.` : `Who moves: about ${formatPeople(movers)} people, ${share}.`,
+    movers === null || movers === undefined ? `Who moves: an assumed ${share}.` : `Who moves: about ${formatPeople(movers)} people, an assumed ${share}.`,
     `Each moves from no work into ${ENTRY_ASSUMPTION.work}.`,
     "The Exchequer saving then counts the taxes paid on their earnings and any fall in their benefits.",
     "The average loss covers every 16 to 24-year-old in a losing household, whether or not they move.",
@@ -306,12 +308,15 @@ function SourceLink({ href, children }) {
 export const REVIEW_COMPARISON_TITLE = "Beside the review's own estimate";
 
 /** The two exercises' names, on their cards and over the full table's columns. */
-export const OUR_SCENARIO_TITLE = "PolicyEngine: illustrative scenario";
+export const OUR_SCENARIO_TITLE = `PolicyEngine: assumed move into work (${ENTRY_ASSUMPTION.share})`;
 export const REVIEW_MODELLING_TITLE = "The review’s modelling";
 
 /** Said wherever the two figures meet: they are not the same exercise. */
 export const DIFFERENT_EXERCISES_SENTENCE =
   "The two are different exercises, for different years, groups and measures: neither figure is a check on the other.";
+
+/** Why our figure is not drawn beside the review's: it is an assumption, not an estimate. */
+export const ASSUMED_NOT_ESTIMATED_SENTENCE = `Our figure follows from an assumed ${ENTRY_ASSUMPTION.share} moving into work, not an estimate of how many would, so the two are not drawn on one scale.`;
 
 const onePlace = (value) => `${value.toFixed(1)}%`;
 
@@ -331,15 +336,13 @@ function neetRateText(rate) {
  * measures and method, and the report cited. Neither is said to be right.
  */
 export function ReviewComparison({ summary, review, catalogue }) {
-  // On a phone the bars' names wrap, leaving the plot its room
-  const narrow = useNarrowViewport();
   const entry = summaryRun(summary, ENTRY_RUN);
   const movers = entryMovers(entry);
   const yearLabel = fiscalYearTick(summary.year);
   const fullMeasure = catalogue?.byId?.get(DEFAULT_SUMMARY_RUN);
   const fullName = fullMeasure ? shortNameOf(fullMeasure) : DEFAULT_SUMMARY_RUN;
   const { employment, report, neetRate } = review;
-  const ours = { name: `PolicyEngine estimate, ${yearLabel}`, column: OUR_SCENARIO_TITLE };
+  const ours = { column: OUR_SCENARIO_TITLE };
   const theirs = { name: `The review (published), by ${employment.byYear}`, column: REVIEW_MODELLING_TITLE };
   const notRun = "Not yet run";
   // The cards' one-line versions; the full wording is in the table under "Full comparison"
@@ -387,6 +390,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
       title: OUR_SCENARIO_TITLE,
       chip: null,
       figure: movers !== null ? `About ${formatPeople(movers)}` : notRun,
+      caption: `people assumed to move into work: an assumed ${ENTRY_ASSUMPTION.share}, not an estimate`,
       side: "ours",
     },
     {
@@ -394,6 +398,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
       title: REVIEW_MODELLING_TITLE,
       chip: <SourceChip kind="published" source="the review" />,
       figure: `About ${formatPeople(employment.people)}`,
+      caption: "people moving into work, the review estimates",
       side: "theirs",
     },
   ];
@@ -401,7 +406,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
     {
       key: "people",
       label: "People moving into work",
-      ours: movers !== null ? `About ${formatPeople(movers)}` : notRun,
+      ours: movers !== null ? `About ${formatPeople(movers)}, assumed (${ENTRY_ASSUMPTION.share} of the group), not estimated` : notRun,
       theirs: `About ${formatPeople(employment.people)}`,
     },
     { key: "when", label: "When", ours: yearLabel, theirs: `By ${employment.byYear}` },
@@ -416,10 +421,6 @@ export function ReviewComparison({ summary, review, catalogue }) {
     { key: "work", label: "Work assumed", ours: `${ENTRY_ASSUMPTION.work[0].toUpperCase()}${ENTRY_ASSUMPTION.work.slice(1)}`, theirs: employment.hours },
     { key: "neet", label: "NEET rate, 16 to 24-year-olds", ours: "Not modelled", theirs: neetRateText(neetRate) },
   ].filter((row) => row.theirs);
-  const bars = [
-    { name: ours.name, value: movers, label: movers !== null ? formatPeople(movers) : "", color: CHART_COLOURS.after },
-    { name: theirs.name, value: employment.people, label: formatPeople(employment.people), color: CHART_COLOURS.reference },
-  ];
   const csv = () =>
     buildChartCsv({
       title: `${REVIEW_COMPARISON_TITLE}: people moving into work`,
@@ -438,31 +439,11 @@ export function ReviewComparison({ summary, review, catalogue }) {
         id="milburn-review-heading"
         icon="scale"
         title={REVIEW_COMPARISON_TITLE}
-        description={`People moving into work. ${DIFFERENT_EXERCISES_SENTENCE}`}
+        description={`People moving into work. ${DIFFERENT_EXERCISES_SENTENCE} ${ASSUMED_NOT_ESTIMATED_SENTENCE}`}
         name="beside-the-reviews-own-estimate"
         csv={csv}
         after={
           <>
-            <ul className="milburn-versus" aria-label="The two exercises side by side">
-              {cards.map((card) => (
-                <li key={card.key} className={`milburn-versus-card${card.side === "ours" ? " is-estimate" : ""}`} data-side={card.side}>
-                  {card.chip}
-                  <h4>{card.title}</h4>
-                  <p className="milburn-versus-figure">{card.figure}</p>
-                  <p className="milburn-versus-caption">people moving into work</p>
-                  <ul className="milburn-versus-rows">
-                    {cardRows.map((row) => (
-                      <li key={row.key} data-card-row={row.key}>
-                        <TitleIcon name={row.icon} bare size={14} />
-                        <span>
-                          <strong>{row.label}:</strong> {row[card.side]}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
             <details className="milburn-details" data-full-comparison="">
               <summary>
                 <TitleIcon name="list" bare size={14} />
@@ -540,14 +521,27 @@ export function ReviewComparison({ summary, review, catalogue }) {
           </>
         }
       >
-        <div data-single-chart="">
-          <HorizontalBars
-            ariaLabel={`People moving into work. ${ours.name}: ${movers !== null ? `about ${formatPeople(movers)}` : "not yet run"}. ${theirs.name}: about ${formatPeople(employment.people)}. ${DIFFERENT_EXERCISES_SENTENCE}`}
-            format={(value) => (value >= 1000 ? `${value / 1000}k` : String(value))}
-            labelWidth={narrow ? 120 : 196}
-            rows={bars}
-          />
-        </div>
+        {/* Two cards, not bars on one axis: our figure is an assumption, the review's an estimate */}
+        <ul className="milburn-versus" aria-label="The two exercises side by side">
+          {cards.map((card) => (
+            <li key={card.key} className={`milburn-versus-card${card.side === "ours" ? " is-estimate" : ""}`} data-side={card.side}>
+              {card.chip}
+              <h4>{card.title}</h4>
+              <p className="milburn-versus-figure">{card.figure}</p>
+              <p className="milburn-versus-caption">{card.caption}</p>
+              <ul className="milburn-versus-rows">
+                {cardRows.map((row) => (
+                  <li key={row.key} data-card-row={row.key}>
+                    <TitleIcon name={row.icon} bare size={14} />
+                    <span>
+                      <strong>{row.label}:</strong> {row[card.side]}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
       </MilburnChartCard>
     </section>
   );
@@ -879,7 +873,7 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null, gainY
 }
 
 /**
- * Impact's Return to work sub-tab (?sub=scenarios): the full abolition
+ * Impact's Moves into work (illustrative) sub-tab (?sub=scenarios): the full abolition
  * package beside the same package with a quarter of non-working 18 to
  * 24-year-olds with PIP or the health element moving into work,
  * microsimulated (milburn_summary.json); that run beside the review's own
@@ -933,7 +927,7 @@ export default function BehaviouralScenarios({ selectedRun } = {}) {
     <div className="results-container milburn-scenarios">
       <SectionHeading
         icon="sliders"
-        title="Return to work"
+        title="Moves into work (illustrative)"
         subtitle="What changes if some non-working young people with PIP or the health element move into work."
       />
       {/* The assumption, the year it covers and the link to how it was chosen, in one line */}
