@@ -81,6 +81,20 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
         "child_poverty_change_pp_rel_ahc": round(
             float(metrics["child_poverty_rel_ahc_change_pp"]), 3
         ),
+        # Before housing costs: the page's default poverty measure
+        "people_into_poverty_abs_bhc": round(
+            float(metrics["poverty_abs_bhc_change_pp"])
+            / 100
+            * float(ages["all"]["people"])
+        ),
+        "people_into_poverty_rel_bhc": round(
+            float(metrics["poverty_rel_bhc_change_pp"])
+            / 100
+            * float(ages["all"]["people"])
+        ),
+        "child_poverty_change_pp_rel_bhc": round(
+            float(metrics["child_poverty_rel_bhc_change_pp"]), 3
+        ),
     }
     # People whose own earnings or taxes change (calculators.py): the movers
     # in a run with a move into work, none in a static run.

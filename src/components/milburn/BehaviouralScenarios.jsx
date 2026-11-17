@@ -123,8 +123,8 @@ function Point({ icon = "pin", children, ...rest }) {
 
 /** "+0.59pp (about 410,000 people)": the change and its count, either left out when missing. */
 function povertyText(run) {
-  const pp = run.povertyPp.abs_ahc;
-  const count = run.peopleIntoPovertyAbsAhc;
+  const pp = run.povertyPp.abs_bhc;
+  const count = run.peopleIntoPovertyAbs;
   if (pp === null && count === null) return "Not in the summary";
   const people = count !== null ? `about ${formatPeople(count)} people` : "";
   if (pp === null) return people;
@@ -155,7 +155,7 @@ export function EntryComparison({ summary, catalogue }) {
   // A fall in poverty or in the loss is the better outcome; a rise in the saving is
   const tone = (delta, betterWhen) => (delta === null || delta === 0 ? "flat" : Math.sign(delta) === betterWhen ? "more" : "less");
   const savingDelta = difference(entrySaving, fullSaving);
-  const povertyDelta = difference(entry.povertyPp.abs_ahc, full.povertyPp.abs_ahc);
+  const povertyDelta = difference(entry.povertyPp.abs_bhc, full.povertyPp.abs_bhc);
   const lossDelta = difference(entry.averageLossYoung, full.averageLossYoung);
   const rows = [
     {
@@ -173,12 +173,12 @@ export function EntryComparison({ summary, catalogue }) {
     {
       key: "poverty",
       icon: "percent",
-      label: "Absolute poverty after housing costs, all ages",
+      label: "Absolute poverty before housing costs, all ages",
       short: "Absolute poverty rate (pp)",
       full: povertyText(full),
       entry: povertyText(entry),
-      values: [full.povertyPp.abs_ahc, entry.povertyPp.abs_ahc],
-      barLabels: [formatSignedPp(full.povertyPp.abs_ahc), formatSignedPp(entry.povertyPp.abs_ahc)],
+      values: [full.povertyPp.abs_bhc, entry.povertyPp.abs_bhc],
+      barLabels: [formatSignedPp(full.povertyPp.abs_bhc), formatSignedPp(entry.povertyPp.abs_bhc)],
       format: (value) => `${value}pp`,
       delta: povertyDelta === null ? null : formatSignedPp(povertyDelta),
       tone: tone(povertyDelta, -1),

@@ -167,8 +167,8 @@ describe("measure choices", () => {
     // toggles in its popover
     const choices = document.querySelector(".summary-metric-choices");
     expect(choices.previousElementSibling).toHaveClass("chart-header");
-    // Absolute poverty after housing costs by default
-    expect(screen.getByRole("button", { name: /^Options:/ })).toHaveAccessibleName("Options: Absolute · After housing costs · All people");
+    // Absolute poverty before housing costs by default
+    expect(screen.getByRole("button", { name: /^Options:/ })).toHaveAccessibleName("Options: Absolute · Before housing costs · All people");
     fireEvent.click(screen.getByRole("button", { name: /^Options:/ }));
     const choose = (group, option) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: group })).getByRole("radio", { name: option }));
@@ -209,7 +209,7 @@ describe("measure choices", () => {
 describe("povertyMetric and parsePovertyChoice", () => {
   it("keeps the headline column for absolute, before housing costs, everyone", () => {
     expect(povertyMetric(parsePovertyChoice("absolute-bhc-all")).key).toBe("poverty_change_pp");
-    expect(povertyMetric(parsePovertyChoice(null)).key).toBe("poverty_abs_ahc_change_pp");
+    expect(povertyMetric(parsePovertyChoice(null)).key).toBe("poverty_change_pp");
     expect(povertyMetric(parsePovertyChoice("relative-ahc-children")).key).toBe("child_poverty_rel_ahc_change_pp");
     expect(povertyMetric(parsePovertyChoice("absolute-ahc-all")).key).toBe("poverty_abs_ahc_change_pp");
     expect(parsePovertyChoice("nonsense-bhc")).toEqual({ basis: "absolute", housing: "bhc", group: "all" });

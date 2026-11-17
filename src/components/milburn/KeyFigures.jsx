@@ -37,7 +37,7 @@ const RANGE_NAMES = ["No replacement", "Central", "Phased"];
 
 /**
  * The packages' range, whatever run is selected: each package's saving and
- * the people moved into absolute poverty after housing costs, from
+ * the people moved into absolute poverty before housing costs, from
  * milburn_summary.json. A package the file does not list is left out.
  */
 export function packageRange(summary) {
@@ -49,8 +49,8 @@ export function packageRange(summary) {
       name: RANGE_NAMES[index] ?? milburnDisplayName(id, id),
       saving: formatBn(savingInYear(run, summary.year)),
       savingValue: savingInYear(run, summary.year),
-      povertyValue: run.peopleIntoPovertyAbsAhc,
-      poverty: run.peopleIntoPovertyAbsAhc === null ? "" : `about ${formatPeople(run.peopleIntoPovertyAbsAhc)}`,
+      povertyValue: run.peopleIntoPovertyAbs,
+      poverty: run.peopleIntoPovertyAbs === null ? "" : `about ${formatPeople(run.peopleIntoPovertyAbs)}`,
     };
   }).filter(Boolean);
 }
@@ -74,11 +74,11 @@ function RangeStrip({ summary, selectedId }) {
   const csv = () =>
     buildChartCsv({
       title,
-      units: "Exchequer saving in £bn; people moved into absolute poverty after housing costs",
+      units: "Exchequer saving in £bn; people moved into absolute poverty before housing costs",
       columns: [
         { key: "name", label: "Package" },
         { key: "savingValue", label: "Exchequer saving (£bn)", decimals: 3 },
-        { key: "povertyValue", label: "People into absolute poverty after housing costs", decimals: 0 },
+        { key: "povertyValue", label: "People into absolute poverty before housing costs", decimals: 0 },
       ],
       rows,
     });
@@ -99,7 +99,7 @@ function RangeStrip({ summary, selectedId }) {
               <tr>
                 <th scope="col">Package</th>
                 <th scope="col">Exchequer saving</th>
-                <th scope="col">Into absolute poverty (after housing costs)</th>
+                <th scope="col">Into absolute poverty (before housing costs)</th>
               </tr>
             </thead>
             <tbody>
@@ -124,9 +124,9 @@ function RangeStrip({ summary, selectedId }) {
             rows={rows.map((row) => ({ name: row.name, value: row.savingValue, label: row.saving, color: CHART_COLOURS.gain, faded: faded(row) }))}
           />
         </ChartPanel>
-        <ChartPanel icon="percent" title="People into absolute poverty, after housing costs">
+        <ChartPanel icon="percent" title="People into absolute poverty, before housing costs">
           <HorizontalBars
-            ariaLabel={`People moved into absolute poverty after housing costs by package: ${rows.map((row) => `${row.name} ${row.poverty}`).join(", ")}`}
+            ariaLabel={`People moved into absolute poverty before housing costs by package: ${rows.map((row) => `${row.name} ${row.poverty}`).join(", ")}`}
             format={(value) => (Math.abs(value) >= 1000 ? `${value / 1000}k` : String(value))}
             labelWidth={96}
             rows={rows.map((row) => ({ name: row.name, value: row.povertyValue, label: row.poverty, color: CHART_COLOURS.loss, faded: faded(row) }))}
@@ -139,10 +139,10 @@ function RangeStrip({ summary, selectedId }) {
 
 /** The relative poverty figure as one footnote sentence, or null when the run carries none. */
 export function relativePovertySentence(run) {
-  const count = run?.peopleIntoPovertyRelAhc;
+  const count = run?.peopleIntoPovertyRel;
   if (count === null || count === undefined) return null;
-  const pp = run.povertyPp.rel_ahc;
-  return `Relative poverty (60% of median, after housing costs): ${formatPeople(count)} people move ${count >= 0 ? "into" : "out of"} it${pp !== null ? ` (${formatSignedPp(pp)})` : ""}.`;
+  const pp = run.povertyPp.rel_bhc;
+  return `Relative poverty (60% of median, before housing costs): ${formatPeople(count)} people move ${count >= 0 ? "into" : "out of"} it${pp !== null ? ` (${formatSignedPp(pp)})` : ""}.`;
 }
 
 /**
@@ -199,10 +199,10 @@ export function keyFigureTiles(run, year) {
   };
   povertyTile(
     "poverty-abs",
-    run.peopleIntoPovertyAbsAhc,
-    run.povertyPp.abs_ahc,
+    run.peopleIntoPovertyAbs,
+    run.povertyPp.abs_bhc,
     "absolute",
-    "After housing costs, all ages.",
+    "Before housing costs, all ages.",
   );
   return tiles;
 }

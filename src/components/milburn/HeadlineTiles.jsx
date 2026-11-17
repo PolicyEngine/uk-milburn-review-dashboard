@@ -16,12 +16,12 @@ import { packageRange, STATIC_NOTE } from "./KeyFigures";
 import { YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
-/** The four poverty lines the summary carries, absolute after housing costs first. */
+/** The four poverty lines the summary carries, absolute before housing costs first. */
 export const POVERTY_LINES = [
-  { key: "abs_ahc", label: "Absolute, after housing costs", icon: "house" },
   { key: "abs_bhc", label: "Absolute, before housing costs", icon: "wallet" },
-  { key: "rel_ahc", label: "Relative, after housing costs", icon: "house" },
+  { key: "abs_ahc", label: "Absolute, after housing costs", icon: "house" },
   { key: "rel_bhc", label: "Relative, before housing costs", icon: "wallet" },
+  { key: "rel_ahc", label: "Relative, after housing costs", icon: "house" },
 ];
 
 /** A share of the largest figure in a set, for a bar's width ("62%"); 0% with nothing to compare. */
@@ -121,30 +121,30 @@ export function PovertyHeadline({ runId }) {
     <section className="report-section milburn-key card" aria-label="Poverty headline">
       <Heading title="Poverty at a glance" name={name} onlyYear={summary.year} />
       <ul className="milburn-key-tiles" aria-label="Figures">
-        {run.peopleIntoPovertyAbsAhc !== null && (
+        {run.peopleIntoPovertyAbs !== null && (
           <Tile
             icon="usersRound"
-            value={formatPeople(run.peopleIntoPovertyAbsAhc)}
-            extra={formatSignedPp(run.povertyPp.abs_ahc)}
-            label={`People ${direction(run.peopleIntoPovertyAbsAhc)} absolute poverty`}
-            note="After housing costs; line fixed in real terms."
+            value={formatPeople(run.peopleIntoPovertyAbs)}
+            extra={formatSignedPp(run.povertyPp.abs_bhc)}
+            label={`People ${direction(run.peopleIntoPovertyAbs)} absolute poverty`}
+            note="Before housing costs; line fixed in real terms."
           />
         )}
-        {run.peopleIntoPovertyRelAhc !== null && (
+        {run.peopleIntoPovertyRel !== null && (
           <Tile
             icon="scale"
-            value={formatPeople(run.peopleIntoPovertyRelAhc)}
-            extra={formatSignedPp(run.povertyPp.rel_ahc)}
-            label={`People ${direction(run.peopleIntoPovertyRelAhc)} relative poverty`}
-            note="After housing costs; line moves with the median."
+            value={formatPeople(run.peopleIntoPovertyRel)}
+            extra={formatSignedPp(run.povertyPp.rel_bhc)}
+            label={`People ${direction(run.peopleIntoPovertyRel)} relative poverty`}
+            note="Before housing costs; line moves with the median."
           />
         )}
-        {run.childPovertyPpRelAhc !== null && (
+        {run.childPovertyPpRel !== null && (
           <Tile
             icon="cake"
-            value={formatSignedPp(run.childPovertyPpRelAhc)}
+            value={formatSignedPp(run.childPovertyPpRel)}
             label="Child poverty rate"
-            note="Relative, after housing costs."
+            note="Relative, before housing costs."
           />
         )}
       </ul>

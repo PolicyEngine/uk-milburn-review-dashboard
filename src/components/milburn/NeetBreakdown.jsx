@@ -25,15 +25,16 @@ export function formatChange(value) {
 }
 
 const ROWS = [
-  { key: "population", label: "People", format: formatPeople },
-  { key: "share_in_losing_households_pct", label: "Share in households that lose", format: formatSharePct, bar: true },
+  { key: "population", label: "People", icon: "users", format: formatPeople },
+  { key: "share_in_losing_households_pct", label: "Share in households that lose", icon: "percent", format: formatSharePct, bar: true },
   {
     key: "average_change_in_household_net_income",
     label: "Average change in household net income, a year",
+    icon: "wallet",
     format: formatChange,
   },
-  { key: "people_losing_uc_health_or_pip", label: "People losing the UC health element or PIP", format: formatPeople },
-  { key: "share_losing_uc_health_or_pip_pct", label: "Share losing the UC health element or PIP", format: formatSharePct, bar: true },
+  { key: "people_losing_uc_health_or_pip", label: "People losing the UC health element or PIP", icon: "user", format: formatPeople },
+  { key: "share_losing_uc_health_or_pip_pct", label: "Share losing the UC health element or PIP", icon: "scale", format: formatSharePct, bar: true },
 ];
 
 function Figure({ value, format, bar }) {
@@ -56,7 +57,7 @@ function CountLine({ neet, benchmark }) {
   const share = neet.shareOfYoung === null ? "" : ` (${number(neet.shareOfYoung, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}% of 16–24s)`;
   const source = benchmark ? shortSource(benchmark.source) : "";
   return (
-    <p className="neet-breakdown-count" data-neet-count="">
+    <span className="neet-breakdown-count" data-neet-count="">
       Our approximation counts {formatPeople(neet.total)} people aged 16 to 24 as NEET in {yearLabel(neet.year)}
       {share}.
       {benchmark?.value && (
@@ -76,7 +77,7 @@ function CountLine({ neet, benchmark }) {
           , on a different definition.
         </>
       )}
-    </p>
+    </span>
   );
 }
 
@@ -92,7 +93,7 @@ export default function NeetBreakdown({ selectedPolicies = [] }) {
   const { status, neet, benchmark } = useNeetBreakdown({ enabled: selected !== null });
   if (selected === null || status !== "ready" || neet.reformId !== selected) return null;
   const year = yearLabel(neet.year);
-  const description = `The report package's effect on 16 to 24-year-olds not in education, employment or training (${NEET_DEFINITION_LINE}), beside other 16 to 24-year-olds, ${year}.`;
+  const description = `The report package's effect on NEET 16 to 24-year-olds, beside other 16 to 24-year-olds, ${year}.`;
   return (
     <section className="report-section neet-breakdown" aria-label={NEET_TITLE} data-neet-breakdown="">
       {/* The card's frame comes from the stack, as the other tabs' cards */}
@@ -102,22 +103,21 @@ export default function NeetBreakdown({ selectedPolicies = [] }) {
         title={NEET_TITLE}
         description={description}
         after={
-          <>
-            <CountLine neet={neet} benchmark={benchmark} />
-            {neet.notes.length > 0 && (
-              <details className="milburn-details">
-                <summary>
-                  <TitleIcon name="alert" bare size={14} />
-                  More info
-                </summary>
-                <ul>
-                  {neet.notes.map((note) => (
-                    <li key={note}>{note}</li>
-                  ))}
-                </ul>
-              </details>
-            )}
-          </>
+          <details className="milburn-details">
+            <summary>
+              <TitleIcon name="alert" bare size={14} />
+              More info
+            </summary>
+            <ul>
+              <li>NEET is {NEET_DEFINITION_LINE}.</li>
+              <li>
+                <CountLine neet={neet} benchmark={benchmark} />
+              </li>
+              {neet.notes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          </details>
         }
       >
         <div className="milburn-table-wrap">
@@ -138,7 +138,12 @@ export default function NeetBreakdown({ selectedPolicies = [] }) {
             <tbody>
               {ROWS.map((row) => (
                 <tr key={row.key} data-neet-row={row.key}>
-                  <th scope="row">{row.label}</th>
+                  <th scope="row">
+                    <span className="neet-breakdown-rowlabel">
+                      <TitleIcon name={row.icon} bare size={15} />
+                      {row.label}
+                    </span>
+                  </th>
                   {NEET_GROUPS.map((group) => (
                     <td key={group.key}>
                       <Figure value={neet.groups[group.key][row.key]} format={row.format} bar={row.bar} />

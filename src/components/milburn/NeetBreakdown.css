@@ -56,3 +56,15 @@
 .neet-breakdown .milburn-details li + li {
   margin-top: 6px;
 }
+
+/* Row labels with an icon (Vahid, 17 Nov) */
+.neet-breakdown-rowlabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.neet-breakdown-rowlabel svg {
+  flex: none;
+  color: var(--c-gain-text);
+}

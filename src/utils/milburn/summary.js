@@ -9,8 +9,8 @@
  *     average_loss_young_person_in_losing_household,
  *     everyone_in_losing_households_pct,
  *     poverty_change_pp: { rel_bhc, rel_ahc, abs_bhc, abs_ahc },
- *     people_into_poverty_abs_ahc, people_into_poverty_rel_ahc,
- *     child_poverty_change_pp_rel_ahc,
+ *     people_into_poverty_abs_bhc, people_into_poverty_rel_bhc,
+ *     child_poverty_change_pp_rel_bhc,
  *     break_even_share_in_work_pct: { h16, h25 },
  *     entrants_to_match_income_loss: { h16, h25 },
  *     exchequer_gain_per_entrant: { h16, h25 }, people_directly_affected,
@@ -101,9 +101,10 @@ export function parseSummaryRun(run) {
     averageLossYoung: averageLoss,
     everyoneLosingPct: finite(run.everyone_in_losing_households_pct),
     povertyPp: pick(run.poverty_change_pp, ["rel_bhc", "rel_ahc", "abs_bhc", "abs_ahc"]),
-    peopleIntoPovertyAbsAhc: finite(run.people_into_poverty_abs_ahc),
-    peopleIntoPovertyRelAhc: finite(run.people_into_poverty_rel_ahc),
-    childPovertyPpRelAhc: finite(run.child_poverty_change_pp_rel_ahc),
+    // Before housing costs: the page's default poverty measure
+    peopleIntoPovertyAbs: finite(run.people_into_poverty_abs_bhc),
+    peopleIntoPovertyRel: finite(run.people_into_poverty_rel_bhc),
+    childPovertyPpRel: finite(run.child_poverty_change_pp_rel_bhc),
     breakEvenSharePct: pick(run.break_even_share_in_work_pct, HOURS_KEYS),
     entrantsToMatch: pick(run.entrants_to_match_income_loss, HOURS_KEYS),
     exchequerGainPerEntrant: pick(run.exchequer_gain_per_entrant, HOURS_KEYS),
@@ -223,13 +224,15 @@ export function useMilburnSummary(refresh, { basePath = process.env.NEXT_PUBLIC_
   return enabled ? state : { status: "unavailable", summary: null };
 }
 
-/** The poverty measure the summary counts directly: absolute, after housing costs, all people. */
-export const DIRECT_COUNT_METRIC = "poverty_abs_ahc_change_pp";
+/** The poverty measure the summary counts directly: absolute, before housing costs, all people. */
+export const DIRECT_COUNT_METRIC = "poverty_change_pp";
+// The same measure under its own name: the default choice reads the headline column
+const DIRECT_COUNT_KEYS = new Set([DIRECT_COUNT_METRIC, "poverty_abs_bhc_change_pp"]);
 
 /**
  * The summary's direct count of people moved into poverty, as
- * count(runId, year, metricKey): the run's people_into_poverty_abs_ahc
- * (negative: out of poverty) for absolute poverty after housing costs in
+ * count(runId, year, metricKey): the run's people_into_poverty_abs_bhc
+ * (negative: out of poverty) for absolute poverty before housing costs in
  * the summary's year, else null. So a poverty card that would otherwise
  * multiply the rate's change by the population reads the same count as
  * Key figures. Null without a summary.
@@ -237,8 +240,8 @@ export const DIRECT_COUNT_METRIC = "poverty_abs_ahc_change_pp";
 export function summaryPovertyCount(summary) {
   if (!summary?.runs) return null;
   return (runId, year, metricKey) => {
-    if (metricKey !== DIRECT_COUNT_METRIC || Number(year) !== summary.year) return null;
-    return finite(summary.runs.get(runId)?.peopleIntoPovertyAbsAhc);
+    if (!DIRECT_COUNT_KEYS.has(metricKey) || Number(year) !== summary.year) return null;
+    return finite(summary.runs.get(runId)?.peopleIntoPovertyAbs);
   };
 }
 

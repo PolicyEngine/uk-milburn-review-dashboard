@@ -280,32 +280,21 @@ function StatTile({ row, estimate, yearLabel }) {
   const ours = hasEstimate ? short.estimateBasis ?? (row.estimate.fixed ? oursLabel(row.estimate.label) : row.estimate.label) : "";
   return (
     <li className={`bm-tile${published.value ? "" : " is-estimate"}`} data-benchmark={row.id}>
-      <div className="bm-tile-head">
-        <span className="bm-tile-icon" aria-hidden="true">
-          <TitleIcon name={short.icon ?? BENCHMARK_ICON} bare size={20} />
-        </span>
-        {published.value ? (
-          <p className="bm-figure">
-            {/* Whose figure, only where the tile carries two */}
-            {hasEstimate && (
-              <span className="bm-kicker">
-                <TitleIcon name="fileText" bare size={12} /> Published
-              </span>
-            )}
-            <Value value={published.value} />
-          </p>
-        ) : (
-          hasEstimate && (
-            <p className="bm-figure is-estimate">
-              {estimateKicker}
-              {estimateValue}
-            </p>
-          )
-        )}
-      </div>
-      <h4 title={row.figure}>{short.label ?? row.figure}</h4>
-      {published.value && hasEstimate && (
-        <p className="bm-figure is-estimate is-second">
+      {/* Laid out as the comparison panels (Vahid, 17 Nov): icon and title, the figure in a band, its graphic */}
+      <h4 title={row.figure}>
+        <TitleIcon name={short.icon ?? BENCHMARK_ICON} />
+        <span className="title-text">{short.label ?? row.figure}</span>
+      </h4>
+      {published.value && (
+        <p className="bm-figure">
+          <span className="bm-kicker">
+            <TitleIcon name="fileText" bare size={12} /> Published
+          </span>
+          <Value value={published.value} />
+        </p>
+      )}
+      {hasEstimate && (
+        <p className="bm-figure is-estimate">
           {estimateKicker}
           {estimateValue}
         </p>

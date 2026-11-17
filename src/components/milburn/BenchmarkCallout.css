@@ -17,7 +17,7 @@
 
 /* Published figures as small cards (PublishedCards): icon tile, value, title, basis, source chip */
 .pub-cards {
-  margin: 12px 0 0;
+  margin: 14px 0 0;
   padding: 0;
   list-style: none;
   display: grid;
@@ -28,12 +28,18 @@
 .pub-card {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
-  padding: 16px;
+  padding: 18px 18px 14px;
   border: 1px solid var(--c-grid);
-  border-radius: 10px;
+  border-left: 3px solid var(--c-gain);
+  border-radius: 12px;
   background: var(--c-surface);
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.pub-card:hover {
+  border-color: var(--c-gain);
 }
 
 .pub-card-icon {
@@ -64,13 +70,12 @@
 
 .pub-card-value {
   color: var(--c-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .pub-card-value strong {
-  font-size: 1.25rem;
+  color: var(--c-gain-text);
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -84,26 +89,20 @@
   font-size: var(--fs-small);
   font-weight: 600;
   color: var(--c-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .pub-card-basis {
   font-size: var(--fs-caption);
+  line-height: 1.5;
   color: var(--c-axis-title);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
 }
 
 .pub-card p.pub-card-source {
   display: flex;
   min-width: 0;
   margin-top: auto;
-  padding-top: 6px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--c-grid);
 }
 
 .bm-callout a:focus-visible {
@@ -176,26 +175,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .bm-callout-summary,
-  .bm-callout-chevron {
+  .bm-callout-chevron,
+  .pub-card {
     transition: none;
   }
 }
 
 /* On a phone: the title may take two lines, and the source chip the card's full width under the icon */
 @media (max-width: 480px) {
-  .pub-card-label {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    white-space: normal;
-  }
-
-  .pub-card-basis {
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-  }
-
   .pub-card p.pub-card-source {
     margin-left: -48px;
   }

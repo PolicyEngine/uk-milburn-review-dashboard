@@ -124,8 +124,8 @@ export const POVERTY_CHOICES = [
 // Absolute poverty after housing costs by default: the absolute line is
 // fixed in real terms, while the relative line (60% of the median) moves
 // with the measures' own effect on the median
-export const POVERTY_DEFAULT = { basis: "absolute", housing: "ahc", group: "all" };
-const POVERTY_DEFAULT_TEXT = "absolute-ahc-all";
+export const POVERTY_DEFAULT = { basis: "absolute", housing: "bhc", group: "all" };
+const POVERTY_DEFAULT_TEXT = "absolute-bhc-all";
 
 const POVERTY_LINES = {
   absolute: "the absolute poverty line (60% of 2024-25 median income, constant in real terms)",

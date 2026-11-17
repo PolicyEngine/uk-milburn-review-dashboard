@@ -20,7 +20,9 @@
         "abs_ahc": 0.5
       },
       "people_into_poverty_rel_ahc": 150000,
+      "people_into_poverty_rel_bhc": 130000,
       "child_poverty_change_pp_rel_ahc": 0.4,
+      "child_poverty_change_pp_rel_bhc": 0.35,
       "break_even_share_in_work_pct": {
         "h16": 109.9,
         "h25": 87.9
@@ -33,7 +35,8 @@
         "h16": 4000.0,
         "h25": 9000.0
       },
-      "people_into_poverty_abs_ahc": 300000
+      "people_into_poverty_abs_ahc": 300000,
+      "people_into_poverty_abs_bhc": 280000
     },
     {
       "id": "milburn_package_entry_25pct",
@@ -49,8 +52,10 @@
         "rel_ahc": 0.1
       },
       "people_into_poverty_rel_ahc": 80000,
+      "people_into_poverty_rel_bhc": 70000,
       "people_directly_affected": 70400,
-      "child_poverty_change_pp_rel_ahc": 0.2
+      "child_poverty_change_pp_rel_ahc": 0.2,
+      "child_poverty_change_pp_rel_bhc": 0.15
     },
     {
       "id": "youth_allowance_at_25_plus_rate",
@@ -63,12 +68,17 @@
       "share_of_16_24_in_losing_households_pct": 15.0,
       "average_loss_young_person_in_losing_household": -1100,
       "poverty_change_pp": {
+        "rel_bhc": -0.12,
         "rel_ahc": -0.14,
+        "abs_bhc": -0.13,
         "abs_ahc": -0.16
       },
       "people_into_poverty_rel_ahc": -99000,
+      "people_into_poverty_rel_bhc": -88000,
       "child_poverty_change_pp_rel_ahc": -0.18,
-      "people_into_poverty_abs_ahc": -120000
+      "child_poverty_change_pp_rel_bhc": -0.15,
+      "people_into_poverty_abs_ahc": -120000,
+      "people_into_poverty_abs_bhc": -110000
     }
   ]
 }

@@ -184,6 +184,9 @@
   display: grid;
   gap: 2px;
   min-width: 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--c-highlight-band);
 }
 
 .bm-kicker {
@@ -207,7 +210,7 @@
 }
 
 .bm-value-main {
-  font-size: var(--fs-xl);
+  font-size: var(--fs-section);
   font-weight: 700;
   color: var(--c-ink);
   font-variant-numeric: tabular-nums;
@@ -227,29 +230,33 @@
 /* Two dated points as bars from zero */
 .bm-range {
   display: grid;
-  gap: 6px;
+  gap: 10px;
+  padding: 4px 0;
 }
 
 .bm-range-row {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 52px;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
-  font-size: var(--fs-micro);
+  font-size: var(--fs-caption);
   color: var(--c-axis-title);
   font-variant-numeric: tabular-nums;
 }
 
+.bm-range-label {
+  text-align: right;
+}
+
 .bm-range-track {
-  height: 10px;
-  border-radius: 5px;
-  background: var(--c-muted-fill);
+  height: 24px;
+  border-left: 1px solid var(--c-grid);
 }
 
 .bm-range-fill {
   display: block;
   height: 100%;
-  border-radius: 5px;
+  border-radius: 0 4px 4px 0;
   background: var(--c-before);
 }
 

@@ -65,8 +65,9 @@ describe("NeetBreakdown", () => {
     serve({ [NEET_FILE]: FIXTURE, [BENCHMARKS_FILE]: BENCHMARKS });
     const { container } = render(<NeetBreakdown selectedPolicies={[NEET_RUN]} />);
     await screen.findByRole("heading", { name: NEET_TITLE });
-    expect(container.querySelector(".chart-description").textContent).toContain(NEET_DEFINITION_LINE);
+    expect(container.querySelector(".chart-description").textContent).toContain("NEET 16 to 24-year-olds");
     expect(container.querySelector(".chart-description").textContent).toContain("2029-30");
+    expect(container.querySelector("details").textContent).toContain(NEET_DEFINITION_LINE);
     const cells = (key) => [...container.querySelectorAll(`[data-neet-row="${key}"] td`)].map((cell) => cell.textContent);
     expect(cells("population")).toEqual(["1,235,000", "6,000,000"]);
     expect(cells("share_in_losing_households_pct")).toEqual(["21.50%", "4.25%"]);
@@ -115,7 +116,8 @@ describe("NeetBreakdown", () => {
     const details = container.querySelector("details");
     expect(details.open).toBe(false);
     expect(details.querySelector("summary").textContent).toBe("More info");
-    expect([...details.querySelectorAll("li")].map((item) => item.textContent)).toEqual([
+    expect(details.querySelector("[data-neet-count]")).not.toBeNull();
+    expect([...details.querySelectorAll("li")].slice(2).map((item) => item.textContent)).toEqual([
       "The survey data has no NEET flag.",
       "Thin cells are withheld.",
     ]);

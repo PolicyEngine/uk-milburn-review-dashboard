@@ -203,11 +203,11 @@ describe("key figure tiles", () => {
     expect(byKey.young.label).toContain("households that lose");
     expect(byKey.young.definition).toContain("Includes siblings, partners");
     expect(byKey.loss.label).toBe("Their average household loss");
-    // Absolute poverty after housing costs only: relative poverty is a
+    // Absolute poverty before housing costs only: relative poverty is a
     // footnote, and there is no child poverty tile
     expect(tiles.map((tile) => tile.key)).toEqual(["saving", "young", "loss", "poverty-abs"]);
     expect(byKey["poverty-abs"].label).toBe("People into absolute poverty");
-    expect(byKey["poverty-abs"].value).toBe("300,000");
+    expect(byKey["poverty-abs"].value).toBe("280,000");
   });
 
   it("label a gain run's figures as gains and a cost", () => {
@@ -219,7 +219,7 @@ describe("key figure tiles", () => {
     expect(byKey.loss.label).toBe("Their average household gain");
     expect(byKey.loss.value).toBe("£1,100");
     expect(byKey["poverty-abs"].label).toBe("People out of absolute poverty");
-    expect(byKey["poverty-abs"].extra).toBe("−0.16pp");
+    expect(byKey["poverty-abs"].extra).toBe("−0.13pp");
   });
 });
 
@@ -246,7 +246,7 @@ describe("KeyFigures", () => {
     // An upper bound on losses, never said of the saving
     expect(region.textContent).not.toMatch(/\(upper bound\)|upper bound on the saving/i);
     expect(region.textContent).toContain(RELATIVE_LINE_NOTE);
-    expect(region.textContent).toContain("Relative poverty (60% of median, after housing costs): 150,000 people move into it (+0.20pp).");
+    expect(region.textContent).toContain("Relative poverty (60% of median, before housing costs): 130,000 people move into it (+0.30pp).");
     expect(region.textContent).toContain(REPLACEMENT_NOT_MODELLED_NOTE);
     expect(region.textContent).toContain(REPLACEMENT_PARTS_NOTE);
     // A package is shown above: it is the one picked out in the range
@@ -268,7 +268,7 @@ describe("KeyFigures", () => {
     const rows = within(strip).getAllByRole("row");
     // The fixture lists only the full package: the others are left out
     expect(rows).toHaveLength(2);
-    expect(rows[1].textContent).toBe("No replacement£4.00bnabout 300,000");
+    expect(rows[1].textContent).toBe("No replacement£4.00bnabout 280,000");
     // Not a package: no row is picked out, and nothing is said to be selected
     const region = screen.getByRole("region", { name: "Key figures" });
     expect(region.textContent).toContain(RANGE_WITHOUT_SELECTION);
@@ -311,9 +311,9 @@ describe("headline tiles", () => {
       </MeasureCatalogueProvider>,
     );
     const poverty = await screen.findByRole("region", { name: "Poverty headline" });
-    expect(poverty.textContent).toContain("300,000");
-    expect(poverty.textContent).toContain("+0.50pp");
-    expect(poverty.textContent).toContain("150,000");
+    expect(poverty.textContent).toContain("280,000");
+    expect(poverty.textContent).toContain("+0.40pp");
+    expect(poverty.textContent).toContain("130,000");
     // Static and rounding: once, in the folded notes; no estimate or policy chip in the heading
     expect(poverty.textContent.match(/Static/g)).toHaveLength(1);
     expect(poverty.querySelector("details[data-notes] > summary").textContent).toBe("Notes and caveats");
@@ -389,9 +389,9 @@ describe("the published summary", () => {
 
   it("gives the packages' range: no replacement, central and phased", () => {
     expect(packageRange(published).map(({ name, saving, poverty }) => [name, saving, poverty])).toEqual([
-      ["No replacement", "£4.67bn", "about 391,000"],
-      ["Central", "£2.64bn", "about 277,000"],
-      ["Phased", "£3.77bn", "about 317,000"],
+      ["No replacement", "£4.67bn", "about 342,000"],
+      ["Central", "£2.64bn", "about 99,000"],
+      ["Phased", "£3.77bn", "about 246,000"],
     ]);
   });
 
@@ -427,8 +427,8 @@ describe("the published summary", () => {
     const rows = within(screen.getByRole("table")).getAllByRole("row");
     expect(rows[1].textContent).toContain("£4.67bn");
     expect(rows[1].textContent).toContain("£4.80bn");
-    expect(rows[2].textContent).toContain("+0.56pp (about 391,000 people)");
-    expect(rows[2].textContent).toContain("+0.34pp (about 240,000 people)");
+    expect(rows[2].textContent).toContain("+0.49pp (about 342,000 people)");
+    expect(rows[2].textContent).toContain("+0.25pp (about 176,000 people)");
     expect(rows[3].textContent).toContain("£12,962");
     expect(rows[3].textContent).toContain("£11,586");
   });
@@ -438,24 +438,24 @@ describe("the poverty card's direct count", () => {
   const published = parseSummary(JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8")));
   const count = summaryPovertyCount(published);
 
-  it("reads the summary's count for absolute poverty after housing costs in its year only", () => {
+  it("reads the summary's count for absolute poverty before housing costs in its year only", () => {
     expect(published.year).toBe(2029);
-    expect(count("milburn_package", 2029, "poverty_abs_ahc_change_pp")).toBe(390685);
-    expect(count("milburn_package", 2028, "poverty_abs_ahc_change_pp")).toBeNull();
-    expect(count("milburn_package", 2027, "poverty_abs_ahc_change_pp")).toBeNull();
+    expect(count("milburn_package", 2029, "poverty_abs_bhc_change_pp")).toBe(342299);
+    expect(count("milburn_package", 2028, "poverty_abs_bhc_change_pp")).toBeNull();
+    expect(count("milburn_package", 2027, "poverty_abs_bhc_change_pp")).toBeNull();
     expect(count("milburn_package", 2029, "poverty_rel_ahc_change_pp")).toBeNull();
-    expect(count("not_a_run", 2029, "poverty_abs_ahc_change_pp")).toBeNull();
+    expect(count("not_a_run", 2029, "poverty_abs_bhc_change_pp")).toBeNull();
     expect(summaryPovertyCount(null)).toBeNull();
   });
 
   it("replaces pp × population in the card's bars, so it reads the summary's own count as Key figures do", () => {
-    // +0.559pp of about 70m people would be 391,300; the summary counts 390,685
-    const measures = [{ id: "milburn_package", name: "Package", value: 0.559, colour: "" }];
+    // +0.490pp of about 70m people would be 343,000; the summary counts 342,299
+    const measures = [{ id: "milburn_package", name: "Package", value: 0.49, colour: "" }];
     const scaled = povertyWaterfall(measures, null, 70);
-    expect(Math.round(-scaled.steps[0].x)).toBe(391300);
-    const direct = povertyWaterfall(measures, null, 70, [], (id) => count(id, 2029, "poverty_abs_ahc_change_pp"));
-    expect(direct.steps[0].x).toBe(-390685);
-    expect(formatPeople(-direct.steps[0].x)).toBe("391,000");
+    expect(Math.round(-scaled.steps[0].x)).toBe(343000);
+    const direct = povertyWaterfall(measures, null, 70, [], (id) => count(id, 2029, "poverty_abs_bhc_change_pp"));
+    expect(direct.steps[0].x).toBe(-342299);
+    expect(formatPeople(-direct.steps[0].x)).toBe("342,000");
   });
 });
 
@@ -468,7 +468,7 @@ describe("EntryComparison", () => {
     expect(rows[1].textContent).toContain("£4.00bn");
     expect(rows[1].textContent).toContain("£3.00bn");
     // The entry run carries no absolute poverty figure: said, never zero
-    expect(rows[2].textContent).toContain("+0.50pp (about 300,000 people)");
+    expect(rows[2].textContent).toContain("+0.40pp (about 280,000 people)");
     expect(rows[2].textContent).toContain("Not in the summary");
     expect(rows[3].textContent).toContain("£12,000");
     expect(rows[3].textContent).toContain("£9,000");

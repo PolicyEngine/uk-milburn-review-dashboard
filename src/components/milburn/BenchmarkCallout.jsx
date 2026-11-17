@@ -117,11 +117,11 @@ export function PublishedCards({ items, ariaLabel }) {
               <strong>{item.main}</strong>
               {item.qualifier && <span className="pub-card-qualifier"> {item.qualifier}</span>}
             </p>
-            <p className="pub-card-label" title={item.label}>
+            <p className="pub-card-label">
               {item.label}
             </p>
             {item.basis && (
-              <p className="pub-card-basis" title={item.basisTitle || item.basis}>
+              <p className="pub-card-basis" title={item.basisTitle || undefined}>
                 {item.basis}
               </p>
             )}
