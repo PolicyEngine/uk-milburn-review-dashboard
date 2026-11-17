@@ -31,6 +31,17 @@
   color: var(--c-axis-title);
 }
 
+/* A choice switches at once: the shared tiles fade their background but
+   not their text, so for a moment the new choice's white label sat on a
+   white tile and the old one still looked chosen */
+.milburn-household .choice-segmented .choice-tile {
+  transition: border-color var(--pe-transition-fast);
+}
+
+.milburn-waterfall-note {
+  margin: 8px 0 0;
+}
+
 .milburn-runs-note {
   margin: 12px 0 0;
 }

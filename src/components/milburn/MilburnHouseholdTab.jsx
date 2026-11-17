@@ -252,6 +252,29 @@ function runViews(results) {
 }
 
 /**
+ * What the PIP removal's step includes beyond the PIP itself, in one line
+ * under the waterfall, or null: its change on its own less the PIP the
+ * household loses. A young single renter on PIP daily living is exempt
+ * from the shared accommodation rate, so the step can include a fall in
+ * Universal Credit's housing element; that is said when the amounts match,
+ * any other difference only as other benefits.
+ */
+export function pipKnockOn(view) {
+  const part = (view.byPolicy?.measures ?? []).find((measure) => /\bPIP\b/.test(measure.name ?? ""));
+  const pip = (view.programmes ?? []).find((row) => row.id === "pip");
+  if (!part || !pip) return null;
+  const extra = part.change - pip.change;
+  if (Math.round(extra) === 0) return null;
+  const uc = (view.programmes ?? []).find((row) => row.id === "universal_credit");
+  const housing = uc?.children?.find((child) => child.id === "uc_housing_costs_element")?.change ?? 0;
+  const name = shortPart(part.name);
+  if (Math.abs(extra - housing) < 1) {
+    return `${name} (${formatSignedPounds(part.change)}) includes ${formatSignedPounds(extra)} from Universal Credit's housing element: without PIP daily living, a young single renter is paid the shared accommodation rate.`;
+  }
+  return `${name} (${formatSignedPounds(part.change)}) includes ${formatSignedPounds(extra)} from changes to other benefits, besides the PIP itself.`;
+}
+
+/**
  * The result: the Budget calculator's result card (three tiles, then the
  * waterfall from net income under current law through the package's two
  * removals), with the package's change as "Your change": the one run the
@@ -265,6 +288,7 @@ function ResultCard({ views }) {
     ? policyRows(pkg.byPolicy, totals.change, [], YEAR).rows.map((row) => ({ ...row, label: shortPart(row.name) }))
     : null;
   const share = totals.before > 0 ? (totals.change / totals.before) * 100 : null;
+  const knockOn = pipKnockOn(pkg);
   return (
     <section className={`card result-card ${changeClass(totals.change)}`} aria-label="Your result">
       <div className="forecast-tiles position-tiles result-tiles">
@@ -304,6 +328,11 @@ function ResultCard({ views }) {
           title="How each removal changes your income"
           afterName="With the removals"
         />
+        {knockOn && (
+          <p className="single-year-quiet milburn-waterfall-note" data-note="pip-knock-on">
+            {knockOn}
+          </p>
+        )}
       </div>
     </section>
   );

@@ -295,12 +295,20 @@ export function withUcWithdrawn(programmes) {
   });
 }
 
+/**
+ * How long a custom household waits for a scaled-to-zero service: the
+ * Budget calculator's retries (RETRY_POLICY) over up to four minutes, as a
+ * Modal cold start of the Milburn app has taken close to three.
+ */
+export const COLD_START_RETRY = Object.freeze({ budgetMs: 240_000, maxRetries: 6 });
+
 /** Whether custom households can be calculated on this build. */
 export const customAvailable = () => Boolean(householdApiUrl());
 
 /**
  * One custom household's four answers: one POST per run (`runs`, with each
- * one's policies, from parsePresets), at once, to the household API as the
+ * one's policies, from parsePresets), the first alone and then the other
+ * three together, to the household API as the
  * Autumn Budget calculator posts (NEXT_PUBLIC_HOUSEHOLD_API_URL is the
  * endpoint itself, …/api/household-impact), retried while a scaled-to-zero
  * service starts up (postHouseholdImpactRetrying). Rejects with the API
@@ -311,13 +319,17 @@ export async function calculateHousehold(answers, { runs, fetchImpl, signal, onR
   if (!householdApiUrl()) throw Object.assign(new Error("Custom households need the household API, which this build does not have."), { kind: "unavailable" });
   if (!runs?.length) throw new Error("The runs to calculate are not available.");
   const household = householdRequest(answers);
-  const entries = await Promise.all(
-    runs.map(async (run) => {
-      const body = { year: YEAR, policies: run.policies, household, include: ["by_policy"] };
-      return [run.key, await postHouseholdImpactRetrying(body, { fetchImpl, signal, timeoutMs: MODAL_TIMEOUT_MS, onRetry })];
-    }),
-  );
-  return Object.fromEntries(entries);
+  const post = (run) =>
+    postHouseholdImpactRetrying(
+      { year: YEAR, policies: run.policies, household, include: ["by_policy"] },
+      { fetchImpl, signal, timeoutMs: MODAL_TIMEOUT_MS, onRetry, retry: COLD_START_RETRY },
+    );
+  // The first run alone, through a cold start; the others once the
+  // service answers, together
+  const [first, ...rest] = runs;
+  const firstResult = await post(first);
+  const others = await Promise.all(rest.map(async (run) => [run.key, await post(run)]));
+  return Object.fromEntries([[first.key, firstResult], ...others]);
 }
 
 /** The example id in the address (?example=), or null. */

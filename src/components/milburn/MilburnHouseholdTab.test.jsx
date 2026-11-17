@@ -2,9 +2,10 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import MilburnHouseholdTab, { MILBURN_STEPS, formatSignedPounds, milburnStepSummary, resetSavedMilburnForm } from "./MilburnHouseholdTab";
+import MilburnHouseholdTab, { MILBURN_STEPS, formatSignedPounds, milburnStepSummary, pipKnockOn, resetSavedMilburnForm } from "./MilburnHouseholdTab";
 import { normaliseHouseholdImpact } from "../../utils/householdImpactApi";
 import {
+  COLD_START_RETRY,
   DEFAULT_ANSWERS,
   PRESETS_FILE,
   RUNS,
@@ -118,6 +119,32 @@ describe("householdCalculator", () => {
     expect(uc.children.at(-1).id).toBe("uc_withdrawn");
   });
 
+  it("sends the first run alone, then the other three, waiting up to four minutes for a cold start", async () => {
+    vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
+    const log = [];
+    let releaseFirst;
+    const fetchImpl = vi.fn((_url, init) => {
+      const key = PRESETS.runs.find((run) => run.policies.join() === JSON.parse(init.body).policies.join()).key;
+      log.push(`start ${key}`);
+      const answer = { ok: true, json: async () => example("lone_parent").results[key] };
+      if (key !== "package") return Promise.resolve(answer);
+      return new Promise((resolve) => {
+        releaseFirst = () => {
+          log.push("package answered");
+          resolve(answer);
+        };
+      });
+    });
+    const pending = calculateHousehold(answersFromHousehold(example("lone_parent").household), { runs: PRESETS.runs, fetchImpl });
+    await waitFor(() => expect(log).toEqual(["start package"]));
+    releaseFirst();
+    const results = await pending;
+    expect(log.slice(0, 2)).toEqual(["start package", "package answered"]);
+    expect(log).toHaveLength(5);
+    expect(Object.keys(results)).toEqual(RUNS.map((run) => run.key));
+    expect(COLD_START_RETRY.budgetMs).toBeGreaterThanOrEqual(240_000);
+  });
+
   it("posts one request per run to the household API", async () => {
     vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
     const bodies = [];
@@ -217,6 +244,42 @@ describe("MilburnHouseholdTab", () => {
     // No Budget-only questions
     expect(form.queryByText(/Student loan/)).toBeNull();
     expect(form.queryByText(/Council tax band/i)).toBeNull();
+  });
+
+  it("shows one chosen tile in each choice, every tile with its label", () => {
+    render(<MilburnHouseholdTab presets={PRESETS} />);
+    openForm();
+    pick("Health condition limiting work-related activity", "Yes");
+    pick("Health element claimed", "From April 2026");
+    pick("PIP daily living", "Standard");
+    pick("Partner", "Yes");
+    for (const name of ["Health element claimed", "PIP daily living", "PIP mobility", "Partner's PIP daily living", "Partner's PIP mobility"]) {
+      const group = screen.getByRole("radiogroup", { name });
+      const tiles = [...group.querySelectorAll(".choice-tile")];
+      expect(tiles.filter((tile) => tile.classList.contains("is-checked"))).toHaveLength(1);
+      expect(tiles.every((tile) => tile.textContent.trim().length > 0)).toBe(true);
+    }
+    const checked = (name) => screen.getByRole("radiogroup", { name }).querySelector(".is-checked").textContent;
+    expect(checked("Health element claimed")).toBe("From April 2026");
+    expect(checked("PIP daily living")).toBe("Standard");
+    expect(within(screen.getByRole("radiogroup", { name: "PIP daily living" })).getByLabelText("Standard").checked).toBe(true);
+  });
+
+  it("switches a choice's colours at once, never fading the tile under a white label", () => {
+    const css = readFileSync(resolve(__dirname, "MilburnHouseholdTab.css"), "utf8");
+    expect(css).toMatch(/\.milburn-household \.choice-segmented \.choice-tile \{\s*transition: border-color var\(--pe-transition-fast\);\s*\}/);
+  });
+
+  it("says when the PIP removal's step includes the housing element", () => {
+    const view = normaliseHouseholdImpact(example("renting_health").results.package);
+    expect(pipKnockOn(view)).toBe(
+      "PIP removed (−£7,566) includes −£1,061 from Universal Credit's housing element: without PIP daily living, a young single renter is paid the shared accommodation rate.",
+    );
+    // Living with parents: no housing element, nothing to say
+    expect(pipKnockOn(normaliseHouseholdImpact(example("with_parents_health").results.package))).toBeNull();
+    render(<MilburnHouseholdTab presets={PRESETS} />);
+    fireEvent.click(within(screen.getByRole("group", { name: "Example households" })).getByRole("button", { name: "22, renting alone" }));
+    expect(document.querySelector('[data-note="pip-knock-on"]').textContent).toContain("shared accommodation rate");
   });
 
   it("summarises a closed step's changed answers", () => {
