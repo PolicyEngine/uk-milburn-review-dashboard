@@ -84,8 +84,9 @@ describe("display years", () => {
       expect(yearsForSelection(rows, ["threshold_freeze_2031_32"])[0]).toBe(2027);
     });
 
+    // 2029-30: the first year of the report's welfare changes
     it("never moves the default year", () => {
-      expect(DEFAULT_DISPLAY_YEAR).toBe(2027);
+      expect(DEFAULT_DISPLAY_YEAR).toBe(2029);
     });
   });
 });

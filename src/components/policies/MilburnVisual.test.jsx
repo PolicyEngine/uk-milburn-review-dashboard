@@ -118,6 +118,28 @@ describe("MilburnVisual", () => {
     expect(shares[0]).toEqual({ year: 2027, share: 2.009 / 4.486 });
   });
 
+  it("the report's runs with stated assumptions: each card's visual says its own rule, and shares come from the results", async () => {
+    // Higher Youth Allowance: the 25-and-over rate, for claims with a housing costs element only
+    const allowance = milburnVisualView(details.milburn_report_youth_allowance_independent.visual, "The measure");
+    expect(allowance.caption).toBe("Standard allowance for a claim with a housing costs element, a month, at 2027-28 rates");
+    expect(allowance.alt).toMatch(/Claims without a housing costs element keep the under-25 rate\.$/);
+    expect(details.milburn_report_youth_allowance_independent.starts).toBe("Apr 2029");
+    // Glide path: the end state's chart, with its steps; a path that does not end at the threshold draws nothing
+    const glide = details.milburn_report_employer_nics_threshold_glide_path.visual;
+    const path = milburnVisualView(glide, "The measure");
+    expect(path.bands[1]).toMatchObject({ title: "21 to 24", text: "From £10,000 by 2031-32, was £5,000" });
+    expect(path.chips[0]).toEqual({ icon: "file-clock", when: "2027-28 to 2031-32", value: "£6,000, rising £1,000 a year" });
+    expect(path.alt).toContain("in steps: £6,000 in 2027-28, rising £1,000 a year.");
+    expect(milburnVisualView({ ...glide, glide: { ...glide.glide, from: 7000 } }, "The measure")).toBeNull();
+    // Phased: 45% a year from the April 2028 cohort, as a share of the report's package from 2029-30
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(PUBLISHED_SUMMARY, { status: 200 })));
+    show("milburn_report_package_phased");
+    expect(image()).toHaveAccessibleName(/People who turned 18 since April 2028 are reached at once; existing claimants as they are reassessed, at 45% of the remaining caseload a year\./);
+    await screen.findByRole("img", { name: /Exchequer saving as a share of the unphased package's, from the results: 59% in 2029-30, 84% in 2030-31, 93% in 2031-32\.$/ });
+    const shares = phasedSavingShares(parseSummary(JSON.parse(PUBLISHED_SUMMARY)), "milburn_report_package_phased", "milburn_report_package");
+    expect(shares[0]).toEqual({ year: 2029, share: 2.766 / 4.666 });
+  });
+
   it("phased package: the rule alone when the summary is missing, never a typed share", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 404 })));
     const { container } = show("milburn_package_phased");

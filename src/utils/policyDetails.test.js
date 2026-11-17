@@ -156,6 +156,10 @@ it("describes each Milburn candidate measure in one neutral line, applied whatev
     "milburn_report_package",
     "milburn_report_uc_health",
     "milburn_report_pip",
+    // Its runs with stated assumptions
+    "milburn_report_youth_allowance_independent",
+    "milburn_report_package_phased",
+    "milburn_report_employer_nics_threshold_glide_path",
   ];
   expect(MILBURN_POLICY_DETAILS.map((entry) => entry.id)).toEqual(ids);
   for (const entry of MILBURN_POLICY_DETAILS) {

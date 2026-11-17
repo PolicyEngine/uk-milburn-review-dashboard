@@ -1,7 +1,7 @@
 {
   "title": "Benchmarks: published figures on young people, work and health-related benefits",
   "note": "Reference figures from the review (From a Welfare State to a Working State, 17 November 2026) and other sources, as published, each with its own definitions, coverage and date. Where PolicyEngine has a comparable figure, it is shown beside the published one with its build and year.",
-  "policyengine_estimate_year": 2027,
+  "policyengine_estimate_year": 2029,
   "rows": [
     {
       "id": "neet_16_24",
@@ -37,7 +37,7 @@
       "policyengine_estimate": {
         "value": "232,000",
         "basis": "Benefit units with the LCWRA element in which every adult is under 25, UK",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
+        "label": "PolicyEngine, build fcfac709, 2027-28 baseline caseload"
       }
     },
     {
@@ -52,7 +52,7 @@
       "policyengine_estimate": {
         "value": "232,000",
         "basis": "Benefit units with the LCWRA element in which every adult is under 25, UK: benefit units, not people",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
+        "label": "PolicyEngine, build fcfac709, 2027-28 baseline caseload"
       }
     },
     {
@@ -78,7 +78,7 @@
       "policyengine_estimate": {
         "value": "347,000",
         "basis": "PIP recipients aged 18 to 24, UK; 16 and 17-year-olds are not counted",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
+        "label": "PolicyEngine, build fcfac709, 2027-28 baseline caseload"
       }
     },
     {
@@ -128,9 +128,9 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "£4.49bn a year",
-        "basis": "Static saving from removing the UC health element for under-25s and PIP for ages 18 to 24, UK: the spending the modelled package removes, without PIP at 16 and 17",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
+        "value": "£4.67bn a year",
+        "basis": "Static saving in 2029-30 from removing the UC health element for under-25s and PIP for ages 18 to 24, UK: the spending the modelled package removes, without PIP at 16 and 17",
+        "label": "PolicyEngine, build fcfac709, 2029-30"
       }
     },
     {
@@ -143,9 +143,9 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "£4.42bn a year",
-        "basis": "Static saving from removing PIP for ages 16 to 24 in 2027-28, UK; £3.44bn for ages 18 to 24",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
+        "value": "£4.68bn a year",
+        "basis": "Static saving from removing PIP for ages 16 to 24 in 2029-30, UK; £3.64bn for ages 18 to 24",
+        "label": "PolicyEngine, build fcfac709, 2029-30"
       }
     },
     {
@@ -158,9 +158,9 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "£1.15bn a year",
-        "basis": "Static saving from removing the UC health element for under-25s in 2027-28, UK",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
+        "value": "£1.13bn a year",
+        "basis": "Static saving from removing the UC health element for under-25s in 2029-30, UK",
+        "label": "PolicyEngine, build fcfac709, 2029-30"
       }
     },
     {
@@ -173,9 +173,9 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "£2.54bn to £4.49bn a year",
-        "basis": "Static saving in 2027-28, UK: from the central variant (severe cases kept, PIP at half rate) to full removal of the UC health element for under-25s and PIP for ages 18 to 24",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
+        "value": "£2.64bn to £4.67bn a year",
+        "basis": "Static saving in 2029-30, UK: from the central variant (severe cases kept, PIP at half rate) to full removal of the UC health element for under-25s and PIP for ages 18 to 24",
+        "label": "PolicyEngine, build fcfac709, 2029-30"
       }
     },
     {
@@ -232,9 +232,9 @@
       "date": "11 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "£4.43bn a year",
-        "basis": "Static cost of a zero employer National Insurance rate for under-25s, UK",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
+        "value": "£4.65bn a year",
+        "basis": "Static cost of a zero employer National Insurance rate for under-25s in 2029-30, UK",
+        "label": "PolicyEngine, build fcfac709, 2029-30"
       }
     },
     {
@@ -247,9 +247,9 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "156,000 more",
-        "basis": "People in relative poverty after housing costs in 2027-28, UK: static effect of removing the UC health element for under-25s and PIP for ages 18 to 24, with no replacement benefit and no one moving into work",
-        "label": "PolicyEngine, build fcfac709, 2027-28"
+        "value": "260,000 more",
+        "basis": "People in relative poverty after housing costs in 2029-30, UK: static effect of removing the UC health element for under-25s and PIP for ages 18 to 24, with no replacement benefit and no one moving into work",
+        "label": "PolicyEngine, build fcfac709, 2029-30"
       }
     },
     {

@@ -1003,6 +1003,87 @@ for (const [id, base] of Object.entries(REPORT_RUN_OF)) {
   });
 }
 
+// The report's runs with stated assumptions: the higher Youth Allowance,
+// the benefit changes phased in, and the employer threshold's glide path
+MILBURN_POLICY_DETAILS.push(
+  {
+    id: "milburn_report_youth_allowance_independent",
+    shortName: "Higher Youth Allowance, living independently",
+    noun: "a higher Youth Allowance for under-25s living independently",
+    sentence: "paying under-25s living independently the 25-and-over standard allowance",
+    summary: "Pays the 25-and-over standard allowance to under-25 claims with housing costs.",
+    points: [
+      { label: "Who", icon: "users", text: "UC claims, every adult under 25, with a housing costs element." },
+      // Analytical annex, section 8
+      { label: "Proxy", icon: "scale", text: "The review's own, for living independently." },
+      // Report 6.5, para 748
+      { label: "Report", icon: "file", text: "Other young claims keep the under-25 rate." },
+    ],
+    affects: "Under-25 UC claims with a housing costs element",
+    starts: "Apr 2029",
+    inForce: { from: "2029-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      // Report 6.5, para 748; analytical annex, section 8
+      "The report proposes a higher Youth Allowance for young people living independently (paragraph 748).",
+      "A housing costs element is the review's own proxy for living independently (analytical annex, section 8).",
+      "The report gives no amount for its work allowance, so none is modelled.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
+    ],
+    visual: { kind: "milburn-standard-allowance", place: "change", housingCosts: true, ratesNote: true },
+  },
+  {
+    id: "milburn_report_package_phased",
+    shortName: "The report's benefit changes, phased in",
+    noun: "the report's benefit changes, phased in over five years",
+    sentence: "phasing in the report's benefit changes as claimants are reassessed",
+    summary: "The report's health element and PIP changes, phased in as claimants are reassessed.",
+    points: [
+      { label: "New entrants", icon: "users", text: "Turning 18 from April 2028: reached at once." },
+      { label: "Existing", icon: "clock", text: "An assumed 45% of those remaining each year." },
+      // Report, para 773: no more than five years
+      { label: "Reach", icon: "scale", text: "About 95% of existing claimants within five years." },
+    ],
+    affects: "Under-25s with the health element; 18 to 24s with PIP",
+    starts: "Apr 2029",
+    inForce: { from: "2029-04" },
+    type: "Benefit",
+    details: [
+      "Static: claimants do not change their work or claims in response.",
+      "Who is reassessed each year is a random draw: the data hold no reassessment dates.",
+      // Report, para 773
+      "The report proposes a transition of no more than five years (paragraph 773); 45% a year is our assumption.",
+      "The chart's shares are this run's saving over the unphased package's, from the results, not the share of claimants reached.",
+    ],
+    visual: { kind: "milburn-phased", place: "change", since: 2028, each: 0.45, of: "milburn_report_package", whole: "the unphased package" },
+  },
+  {
+    id: "milburn_report_employer_nics_threshold_glide_path",
+    shortName: "Employer NI threshold for 21 to 24s, phased in",
+    noun: "an employer National Insurance threshold for 21 to 24s in retail and hospitality, phased in over five years",
+    sentence: "raising the employer National Insurance threshold in steps to £10,000 for 21 to 24-year-olds in retail and hospitality",
+    summary: "Raises the employer NI threshold in yearly steps to £10,000 by 2031-32.",
+    points: [
+      { label: "Who", icon: "users", text: "Employees aged 21 to 24, main job in retail or hospitality." },
+      { label: "Steps", icon: "clock", text: "£6,000 in 2027-28, rising £1,000 a year." },
+      { label: "Rate", icon: "coins", text: "15% rate unchanged; only the threshold moves." },
+    ],
+    affects: "21 to 24-year-olds in retail and hospitality and their employers",
+    starts: "Apr 2027",
+    inForce: { from: "2027-04" },
+    type: "National Insurance",
+    details: [
+      "Static: employers' total cost of employment is held fixed, so the saving passes to pay; hiring does not respond.",
+      "Retail is SIC division 47 and hospitality divisions 55 and 56, by the main job.",
+      // Report, paras 269 to 271
+      "The report proposes a five-year glide path (paragraphs 269 to 271); equal steps and the 2027 start are assumed.",
+    ],
+    // The end state's chart, with the steps to it
+    visual: { kind: "milburn-employer-nics", place: "change", limit: 25, threshold: 10000, glide: { from: 6000, step: 1000, firstYear: 2027, lastYear: 2031 } },
+  },
+);
+
 const DETAILS_BY_ID = Object.fromEntries([
   ...POLICY_DETAILS.map(({ id, name: _name, description: _description, writtenFor, ...fields }) => [id, { writtenFor, fields }]),
   ...MILBURN_POLICY_DETAILS.map(({ id, ...fields }) => [id, { writtenFor: undefined, fields }]),

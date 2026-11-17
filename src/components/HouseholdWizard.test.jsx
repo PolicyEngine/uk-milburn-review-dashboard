@@ -286,7 +286,7 @@ describe("the personal impact form", () => {
     expect(value("Child 1's age")).toBe(5);
     expect(screen.queryByRole("combobox", { name: /Child 1 in full-time education/ })).toBeNull();
     // The age in the chosen year, which the calculation uses as entered
-    expect(field("child_0")).toHaveTextContent("Age in 2027-28, from 0 to 19.");
+    expect(field("child_0")).toHaveTextContent("Age in 2029-30, from 0 to 19.");
     fireEvent.change(box("Child 2's age"), { target: { value: "17" } });
     expect(chosen("Child 2 in full-time education (non-advanced)")).toBe("Yes");
     choose("Child 2 in full-time education (non-advanced)", "No");

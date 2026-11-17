@@ -161,24 +161,31 @@ export function employerNicsView(visual, name) {
   if (visual.threshold !== undefined) {
     const threshold = visual.threshold;
     if (!Number.isFinite(threshold) || threshold <= secondaryThreshold) return null;
+    // The glide path (the report's five years, in our equal steps): drawn only where its steps end at the threshold
+    const glide = visual.glide;
+    if (glide !== undefined && !(isAge(glide.firstYear) && isAge(glide.lastYear) && glide.lastYear > glide.firstYear && glide.step > 0 && glide.from > secondaryThreshold && glide.from + glide.step * (glide.lastYear - glide.firstYear) === threshold)) return null;
     const band = `${zeroRateBelowAge} to ${limit - 1}`;
     const moved = (age) => age >= zeroRateBelowAge && age < limit;
     return {
-      caption: "Earnings from which employers pay National Insurance, by the employee's age",
+      caption: glide
+        ? `Earnings from which employers pay National Insurance, by the employee's age, from ${fiscalYear(glide.lastYear)}`
+        : "Earnings from which employers pay National Insurance, by the employee's age",
       ages: cells(16, (age) => ({ before: age < zeroRateBelowAge ? 0 : 1, after: age < zeroRateBelowAge ? 0 : 1, some: moved(age) })),
       key: [["some", "Higher threshold, retail and hospitality"], ["after", "Unchanged"]],
       bands: [
         { from: 16, to: zeroRateBelowAge - 1, title: `Under ${zeroRateBelowAge}`, text: "0% already", tone: "kept" },
-        { from: zeroRateBelowAge, to: limit - 1, title: band, text: `From ${wholePounds(threshold)}, was ${wholePounds(secondaryThreshold)}`, tone: "cut" },
+        { from: zeroRateBelowAge, to: limit - 1, title: band, text: glide ? `From ${wholePounds(threshold)} by ${fiscalYear(glide.lastYear)}, was ${wholePounds(secondaryThreshold)}` : `From ${wholePounds(threshold)}, was ${wholePounds(secondaryThreshold)}`, tone: "cut" },
         { from: limit, to: LAST_AGE, title: `${limit} and over`, text: `From ${wholePounds(secondaryThreshold)}`, tone: "kept" },
       ],
       chips: [
+        ...(glide ? [{ icon: "file-clock", when: `${fiscalYear(glide.firstYear)} to ${fiscalYear(glide.lastYear)}`, value: `${wholePounds(glide.from)}, rising ${wholePounds(glide.step)} a year` }] : []),
         { icon: "coins", when: "Rate above the threshold", value: `${percent(rate)}, unchanged` },
         { icon: "cap", when: `Apprentices under ${apprenticeZeroRateBelowAge}`, value: "0% already" },
       ],
       alt:
         `${name}: the earnings from which employers pay National Insurance, by the employee's age. ` +
-        `Under ${zeroRateBelowAge}: 0% already. Ages ${band} in retail and hospitality: from ${wholePounds(threshold)} a year under the measure, instead of ${wholePounds(secondaryThreshold)}. ` +
+        `Under ${zeroRateBelowAge}: 0% already. Ages ${band} in retail and hospitality: from ${wholePounds(threshold)} a year under the measure${glide ? ` by ${fiscalYear(glide.lastYear)}` : ""}, instead of ${wholePounds(secondaryThreshold)}` +
+        (glide ? `, in steps: ${wholePounds(glide.from)} in ${fiscalYear(glide.firstYear)}, rising ${wholePounds(glide.step)} a year. ` : ". ") +
         `Aged ${limit} and over, and other sectors: from ${wholePounds(secondaryThreshold)}, unchanged. ` +
         `The ${percent(rate)} rate is unchanged; apprentices under ${apprenticeZeroRateBelowAge} have a zero rate already.`,
     };
@@ -207,8 +214,14 @@ export function employerNicsView(visual, name) {
 
 // --- Standard allowance ---------------------------------------------------------
 
-/** The under-25 standard allowance beside the 25-and-over rate, single and couple. */
-export function standardAllowanceView(_visual, name) {
+/**
+ * The under-25 standard allowance beside the 25-and-over rate, single and
+ * couple. With `visual.housingCosts` (the report's higher Youth Allowance)
+ * the higher rate is for claims with a housing costs element only.
+ */
+export function standardAllowanceView(visual, name) {
+  const housing = visual?.housingCosts === true;
+  const when = ratesYearText(visual);
   const { singleUnder25, single25Plus, coupleUnder25, couple25Plus } = MILBURN_RATES.standardAllowance;
   const pairs = [
     { label: "Single, under 25", words: "a single claimant under 25", before: singleUnder25, after: single25Plus },
@@ -217,7 +230,7 @@ export function standardAllowanceView(_visual, name) {
   if (pairs.some(({ before, after }) => !(after > before))) return null;
   const gain = ({ before, after }) => Math.round(after) - Math.round(before);
   return {
-    caption: `Standard allowance, a month, ${MILBURN_RATES.year}`,
+    caption: `Standard allowance${housing ? " for a claim with a housing costs element" : ""}, a month, ${when}`,
     max: couple25Plus,
     key: [["before", "Under-25 rate"], ["after", "25-and-over rate"]],
     groups: pairs.map((pair) => ({
@@ -229,9 +242,10 @@ export function standardAllowanceView(_visual, name) {
       ],
     })),
     alt:
-      `${name}: the Universal Credit standard allowance, a month, ${MILBURN_RATES.year} (about). ` +
+      `${name}: the Universal Credit standard allowance${housing ? " for a claim with a housing costs element" : ""}, a month, ${when} (about). ` +
       pairs.map((pair) => `For ${pair.words}: ${wholePounds(pair.after)} instead of ${wholePounds(pair.before)}, ${wholePounds(gain(pair))} more`).join("; ") +
-      ".",
+      "." +
+      (housing ? " Claims without a housing costs element keep the under-25 rate." : ""),
   };
 }
 
@@ -295,9 +309,11 @@ export function packageView(visual, name) {
  * Empty without the file or either run. This is what the
  * run's results show; the rule above gives who is reached, not this share.
  */
-export function phasedSavingShares(summary, runId) {
+// `fullId`: the run it is a share of (a card's `visual.of`: the report's
+// phased run against the report's package, whose saving starts in 2029-30)
+export function phasedSavingShares(summary, runId, fullId = DEFAULT_SUMMARY_RUN) {
   const phased = summaryRun(summary, runId);
-  const full = summaryRun(summary, DEFAULT_SUMMARY_RUN);
+  const full = summaryRun(summary, fullId);
   if (!phased || !full) return [];
   return Object.keys(phased.savingBn)
     .sort()
@@ -311,10 +327,15 @@ export function phasedSavingShares(summary, runId) {
  * given, its saving as a share of full abolition's in each year, from the
  * results. Without shares, the rule alone: no share is typed here.
  */
-export function phasedView(_visual, name, shares = []) {
+export function phasedView(visual, name, shares = []) {
   const whole = (share) => `${Math.round(share * 100)}%`;
-  const each = whole(MILBURN_PHASING.reassessedEachYear);
-  const since = `April ${MILBURN_PHASING.start}`;
+  // The card's own rule where it gives one (the report's run: `since`, `each`), else the pre-report run's
+  const rate = visual?.each ?? MILBURN_PHASING.reassessedEachYear;
+  const start = visual?.since ?? MILBURN_PHASING.start;
+  if (!(rate > 0 && rate <= 1) || !isAge(start)) return null;
+  const of = typeof visual?.whole === "string" && visual.whole ? visual.whole : "full abolition";
+  const each = whole(rate);
+  const since = `April ${start}`;
   const rule = `People who turned 18 since ${since} are reached at once; existing claimants as they are reassessed, at ${each} of the remaining caseload a year.`;
   const chips = [
     { icon: "file-plus", when: `Turned 18 since ${since}`, value: "Reached at once" },
@@ -324,15 +345,15 @@ export function phasedView(_visual, name, shares = []) {
     return { caption: "How the new rules are phased in", key: [], max: 1, groups: [], chips, alt: `${name}: ${rule}` };
   }
   return {
-    caption: "Exchequer saving as a share of full abolition's",
+    caption: `Exchequer saving as a share of ${of}'s`,
     max: Math.max(1, ...shares.map((entry) => entry.share)),
-    key: [["after", "Phased package"], ["ghost", "Full abolition"]],
+    key: [["after", "Phased package"], ["ghost", of.charAt(0).toUpperCase() + of.slice(1)]],
     groups: shares.map((entry) => ({
       columns: [{ label: fiscalYear(entry.year), text: whole(entry.share), ghost: 1, parts: [{ value: entry.share, tone: "after" }] }],
     })),
     chips,
     alt:
-      `${name}: ${rule} Its Exchequer saving as a share of full abolition's, from the results: ` +
+      `${name}: ${rule} Its Exchequer saving as a share of ${of}'s, from the results: ` +
       shares.map((entry) => `${whole(entry.share)} in ${fiscalYear(entry.year)}`).join(", ") +
       ".",
   };

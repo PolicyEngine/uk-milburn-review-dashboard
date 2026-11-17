@@ -14,7 +14,7 @@ import {
   BENCHMARK_SHORT,
   benchmarkGroups,
   comparisonFor,
-  DIFFERENT_BASIS,
+  differentBasis as differentBasisFor,
   estimateFor,
   figureRange,
   figureShare,
@@ -146,7 +146,7 @@ const COMPARE_BAR_SHAPE = barShape(["value"], { layout: "vertical" });
  * between them as a % of the published figure, and both figures in text
  * (the chart is hidden from screen readers).
  */
-function ComparePanel({ row, comparison }) {
+function ComparePanel({ row, comparison, year }) {
   const short = BENCHMARK_SHORT[row.id] ?? {};
   const title = short.label ?? row.figure;
   const published = splitValue(row.value);
@@ -158,7 +158,7 @@ function ComparePanel({ row, comparison }) {
   const tick = compareTick(comparison.unit);
   const gap = comparison.gapPct;
   // A pair that counts different things is drawn without a gap
-  const differentBasis = DIFFERENT_BASIS[row.id];
+  const differentBasis = differentBasisFor(row.id, year);
   // Room right of the plot for the longest bar's own label
   const labelRoom = Math.ceil(Math.max(...bars.map((bar) => tickTextWidth(bar.text, 12)))) + 12;
   return (
@@ -378,7 +378,7 @@ export default function BenchmarksTable() {
               </div>
               <ul className="bm-compare-grid">
                 {pairs.map(({ row, comparison }) => (
-                  <ComparePanel key={row.id} row={row} comparison={comparison} />
+                  <ComparePanel key={row.id} row={row} comparison={comparison} year={data.year} />
                 ))}
               </ul>
             </div>

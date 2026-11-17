@@ -5,6 +5,7 @@
  * results (`run`/`reform_id` with a `metric`) or a fixed figure from a named
  * build (`value`, with its `basis` and `label`).
  */
+import { yearLabel } from "../displayYears";
 import { youngPeopleWorseOff } from "./youngPeople";
 
 export const BENCHMARKS_FILE = "milburn_benchmarks.json";
@@ -81,13 +82,13 @@ export const BENCHMARK_SHORT = {
   uc_health_no_work_requirements: {
     label: "On UC health with no work requirements",
     icon: "heartPulse",
-    estimateBasis: "Benefit units with LCWRA, every adult under 25, UK",
+    estimateBasis: "Benefit units with LCWRA, every adult under 25, UK, 2027-28",
   },
   uc_health_element_16_24: {
     label: "16–24s receiving the UC health element",
     icon: "activity",
     basis: "Resolution Foundation response to the review",
-    estimateBasis: "Benefit units with LCWRA, every adult under 25, UK",
+    estimateBasis: "Benefit units with LCWRA, every adult under 25, UK, 2027-28",
   },
   incapacity_benefits_young: {
     label: "Young people on incapacity benefits, the review says",
@@ -98,7 +99,7 @@ export const BENCHMARK_SHORT = {
     label: "Young people receiving PIP",
     icon: "clipboard",
     basis: "Resolution Foundation response to the review",
-    estimateBasis: "PIP recipients aged 18 to 24, UK",
+    estimateBasis: "PIP recipients aged 18 to 24, UK, 2027-28",
   },
   dla_pip_16_24: {
     label: "16–24s receiving DLA or PIP, the review says",
@@ -121,20 +122,20 @@ export const BENCHMARK_SHORT = {
     label: "PIP spending, ages 16 to 24",
     icon: "wallet",
     basis: "The review's figure for 2025-26",
-    estimateBasis: "Static saving from removing PIP at 16 to 24, 2027-28, UK",
+    estimateBasis: "Static saving from removing PIP at 16 to 24, 2029-30, UK",
   },
   uc_health_spend_16_24: {
     label: "UC LCWRA element spending, ages 16 to 24",
     icon: "piggy",
     basis: "The review's figure for 2025-26",
-    estimateBasis: "Static saving from removing it for under-25s, 2027-28, UK",
+    estimateBasis: "Static saving from removing it for under-25s, 2029-30, UK",
   },
   incapacity_spending_18_24: { label: "Incapacity benefit spending, ages 18 to 24", icon: "trend" },
   review_welfare_saving_2036: {
     label: "Annual welfare saving the review estimates",
     icon: "scale",
     basis: "2026-27 prices, UK; replacement awards, a Youth Allowance and a work allowance included",
-    estimateBasis: "Static, 2027-28: central variant to full removal",
+    estimateBasis: "Static, 2029-30: central variant to full removal",
   },
   milburn_welfare_saving_10y: {
     label: "Cumulative welfare savings by 2036-37",
@@ -155,13 +156,13 @@ export const BENCHMARK_SHORT = {
     label: "Cost of zero employer NI for under-25s",
     icon: "building",
     basis: "Resolution Foundation estimate; not a recommendation of the review",
-    estimateBasis: "Static cost, UK",
+    estimateBasis: "Static cost, 2029-30, UK",
   },
   relative_poverty_review: {
     label: "Relative poverty after housing costs, the review estimates",
     icon: "house",
     basis: "Once fully rolled out, with 440,000 more young people in work",
-    estimateBasis: "Static, 2027-28: full removal, no replacement benefit or move into work",
+    estimateBasis: "Static, 2029-30: full removal, no replacement benefit or move into work",
   },
   kept_out_of_poverty: { label: "Kept out of poverty by UC health and/or PIP", icon: "shield" },
   pip_no_extra_costs: { label: "Young PIP claimants reporting no extra costs", icon: "receipt" },
@@ -172,14 +173,24 @@ export const BENCHMARK_SHORT = {
  * difference in a few words: drawn side by side, with no gap between them
  * (a gap to two decimal places would read as a check on the published
  * figure). The other pairs measure the same thing and keep their gap.
+ * A saving's year is the file's own (`policyengine_estimate_year`), never
+ * typed here: `differentBasis(id, year)` gives the words.
  */
+const savingAgainstSpending = (year) => `a saving${Number.isInteger(year) ? ` in ${yearLabel(year)}` : ""} against spending in 2025-26`;
+
 export const DIFFERENT_BASIS = Object.freeze({
   uc_health_no_work_requirements: "benefit units against people",
   uc_health_element_16_24: "benefit units against people",
   young_pip_recipients: "ours leaves out 16 and 17-year-olds",
-  pip_spend_16_24: "a saving in 2027-28 against spending in 2025-26",
-  uc_health_spend_16_24: "a saving in 2027-28 against spending in 2025-26",
+  pip_spend_16_24: savingAgainstSpending,
+  uc_health_spend_16_24: savingAgainstSpending,
 });
+
+/** How a pair's two figures differ, in a few words, or null for a like-for-like pair; `year` is the estimates' year (the file's). */
+export function differentBasis(id, year) {
+  const words = Object.hasOwn(DIFFERENT_BASIS, id) ? DIFFERENT_BASIS[id] : null;
+  return typeof words === "function" ? words(year) : words;
+}
 
 /** The icon of a figure with none of its own. */
 export const BENCHMARK_ICON = "fileText";

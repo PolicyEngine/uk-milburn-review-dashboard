@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import MethodologyTab, { METHOD_CONTENTS, METHOD_SECTIONS, MILBURN_LIMITATIONS } from "./MethodologyTab";
 import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
-import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
+import { groupMilburnMeasures, MILBURN_GROUPS } from "../utils/milburn/measureGroups";
 import { METHOD_ANCHORS } from "./methodology/anchors";
 import { unavailableMeasures } from "./methodology/measures";
 import { buildMeasureCatalogue, MeasureCatalogueProvider } from "../utils/measureCatalogue";
@@ -81,8 +81,12 @@ describe("MethodologyTab", () => {
   });
 
   it("counts and lists the measures the page offers, leaving out a hidden run", () => {
+    // The page offers the report's runs and the comparators; every other run is hidden
+    const offeredIds = MILBURN_GROUPS.filter((group) => !group.hidden).flatMap((group) => group.ids);
+    const offered = catalogue.measures.map((measure, index) => ({ ...measure, id: offeredIds[index] }));
+    expect(offered.every((measure) => typeof measure.id === "string")).toBe(true);
     const hidden = { ...catalogue.measures[0], id: "milburn_package_entry_25pct", name: "Hidden entry run" };
-    const withHidden = { ...catalogue, measures: [...catalogue.measures, hidden] };
+    const withHidden = { ...catalogue, measures: [...offered, hidden] };
     render(<MeasureCatalogueProvider catalogue={withHidden}><MethodologyTab onShowTab={vi.fn()} /></MeasureCatalogueProvider>);
     const shown = groupMilburnMeasures(withHidden.measures).flatMap((group) => group.measures);
     expect(shown).toHaveLength(catalogue.measures.length);

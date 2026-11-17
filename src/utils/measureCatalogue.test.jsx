@@ -291,6 +291,8 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
       /for \(const \[id, base\] of Object\.entries\(REPORT_RUN_OF\)\) \{[\s\S]*?\n\}/,
       // The report's employer NI threshold card
       /MILBURN_POLICY_DETAILS\.push\(\{\n  id: "milburn_report_employer_nics_threshold"[\s\S]*?\n\}\);/,
+      // The report's runs with stated assumptions: Youth Allowance, phased package, glide path
+      /MILBURN_POLICY_DETAILS\.push\(\n  \{\n    id: "milburn_report_youth_allowance_independent"[\s\S]*?\n\);/,
     ],
     // The Milburn review: the measures listed as not computable, in the
     // registry's own words

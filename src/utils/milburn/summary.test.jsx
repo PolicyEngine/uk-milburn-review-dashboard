@@ -371,9 +371,9 @@ describe("the published summary", () => {
 
   it("gives the packages' range: no replacement, central and phased", () => {
     expect(packageRange(published).map(({ name, saving, poverty }) => [name, saving, poverty])).toEqual([
-      ["No replacement", "£4.49bn", "about 410,000"],
-      ["Central", "£2.54bn", "about 314,000"],
-      ["Phased", "£2.01bn", "about 143,000"],
+      ["No replacement", "£4.67bn", "about 391,000"],
+      ["Central", "£2.64bn", "about 277,000"],
+      ["Phased", "£3.77bn", "about 317,000"],
     ]);
   });
 
@@ -388,29 +388,29 @@ describe("the published summary", () => {
       expect(run.breakEvenSharePct.h25).toBeLessThan(run.breakEvenSharePct.h16);
     }
     const full = summaryRun(published, "milburn_package");
-    expect(full.breakEvenSharePct).toEqual({ h16: 98.7, h25: 77.1 });
+    expect(full.breakEvenSharePct).toEqual({ h16: 102.2, h25: 79.9 });
     // Above 100% still occurs, so its wording is still shown
     expect(summaryRun(published, "milburn_package_phased").breakEvenSharePct.h16).toBeGreaterThan(100);
   });
 
   it("counts the entry run's movers from its own results, and none in a static run", () => {
-    expect(formatPeople(entryMovers(summaryRun(published, "milburn_package_entry_25pct")))).toBe("82,000");
+    expect(formatPeople(entryMovers(summaryRun(published, "milburn_package_entry_25pct")))).toBe("83,000");
     expect(entryMovers(summaryRun(published, "milburn_package"))).toBeNull();
     render(<EntryComparison summary={published} catalogue={null} />);
     const section = screen.getByRole("region", { name: "With a quarter moving into work" });
-    expect(section.textContent).toContain("25% of non-working 18 to 24-year-olds with PIP or the health element moving into work (about 82,000 people)");
-    expect(section.textContent).toContain("Who moves: about 82,000 people, 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
+    expect(section.textContent).toContain("25% of non-working 18 to 24-year-olds with PIP or the health element moving into work (about 83,000 people)");
+    expect(section.textContent).toContain("Who moves: about 83,000 people, 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
   });
 
   it("leads Return to work with the 25% entry run against the static package", () => {
     render(<EntryComparison summary={published} catalogue={null} />);
     const rows = within(screen.getByRole("table")).getAllByRole("row");
-    expect(rows[1].textContent).toContain("£4.49bn");
-    expect(rows[1].textContent).toContain("£4.61bn");
-    expect(rows[2].textContent).toContain("+0.59pp (about 410,000 people)");
-    expect(rows[2].textContent).toContain("+0.39pp (about 272,000 people)");
-    expect(rows[3].textContent).toContain("£12,622");
-    expect(rows[3].textContent).toContain("£11,305");
+    expect(rows[1].textContent).toContain("£4.67bn");
+    expect(rows[1].textContent).toContain("£4.80bn");
+    expect(rows[2].textContent).toContain("+0.56pp (about 391,000 people)");
+    expect(rows[2].textContent).toContain("+0.34pp (about 240,000 people)");
+    expect(rows[3].textContent).toContain("£12,962");
+    expect(rows[3].textContent).toContain("£11,586");
   });
 });
 
@@ -419,21 +419,23 @@ describe("the poverty card's direct count", () => {
   const count = summaryPovertyCount(published);
 
   it("reads the summary's count for absolute poverty after housing costs in its year only", () => {
-    expect(count("milburn_package", 2027, "poverty_abs_ahc_change_pp")).toBe(409743);
+    expect(published.year).toBe(2029);
+    expect(count("milburn_package", 2029, "poverty_abs_ahc_change_pp")).toBe(390685);
     expect(count("milburn_package", 2028, "poverty_abs_ahc_change_pp")).toBeNull();
-    expect(count("milburn_package", 2027, "poverty_rel_ahc_change_pp")).toBeNull();
-    expect(count("not_a_run", 2027, "poverty_abs_ahc_change_pp")).toBeNull();
+    expect(count("milburn_package", 2027, "poverty_abs_ahc_change_pp")).toBeNull();
+    expect(count("milburn_package", 2029, "poverty_rel_ahc_change_pp")).toBeNull();
+    expect(count("not_a_run", 2029, "poverty_abs_ahc_change_pp")).toBeNull();
     expect(summaryPovertyCount(null)).toBeNull();
   });
 
-  it("replaces pp × population in the card's bars, so it reads 410,000 as Key figures do", () => {
-    // +0.589pp of about 70m people would be about 412,000
-    const measures = [{ id: "milburn_package", name: "Package", value: 0.589, colour: "" }];
+  it("replaces pp × population in the card's bars, so it reads the summary's own count as Key figures do", () => {
+    // +0.559pp of about 70m people would be 391,300; the summary counts 390,685
+    const measures = [{ id: "milburn_package", name: "Package", value: 0.559, colour: "" }];
     const scaled = povertyWaterfall(measures, null, 70);
-    expect(Math.round(-scaled.steps[0].x / 1000)).toBe(412);
-    const direct = povertyWaterfall(measures, null, 70, [], (id) => count(id, 2027, "poverty_abs_ahc_change_pp"));
-    expect(direct.steps[0].x).toBe(-409743);
-    expect(formatPeople(-direct.steps[0].x)).toBe("410,000");
+    expect(Math.round(-scaled.steps[0].x)).toBe(391300);
+    const direct = povertyWaterfall(measures, null, 70, [], (id) => count(id, 2029, "poverty_abs_ahc_change_pp"));
+    expect(direct.steps[0].x).toBe(-390685);
+    expect(formatPeople(-direct.steps[0].x)).toBe("391,000");
   });
 });
 

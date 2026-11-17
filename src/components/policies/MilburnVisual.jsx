@@ -147,8 +147,8 @@ function Columns({ view }) {
  */
 function PhasedColumns({ policy }) {
   const { summary } = useMilburnSummary(null);
-  const view = phasedView(policy.visual, policy.label ?? policy.name, phasedSavingShares(summary, policy.id));
-  return <Columns view={view} />;
+  const view = phasedView(policy.visual, policy.label ?? policy.name, phasedSavingShares(summary, policy.id, policy.visual.of));
+  return view ? <Columns view={view} /> : null;
 }
 
 /**

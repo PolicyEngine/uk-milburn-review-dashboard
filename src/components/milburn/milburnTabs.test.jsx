@@ -37,7 +37,8 @@ afterEach(() => {
   state.measureRows = null;
 });
 
-const youngRow = { reform_id: "combined--pkg", year: "2027", age_band: "16-24", people: "1000000", pct_worse_off: "10" };
+// The benchmarks file's year (policyengine_estimate_year), 2029-30
+const youngRow = { reform_id: "combined--pkg", year: "2029", age_band: "16-24", people: "1000000", pct_worse_off: "10" };
 
 const summaryText = readFileSync(join(__dirname, "..", "..", "test", "fixtures", "milburn", "summary", "milburn_summary.json"), "utf8");
 
@@ -194,9 +195,11 @@ describe("Benchmarks", () => {
     for (const [published, estimate] of [["260,000", "232,000"]]) {
       const row = screen.getByText(published).closest("li");
       expect(row.textContent).toContain(estimate);
-      expect(row.textContent).toContain("PolicyEngine, build fcfac709, 2027-28");
+      // A caseload is the 2027-28 baseline's, and says so; the savings are 2029-30's
+      expect(row.textContent).toContain("PolicyEngine, build fcfac709, 2027-28 baseline caseload");
     }
-    expect(screen.getByText("£4.43bn a year").closest("li").textContent).toContain("£5.1bn a year");
+    expect(screen.getByText("£4.65bn a year").closest("li").textContent).toContain("PolicyEngine, build fcfac709, 2029-30");
+    expect(screen.getByText("£4.65bn a year").closest("li").textContent).toContain("£5.1bn a year");
     // Each comparable pair is a comparison panel with its gap as a % of the published figure
     const region = screen.getByRole("region", { name: "Benchmarks" });
     expect([...region.querySelectorAll(".bm-compare")].map((panel) => panel.dataset.benchmark)).toEqual([
@@ -207,11 +210,11 @@ describe("Benchmarks", () => {
       "uc_health_spend_16_24",
       "employer_nics_under_25",
     ]);
-    expect(screen.getByText("£4.43bn a year").closest("li").textContent).toContain("PolicyEngine is 13.14% lower");
+    expect(screen.getByText("£4.65bn a year").closest("li").textContent).toContain("PolicyEngine is 8.82% lower");
     // A pair that counts different things says so, with no gap between the two
     for (const [published, difference] of [
-      ["£4.42bn a year", "a saving in 2027-28 against spending in 2025-26"],
-      ["£1.15bn a year", "a saving in 2027-28 against spending in 2025-26"],
+      ["£4.68bn a year", "a saving in 2029-30 against spending in 2025-26"],
+      ["£1.13bn a year", "a saving in 2029-30 against spending in 2025-26"],
       ["260,000", "benefit units against people"],
       ["176,000", "benefit units against people"],
       ["450,000", "ours leaves out 16 and 17-year-olds"],
@@ -247,10 +250,10 @@ describe("Benchmarks", () => {
     expect(saving.textContent).toContain("17 November 2026");
     // A figure on another basis is a tile with the PolicyEngine range beside it, not a gap
     const annual = screen.getByText("£3.6bn in 2036-37").closest("li");
-    expect(annual.textContent).toContain("£2.54bn to £4.49bn a year");
+    expect(annual.textContent).toContain("£2.64bn to £4.67bn a year");
     expect(annual.textContent).not.toContain("PolicyEngine is");
     const poverty = screen.getByText("50,000 fewer").closest("li");
-    expect(poverty.textContent).toContain("156,000 more");
+    expect(poverty.textContent).toContain("260,000 more");
     // The page's notes are folded away
     expect(screen.getByText("About these figures").closest("details")).not.toHaveAttribute("open");
     // Rows without a source are gone, and no link carries a stray %20 or points elsewhere than its label
