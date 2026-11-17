@@ -88,11 +88,11 @@ export const REPORT_COPY = Object.freeze({
     landingIntroLead: "",
     // The intro is: the PolicyEngine UK link, a space, rest, the report's link (FINAL_REPORT), tail
     landingIntroRest:
-      "estimates, by age, of benefit measures drawn from the final report of the independent review of young people and work,",
+      "estimates, by age, of benefit and employer National Insurance measures drawn from the final report of the independent review of young people and work,",
     landingIntroTail: " (17 November 2026). The report’s replacement payments are not modelled.",
     measuresBoxLine: "Every measure, and how we model it",
     metaDescription:
-      "PolicyEngine UK estimates of benefit measures drawn from From a Welfare State to a Working State, the final report of the independent review of young people and work (the Milburn review, 17 November 2026): the public finances and households by age. The report’s proposals are not government policy unless the government adopts them.",
+      "PolicyEngine UK estimates of benefit and employer National Insurance measures drawn from From a Welfare State to a Working State, the final report of the independent review of young people and work (the Milburn review, 17 November 2026): the public finances and households by age. The report’s proposals are not government policy unless the government adopts them.",
     methodSummary:
       "on a survey of UK households with and without each measure drawn from the final report of the Milburn review of young people and work; weights scale the survey to the UK. The figures are static.",
     reviewTopicPreview: "Final report 17 November 2026 · What it proposes · What we model · Not government policy",
@@ -114,10 +114,10 @@ export const REPORT_COPY = Object.freeze({
     rulesNotSetOut: "Its eligibility and rates are not in the model.",
     higherAmountAltTail: "",
     newBenefitAltTail: ".",
-    // Both comparators are wider forms of a proposal in the report (a
-    // Youth Allowance; an employer NICs relief for 21 to 24-year-olds in
-    // retail and hospitality), so neither is "not in the report"
-    comparatorsLabel: "Comparators (pre-report runs)",
+    // Neither comparator is "not in the report": PIP at half rate stands in
+    // for its Additional Cost Allowance, and zero employer NI under 25 is an
+    // option it considers (para 268). Both run from April 2027
+    comparatorsLabel: "Comparators (from April 2027)",
   }),
 });
 

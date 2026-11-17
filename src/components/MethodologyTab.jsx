@@ -62,8 +62,8 @@ const AnnexLink = ({ children = "analytical annex" }) => <ExternalLink href={FIN
 
 /**
  * What the final report proposes on benefits and employer costs, one line
- * each, in its own terms (executive summary, paragraphs 50, 101, 102 and
- * 107; chapter 6, paragraphs 748 to 756).
+ * each, in its own terms (executive summary, paragraphs 50, 51, 101, 102
+ * and 107; chapter 6, paragraphs 745 to 760).
  */
 export const REPORT_PROPOSALS = [
   "A single Youth Allowance at the under-25 rate of Universal Credit, higher for young people living independently.",
@@ -74,7 +74,7 @@ export const REPORT_PROPOSALS = [
   "A work allowance for everyone on the Youth Allowance who works, and a duty to engage, with loss of the allowance as a last resort.",
   "Child Disability Living Allowance extended from age 16 to 18.",
   "The employer National Insurance threshold raised from £5,000 to £10,000 for 21 to 24-year-olds in retail and hospitality, over five years, when fiscal conditions allow.",
-  "Opportunity and Support Guarantees through a Youth Opportunity Service, including a £3,000 subsidy for hiring a young person.",
+  "Opportunity and Support Guarantees through a Youth Opportunity Service, including a £3,000 payment to employers who hire a young person out of work and education for six months.",
 ];
 
 /**
@@ -82,10 +82,10 @@ export const REPORT_PROPOSALS = [
  * run: the runs published are listed under "Measures modelled".
  */
 export const REPORT_MODELLED = [
-  "Modelled: the health element removed for under-25s and PIP removed for 18 to 24-year-olds, each alone and together, with variants by age, by severity and phased as claimants are reassessed.",
-  "Stand-in: PIP at half rate, in place of the Additional Cost Allowance, for which the report gives no rates.",
-  "Wider than the report: the 25-and-over standard allowance for every under-25, and no employer National Insurance for any under-25.",
-  "Not modelled: the Health and Disability Fund, Severe and Complex Needs Insurance, the duty to engage, the Disability Living Allowance extension and the Guarantees.",
+  "Modelled: the health element removed for under-25s and PIP removed for 18 to 24-year-olds, each alone and together, from April 2029; and the £10,000 employer National Insurance threshold for 21 to 24-year-olds in retail and hospitality, at its end state.",
+  "Modelled with stated assumptions: the higher Youth Allowance for young people living independently, at the 25-and-over rate for under-25 claims with a housing costs element (the review’s own proxy, analytical annex, section 8); the benefit changes phased in, with people turning 18 moved at once and an assumed 45% of the remaining claimants each year; and the threshold raised in assumed equal steps from £6,000 in 2027-28 to £10,000 in 2031-32. Each is listed on the Measures tab as not yet run until its results are published.",
+  "Comparators, from April 2027: PIP at half rate, a stand-in for the Additional Cost Allowance, for which the report gives no rates; and no employer National Insurance for any under-25, an option the report considers and does not propose (paragraph 268).",
+  "Not modelled: the Additional Cost Allowance itself, the Health and Disability Fund, Severe and Complex Needs Insurance, the Youth Allowance’s work allowance, the duty to engage, the Disability Living Allowance extension and the Guarantees.",
 ];
 
 /**
@@ -94,10 +94,10 @@ export const REPORT_MODELLED = [
  * its timing and where it applies.
  */
 const REPORT_DESIGN_LIMITATIONS = [
-  ["Replacements not modelled", "The report replaces PIP for young people with an Additional Cost Allowance for ongoing costs and a local Health and Disability Fund for one-off or changing costs, and adds Severe and Complex Needs Insurance. The full abolition package (upper bound) includes none of them. The central variant stands in with PIP at half rate and the health element kept for severe cases."],
-  ["Youth Allowance", "The report sets its Youth Allowance at the under-25 rate, higher for those living independently, and adds a work allowance. The report gives no amount for the work allowance. Our comparator gives every under-25 the 25-and-over rate, which is wider."],
-  ["Employer National Insurance", "The report raises the employer threshold to £10,000 for 21 to 24-year-olds in retail and hospitality. It gives no start date or yearly steps. Our comparator removes employer National Insurance for all under-25s on earnings up to £50,270, which is wider."],
-  ["Timing", "Our measures apply in full from April 2027. The report moves new claims first and existing claimants at their scheduled reassessment, with welfare savings from 2029-30; the phased package approximates this with an assumed 25% reassessed each year."],
+  ["Replacements not modelled", "The report proposes replacing PIP for young people with an Additional Cost Allowance for ongoing costs and a local Health and Disability Fund for one-off or changing costs, and adding Severe and Complex Needs Insurance. Our runs of the report’s benefit changes include none of them, so their losses are an upper bound. The comparator with PIP at half rate stands in for the Additional Cost Allowance."],
+  ["Youth Allowance", "The report proposes a Youth Allowance at the under-25 rate, higher for those living independently, and a work allowance. It gives no amount for the higher rate or the work allowance. The base rate leaves awards unchanged. Our run of the higher rate pays the 25-and-over rate to claims in which every adult is under 25 and that include a housing costs element, the review’s own proxy for living independently (analytical annex, section 8). The work allowance is not modelled."],
+  ["Employer National Insurance", "The report proposes raising the employer threshold from £5,000 to £10,000 for 21 to 24-year-olds in retail and hospitality over five years, when fiscal conditions allow. It gives no start date, yearly steps or costing. One run shows the £10,000 end state in every year; another assumes equal steps from £6,000 in 2027-28 to £10,000 in 2031-32. The comparator removes employer National Insurance for all under-25s on earnings up to £50,270, which is wider."],
+  ["Timing", "The report’s benefit changes apply from April 2029, the first year of the report’s welfare savings; the comparators apply from April 2027. The report proposes moving new claims first and existing claimants at their scheduled reassessment, within five years (paragraph 773). Our main runs apply each change to everyone at once; the phased run moves people turning 18 at once and an assumed 45% of the remaining claimants each year, about 95% within five years."],
   ["Geography", "Unless a measure says otherwise, our figures apply it across the UK, including Scotland, where Adult Disability Payment has replaced PIP, and Northern Ireland, which runs its own social security system. The report’s welfare estimates also cover PIP and Universal Credit across the UK, but its support costs cover Great Britain and its delivery proposals are most specific to England."],
 ];
 
@@ -250,7 +250,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
                 </p>
                 <p className="method-lead">
                   What the <ReportLink />{" "}
-                  proposes on benefits and employer costs (paragraphs 50, 101 to 107 and 748 to 756):
+                  proposes on benefits and employer costs (paragraphs 50, 51, 101 to 107 and 745 to 760):
                 </p>
                 <ul className="method-list" data-report-proposals="">
                   {REPORT_PROPOSALS.map((line) => (
@@ -434,7 +434,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
                 ["Other ages", AGE_HOUSEHOLD_NOTE],
                 [
                   "Under 25",
-                  "Most measures apply to people under 25, and the PIP measure to those aged 18 to 24; the 16 to 24 band covers both.",
+                  "The health element measure applies to people under 25, the PIP measure to those aged 18 to 24 and the employer National Insurance threshold to those aged 21 to 24; the 16 to 24 band covers all three.",
                 ],
               ]}
             />
@@ -451,7 +451,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
               items={[
                 [
                   "Microsimulated",
-                  `The full abolition package is run again on the assumption that ${ENTRY_ASSUMPTION_TEXT}, chosen at random, and set beside the static package: the saving, poverty and average loss.`,
+                  `The full abolition package (the same two removals as the report’s benefit changes, applied from April 2027) is run again on the assumption that ${ENTRY_ASSUMPTION_TEXT}, chosen at random, and set beside the static package: the saving, poverty and average loss.`,
                 ],
                 [
                   "Why 25%",
@@ -489,7 +489,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
           </Topic>
           <Topic id="method-benchmarks" title="Benchmarks" preview="Published figures · Sources · PolicyEngine estimates beside them">
             <p className="method-more">
-              Published figures from the ONS, DWP, the Resolution Foundation and the IFS, each with its basis, source
+              Published figures from the review, the ONS, the Resolution Foundation and the IFS, each with its basis, source
               and date. Where PolicyEngine has a comparable figure, it sits beside it, labelled with its build and
               year; the two can count different groups or areas, so the estimate is context, not a check.
             </p>

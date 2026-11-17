@@ -208,7 +208,7 @@ export function EntryComparison({ summary, catalogue }) {
         id="milburn-entry-heading"
         icon="briefcase"
         title={title}
-        description={`${fullName}, ${yearLabel}: static, against ${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group} moving into work${movers !== null ? ` (about ${formatPeople(movers)} people)` : ""}.`}
+        description={`${fullName} (the same two removals as the report’s benefit changes, applied from April 2027), ${yearLabel}: static, against ${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group} moving into work${movers !== null ? ` (about ${formatPeople(movers)} people)` : ""}.`}
         name="quarter-moving-into-work"
         csv={csv}
         legendItems={SERIES.map((series) => ({ color: series.color, label: series.name, type: "rect" }))}
@@ -306,7 +306,9 @@ const onePlace = (value) => `${value.toFixed(1)}%`;
 function neetRateText(rate) {
   if (!rate) return "";
   const last = rate.years.length - 1;
-  return `${onePlace(rate.withReformsPct[0])} in ${rate.years[0]} to ${onePlace(rate.withReformsPct[last])} in ${rate.years[last]}; ${onePlace(rate.baselinePct[last])} in ${rate.years[last]} without the reforms`;
+  const path = `${onePlace(rate.withReformsPct[0])} in ${rate.years[0]} to ${onePlace(rate.withReformsPct[last])} in ${rate.years[last]}; ${onePlace(rate.baselinePct[last])} in ${rate.years[last]} without the reforms`;
+  // The review's own target, which its modelled path stops short of (paragraph 142)
+  return rate.ambitionPct === null || rate.ambitionPct === undefined ? path : `${path}; the review’s ambition is around ${rate.ambitionPct}%`;
 }
 
 /**
@@ -343,7 +345,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
       key: "method",
       icon: "calculator",
       label: "Method",
-      ours: "Static microsimulation; entry rate assumed, not estimated",
+      ours: "Microsimulation with an assumed move into work; entry rate assumed, not estimated",
       theirs: employment.method && "Evidence from past programmes, summed and adjusted for overlap",
     },
     {
@@ -359,7 +361,11 @@ export function ReviewComparison({ summary, review, catalogue }) {
       icon: "percent",
       label: "NEET rate",
       ours: "Not modelled",
-      theirs: neetRate && `${onePlace(neetRate.withReformsPct[0])} to ${onePlace(neetRate.withReformsPct[last])} by ${neetRate.years[last]}`,
+      theirs:
+        neetRate &&
+        `${onePlace(neetRate.withReformsPct[0])} to ${onePlace(neetRate.withReformsPct[last])} by ${neetRate.years[last]}${
+          neetRate.ambitionPct === null || neetRate.ambitionPct === undefined ? "" : `; ambition around ${neetRate.ambitionPct}%`
+        }`,
     },
   ].filter((row) => row.theirs);
   const cards = [
@@ -391,7 +397,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
     {
       key: "method",
       label: "Method",
-      ours: "Static microsimulation, with an entry rate that is assumed for illustration, not estimated",
+      ours: "Microsimulation with an assumed move into work; the entry rate is assumed for illustration, not estimated",
       theirs: employment.method,
     },
     { key: "work", label: "Work assumed", ours: `${ENTRY_ASSUMPTION.work[0].toUpperCase()}${ENTRY_ASSUMPTION.work.slice(1)}`, theirs: employment.hours },

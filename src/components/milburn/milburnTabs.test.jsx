@@ -87,10 +87,10 @@ describe("Return to work", () => {
     expect(row("people")).toEqual(["People moving into work", "About 70,000", "About 440,000"]);
     expect(row("when")).toEqual(["When", "2027-28", "By 2036"]);
     expect(row("who")[1]).toBe("25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random");
-    expect(row("method")[1]).toMatch(/^Static microsimulation, with an entry rate that is assumed/);
+    expect(row("method")[1]).toBe("Microsimulation with an assumed move into work; the entry rate is assumed for illustration, not estimated");
     expect(row("method")[2]).toBe(published.employment.method);
     expect(row("work")[2]).toBe(published.employment.hours);
-    expect(row("neet")).toEqual(["NEET rate, 16 to 24-year-olds", "Not modelled", "13.1% in 2026/27 to 6.8% in 2036/37; 13.4% in 2036/37 without the reforms"]);
+    expect(row("neet")).toEqual(["NEET rate, 16 to 24-year-olds", "Not modelled", "13.1% in 2026/27 to 6.8% in 2036/37; 13.4% in 2036/37 without the reforms; the review’s ambition is around 5%"]);
     // Two cards say whose figure each is: ours an estimate, the review's published
     const card = (side) => section.querySelector(`.milburn-versus-card[data-side="${side}"]`);
     expect(card("ours").querySelector("h4").textContent).toBe("PolicyEngine: illustrative scenario");
@@ -108,7 +108,7 @@ describe("Return to work", () => {
         expect(line.textContent.split(/\s+/).length, line.textContent).toBeLessThanOrEqual(13);
       }
     }
-    expect(card("theirs").querySelector('[data-card-row="neet"]').textContent).toBe("NEET rate: 13.1% to 6.8% by 2036/37");
+    expect(card("theirs").querySelector('[data-card-row="neet"]').textContent).toBe("NEET rate: 13.1% to 6.8% by 2036/37; ambition around 5%");
     // The bars say whose each is
     expect(section.querySelector("[data-single-chart] [role=img]").getAttribute("aria-label")).toMatch(/PolicyEngine estimate, 2027-28: about 70,000\. The review \(published\), by 2036: about 440,000/);
     // One short source line in view; the table and the full citation are folded away
@@ -207,12 +207,19 @@ describe("Benchmarks", () => {
       "uc_health_spend_16_24",
       "employer_nics_under_25",
     ]);
-    expect(screen.getByText("260,000").closest("li").textContent).toContain("PolicyEngine is 10.77% lower");
     expect(screen.getByText("£4.43bn a year").closest("li").textContent).toContain("PolicyEngine is 13.14% lower");
-    expect(screen.getByText("£4.42bn a year").closest("li").textContent).toContain("PolicyEngine is 16.32% higher");
-    expect(screen.getByText("£1.15bn a year").closest("li").textContent).toContain("PolicyEngine is 25.00% higher");
-    expect(screen.getByText("176,000").closest("li").textContent).toContain("PolicyEngine is 31.82% higher");
-    expect(screen.getByText("450,000").closest("li").textContent).toContain("PolicyEngine is 22.89% lower");
+    // A pair that counts different things says so, with no gap between the two
+    for (const [published, difference] of [
+      ["£4.42bn a year", "a saving in 2027-28 against spending in 2025-26"],
+      ["£1.15bn a year", "a saving in 2027-28 against spending in 2025-26"],
+      ["260,000", "benefit units against people"],
+      ["176,000", "benefit units against people"],
+      ["450,000", "ours leaves out 16 and 17-year-olds"],
+    ]) {
+      const panel = screen.getByText(published).closest("li");
+      expect(panel.textContent, published).toContain(`Not like for like: ${difference}`);
+      expect(panel.textContent, published).not.toMatch(/PolicyEngine is|% (higher|lower)/);
+    }
     // Every other figure is a stat tile under its theme, once, with its source and date
     expect([...region.querySelectorAll(".bm-tile")].map((tile) => tile.dataset.benchmark)).toEqual([
       "neet_16_24",

@@ -1271,21 +1271,21 @@ _UC_AGE = milburn_design.UC_HEALTH_UPPER_AGE  # 25
 _UNDER = milburn_design.under_text()  # "under-25s"
 _PIP_BAND = milburn_design.age_band_text()  # "18 to 24"
 _PIP_PEOPLE = milburn_design.age_band_people_text()  # "18 to 24-year-olds"
-# Sentences that date from before the report: rewrite them on report day.
+# How each 15 November run stands against the final report (17 November
+# 2026): what the report proposes in its place.
 YOUTH_ALLOWANCE_BRIEFING_NOTE = (
-    "Briefings before the report point to a "
-    "youth allowance at the under-25 rate, which would leave awards "
-    "unchanged; this variant shows the higher rate."
+    "The report proposes a Youth Allowance at the under-25 rate, higher "
+    "only for those living independently; this run shows the higher rate "
+    "for every under-25."
 )
 EMPLOYER_NICS_BRIEFING_NOTE = (
-    "Recommended by the Work and Pensions Committee; briefings do "
-    "not attribute it to the review."
+    "The report considers this option and does not propose it (paragraph "
+    "268); it proposes a higher threshold for 21 to 24-year-olds in retail "
+    "and hospitality instead."
 )
 SEVERE_KEPT_BRIEFING_NOTE = (
-    "The points stand "
-    "in for the trailed higher-rate "
-    "benefit for people with the most severe conditions, whose "
-    "eligibility rules are not yet known."
+    "The points stand in for the report's Severe and Complex Needs "
+    "Insurance, for which the report gives no eligibility test."
 )
 UC_HEALTH_UNDER_25_ID = "uc_health_element_removed_under_25"
 UC_HEALTH_UNDER_25_NEW_CLAIMS_ID = (
@@ -1599,8 +1599,8 @@ def _create_pip_halved_under_25() -> Reform:
         description=(
             f"{_FROM} people aged {_PIP_BAND} receive half their current "
             "Personal Independence Payment. This is an illustrative stand-in "
-            "for a smaller, non-means-tested additional cost allowance in "
-            "place of PIP, whose rules are not yet known; Scottish Adult "
+            "for the report's Additional Cost Allowance, for which the report "
+            "gives no rates; Scottish Adult "
             "Disability Payment, recorded as PIP, is included. Half an award "
             "can fall below the amounts that qualify a carer for Carer's "
             "Allowance or a household for disability premia, so those can be "
@@ -1954,6 +1954,20 @@ def _report_employer_nics_text() -> tuple[str, str]:
     return name, description
 
 
+def _report_replacements_text() -> str:
+    """Said of the report package while it removes both benefits with
+    nothing in their place: the report's replacement payments (Additional
+    Cost Allowance, Health and Disability Fund, Severe and Complex Needs
+    Insurance) are not in the run. Empty once a stand-in is set."""
+    d = milburn_design
+    stand_in = (
+        d.REPORT_PIP_REPLACEMENT_SHARE
+        or d.REPORT_PIP_REPLACEMENT_SHARES is not None
+        or d.REPORT_UC_HEALTH_SEVERE_KEPT
+    )
+    return "" if stand_in else " and without its replacement payments"
+
+
 def _report_without_employer_nics_text() -> str:
     """A sentence for the report variants that leave the employer rate
     out; empty while no rate is set."""
@@ -2141,8 +2155,8 @@ def _create_milburn_report_youth_allowance_independent() -> Reform:
             "under 25 and that include a housing costs element are paid the "
             "standard allowance for those aged 25 and over, the review's own "
             "proxy for living independently (analytical annex, section 8). "
-            "Other young claims keep the under-25 rate, which the report sets "
-            "as the Youth Allowance's base level. The report gives no amount "
+            "Other young claims keep the under-25 rate, which the report "
+            "proposes as the Youth Allowance's base level. The report gives no amount "
             "for its work allowance, so none is modelled."
         ),
         simulation_modifier=_youth_allowance_independent,
@@ -2260,8 +2274,9 @@ def _get_reserved() -> dict[str, Reform]:
             package_id=MILBURN_REPORT_PACKAGE_ID,
             name="Milburn report package (combined)",
             description=(
-                f"The report's design, simulated together with their "
-                f"interactions: {'; '.join(names)}."
+                "The report's changes modelled here, simulated together "
+                f"with their interactions{_report_replacements_text()}: "
+                f"{'; '.join(names)}."
             ),
         )
         # Not the cached lookup: this can run while _get_reforms is still

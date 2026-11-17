@@ -71,7 +71,7 @@ export const BENCHMARK_SHORT = {
   neet_rate_projection_2036: {
     label: "NEET rate the review projects for 2036-37",
     icon: "arrowDown",
-    basis: "16–24s, UK, from 13.1% in 2026-27; the review's modelling",
+    basis: "16–24s, UK, from 13.1% in 2026-27; the review's modelling. Its ambition is around 5%",
   },
   into_sustained_work_2036: {
     label: "Into sustained work by 2036, the review expects",
@@ -139,7 +139,7 @@ export const BENCHMARK_SHORT = {
   milburn_welfare_saving_10y: {
     label: "Cumulative welfare savings by 2036-37",
     icon: "coins",
-    basis: "Eight years, 2029-30 to 2036-37, 2026-27 prices; reported as £13.8bn before publication",
+    basis: "Eight years, 2029-30 to 2036-37, 2026-27 prices",
   },
   review_investment_2036: {
     label: "Annual cost of the review's recommendations",
@@ -149,10 +149,10 @@ export const BENCHMARK_SHORT = {
   youth_hiring_incentives_cost: {
     label: "Cost of the review's youth hiring incentives",
     icon: "userPlus",
-    basis: "Youth Jobs Grant and apprenticeships; no separate employer NICs cost",
+    basis: "Youth Jobs Grant and apprenticeships; no separate employer NI cost",
   },
   employer_nics_under_25: {
-    label: "Cost of zero employer NICs for under-25s",
+    label: "Cost of zero employer NI for under-25s",
     icon: "building",
     basis: "Resolution Foundation estimate; not a recommendation of the review",
     estimateBasis: "Static cost, UK",
@@ -166,6 +166,20 @@ export const BENCHMARK_SHORT = {
   kept_out_of_poverty: { label: "Kept out of poverty by UC health and/or PIP", icon: "shield" },
   pip_no_extra_costs: { label: "Young PIP claimants reporting no extra costs", icon: "receipt" },
 };
+
+/**
+ * Pairs whose two figures count different things, by row id, with the
+ * difference in a few words: drawn side by side, with no gap between them
+ * (a gap to two decimal places would read as a check on the published
+ * figure). The other pairs measure the same thing and keep their gap.
+ */
+export const DIFFERENT_BASIS = Object.freeze({
+  uc_health_no_work_requirements: "benefit units against people",
+  uc_health_element_16_24: "benefit units against people",
+  young_pip_recipients: "ours leaves out 16 and 17-year-olds",
+  pip_spend_16_24: "a saving in 2027-28 against spending in 2025-26",
+  uc_health_spend_16_24: "a saving in 2027-28 against spending in 2025-26",
+});
 
 /** The icon of a figure with none of its own. */
 export const BENCHMARK_ICON = "fileText";

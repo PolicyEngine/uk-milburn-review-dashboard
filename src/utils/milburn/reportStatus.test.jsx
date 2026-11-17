@@ -80,7 +80,7 @@ describe("the switch", () => {
     const text = flat(REPORT_COPY.after);
     expect(text).not.toMatch(STALE);
     expect(text).not.toMatch(/government will|will adopt|should|must/i);
-    expect(REPORT_COPY.after.comparatorsLabel).toBe("Comparators (pre-report runs)");
+    expect(REPORT_COPY.after.comparatorsLabel).toBe("Comparators (from April 2027)");
     expect(REPORT_COPY.after.policyLimit).toContain("not government policy unless the government adopts them");
   });
 
@@ -108,7 +108,7 @@ describe("the landing page", () => {
     const { container } = render(<LandingPage onOpen={() => {}} published />);
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Young people and work: measures from the final report modelled");
     expect(document.querySelector(".landing-intro")).toHaveTextContent(
-      /^PolicyEngine UK( \(opens in a new tab\))? estimates, by age, of benefit measures drawn from the final report of the independent review of young people and work, From a Welfare State to a Working State( \(opens in a new tab\))? \(17 November 2026\)\. The report’s replacement payments are not modelled\.$/,
+      /^PolicyEngine UK( \(opens in a new tab\))? estimates, by age, of benefit and employer National Insurance measures drawn from the final report of the independent review of young people and work, From a Welfare State to a Working State( \(opens in a new tab\))? \(17 November 2026\)\. The report’s replacement payments are not modelled\.$/,
     );
     expect(screen.getByRole("link", { name: /PolicyEngine UK/ })).toHaveAttribute("href", "https://policyengine.org/uk/model");
     const report = screen.getByRole("link", { name: /From a Welfare State to a Working State/ });
@@ -157,7 +157,9 @@ describe("Methodology", () => {
     expect([...topic().querySelectorAll("[data-report-modelled] li")].map((item) => item.textContent)).toEqual(REPORT_MODELLED);
     const proposals = REPORT_PROPOSALS.join("\n");
     for (const name of ["Youth Allowance", "Additional Cost Allowance", "Health and Disability Fund", "Severe and Complex Needs Insurance", "21 to 24-year-olds in retail and hospitality"]) expect(proposals, name).toContain(name);
-    expect(REPORT_MODELLED.map((line) => line.split(":")[0])).toEqual(["Modelled", "Stand-in", "Wider than the report", "Not modelled"]);
+    expect(REPORT_MODELLED.map((line) => line.split(":")[0])).toEqual(["Modelled", "Modelled with stated assumptions", "Comparators, from April 2027", "Not modelled"]);
+    // The runs offered now: no pre-report package or variant is named
+    expect(REPORT_MODELLED.join("\n")).not.toMatch(/full abolition|central variant|upper bound/i);
     expect(topic().textContent).toContain("Proposals we do not model are listed with the reason under “Measures we cannot compute”.");
     expect(topic().textContent).toContain("The report’s proposals are not government policy unless the government adopts them.");
     // The list the topic points to is on the same tab
@@ -180,6 +182,14 @@ describe("Methodology", () => {
     const text = Object.fromEntries(milburnLimitations(true));
     expect(text["Replacements not modelled"]).toContain("Additional Cost Allowance for ongoing costs and a local Health and Disability Fund for one-off or changing costs");
     expect(text.Geography).toContain("Northern Ireland");
+    // The runs as they stand: the benefit changes from April 2029, the comparators from April 2027, the phased run's assumption
+    expect(text.Timing).toContain("The report’s benefit changes apply from April 2029");
+    expect(text.Timing).toContain("the comparators apply from April 2027");
+    expect(text.Timing).toContain("an assumed 45% of the remaining claimants each year");
+    expect(text["Youth Allowance"]).toContain("the review’s own proxy for living independently (analytical annex, section 8)");
+    expect(text["Employer National Insurance"]).toContain("One run shows the £10,000 end state in every year");
+    // The report proposes; no limit says a change is happening, or names a run no longer offered
+    expect(Object.values(text).join(" ")).not.toMatch(/The report (replaces|raises|moves|sets|adds|doubles)\b|full abolition package|central variant/);
     expect(milburnLimitations(true).flat().join(" ")).not.toMatch(STALE);
   });
 

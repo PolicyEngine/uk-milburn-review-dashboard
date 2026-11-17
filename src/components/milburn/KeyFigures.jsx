@@ -31,7 +31,7 @@ export const REPLACEMENT_PARTS_NOTE =
   "Left out: Additional Cost Allowance (ongoing costs), local Health and Disability Fund (one-off or changing costs), Severe and Complex Needs Insurance.";
 
 /** The range strip's short names for the packages, by position in PACKAGE_IDS. */
-const RANGE_NAMES = ["Upper bound", "Central", "Phased"];
+const RANGE_NAMES = ["No replacement", "Central", "Phased"];
 
 /**
  * The packages' range, whatever run is selected: each package's saving and
@@ -57,7 +57,7 @@ export function packageRange(summary) {
 export const RANGE_WITH_SELECTION = "The packages side by side; the one shown above is in full colour.";
 
 /** Under the range's title when the run shown above is not a package: nothing is picked out. */
-export const RANGE_WITHOUT_SELECTION = "The packages side by side, for context; the measure shown above is not one of them.";
+export const RANGE_WITHOUT_SELECTION = "Earlier package runs, applied from April 2027, for context.";
 
 function RangeStrip({ summary, selectedId }) {
   const rows = packageRange(summary);

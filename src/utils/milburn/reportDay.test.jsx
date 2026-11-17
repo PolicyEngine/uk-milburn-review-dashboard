@@ -63,14 +63,14 @@ describe("the landing boxes", () => {
     expect(landingBoxes({ reportDay: false }).map(([tab, sub, , title]) => [tab, sub, title])).toEqual([
       ["dashboard", "age", "Young people"],
       ["dashboard", "scenarios", "Return to work"],
-      ["policies", undefined, "The measures modelled"],
+      ["policies", undefined, "Measures we model"],
     ]);
   });
 
   it("on: Return to work's box is left out", () => {
     expect(landingBoxes({ reportDay: true }).map(([tab, sub, , title]) => [tab, sub, title])).toEqual([
       ["dashboard", "age", "Young people"],
-      ["policies", undefined, "The measures modelled"],
+      ["policies", undefined, "Measures we model"],
     ]);
   });
 

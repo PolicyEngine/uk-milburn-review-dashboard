@@ -43,14 +43,14 @@
     {
       "id": "youth_allowance_at_25_plus_rate",
       "name": "Under-25 UC standard allowance at the 25-and-over rate",
-      "description": "From April 2027 single Universal Credit claimants under 25 receive the standard allowance for those aged 25 and over, and couples in which both are under 25 receive the couple rate for those aged 25 and over. The protected health element is held at its current-law amount, which the law otherwise links to the under-25 allowances. Briefings before the report point to a youth allowance at the under-25 rate, which would leave awards unchanged; this variant shows the higher rate.",
+      "description": "From April 2027 single Universal Credit claimants under 25 receive the standard allowance for those aged 25 and over, and couples in which both are under 25 receive the couple rate for those aged 25 and over. The protected health element is held at its current-law amount, which the law otherwise links to the under-25 allowances. The report proposes a Youth Allowance at the under-25 rate, higher only for those living independently; this run shows the higher rate for every under-25.",
       "status": "computable",
       "first_year": 2027
     },
     {
       "id": "employer_nics_zero_under_25",
       "name": "Employer NICs zero rate extended to under-25s",
-      "description": "From April 2027 employers pay no Class 1 National Insurance on earnings up to the upper secondary threshold (\u00a350,270 a year) for employees under 25, extending the zero rate for under-21s. The model passes employers' National Insurance through to wages, so the saving shows as higher pay for these employees. Recommended by the Work and Pensions Committee; briefings do not attribute it to the review.",
+      "description": "From April 2027 employers pay no Class 1 National Insurance on earnings up to the upper secondary threshold (\u00a350,270 a year) for employees under 25, extending the zero rate for under-21s. The model passes employers' National Insurance through to wages, so the saving shows as higher pay for these employees. The report considers this option and does not propose it (paragraph 268); it proposes a higher threshold for 21 to 24-year-olds in retail and hospitality instead.",
       "status": "computable",
       "first_year": 2027
     },
@@ -64,14 +64,14 @@
     {
       "id": "uc_health_element_removed_under_25_severe_kept",
       "name": "UC health element removed for under-25s, severe cases kept",
-      "description": "As the removal for under-25s, except that a young claimant with limited capability for work and work-related activity who scores 24 or more PIP daily living points (about a fifth of young PIP recipients) keeps the element. The points stand in for the trailed higher-rate benefit for people with the most severe conditions, whose eligibility rules are not yet known.",
+      "description": "As the removal for under-25s, except that a young claimant with limited capability for work and work-related activity who scores 24 or more PIP daily living points (about a fifth of young PIP recipients) keeps the element. The points stand in for the report's Severe and Complex Needs Insurance, for which the report gives no eligibility test.",
       "status": "computable",
       "first_year": 2027
     },
     {
       "id": "pip_halved_under_25",
       "name": "PIP at half rate for 18 to 24-year-olds",
-      "description": "From April 2027 people aged 18 to 24 receive half their current Personal Independence Payment. This is an illustrative stand-in for a smaller, non-means-tested additional cost allowance in place of PIP, whose rules are not yet known; Scottish Adult Disability Payment, recorded as PIP, is included. Half an award can fall below the amounts that qualify a carer for Carer's Allowance or a household for disability premia, so those can be lost too; a new allowance could carry its own qualifying rules.",
+      "description": "From April 2027 people aged 18 to 24 receive half their current Personal Independence Payment. This is an illustrative stand-in for the report's Additional Cost Allowance, for which the report gives no rates; Scottish Adult Disability Payment, recorded as PIP, is included. Half an award can fall below the amounts that qualify a carer for Carer's Allowance or a household for disability premia, so those can be lost too; a new allowance could carry its own qualifying rules.",
       "status": "computable",
       "first_year": 2027
     },
@@ -99,23 +99,23 @@
     {
       "id": "milburn_report_package",
       "name": "Milburn report package (combined)",
-      "description": "The report's design, simulated together with their interactions: UC health element removed for under-25s; PIP removed for 18 to 24-year-olds.",
+      "description": "The report's changes modelled here, simulated together with their interactions and without its replacement payments: UC health element removed for under-25s; PIP removed for 18 to 24-year-olds.",
       "status": "computable",
-      "first_year": 2027
+      "first_year": 2029
     },
     {
       "id": "milburn_report_uc_health",
       "name": "UC health element removed for under-25s",
       "description": "From April 2029 Universal Credit awards no longer include the health (LCWRA) element where the claimant with limited capability for work and work-related activity is under 25, for existing and new claimants alike; an award keeps it where a joint claimant aged 25 or over has that capability. The assessment itself is unchanged, so the work allowance still applies, but an award without the element loses the benefit cap exception that rests on it.",
       "status": "computable",
-      "first_year": 2027
+      "first_year": 2029
     },
     {
       "id": "milburn_report_pip",
       "name": "PIP removed for 18 to 24-year-olds",
       "description": "From April 2029 people aged 18 to 24 receive neither component of Personal Independence Payment; 16 and 17-year-olds keep it and Disability Living Allowance for children is unchanged. Entitlements that depend on receiving PIP go with it. Scottish recipients of Adult Disability Payment, which the data record as PIP, are included.",
       "status": "computable",
-      "first_year": 2027
+      "first_year": 2029
     },
     {
       "id": "milburn_report_employer_nics_threshold",
@@ -127,16 +127,16 @@
     {
       "id": "milburn_report_youth_allowance_independent",
       "name": "Higher Youth Allowance for under-25s living independently",
-      "description": "From April 2029 Universal Credit claims in which every adult is under 25 and that include a housing costs element are paid the standard allowance for those aged 25 and over, the review's own proxy for living independently (analytical annex, section 8). Other young claims keep the under-25 rate, which the report sets as the Youth Allowance's base level. The report gives no amount for its work allowance, so none is modelled.",
+      "description": "From April 2029 Universal Credit claims in which every adult is under 25 and that include a housing costs element are paid the standard allowance for those aged 25 and over, the review's own proxy for living independently (analytical annex, section 8). Other young claims keep the under-25 rate, which the report proposes as the Youth Allowance's base level. The report gives no amount for its work allowance, so none is modelled.",
       "status": "computable",
-      "first_year": 2027
+      "first_year": 2029
     },
     {
       "id": "milburn_report_package_phased",
       "name": "Milburn report package, phased as claimants are reassessed",
       "description": "The report's health element and PIP changes for young people, reaching people who turned 18 since April 2028 at once, and existing claimants as they are reassessed, at an assumed 45% of those remaining each year. Who is reassessed is a random draw, as the data hold no reassessment dates.",
       "status": "computable",
-      "first_year": 2027
+      "first_year": 2029
     },
     {
       "id": "milburn_report_employer_nics_threshold_glide_path",

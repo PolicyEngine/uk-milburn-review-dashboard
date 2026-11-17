@@ -29,29 +29,6 @@ const EDUCATION = { label: "Education and skills", icon: "cap" };
 
 export const NOT_COMPUTABLE_MEASURES = [
   {
-    // Report 6.5, para 748: higher for young people living independently,
-    // care leavers and the estranged included; no amount is given (the
-    // annex's own modelling proxies it with the 25-and-over rate)
-    id: "youth_allowance_higher_rate",
-    name: "Higher Youth Allowance for those living independently",
-    summary: "A higher Youth Allowance for under-25s living independently, including care leavers and estranged young people.",
-    affects: "Under-25s on Universal Credit living independently",
-    category: BENEFITS,
-    kind: "A higher rate of an existing benefit.",
-    notModelled: "The report gives no amount for the higher rate.",
-    visual: {
-      kind: "split",
-      caption: "Which Youth Allowance rate a young person gets",
-      root: [{ icon: "user", label: "A young person on Youth Allowance" }],
-      test: { icon: "house", label: "Living independently", unknown: "No amount given" },
-      branches: [
-        { answer: "No", icon: "wallet", label: "Standard young person's rate" },
-        { answer: "Yes", icon: "wallet", label: "Higher rate", tone: "gain", plus: true },
-      ],
-      alt: "A young person living independently would get a higher Youth Allowance than the standard young person's rate. The report gives no amount for it.",
-    },
-  },
-  {
     // Report 6.5, para 749: a work allowance for everyone on the Youth
     // Allowance in work; no amount is given
     id: "youth_allowance_work_allowance",
@@ -165,7 +142,7 @@ export const NOT_COMPUTABLE_MEASURES = [
     // week for 6 months, conditional on a participation plan
     id: "care_leaver_transition_allowance",
     name: "Care Leaver Transition Allowance",
-    summary: "£50 a week for six months for care leavers out of work and education.",
+    summary: "A six-month £50 weekly allowance for care leavers who are NEET or at serious risk.",
     affects: "Care leavers with a participation plan",
     category: BENEFITS,
     kind: "A new time-limited allowance.",

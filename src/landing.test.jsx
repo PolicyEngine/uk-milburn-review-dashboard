@@ -28,7 +28,7 @@ const INTRO = new RegExp(`^${literal(COPY.landingIntroLead)}PolicyEngine UK${NEW
 const BOXES = {
   society: /^Young people/,
   scenarios: /^Return to work/,
-  policies: /^The measures modelled/,
+  policies: /^Measures we model/,
 };
 
 beforeEach(() => {
@@ -74,7 +74,7 @@ describe("the landing page", () => {
     expect(within(page).getAllByRole("link", { name: /Explore$/ }).map((link) => [link.getAttribute("href"), link.textContent])).toEqual([
       ["?tab=dashboard&sub=age", "Young peopleWho gains or loses, and the costExplore→"],
       ...(RETURN_TO_WORK_SHOWN ? [["?tab=dashboard&sub=scenarios", "Return to workThe package if some young people move into workExplore→"]] : []),
-      ["?tab=policies", `The measures modelled${COPY.measuresBoxLine}Explore→`],
+      ["?tab=policies", `Measures we model${COPY.measuresBoxLine}Explore→`],
     ]);
     expect(page.querySelector(".landing-box-figure")).toBeNull();
     expect(page.querySelector(".landing-boxes")).not.toHaveTextContent(/£|\d/);
@@ -128,7 +128,7 @@ describe("the landing page", () => {
     ).toBeInTheDocument();
   });
 
-  it("names the policies box after the measures modelled, with no provisional subtitle, once every measure is approved", async () => {
+  it("names the policies box Measures we model, with no provisional subtitle, once every measure is approved", async () => {
     const { container } = await renderApp();
     expect(container.querySelectorAll(".publication-provisional")).toHaveLength(0);
     fireEvent.click(box("policies"));
@@ -326,7 +326,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
     expect(rows.map((row) => row.textContent)).toEqual([
       "Young peopleWho gains or loses, and the cost",
       ...(RETURN_TO_WORK_SHOWN ? ["Return to workThe package if some young people move into work"] : []),
-      `The measures modelled${COPY.measuresBoxLine}`,
+      `Measures we model${COPY.measuresBoxLine}`,
     ]);
     const site = within(within(nav).getByRole("region", { name: "More from PolicyEngine" })).getByRole("link");
     expect(site).toHaveTextContent("policyengine.orgResearch, the model and the API (opens in a new tab)");
@@ -392,7 +392,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
   it.each([
     [/^Young people/, "Impact", "dashboard"],
     ...(RETURN_TO_WORK_SHOWN ? [[/^Return to work/, "Impact", "dashboard"]] : []),
-    [/^The measures modelled/, "Measures", "policies"],
+    [/^Measures we model/, "Measures", "policies"],
   ])("opens a view from a box and closes: %s", async (name, view, tab) => {
     await openDrawer();
     fireEvent.click(within(drawer()).getByRole("link", { name }));

@@ -45,9 +45,9 @@ describe("with the final report published", () => {
     expect(CANDIDATE_PROVISIONAL_LABEL).not.toBe(PROVISIONAL_LABEL);
   });
 
-  it("labels the comparators as wider than the report proposes, and keeps the other groups as they were", () => {
+  it("labels the comparators by their start, and keeps the other groups as they were", () => {
     const labels = MILBURN_GROUPS.filter((group) => !group.hidden).map((group) => group.label);
-    expect(labels).toEqual(["The report's measures", "Comparators (pre-report runs)"]);
+    expect(labels).toEqual(["The report's measures", "Comparators (from April 2027)"]);
     expect(MILBURN_GROUPS.find((group) => group.id === COMPARATORS_GROUP).label).toBe(REPORT_COPY.after.comparatorsLabel);
   });
 

@@ -244,6 +244,44 @@
       }
     },
     {
+      "id": "milburn_report_package_phased",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": 0.0,
+        "2028": 0.0,
+        "2029": 2.766,
+        "2030": 4.011,
+        "2031": 4.563
+      },
+      "direction": "loss",
+      "young_people_in_losing_households": 341034,
+      "share_of_16_24_in_losing_households_pct": 4.56,
+      "average_loss_young_person_in_losing_household": 12710,
+      "everyone_in_losing_households_pct": 1.27,
+      "poverty_change_pp": {
+        "rel_bhc": 0.11,
+        "rel_ahc": 0.217,
+        "abs_bhc": 0.223,
+        "abs_ahc": 0.295
+      },
+      "people_into_poverty_abs_ahc": 206269,
+      "people_into_poverty_rel_ahc": 151658,
+      "child_poverty_change_pp_rel_ahc": 0.362,
+      "people_directly_affected": 0,
+      "break_even_share_in_work_pct": {
+        "h16": 103.1,
+        "h25": 80.6
+      },
+      "entrants_to_match_income_loss": {
+        "h16": 351765,
+        "h25": 274803
+      },
+      "exchequer_gain_per_entrant": {
+        "h16": 4026.67,
+        "h25": 8934.25
+      }
+    },
+    {
       "id": "milburn_report_pip",
       "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
       "saving_bn": {
@@ -318,6 +356,32 @@
         "h16": 4026.67,
         "h25": 8934.25
       }
+    },
+    {
+      "id": "milburn_report_youth_allowance_independent",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+      "saving_bn": {
+        "2027": 0.0,
+        "2028": 0.0,
+        "2029": -0.131,
+        "2030": -0.132,
+        "2031": -0.13
+      },
+      "direction": "gain",
+      "young_people_in_losing_households": 158959,
+      "share_of_16_24_in_losing_households_pct": 2.12,
+      "average_loss_young_person_in_losing_household": -1093,
+      "everyone_in_losing_households_pct": 0.01,
+      "poverty_change_pp": {
+        "rel_bhc": -0.001,
+        "rel_ahc": -0.008,
+        "abs_bhc": -0.001,
+        "abs_ahc": -0.01
+      },
+      "people_into_poverty_abs_ahc": -7164,
+      "people_into_poverty_rel_ahc": -5442,
+      "child_poverty_change_pp_rel_ahc": -0.015,
+      "people_directly_affected": 0
     },
     {
       "id": "pip_halved_under_25",

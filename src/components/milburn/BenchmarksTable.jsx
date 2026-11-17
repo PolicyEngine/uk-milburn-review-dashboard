@@ -14,6 +14,7 @@ import {
   BENCHMARK_SHORT,
   benchmarkGroups,
   comparisonFor,
+  DIFFERENT_BASIS,
   estimateFor,
   figureRange,
   figureShare,
@@ -156,6 +157,8 @@ function ComparePanel({ row, comparison }) {
   const { domain, ticks } = zeroBasedAxis(bars.map((bar) => bar.value));
   const tick = compareTick(comparison.unit);
   const gap = comparison.gapPct;
+  // A pair that counts different things is drawn without a gap
+  const differentBasis = DIFFERENT_BASIS[row.id];
   // Room right of the plot for the longest bar's own label
   const labelRoom = Math.ceil(Math.max(...bars.map((bar) => tickTextWidth(bar.text, 12)))) + 12;
   return (
@@ -165,12 +168,19 @@ function ComparePanel({ row, comparison }) {
           <TitleIcon name={short.icon ?? BENCHMARK_ICON} />
           <span className="title-text">{title}</span>
         </h4>
-        <p className="bm-gap">
-          <TitleIcon name={Math.abs(gap) < 0.005 ? "equal" : gap < 0 ? "arrowDown" : "arrowUp"} bare size={13} />
-          <span>
-            PolicyEngine is <strong>{gapText(gap)}</strong>
-          </span>
-        </p>
+        {differentBasis ? (
+          <p className="bm-gap" data-different-basis="">
+            <TitleIcon name="scale" bare size={13} />
+            <span>Not like for like: {differentBasis}</span>
+          </p>
+        ) : (
+          <p className="bm-gap">
+            <TitleIcon name={Math.abs(gap) < 0.005 ? "equal" : gap < 0 ? "arrowDown" : "arrowUp"} bare size={13} />
+            <span>
+              PolicyEngine is <strong>{gapText(gap)}</strong>
+            </span>
+          </p>
+        )}
       </div>
       <dl className="bm-pair">
         <div className="bm-pair-figure">
@@ -362,7 +372,7 @@ export default function BenchmarksTable() {
                     <span className="title-text">Published figures beside PolicyEngine estimates</span>
                   </h3>
                   <p className="chart-description">
-                    Each pair on its own scale from zero. The gap is the PolicyEngine estimate against the published figure.
+                    Each pair on its own scale from zero. Where the two count the same thing, the gap is the PolicyEngine estimate against the published figure; where they count different things, as each basis line says, no gap is given.
                   </p>
                 </div>
               </div>
@@ -416,11 +426,7 @@ export default function BenchmarksTable() {
             </li>
             <li>
               <TitleIcon name="percent" bare size={14} />
-              <span>Gap: the PolicyEngine estimate less the published figure, as a % of the published figure.</span>
-            </li>
-            <li>
-              <TitleIcon name="newspaper" bare size={14} />
-              <span>Press report: the figure as a news site reported it, not taken from the source itself.</span>
+              <span>Gap: the PolicyEngine estimate less the published figure, as a % of the published figure; given only where the two count the same thing.</span>
             </li>
             <li>
               <TitleIcon name="usersRound" bare size={14} />

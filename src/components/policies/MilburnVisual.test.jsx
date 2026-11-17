@@ -30,6 +30,36 @@ describe("MilburnVisual", () => {
     }
   });
 
+  it("says whose rates a report card's chart shows: 2027-28's, on a measure that starts in April 2029", () => {
+    for (const id of ["milburn_report_package", "milburn_report_uc_health", "milburn_report_pip"]) {
+      expect(details[id].starts, id).toBe("Apr 2029");
+      const view = milburnVisualView(details[id].visual, "The measure");
+      expect(view.caption, id).toMatch(/, at 2027-28 rates$/);
+      expect(view.alt, id).toContain("at 2027-28 rates");
+      // The details date the rates as the caption does, and nothing says they are 2029-30's
+      expect(details[id].details.join(" "), id).toContain("The chart shows 2027-28 rates");
+      expect(details[id].details.join(" "), id).not.toMatch(/2029-30 rates/);
+    }
+    // The pre-report cards, which start with their rates' year, keep the plain year
+    expect(milburnVisualView(details.pip_halved_under_25.visual, "The measure").caption).toMatch(/, 2027-28$/);
+  });
+
+  it("employer threshold: the rate stays, the earnings it starts from move at 21 to 24, and no zero rate is drawn there", () => {
+    const view = milburnVisualView(details.milburn_report_employer_nics_threshold.visual, "The measure");
+    expect(view.caption).toBe("Earnings from which employers pay National Insurance, by the employee's age");
+    expect(view.bands.map((band) => [band.title, band.text])).toEqual([
+      ["Under 21", "0% already"],
+      ["21 to 24", "From £10,000, was £5,000"],
+      ["25 and over", "From £5,000"],
+    ]);
+    expect(view.chips[0]).toMatchObject({ when: "Rate above the threshold", value: "15%, unchanged" });
+    // The rate is not cut at 21 to 24: same height before and after, marked as changed
+    expect(view.ages.filter((cell) => cell.age >= 21 && cell.age <= 24).every((cell) => cell.before === 1 && cell.after === 1 && cell.some)).toBe(true);
+    expect(JSON.stringify(view)).not.toMatch(/0%, was|Zero rate on earnings/);
+    // The comparator still draws its zero rate
+    expect(JSON.stringify(milburnVisualView(details.employer_nics_zero_under_25.visual, "The measure"))).toContain("0%, was 15%");
+  });
+
   it("health element: nil under the age limit, both rates named", () => {
     const { container } = show("uc_health_element_removed_under_25");
     expect(image()).toHaveAccessibleName(/Under 25: £0 under the measure, instead of about £442 a month for claims before April 2026 or £217\.26 for claims from April 2026/);
@@ -137,7 +167,7 @@ describe("the measures we cannot compute (NotComputableVisual)", () => {
 
   it("gives each a diagram of a known kind, in words and icons, never a figure", async () => {
     const { NOT_COMPUTABLE_MEASURES, NotComputableVisual, NOT_COMPUTABLE_KINDS } = await load();
-    expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.visual.kind)).toEqual(["split", "split", "swap", "split", "split", "split", "split", "offers", "split", "offers", "offers"]);
+    expect(NOT_COMPUTABLE_MEASURES.map((measure) => measure.visual.kind)).toEqual(["split", "swap", "split", "split", "split", "split", "offers", "split", "offers", "offers"]);
     for (const measure of NOT_COMPUTABLE_MEASURES) {
       expect(Object.keys(NOT_COMPUTABLE_KINDS), measure.id).toContain(measure.visual.kind);
       expect(JSON.stringify(measure.visual), measure.id).not.toMatch(/[£%\d]/);

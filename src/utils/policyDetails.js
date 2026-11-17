@@ -698,7 +698,7 @@ export const MILBURN_POLICY_DETAILS = [
       { label: "Claims", icon: "file", text: "Existing and new claims alike." },
       { label: "Couples", icon: "shield", text: "Kept where a partner of 25 or over qualifies." },
       // Report 6.5, paras 732 and 745
-      { label: "Report", icon: "scale", text: "Abolishes it under 25, with a Youth Allowance in its place." },
+      { label: "Report", icon: "scale", text: "Proposes abolishing it under 25, with a Youth Allowance in its place." },
     ],
     affects: "Under-25s with the UC health element",
     starts: "Apr 2027",
@@ -709,8 +709,8 @@ export const MILBURN_POLICY_DETAILS = [
       "Static: claimants do not change their work or claims in response.",
       "The health element is the LCWRA element in policyengine-uk.",
       // Report 6.5, para 733
-      "The report moves new claimants first and existing claimants at reassessment; this run applies it to all from April 2027.",
-      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+      "The report proposes moving new claimants first, existing ones at reassessment; this run covers all from April 2027.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
   },
   {
@@ -723,7 +723,7 @@ export const MILBURN_POLICY_DETAILS = [
       { label: "Who", text: "New Universal Credit claimants under 25." },
       { label: "Claims", text: "Existing awards continue; only new claims are affected." },
       // Report 6.5, para 733
-      { label: "Report", text: "New claimants move to the new system first." },
+      { label: "Report", text: "Proposes moving new claimants to the new system first." },
     ],
     affects: "New UC claimants under 25 with limited capability for work",
     starts: "Apr 2027",
@@ -744,7 +744,7 @@ export const MILBURN_POLICY_DETAILS = [
       { label: "Kept", icon: "shield", text: "16 and 17-year-olds keep it." },
       { label: "Scotland", icon: "map-pin", text: "Adult Disability Payment counts as PIP in the data." },
       // Report 6.5, paras 750 to 757
-      { label: "Report", icon: "scale", text: "Replaces PIP under 25; the replacements are not modelled." },
+      { label: "Report", icon: "scale", text: "Proposes replacing PIP under 25; the replacements are not modelled." },
     ],
     affects: "PIP recipients aged 18 to 24",
     starts: "Apr 2027",
@@ -755,8 +755,8 @@ export const MILBURN_POLICY_DETAILS = [
       "Static: recipients do not change their work or claims in response.",
       "Benefits that depend on PIP receipt change with it, as the model's rules set out.",
       // Report 6.5, para 760
-      "The report extends child Disability Living Allowance to 18; this run leaves 16 and 17-year-olds on PIP.",
-      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+      "The report proposes extending child Disability Living Allowance to 18; this run leaves 16 and 17-year-olds on PIP.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
   },
   {
@@ -769,7 +769,7 @@ export const MILBURN_POLICY_DETAILS = [
       { label: "Gain", icon: "coins", text: "The gap between the two rates, each month." },
       { label: "Couples", icon: "scale", text: "Both under 25: the 25-and-over couple rate." },
       // Report 6.5, para 748: the Youth Allowance is at the under-25 rate
-      { label: "Report", icon: "file", text: "Sets its Youth Allowance at the under-25 rate; a comparator." },
+      { label: "Report", icon: "file", text: "Proposes a Youth Allowance at the under-25 rate; a comparator." },
     ],
     affects: "UC claimants under 25",
     starts: "Apr 2027",
@@ -780,13 +780,13 @@ export const MILBURN_POLICY_DETAILS = [
       "Static: claimants do not change their work or claims in response.",
       "The protected health element is held at its current-law amount.",
       // Report 6.5, para 748
-      "The report's Youth Allowance is higher only for young people living independently; this run raises every under-25.",
-      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+      "The report proposes a Youth Allowance that is higher only for young people living independently; this run raises every under-25.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
   },
   {
     id: "employer_nics_zero_under_25",
-    shortName: "Zero employer NICs under 25",
+    shortName: "Zero employer NI under 25",
     noun: "zero employer National Insurance under 25",
     sentence: "setting employer National Insurance to zero for employees under 25",
     summary: "Zero employer National Insurance for employees under 25.",
@@ -805,7 +805,7 @@ export const MILBURN_POLICY_DETAILS = [
       "Static: employment and hours do not change in response.",
       "The model passes employer National Insurance through to wages, so the saving shows as higher pay.",
       // Report 1.1, para 50
-      "The report doubles the threshold to £10,000 for 21 to 24-year-olds over five years, in retail and hospitality first.",
+      "The report proposes doubling the threshold to £10,000 for 21 to 24-year-olds over five years, in retail and hospitality first.",
     ],
   },
   {
@@ -813,7 +813,7 @@ export const MILBURN_POLICY_DETAILS = [
     summary: "Removes the health element and PIP for under-25s.",
     points: [
       { label: "Combines", icon: "layers", text: "Both removals, run together." },
-      { label: "Replacement", icon: "scale", text: "None: an upper bound on the saving." },
+      { label: "Replacement", icon: "scale", text: "None modelled: losses are an upper bound." },
     ],
     affects: "Under-25s with health element or PIP",
     starts: "Apr 2027",
@@ -823,8 +823,8 @@ export const MILBURN_POLICY_DETAILS = [
       "Static: claimants do not change their work or claims in response.",
       "The two measures are simulated together, so the total is not the sum of each alone.",
       // Report 6.5, para 732
-      "The report puts a Youth Allowance, an Additional Cost Allowance and other support in their place; none is modelled here.",
-      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+      "The report proposes a Youth Allowance, an Additional Cost Allowance and other support in their place; none is modelled here.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-package", place: "change", pipShare: 0 },
   },
@@ -845,7 +845,7 @@ export const MILBURN_POLICY_DETAILS = [
       "Static: claimants do not change their work or claims in response.",
       // Report 6.5, para 751: the gateway's design is left to further work
       "The points threshold and the half rate are illustrative stand-ins: the report gives no eligibility test or rates.",
-      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-package", place: "change", pipShare: 0.5, severeKept: true },
   },
@@ -864,7 +864,7 @@ export const MILBURN_POLICY_DETAILS = [
       "Static: claimants do not change their work or claims in response.",
       "Who is reassessed each year is a random draw: the data hold no reassessment dates.",
       // Report 6.5, para 733
-      "The report moves existing claimants at their scheduled reassessment; a quarter a year is our assumption.",
+      "The report proposes moving existing claimants at their scheduled reassessment; a quarter a year is our assumption.",
       "The chart's shares are this run's saving over full abolition's, from the results, not the share of claimants reached.",
     ],
     visual: { kind: "milburn-phased", place: "change" },
@@ -885,7 +885,7 @@ export const MILBURN_POLICY_DETAILS = [
     details: [
       "Static: claimants do not change their work or claims in response.",
       "The health element is the LCWRA element in policyengine-uk.",
-      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-health-element", place: "change", limit: 22 },
   },
@@ -905,7 +905,7 @@ export const MILBURN_POLICY_DETAILS = [
       "Static: claimants do not change their work or claims in response.",
       // Report 6.5, para 756: a very high bar, with no test or rate given
       "The points stand in for the report's Severe and Complex Needs Insurance, whose eligibility test is not in the model.",
-      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-health-element", place: "change", limit: 25, severeKept: true },
   },
@@ -925,7 +925,7 @@ export const MILBURN_POLICY_DETAILS = [
       "Static: recipients do not change their work or claims in response.",
       "Half an award can fall below the amounts that qualify a carer or a household for other help.",
       "Scottish Adult Disability Payment, recorded as PIP, is included.",
-      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-pip", place: "change", from: 18, share: 0.5 },
   },
@@ -936,7 +936,7 @@ export const MILBURN_POLICY_DETAILS = [
       { label: "Reading", icon: "scale", text: "'Under 25' taken literally, so from 16." },
       { label: "Unchanged", icon: "shield", text: "Disability Living Allowance under 16." },
       // Report 6.5, para 760
-      { label: "Report", icon: "file", text: "Extends child Disability Living Allowance to 18; not modelled." },
+      { label: "Report", icon: "file", text: "Proposes extending child Disability Living Allowance to 18; not modelled." },
     ],
     affects: "PIP recipients aged 16 to 24",
     starts: "Apr 2027",
@@ -945,7 +945,7 @@ export const MILBURN_POLICY_DETAILS = [
     details: [
       "Static: recipients do not change their work or claims in response.",
       "Benefits that depend on PIP receipt change with it, as the model's rules set out.",
-      "The chart's 2027-28 rates are policyengine-uk's projections where not yet set.",
+      "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",
     ],
     visual: { kind: "milburn-pip", place: "change", from: 16, share: 0 },
   },
@@ -963,7 +963,7 @@ MILBURN_POLICY_DETAILS.push({
   points: [
     { label: "Who", icon: "users", text: "Employees aged 21 to 24, main job in retail or hospitality." },
     { label: "Rate", icon: "coins", text: "15% rate unchanged; only the threshold moves." },
-    { label: "Report", icon: "file", text: "A five-year glide path, when fiscal conditions allow; end state shown." },
+    { label: "Report", icon: "file", text: "Proposes a five-year glide path, when fiscal conditions allow; end state shown." },
   ],
   affects: "21 to 24-year-olds in retail and hospitality and their employers",
   starts: "End state",
@@ -974,7 +974,8 @@ MILBURN_POLICY_DETAILS.push({
     "Retail is SIC division 47 and hospitality divisions 55 and 56, by the main job.",
     "The report gives no start date, phasing amounts or costing.",
   ],
-  visual: { kind: "milburn-employer-nics", place: "change", limit: 25 },
+  // The threshold moves, not the rate: the chart says so (employerNicsView)
+  visual: { kind: "milburn-employer-nics", place: "change", limit: 25, threshold: 10000 },
 });
 
 // The final report's runs (17 November): the same rules as their 15 November
@@ -993,7 +994,9 @@ for (const [id, base] of Object.entries(REPORT_RUN_OF)) {
     id,
     starts: "Apr 2029",
     inForce: { from: "2029-04" },
-    details: (from.details ?? []).map((line) => line.replace(/2027-28/g, "2029-30").replace(/April 2027/g, "April 2029")),
+    // The start moves; the chart's rates stay 2027-28's (measureVisuals.js), and its caption says so
+    details: (from.details ?? []).map((line) => line.replace(/April 2027/g, "April 2029")),
+    ...(from.visual ? { visual: { ...from.visual, ratesNote: true } } : {}),
     ...(id === "milburn_report_package"
       ? { summary: "Removes the UC health element for under-25s and PIP for 18 to 24-year-olds.", affects: "Under-25s with the health element; 18 to 24s with PIP" }
       : {}),

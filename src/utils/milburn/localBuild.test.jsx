@@ -247,7 +247,7 @@ describe("the label and the Policies lists", () => {
     // No banner over the figures: runs not yet made are listed on the Measures tab
     expect(screen.queryByRole("note")).toBeNull();
     const pending = screen.getByRole("region", { name: NOT_YET_RUN_TITLE });
-    expect(pending.textContent).toContain("Employer NICs zero rate extended to under-25s");
+    expect(pending.textContent).toContain("Employer NI zero rate extended to under-25s");
     expect(pending.textContent).not.toContain("PIP removed for 18 to 24-year-olds");
     expect(pending.textContent).not.toMatch(/£0/);
     const notComputable = screen.getByRole("region", { name: NOT_COMPUTABLE_TITLE });

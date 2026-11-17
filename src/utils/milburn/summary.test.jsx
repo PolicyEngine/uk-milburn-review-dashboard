@@ -235,7 +235,9 @@ describe("KeyFigures", () => {
     const region = screen.getByRole("region", { name: "Key figures" });
     // Whose figures: ours, said in the heading
     expect(region.querySelector(".milburn-key-heading [data-source-kind=estimate]").textContent).toBe("PolicyEngine estimates");
-    expect(region.textContent).toContain("Full abolition, no replacements (upper bound)");
+    expect(region.textContent).toContain("Full abolition, no replacements");
+    // An upper bound on losses, never said of the saving
+    expect(region.textContent).not.toMatch(/\(upper bound\)|upper bound on the saving/i);
     expect(region.textContent).toContain(RELATIVE_LINE_NOTE);
     expect(region.textContent).toContain("Relative poverty (60% of median, after housing costs): 150,000 people move into it (+0.20pp).");
     expect(region.textContent).toContain(REPLACEMENT_NOT_MODELLED_NOTE);
@@ -259,7 +261,7 @@ describe("KeyFigures", () => {
     const rows = within(strip).getAllByRole("row");
     // The fixture lists only the full package: the others are left out
     expect(rows).toHaveLength(2);
-    expect(rows[1].textContent).toBe("Upper bound£4.00bnabout 300,000");
+    expect(rows[1].textContent).toBe("No replacement£4.00bnabout 300,000");
     // Not a package: no row is picked out, and nothing is said to be selected
     const region = screen.getByRole("region", { name: "Key figures" });
     expect(region.textContent).toContain(RANGE_WITHOUT_SELECTION);
@@ -367,9 +369,9 @@ describe("BreakEven", () => {
 describe("the published summary", () => {
   const published = parseSummary(JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8")));
 
-  it("gives the packages' range: upper bound, central and phased", () => {
+  it("gives the packages' range: no replacement, central and phased", () => {
     expect(packageRange(published).map(({ name, saving, poverty }) => [name, saving, poverty])).toEqual([
-      ["Upper bound", "£4.49bn", "about 410,000"],
+      ["No replacement", "£4.49bn", "about 410,000"],
       ["Central", "£2.54bn", "about 314,000"],
       ["Phased", "£2.01bn", "about 143,000"],
     ]);
@@ -474,7 +476,9 @@ describe("EntryComparison", () => {
 
 describe("measure groups", () => {
   it("offers the report's measures, then two comparators, and keeps the pre-report runs loadable but not offered", () => {
-    expect(milburnDisplayName("milburn_package", "Milburn package (combined)")).toBe("Full abolition, no replacements (upper bound)");
+    expect(milburnDisplayName("milburn_package", "Milburn package (combined)")).toBe("Full abolition, no replacements");
+    expect(milburnDisplayName("milburn_report_uc_health", "x")).toBe("UC health element removed for under-25s");
+    expect(milburnDisplayName("employer_nics_zero_under_25", "Employer NICs zero rate extended to under-25s")).toBe("Employer NI zero rate extended to under-25s");
     expect(milburnDisplayName("pip_halved_under_25", "PIP at half rate")).toBe("PIP at half rate");
     expect(milburnGroupOf({ id: "milburn_report_package" })).toBe("report");
     expect(milburnGroupOf({ id: "employer_nics_zero_under_25" })).toBe("comparators");

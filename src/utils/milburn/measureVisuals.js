@@ -46,7 +46,7 @@ export const MILBURN_RATES = Object.freeze({
   },
   // A month
   standardAllowance: { singleUnder25: 353.17, single25Plus: 443.21, coupleUnder25: 551.11, couple25Plus: 695.71 },
-  employerNics: { rate: 0.15, zeroRateBelowAge: 21, apprenticeZeroRateBelowAge: 25, upperSecondaryThreshold: 50270 },
+  employerNics: { rate: 0.15, zeroRateBelowAge: 21, apprenticeZeroRateBelowAge: 25, upperSecondaryThreshold: 50270, secondaryThreshold: 5000 },
 });
 
 /**
@@ -55,6 +55,13 @@ export const MILBURN_RATES = Object.freeze({
  * at once, the rest at a quarter of the remaining caseload a year.
  */
 export const MILBURN_PHASING = Object.freeze({ start: 2026, reassessedEachYear: 0.25 });
+
+/**
+ * The rates' year as a caption says it: "2027-28", or "at 2027-28 rates" on
+ * a card whose measure starts later than the rates drawn (`ratesNote`: the
+ * report's runs, from April 2029).
+ */
+export const ratesYearText = (visual) => (visual?.ratesNote === true ? `at ${MILBURN_RATES.year} rates` : MILBURN_RATES.year);
 
 /** PIP is a weekly rate: a month is 52 weeks over 12 months. */
 export const weeklyToMonthly = (weekly) => (weekly * 52) / 12;
@@ -83,7 +90,7 @@ export function healthElementView(visual, name) {
   const severeKept = visual.severeKept === true;
   const ages = cells(18, (age) => ({ before: 1, after: age < limit && !severeKept ? 0 : 1, some: age < limit && severeKept }));
   return {
-    caption: `Health element by a single claimant's age, ${MILBURN_RATES.year}`,
+    caption: `Health element by a single claimant's age, ${ratesYearText(visual)}`,
     ages,
     key: severeKept ? [["some", "Kept only with 24+ points"], ["after", "Under the measure"]] : [["ghost", "Current law"], ["after", "Under the measure"]],
     bands: [
@@ -96,7 +103,7 @@ export function healthElementView(visual, name) {
       ...(severeKept ? [{ icon: "shield", when: "24+ PIP daily living points", value: "Keeps it" }] : []),
     ],
     alt:
-      `${name}: the Universal Credit health element by a single claimant's age, ${MILBURN_RATES.year}. ` +
+      `${name}: the Universal Credit health element by a single claimant's age, ${ratesYearText(visual)}. ` +
       `Under ${limit}: £0 under the measure, instead of about ${wholePounds(amount)} a month for claims before April 2026 ` +
       `or ${pounds(newClaimant)} for claims from April 2026. ` +
       (severeKept ? `A claimant under ${limit} with 24 or more PIP daily living points keeps it. ` : "") +
@@ -118,7 +125,7 @@ export function pipView(visual, name) {
   const ages = cells(16, (age) => ({ before: 1, after: age >= from && age < UPPER_AGE ? share : 1 }));
   const outcome = share ? "Half" : "£0";
   return {
-    caption: `Share of a PIP award paid, by age, ${MILBURN_RATES.year}`,
+    caption: `Share of a PIP award paid, by age, ${ratesYearText(visual)}`,
     ages,
     key: [["ghost", "Current law"], ["after", "Under the measure"]],
     bands: [
@@ -131,7 +138,7 @@ export function pipView(visual, name) {
       { icon: "move", when: "Mobility, a week", value: `About ${wholePounds(mobility.standard)} or ${wholePounds(mobility.enhanced)}` },
     ],
     alt:
-      `${name}: Personal Independence Payment by age, ${MILBURN_RATES.year}. ` +
+      `${name}: Personal Independence Payment by age, ${ratesYearText(visual)}. ` +
       `Ages ${from} to ${UPPER_AGE - 1}: ${share ? "half the award" : "no PIP"} under the measure. ` +
       `Current law's weekly rates: daily living about ${wholePounds(dailyLiving.standard)} (standard) or ${wholePounds(dailyLiving.enhanced)} (enhanced); ` +
       `mobility about ${wholePounds(mobility.standard)} or ${wholePounds(mobility.enhanced)}. ` +
@@ -141,11 +148,41 @@ export function pipView(visual, name) {
 
 // --- Employer National Insurance ---------------------------------------------
 
-/** The employer rate by the employee's age: zero under 21 today, under 25 with the measure. */
+/**
+ * The employer rate by the employee's age: zero under 21 today, under 25
+ * with the measure. With `visual.threshold` (the report's proposal) the
+ * rate is unchanged and only the earnings it starts from move, for
+ * employees from 21 to under `limit` in retail and hospitality.
+ */
 export function employerNicsView(visual, name) {
   const limit = visual?.limit;
-  const { rate, zeroRateBelowAge, apprenticeZeroRateBelowAge, upperSecondaryThreshold } = MILBURN_RATES.employerNics;
+  const { rate, zeroRateBelowAge, apprenticeZeroRateBelowAge, upperSecondaryThreshold, secondaryThreshold } = MILBURN_RATES.employerNics;
   if (!isAge(limit) || limit <= zeroRateBelowAge || limit > LAST_AGE) return null;
+  if (visual.threshold !== undefined) {
+    const threshold = visual.threshold;
+    if (!Number.isFinite(threshold) || threshold <= secondaryThreshold) return null;
+    const band = `${zeroRateBelowAge} to ${limit - 1}`;
+    const moved = (age) => age >= zeroRateBelowAge && age < limit;
+    return {
+      caption: "Earnings from which employers pay National Insurance, by the employee's age",
+      ages: cells(16, (age) => ({ before: age < zeroRateBelowAge ? 0 : 1, after: age < zeroRateBelowAge ? 0 : 1, some: moved(age) })),
+      key: [["some", "Higher threshold, retail and hospitality"], ["after", "Unchanged"]],
+      bands: [
+        { from: 16, to: zeroRateBelowAge - 1, title: `Under ${zeroRateBelowAge}`, text: "0% already", tone: "kept" },
+        { from: zeroRateBelowAge, to: limit - 1, title: band, text: `From ${wholePounds(threshold)}, was ${wholePounds(secondaryThreshold)}`, tone: "cut" },
+        { from: limit, to: LAST_AGE, title: `${limit} and over`, text: `From ${wholePounds(secondaryThreshold)}`, tone: "kept" },
+      ],
+      chips: [
+        { icon: "coins", when: "Rate above the threshold", value: `${percent(rate)}, unchanged` },
+        { icon: "cap", when: `Apprentices under ${apprenticeZeroRateBelowAge}`, value: "0% already" },
+      ],
+      alt:
+        `${name}: the earnings from which employers pay National Insurance, by the employee's age. ` +
+        `Under ${zeroRateBelowAge}: 0% already. Ages ${band} in retail and hospitality: from ${wholePounds(threshold)} a year under the measure, instead of ${wholePounds(secondaryThreshold)}. ` +
+        `Aged ${limit} and over, and other sectors: from ${wholePounds(secondaryThreshold)}, unchanged. ` +
+        `The ${percent(rate)} rate is unchanged; apprentices under ${apprenticeZeroRateBelowAge} have a zero rate already.`,
+    };
+  }
   const ages = cells(16, (age) => ({ before: age < zeroRateBelowAge ? 0 : 1, after: age < limit ? 0 : 1 }));
   return {
     caption: `Employer National Insurance rate by the employee's age, ${MILBURN_RATES.year}`,
@@ -216,7 +253,7 @@ export function packageView(visual, name) {
   const before = Math.round(element) + Math.round(pip);
   const after = Math.round(kept);
   return {
-    caption: `An under-25 with the health element and PIP, a month, ${MILBURN_RATES.year}`,
+    caption: `An under-25 with the health element and PIP, a month, ${ratesYearText(visual)}`,
     max: element + pip,
     key: [["after", "Health element"], ["soft", "PIP"], ["ghost", "Removed"]],
     groups: [
@@ -244,7 +281,7 @@ export function packageView(visual, name) {
       ...(severeKept ? [{ icon: "shield", when: "24+ PIP daily living points", value: "Keeps the element" }] : []),
     ],
     alt:
-      `${name}: an illustrative claimant under 25 with the health element (a claim before April 2026) and standard-rate daily living PIP, a month, ${MILBURN_RATES.year}. ` +
+      `${name}: an illustrative claimant under 25 with the health element (a claim before April 2026) and standard-rate daily living PIP, a month, ${ratesYearText(visual)}. ` +
       `Current law: about ${wholePounds(before)}, of which ${wholePounds(element)} health element and ${wholePounds(pip)} PIP (the weekly rate times 52 over 12). ` +
       `Under the package: ${wholePounds(after)}${share ? " (half the PIP)" : ""}, ${wholePounds(before - after)} a month less.` +
       (severeKept ? " A claimant with 24 or more PIP daily living points keeps the health element." : ""),

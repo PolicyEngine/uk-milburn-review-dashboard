@@ -14,7 +14,7 @@ const COMPARATORS_LABEL = reportCopy().comparatorsLabel;
 /** The packages' names on the page, by run id. */
 export const MILBURN_DISPLAY_NAMES = Object.freeze({
   milburn_report_package: "The report's benefit changes (no replacement modelled)",
-  milburn_report_uc_health: "UC health top-up removed for under-25s",
+  milburn_report_uc_health: "UC health element removed for under-25s",
   milburn_report_pip: "PIP removed for 18 to 24-year-olds",
   // The pre-report runs with the same names as the report's, told apart
   uc_health_element_removed_under_25: "UC health element removed under 25 (from April 2027)",
@@ -23,10 +23,12 @@ export const MILBURN_DISPLAY_NAMES = Object.freeze({
   milburn_report_youth_allowance_independent: "Higher Youth Allowance for under-25s living independently",
   milburn_report_package_phased: "The report's benefit changes, phased in over five years",
   milburn_report_employer_nics_threshold_glide_path: "Employer NI threshold for 21 to 24s, phased in over five years",
-  milburn_package: "Full abolition, no replacements (upper bound)",
+  milburn_package: "Full abolition, no replacements",
   milburn_package_central: "Central variant: severe cases kept, PIP at half rate",
   milburn_package_phased: "Full abolition, phased as claimants are reassessed",
   milburn_package_entry_25pct: "Full abolition with an illustrative move into work (25%)",
+  // The comparator's name in the page's own form for the tax ("employer NI")
+  employer_nics_zero_under_25: "Employer NI zero rate extended to under-25s",
 });
 
 export const REPORT_GROUP = "report";
