@@ -2,7 +2,7 @@
 
 PolicyEngine's dashboard for the independent review of young people and work led by Alan Milburn. Its final report, [From a Welfare State to a Working State: a new settlement for the next generation](https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation), was published by the Department for Work and Pensions on 17 November 2026. The dashboard estimates how the report's tax and benefit measures that a static model can represent would change the public finances and household incomes, by age.
 
-Private repository. Figures are PolicyEngine UK static microsimulation estimates on certified data; they are not for publication until the HMRC SPI licence condition is confirmed (see [Status](#status)).
+This repository contains static UK microsimulation estimates on certified data. See [publication status](#status) before sharing results.
 
 | | |
 |---|---|
@@ -106,7 +106,7 @@ Claude artifact build: `python3 scripts/artifact_export.py` stages a static copy
 
 ## Status
 
-- Not for publication: the HMRC SPI licence condition on the data is not yet confirmed with María, and the deploy target, disclosure floor and CI are open ([`docs/report-day/04-publication-readiness.md`](docs/report-day/04-publication-readiness.md)).
+- As of 17 November 2026, GitHub serves the result tables without a login. The team is waiting for confirmation from María on how the [HMRC Survey of Personal Incomes publication condition](https://doc.ukdataservice.ac.uk/doc/9422/read9422.htm) applies to these estimates. Hold further distribution pending that confirmation. Track the deployment, disclosure checks and CI in the [publication issue](https://github.com/PolicyEngine/uk-milburn-review-dashboard/issues/2).
 - The review's own figures (£3.6bn welfare saving in 2036-37, £13.7bn over 2029-30 to 2036-37, 50,000 fewer in relative poverty) include replacement payments and employment effects; ours are static, without replacements. The dashboard says so beside each one.
 
 ## Origin
