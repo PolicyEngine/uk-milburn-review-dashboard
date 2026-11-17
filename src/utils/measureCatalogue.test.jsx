@@ -307,8 +307,10 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
       /export const MILBURN_SELECTOR_SUMMARIES = Object\.freeze\(\{[\s\S]*?\n\}\);/, /export const MILBURN_GROUPS = Object\.freeze\(\[[\s\S]*?\n\]\);/,
       // A package's parts, drawn under it only where each has its own published run
       /export const PACKAGE_PARTS = Object\.freeze\(\{[\s\S]*?\n\}\);/,
+      // Key figures' range strip: which runs it sets side by side
+      /export const RANGE_IDS = Object\.freeze\(\[.*\]\);/,
     ],
-    "utils/milburn/summary.js": [/^export const (?:DEFAULT_SUMMARY_RUN|ENTRY_RUN) = "[a-z0-9_]+";$/gm],
+    "utils/milburn/summary.js": [/^export const (?:DEFAULT_SUMMARY_RUN|HEADLINE_RUN|ENTRY_RUN) = "[a-z0-9_]+";$/gm],
     // The final report's proposals in its own names (Methodology's account
     // of the report and the limits against its design; Key figures' note on
     // the replacements left out): prose only, deciding nothing about any run

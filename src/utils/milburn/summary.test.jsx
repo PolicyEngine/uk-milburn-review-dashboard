@@ -20,6 +20,7 @@ import {
   formatBn,
   formatPeople,
   formatSignedPp,
+  HEADLINE_RUN,
   parseReviewFigures,
   parseSummary,
   savingInYear,
@@ -33,6 +34,7 @@ import { loadLocalBuildParts } from "./localBuild";
 import { dashboardFromParts } from "../loadDashboard";
 import { MeasureCatalogueProvider } from "../measureCatalogue";
 import KeyFigures, {
+  fallbackRunLine,
   RANGE_WITH_SELECTION,
   RANGE_WITHOUT_SELECTION,
   REPLACEMENT_NOT_MODELLED_NOTE,
@@ -249,11 +251,36 @@ describe("KeyFigures", () => {
     expect(region.textContent).toContain("Relative poverty (60% of median, before housing costs): 130,000 people move into it (+0.30pp).");
     expect(region.textContent).toContain(REPLACEMENT_NOT_MODELLED_NOTE);
     expect(region.textContent).toContain(REPLACEMENT_PARTS_NOTE);
-    // A package is shown above: it is the one picked out in the range
-    expect(region.textContent).toContain(RANGE_WITH_SELECTION);
-    expect(region.querySelectorAll("tr.is-selected")).toHaveLength(1);
+    // The pre-report package is not in the range: nothing is picked out
+    expect(region.textContent).toContain(RANGE_WITHOUT_SELECTION);
+    expect(region.querySelectorAll("tr.is-selected")).toHaveLength(0);
+    // One policy selected: no fallback line
+    expect(region.querySelector("[data-fallback-run]")).toBeNull();
     // The figures are for the summary's year whatever year is chosen: said
     expect(region.querySelector("[data-year-only]").textContent).toBe(yearOnlyText(2027));
+  });
+
+  it("shows the report's package, named on the card, when no single policy is chosen", async () => {
+    vi.stubGlobal("fetch", fixtureFetch());
+    const catalogue = await localCatalogue();
+    render(
+      <MeasureCatalogueProvider catalogue={catalogue}>
+        <KeyFigures />
+      </MeasureCatalogueProvider>,
+    );
+    const panel = await screen.findByRole("list", { name: "Figures" });
+    expect(HEADLINE_RUN).toBe("milburn_report_package");
+    expect(panel.textContent).toContain("£4.50bn");
+    const region = screen.getByRole("region", { name: "Key figures" });
+    // Named in visible text, not only for screen readers
+    const line = region.querySelector(".milburn-key-heading [data-fallback-run]");
+    expect(line.textContent).toBe(fallbackRunLine("milburn_report_package"));
+    expect(line.classList.contains("visually-hidden")).toBe(false);
+    // The report's package is in the range, and picked out
+    expect(region.textContent).toContain(RANGE_WITH_SELECTION);
+    expect(region.querySelectorAll("tr.is-selected")).toHaveLength(1);
+    // Its upper bound covers the timing too
+    expect(REPLACEMENT_NOT_MODELLED_NOTE).toMatch(/not at reassessment/);
   });
 
   it("shows the packages' range strip whatever run is selected", async () => {
@@ -266,16 +293,16 @@ describe("KeyFigures", () => {
     );
     const strip = await screen.findByRole("table");
     const rows = within(strip).getAllByRole("row");
-    // The fixture lists only the full package: the others are left out
+    // The fixture lists only the report's package of the range's runs: the others are left out
     expect(rows).toHaveLength(2);
-    expect(rows[1].textContent).toBe("No replacement£4.00bnabout 280,000");
+    expect(rows[1].textContent).toBe("No replacement£4.50bnabout 290,000");
     // Not a package: no row is picked out, and nothing is said to be selected
     const region = screen.getByRole("region", { name: "Key figures" });
     expect(region.textContent).toContain(RANGE_WITHOUT_SELECTION);
     expect(region.textContent).not.toContain(RANGE_WITH_SELECTION);
     expect(RANGE_WITHOUT_SELECTION).not.toMatch(/selected|full colour/);
     expect(region.querySelectorAll("tr.is-selected")).toHaveLength(0);
-    expect(packageRange(summary).map((row) => row.id)).toEqual(["milburn_package"]);
+    expect(packageRange(summary).map((row) => row.id)).toEqual(["milburn_report_package"]);
   });
 
   it("says a run missing from the summary has not yet run", async () => {
@@ -342,6 +369,32 @@ describe("headline tiles", () => {
     expect(finances.textContent.match(/Static/g)).toHaveLength(1);
   });
 
+  it("show the report's package, named in visible text, with more than one policy selected", async () => {
+    vi.stubGlobal("fetch", fixtureFetch());
+    const catalogue = await localCatalogue();
+    const { unmount } = render(
+      <MeasureCatalogueProvider catalogue={catalogue}>
+        <PovertyHeadline />
+      </MeasureCatalogueProvider>,
+    );
+    const poverty = await screen.findByRole("region", { name: "Poverty headline" });
+    expect(poverty.textContent).toContain("290,000");
+    const line = poverty.querySelector(".milburn-key-heading [data-fallback-run]");
+    expect(line.textContent).toBe(fallbackRunLine("milburn_report_package"));
+    expect(line.classList.contains("visually-hidden")).toBe(false);
+    // The upper bound covers the timing as well as the replacements
+    expect(poverty.querySelector("details[data-notes] [data-replacement-note]").textContent).toBe(REPLACEMENT_NOT_MODELLED_NOTE);
+    unmount();
+    render(
+      <MeasureCatalogueProvider catalogue={catalogue}>
+        <FinancesHeadline selectedYear={2027} />
+      </MeasureCatalogueProvider>,
+    );
+    const finances = await screen.findByRole("region", { name: "Public finances headline" });
+    expect(finances.textContent).toContain("£4.50bn");
+    expect(finances.querySelector(".milburn-key-heading [data-fallback-run]").textContent).toBe(fallbackRunLine("milburn_report_package"));
+  });
+
   it("scale a bar to the largest figure in its list", () => {
     expect(barShare(2, [4, 2])).toBe("50%");
     expect(barShare(-4, [-4, 2])).toBe("100%");
@@ -387,11 +440,12 @@ describe("BreakEven", () => {
 describe("the published summary", () => {
   const published = parseSummary(JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8")));
 
-  it("gives the packages' range: no replacement, central and phased", () => {
+  it("gives the packages' range: the report's package, the pre-report central variant and the report's phased run", () => {
+    expect(packageRange(published).map((row) => row.id)).toEqual(["milburn_report_package", "milburn_package_central", "milburn_report_package_phased"]);
     expect(packageRange(published).map(({ name, saving, poverty }) => [name, saving, poverty])).toEqual([
       ["No replacement", "£4.67bn", "about 342,000"],
       ["Central", "£2.64bn", "about 99,000"],
-      ["Phased", "£3.77bn", "about 246,000"],
+      ["Phased", "£2.77bn", "about 156,000"],
     ]);
   });
 

@@ -92,8 +92,9 @@ export const MILBURN_GROUPS = Object.freeze([
     ids: ["pip_halved_under_25", "employer_nics_zero_under_25"],
   },
   // The other pre-report runs stay loadable (a link naming one still opens
-  // it) but are not offered: the packages feed Key figures' range strip and
-  // Return to work (the 25% entry run against the full abolition package)
+  // it) but are not offered: the central package feeds Key figures' range
+  // strip (RANGE_IDS) and the full package Return to work (the 25% entry run
+  // against it)
   { id: PACKAGES_GROUP, label: "Pre-report packages", hidden: true, ids: ["milburn_package", "milburn_package_central", "milburn_package_phased"] },
   { id: SINGLE_GROUP, label: "Single measures", hidden: true, ids: ["uc_health_element_removed_under_25", "pip_removed_under_25"] },
   {
@@ -116,8 +117,12 @@ export const PACKAGE_PARTS = Object.freeze({
   milburn_package_central: ["uc_health_element_removed_under_25_severe_kept", "pip_halved_under_25"],
 });
 
-/** The packages' run ids, in the order shown (Key figures' range strip). */
-export const PACKAGE_IDS = MILBURN_GROUPS.find((group) => group.id === PACKAGES_GROUP).ids;
+/**
+ * Key figures' range strip, in the order shown: the report's package (no
+ * replacement), the pre-report central variant (the report has no central
+ * run) and the report's phased run.
+ */
+export const RANGE_IDS = Object.freeze(["milburn_report_package", "milburn_package_central", "milburn_report_package_phased"]);
 
 /** A run's display name: the package's own, else the name given. */
 export function milburnDisplayName(id, name) {

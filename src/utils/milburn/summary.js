@@ -38,8 +38,15 @@ import { useEffect, useState } from "react";
 
 export const SUMMARY_FILE = "milburn_summary.json";
 
-/** The run shown when none is chosen. */
+/**
+ * The pre-report full abolition package (from April 2027): the base the
+ * 25% entry run and the pre-report phased run are set beside, which share
+ * its years. Not the headline cards' fallback (HEADLINE_RUN).
+ */
 export const DEFAULT_SUMMARY_RUN = "milburn_package";
+
+/** The run the headline cards show when no single policy is chosen: the report's package. */
+export const HEADLINE_RUN = "milburn_report_package";
 
 /** The run with an illustrative move into work, microsimulated. */
 export const ENTRY_RUN = "milburn_package_entry_25pct";

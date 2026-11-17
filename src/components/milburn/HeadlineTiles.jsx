@@ -2,17 +2,17 @@ import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { shortNameOf } from "../../utils/policyDetails";
 import { fiscalYearTick } from "../../utils/chartTheme";
 import {
-  DEFAULT_SUMMARY_RUN,
   formatBn,
   formatPeople,
   formatSignedPp,
+  HEADLINE_RUN,
   savingInYear,
   summaryRun,
   useMilburnSummary,
 } from "../../utils/milburn/summary";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
-import { packageRange, STATIC_NOTE } from "./KeyFigures";
+import { fallbackRunLine, packageRange, REPLACEMENT_NOT_MODELLED_NOTE, STATIC_NOTE } from "./KeyFigures";
 import { YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
@@ -46,25 +46,25 @@ function MeterRow({ icon, label, value, width, tone, current }) {
   );
 }
 
-/** The run the headline reads (one chosen policy, or the full package) and its summary. */
+/** The run the headline reads (one chosen policy, or the report's package) and its summary. */
 function useHeadlineRun(runId) {
   const catalogue = useMeasureCatalogue();
-  const id = runId || DEFAULT_SUMMARY_RUN;
+  const id = runId || HEADLINE_RUN;
   const measure = catalogue.byId?.get(id);
   const { status, summary } = useMilburnSummary(catalogue.manifest?.snapshotSha256 ?? null);
   const run = status === "ready" ? summaryRun(summary, id) : null;
-  return { local: Boolean(catalogue.localBuild), name: measure ? shortNameOf(measure) : id, summary, run };
+  return { local: Boolean(catalogue.localBuild), name: measure ? shortNameOf(measure) : id, fallback: !runId, summary, run };
 }
 
-function Heading({ title, name, onlyYear }) {
+function Heading({ title, name, fallback, onlyYear }) {
   return (
     <div className="milburn-key-heading">
       <h3>
         <TitleIcon name="sparkle" />
         {title}
       </h3>
-      {/* The header's policy button already names the run: said once, for screen readers only */}
-      <p className="visually-hidden">{name}</p>
+      {/* One selected policy: the header's button names it (screen readers only here); otherwise the fallback is named on the card */}
+      {fallback ? <p data-fallback-run="">{fallbackRunLine(name)}</p> : <p className="visually-hidden">{name}</p>}
       {/* The box's figures are for this year whatever year is chosen above the page */}
       {onlyYear !== undefined && <YearOnlyChip year={onlyYear} />}
     </div>
@@ -112,14 +112,14 @@ function Tile({ icon, value, extra, label, note }) {
  * figures), and labelled so. Nothing while the run or the file is missing.
  */
 export function PovertyHeadline({ runId }) {
-  const { local, name, summary, run } = useHeadlineRun(runId);
+  const { local, name, fallback, summary, run } = useHeadlineRun(runId);
   if (!local || !run) return null;
   const direction = (count) => (count >= 0 ? "into" : "out of");
   const lines = POVERTY_LINES.filter((line) => run.povertyPp[line.key] !== null);
   const values = lines.map((line) => run.povertyPp[line.key]);
   return (
     <section className="report-section milburn-key card" aria-label="Poverty headline">
-      <Heading title="Poverty at a glance" name={name} onlyYear={summary.year} />
+      <Heading title="Poverty at a glance" name={name} fallback={fallback} onlyYear={summary.year} />
       <ul className="milburn-key-tiles" aria-label="Figures">
         {run.peopleIntoPovertyAbs !== null && (
           <Tile
@@ -174,6 +174,10 @@ export function PovertyHeadline({ runId }) {
           <TitleIcon name="calculator" bare size={14} />
           <span>{STATIC_NOTE}</span>
         </li>
+        <li data-replacement-note="">
+          <TitleIcon name="alert" bare size={14} />
+          <span>{REPLACEMENT_NOT_MODELLED_NOTE}</span>
+        </li>
       </Notes>
     </section>
   );
@@ -182,11 +186,11 @@ export function PovertyHeadline({ runId }) {
 /**
  * Public finances' headline, over its chart on the local build route: the
  * run's Exchequer saving in each year, the chosen year marked, beside the
- * three packages' range, from milburn_summary.json. Nothing while the run
+ * range strip's runs (RANGE_IDS), from milburn_summary.json. Nothing while the run
  * or the file is missing.
  */
 export function FinancesHeadline({ runId, selectedYear }) {
-  const { local, name, summary, run } = useHeadlineRun(runId);
+  const { local, name, fallback, summary, run } = useHeadlineRun(runId);
   if (!local || !run) return null;
   const years = Object.keys(run.savingBn).sort();
   if (!years.length) return null;
@@ -198,7 +202,7 @@ export function FinancesHeadline({ runId, selectedYear }) {
   const word = (value) => (value >= 0 ? "saving" : "cost");
   return (
     <section className="report-section milburn-key card" aria-label="Public finances headline">
-      <Heading title="Public finances at a glance" name={name} />
+      <Heading title="Public finances at a glance" name={name} fallback={fallback} />
       <div className="milburn-split">
         <ul className="milburn-key-tiles" aria-label="Figures">
           {current !== null && (

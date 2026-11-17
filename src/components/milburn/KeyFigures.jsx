@@ -2,18 +2,18 @@ import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { shortNameOf } from "../../utils/policyDetails";
 import { fiscalYearTick } from "../../utils/chartTheme";
 import {
-  DEFAULT_SUMMARY_RUN,
   formatBn,
   formatPct,
   formatPeople,
   formatPounds,
   formatSignedPp,
+  HEADLINE_RUN,
   RELATIVE_LINE_NOTE,
   savingInYear,
   summaryRun,
   useMilburnSummary,
 } from "../../utils/milburn/summary";
-import { PACKAGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGroups";
+import { RANGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGroups";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
 import { buildChartCsv } from "../../utils/chartCsv";
@@ -21,9 +21,18 @@ import { CHART_COLOURS } from "../../utils/chartTheme";
 import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
-/** The report's replacements for the benefits removed, which no run models. */
+/**
+ * Why the report's package is an upper bound: no replacement payments, and
+ * every existing claimant reached at once (the report reaches them at
+ * reassessment; the phased run shows that timing).
+ */
 export const REPLACEMENT_NOT_MODELLED_NOTE =
-  "The report’s replacement payments are not modelled, so the full package is an upper bound on losses.";
+  "With no replacement payments modelled and every claimant reached in April 2029, not at reassessment, the full package is an upper bound on losses.";
+
+/** A headline card's visible line when it shows the fallback run, not one selected policy. */
+export function fallbackRunLine(name) {
+  return `Showing: ${name}. Select a single policy to see its own figures.`;
+}
 
 /** What those replacements are, as the final report names them (paragraphs 107 and 752 to 756). */
 export const REPLACEMENT_PARTS_NOTE =
@@ -32,7 +41,7 @@ export const REPLACEMENT_PARTS_NOTE =
 /** Said once in a box's folded notes: what "static" means, and how counts are rounded. */
 export const STATIC_NOTE = "Static: nobody changes their work or claims. Counts rounded to the nearest thousand.";
 
-/** The range strip's short names for the packages, by position in PACKAGE_IDS. */
+/** The range strip's short names for its runs, by position in RANGE_IDS. */
 const RANGE_NAMES = ["No replacement", "Central", "Phased"];
 
 /**
@@ -41,7 +50,7 @@ const RANGE_NAMES = ["No replacement", "Central", "Phased"];
  * milburn_summary.json. A package the file does not list is left out.
  */
 export function packageRange(summary) {
-  return PACKAGE_IDS.map((id, index) => {
+  return RANGE_IDS.map((id, index) => {
     const run = summaryRun(summary, id);
     if (!run) return null;
     return {
@@ -56,10 +65,12 @@ export function packageRange(summary) {
 }
 
 /** Under the range's title when the run shown above is one of the packages. */
-export const RANGE_WITH_SELECTION = "The packages side by side; the one shown above is in full colour.";
+export const RANGE_WITH_SELECTION =
+  "The packages side by side; the one shown above is in full colour. Central is the pre-report variant: the report has no such run.";
 
 /** Under the range's title when the run shown above is not a package: nothing is picked out. */
-export const RANGE_WITHOUT_SELECTION = "Earlier package runs, applied from April 2027, for context.";
+export const RANGE_WITHOUT_SELECTION =
+  "The report’s package, its phased run and the pre-report central variant (the report has no such run), for context.";
 
 function RangeStrip({ summary, selectedId }) {
   const rows = packageRange(summary);
@@ -209,13 +220,13 @@ export function keyFigureTiles(run, year) {
 
 /**
  * Key figures at the top of the Young people sub-tab, for the selected run
- * (the full package by default), from public/data/milburn_summary.json.
+ * (the report's package, named on the card, unless one policy is chosen), from public/data/milburn_summary.json.
  * A run the file does not list says it has not yet run. Only on the local
  * build route.
  */
 export default function KeyFigures({ runId }) {
   const catalogue = useMeasureCatalogue();
-  const id = runId || DEFAULT_SUMMARY_RUN;
+  const id = runId || HEADLINE_RUN;
   const measure = catalogue.byId?.get(id);
   const name = measure ? shortNameOf(measure) : id;
   // Read afresh whenever the runs the page read change
@@ -228,8 +239,8 @@ export default function KeyFigures({ runId }) {
         <TitleIcon name="sparkle" />
         Key figures
       </h3>
-      {/* The header's policy button already names the run: said once, for screen readers only */}
-      <p className="visually-hidden">{name}</p>
+      {/* One selected policy: the header's button names it (screen readers only here); otherwise the fallback is named on the card */}
+      {runId ? <p className="visually-hidden">{name}</p> : <p data-fallback-run="">{fallbackRunLine(name)}</p>}
       {status === "ready" && <YearOnlyChip year={summary.year} />}
     </div>
   );

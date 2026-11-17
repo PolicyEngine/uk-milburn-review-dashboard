@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 
 const fixture = readFileSync(join(__dirname, "..", "..", "test", "fixtures", "milburn", "milburn_scenarios.json"), "utf8");
 const reviewFigures = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_review_figures.json"), "utf8");
@@ -76,12 +76,22 @@ describe("Return to work", () => {
     expect(sameGain.every((node) => node.closest("details[data-case-more]"))).toBe(true);
     expect(tab.querySelector("details[data-case-more] > summary")?.textContent ?? "More info").toBe("More info");
     expect(screen.getByRole("region", { name: "Break-even arithmetic" }).textContent).toContain(
-      "How many young people would need to move into work to match the saving, 2027-28.",
+      "How many young people would need to move into work to match the 2027-28 saving; the gain per entrant is a 2027-28 figure.",
     );
     expect(tab.textContent).not.toMatch(/young people who lose|leaves worse off|Why the effect is small|not a new incentive|not reachable/);
     // The entry cases from the file: 16 hours at £10 an hour
     const cases = screen.getByRole("region", { name: "One young person moving into work" });
     expect(within(cases).getAllByRole("row")[1].textContent).toBe("16 hours£10.00£1,000; £2,000£3,000; £4,000");
+  });
+
+  it("says, visibly, which year the gain per entrant is for: the entry cases' own", async () => {
+    // The saving is the summary's year; the gain from work is the scenarios file's
+    vi.stubGlobal("fetch", serve({ scenarios: JSON.stringify({ ...JSON.parse(fixture), year: 2026 }) }));
+    const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");
+    render(<BehaviouralScenarios />);
+    const region = await screen.findByRole("region", { name: "Break-even arithmetic" });
+    await waitFor(() => expect(region.textContent).toContain("match the 2027-28 saving; the gain per entrant is a 2026-27 figure."));
+    expect(within(region).getByRole("columnheader", { name: "Exchequer gain per entrant, £ a year, 2026-27" })).toBeInTheDocument();
   });
 
   it("sets its illustrative run beside the review's own estimate as a different exercise, citing the report", async () => {
@@ -210,7 +220,7 @@ describe("Benchmarks", () => {
     expect(screen.getByText("100,000")).toBeInTheDocument();
     expect(screen.queryByText("30,000")).toBeNull();
     // Fixed PolicyEngine figures beside the published ones, each saying what ours is; the build id is in the folded notes, once
-    for (const [published, estimate] of [["260,000", "232,000"]]) {
+    for (const [published, estimate] of [["450,000", "347,000"]]) {
       const row = screen.getByText(published).closest("li");
       expect(row.textContent).toContain(estimate);
       // A caseload is the 2027-28 baseline's, and says so; the savings are 2029-30's
@@ -240,8 +250,6 @@ describe("Benchmarks", () => {
     // Each comparable pair is a comparison panel with its gap as a % of the published figure
     const region = screen.getByRole("region", { name: "Benchmarks" });
     expect([...region.querySelectorAll(".bm-compare")].map((panel) => panel.dataset.benchmark)).toEqual([
-      "uc_health_no_work_requirements",
-      "uc_health_element_16_24",
       "young_pip_recipients",
       "pip_spend_16_24",
       "uc_health_spend_16_24",
@@ -252,8 +260,6 @@ describe("Benchmarks", () => {
     for (const [published, difference] of [
       ["£4.68bn a year", "a saving in 2029-30 against spending in 2025-26"],
       ["£1.13bn a year", "a saving in 2029-30 against spending in 2025-26"],
-      ["260,000", "benefit units against people"],
-      ["176,000", "benefit units against people"],
       ["450,000", "ours leaves out 16 and 17-year-olds"],
     ]) {
       const panel = screen.getByText(published).closest("li");
@@ -262,6 +268,8 @@ describe("Benchmarks", () => {
     }
     // Every other figure is a stat tile under its section, once, with its source and date
     expect([...region.querySelectorAll(".bm-tile")].map((tile) => tile.dataset.benchmark)).toEqual([
+      "uc_health_no_work_requirements",
+      "uc_health_element_16_24",
       "package_young_people_affected",
       "young_benefits_spend",
       "review_welfare_saving_2036",

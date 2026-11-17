@@ -39,6 +39,23 @@
       "people_into_poverty_abs_bhc": 280000
     },
     {
+      "id": "milburn_report_package",
+      "label": "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release",
+      "direction": "loss",
+      "saving_bn": {
+        "2027": 4.5
+      },
+      "young_people_in_losing_households": 510000,
+      "share_of_16_24_in_losing_households_pct": 7.6,
+      "average_loss_young_person_in_losing_household": 12500,
+      "poverty_change_pp": {
+        "rel_bhc": 0.31,
+        "abs_bhc": 0.42
+      },
+      "people_into_poverty_rel_bhc": 135000,
+      "people_into_poverty_abs_bhc": 290000
+    },
+    {
       "id": "milburn_package_entry_25pct",
       "label": "build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py release",
       "direction": "loss",

@@ -19,7 +19,7 @@ export const BENCHMARK_SECTIONS = [
   {
     key: "caseloads",
     title: "How do our caseloads compare?",
-    intro: "Published counts of young people on the UC health element or PIP, beside our baseline caseloads.",
+    intro: "Published counts of young people on the UC health element or PIP, beside our baseline PIP caseload.",
     icon: "usersRound",
     ids: ["uc_health_no_work_requirements", "uc_health_element_16_24", "young_pip_recipients", "package_young_people_affected"],
   },
@@ -87,12 +87,10 @@ export const BENCHMARK_SHORT = {
   uc_health_no_work_requirements: {
     label: "On UC health with no work requirements",
     icon: "heartPulse",
-    estimateBasis: "Benefit units with LCWRA, every adult under 25, UK, 2027-28",
   },
   uc_health_element_16_24: {
     label: "16–24s receiving the UC health element",
     icon: "activity",
-    estimateBasis: "Benefit units with LCWRA, every adult under 25, UK, 2027-28",
   },
   incapacity_benefits_young: {
     label: "Young people on incapacity benefits, the review says",
@@ -119,13 +117,13 @@ export const BENCHMARK_SHORT = {
     label: "PIP and UC health spending on young people",
     icon: "banknote",
     basis: "Ages 16 to 24: PIP £3.8bn, UC LCWRA £0.92bn",
-    estimateBasis: "Static saving from the modelled package, UK; PIP from age 18",
+    estimateBasis: "Static Exchequer saving, with knock-on effects on other benefits, UK; PIP from age 18",
   },
   pip_spend_16_24: {
     label: "PIP spending, ages 16 to 24",
     icon: "wallet",
     basis: "Spending in 2025-26",
-    estimateBasis: "Static saving from removing PIP at 16 to 24, 2029-30, UK",
+    estimateBasis: "Static Exchequer saving from removing PIP at 16 to 24, with knock-on effects on other benefits, 2029-30, UK",
   },
   uc_health_spend_16_24: {
     label: "UC LCWRA element spending, ages 16 to 24",
@@ -182,8 +180,6 @@ export const BENCHMARK_SHORT = {
 const savingAgainstSpending = (year) => `a saving${Number.isInteger(year) ? ` in ${yearLabel(year)}` : ""} against spending in 2025-26`;
 
 export const DIFFERENT_BASIS = Object.freeze({
-  uc_health_no_work_requirements: "benefit units against people",
-  uc_health_element_16_24: "benefit units against people",
   young_pip_recipients: "ours leaves out 16 and 17-year-olds",
   pip_spend_16_24: savingAgainstSpending,
   uc_health_spend_16_24: savingAgainstSpending,

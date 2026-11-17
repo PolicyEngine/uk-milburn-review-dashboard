@@ -703,8 +703,12 @@ export function BreakEven({ runId, catalogue }) {
   return <BreakEvenSection runId={runId} catalogue={catalogue} summaryState={summaryState} />;
 }
 
-/** BreakEven with the summary already read. */
-function BreakEvenSection({ runId, catalogue, summaryState, review = null }) {
+/**
+ * BreakEven with the summary already read. `gainYear`: the year of the
+ * household entry cases (milburn_scenarios.json) the gain per entrant comes
+ * from, said on the card where known, as it can differ from the saving's.
+ */
+function BreakEvenSection({ runId, catalogue, summaryState, review = null, gainYear = null }) {
   const id = runId || DEFAULT_SUMMARY_RUN;
   // The review's estimate is for its whole package: drawn only beside the package runs
   const reviewLine = review && (id === DEFAULT_SUMMARY_RUN || id === ENTRY_RUN) ? review.employment : null;
@@ -738,16 +742,20 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null }) {
         entrants: run.entrantsToMatch[hoursId],
         perEntrant: run.exchequerGainPerEntrant[hoursId],
       }));
-      description = `How many young people would need to move into work to match the saving, ${yearLabel}.`;
+      const gainLabel = Number.isInteger(gainYear) ? fiscalYearTick(gainYear) : null;
+      description = gainLabel
+        ? `How many young people would need to move into work to match the ${yearLabel} saving; the gain per entrant is a ${gainLabel} figure.`
+        : `How many young people would need to move into work to match the saving, ${yearLabel}.`;
+      const perEntrantLabel = `Exchequer gain per entrant, £ a year${gainLabel ? `, ${gainLabel}` : ""}`;
       csv = () =>
         buildChartCsv({
           title: `Break-even arithmetic: ${name}, ${yearLabel}`,
           units: "Share in %, entrants in people, Exchequer gain in £ a year per entrant",
           columns: [
             { key: "hours", label: "Hours a week" },
-            { key: "entrants", label: "Entrants needed (Exchequer saving divided by one entrant's gain from work)", decimals: 0 },
+            { key: "entrants", label: `Entrants needed (Exchequer saving divided by one entrant's gain from work${gainLabel ? ` in ${gainLabel}` : ""})`, decimals: 0 },
             { key: "share", label: "Entrants needed as a share of 16 to 24-year-olds in losing households (%)", decimals: 1 },
-            { key: "perEntrant", label: "Exchequer gain per entrant (£ a year)", decimals: 2 },
+            { key: "perEntrant", label: perEntrantLabel, decimals: 2 },
           ],
           rows: hoursRows,
         });
@@ -795,7 +803,7 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null }) {
                   <th scope="col">Hours a week</th>
                   <th scope="col">Entrants needed, as a share of 16–24s in losing households</th>
                   <th scope="col">Entrants needed to match the Exchequer saving</th>
-                  <th scope="col">Exchequer gain per entrant, £ a year</th>
+                  <th scope="col">{perEntrantLabel}</th>
                 </tr>
               </thead>
               <tbody>
@@ -953,7 +961,13 @@ export default function BehaviouralScenarios({ selectedRun } = {}) {
         </div>
       )}
       {cases}
-      <BreakEvenSection runId={selectedRun} catalogue={catalogue} summaryState={summaryState} review={review} />
+      <BreakEvenSection
+        runId={selectedRun}
+        catalogue={catalogue}
+        summaryState={summaryState}
+        review={review}
+        gainYear={file.status === "ready" ? file.data.year : null}
+      />
     </div>
   );
 }

@@ -399,7 +399,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
                 in <Term id="absolutePoverty">absolute poverty</Term>, each before and after housing costs, on the HBAI
                 measure, and the change in the <Term id="gini">Gini coefficient</Term>{" "}
                 of equivalised household net income. Every poverty figure names its measure; where there is a choice,
-                absolute poverty after housing costs is shown first. The relative line is 60% of the median, which
+                absolute poverty before housing costs, for all people, is shown first. The relative line is 60% of the median, which
                 itself moves with these measures; the absolute line is fixed in real terms.
               </p>
             ) : (

@@ -34,11 +34,7 @@
       "url": "https://www.resolutionfoundation.org/comment/youve-got-mail-finally-your-milburn-cram-sheet-inside/",
       "date": "13 November 2026",
       "press_report": false,
-      "policyengine_estimate": {
-        "value": "232,000",
-        "basis": "Benefit units with the LCWRA element in which every adult is under 25, UK",
-        "label": "PolicyEngine, build fcfac709, 2027-28 baseline caseload"
-      }
+      "policyengine_estimate": null
     },
     {
       "id": "uc_health_element_16_24",
@@ -49,11 +45,7 @@
       "url": "https://www.resolutionfoundation.org/press-releases/government-must-match-milburns-ambition-to-properly-invest-in-young-people/",
       "date": "17 November 2026",
       "press_report": false,
-      "policyengine_estimate": {
-        "value": "232,000",
-        "basis": "Benefit units with the LCWRA element in which every adult is under 25, UK: benefit units, not people",
-        "label": "PolicyEngine, build fcfac709, 2027-28 baseline caseload"
-      }
+      "policyengine_estimate": null
     },
     {
       "id": "incapacity_benefits_young",
@@ -129,7 +121,7 @@
       "press_report": false,
       "policyengine_estimate": {
         "value": "£4.67bn a year",
-        "basis": "Static saving in 2029-30 from removing the UC health element for under-25s and PIP for ages 18 to 24, UK: the spending the modelled package removes, without PIP at 16 and 17",
+        "basis": "Static saving in 2029-30 from removing the UC health element for under-25s and PIP for ages 18 to 24, UK: the Exchequer saving, including knock-on effects on other benefits (such as carer benefits and the UC housing element), so not the same as spending on PIP and the health element; PIP at 16 and 17 is not removed",
         "label": "PolicyEngine, build fcfac709, 2029-30"
       }
     },
@@ -144,7 +136,7 @@
       "press_report": false,
       "policyengine_estimate": {
         "value": "£4.68bn a year",
-        "basis": "Static saving from removing PIP for ages 16 to 24 in 2029-30, UK; £3.64bn for ages 18 to 24",
+        "basis": "Static Exchequer saving from removing PIP for ages 16 to 24 in 2029-30, UK, including knock-on effects on other benefits (such as carer benefits and the UC housing element), so not the same as PIP spending; £3.64bn for ages 18 to 24",
         "label": "PolicyEngine, build fcfac709, 2029-30"
       }
     },
@@ -174,7 +166,7 @@
       "press_report": false,
       "policyengine_estimate": {
         "value": "£2.64bn to £4.67bn a year",
-        "basis": "Static saving in 2029-30, UK: from the central variant (severe cases kept, PIP at half rate) to full removal of the UC health element for under-25s and PIP for ages 18 to 24",
+        "basis": "Static saving in 2029-30, UK: from the pre-report central variant (severe cases kept, PIP at half rate) to the report's package, full removal of the UC health element for under-25s and PIP for ages 18 to 24, with every existing claimant reached from April 2029",
         "label": "PolicyEngine, build fcfac709, 2029-30"
       }
     },

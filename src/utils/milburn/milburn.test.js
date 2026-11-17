@@ -104,11 +104,9 @@ describe("the benchmarks file", () => {
   });
 
   it("fills a PolicyEngine estimate only where the verified results have one", () => {
-    // The package's figure is worked out from the results; nine rows carry a
+    // The package's figure is worked out from the results; seven rows carry a
     // fixed figure from the named build; every other row is blank
     expect(parsed.rows.filter((row) => row.estimate).map((row) => row.id)).toEqual([
-      "uc_health_no_work_requirements",
-      "uc_health_element_16_24",
       "young_pip_recipients",
       "package_young_people_affected",
       "young_benefits_spend",
@@ -120,11 +118,19 @@ describe("the benchmarks file", () => {
     ]);
     for (const row of parsed.rows.filter((each) => each.estimate?.fixed)) {
       // The savings and poverty figures are 2029-30's; the caseloads are the 2027-28 baseline's, and say so
-      const caseload = ["uc_health_no_work_requirements", "uc_health_element_16_24", "young_pip_recipients"].includes(row.id);
+      const caseload = row.id === "young_pip_recipients";
       expect(row.estimate.label, row.id).toBe(caseload ? "PolicyEngine, build fcfac709, 2027-28 baseline caseload" : "PolicyEngine, build fcfac709, 2029-30");
       expect(estimateFor(row, { ageRows: [], packageRows: [], packageKey: null, year: 2027 })).toBeNull();
     }
-    expect(parsed.rows.find((row) => row.id === "uc_health_no_work_requirements").estimate.fixed).toBe("232,000");
+    // The UC health caseload (benefit units with LCWRA, a check script's rows) is not shown: published figures only
+    for (const id of ["uc_health_no_work_requirements", "uc_health_element_16_24"]) expect(parsed.rows.find((row) => row.id === id).estimate, id).toBeNull();
+    // Our savings are Exchequer savings with knock-on effects, never called spending
+    for (const id of ["young_benefits_spend", "pip_spend_16_24"]) {
+      const basis = parsed.rows.find((row) => row.id === id).estimate.basis;
+      expect(basis, id).toMatch(/Exchequer saving/);
+      expect(basis, id).toMatch(/knock-on effects on other benefits/);
+      expect(basis, id).not.toMatch(/the spending the modelled package removes/);
+    }
     expect(parsed.rows.find((row) => row.id === "employer_nics_under_25").estimate.fixed).toBe("£4.65bn a year");
     expect(parsed.rows.find((row) => row.id === "young_benefits_spend").estimate.fixed).toBe("£4.67bn a year");
     expect(parsed.rows.find((row) => row.id === "review_welfare_saving_2036").estimate.fixed).toBe("£2.64bn to £4.67bn a year");
@@ -169,16 +175,13 @@ describe("the benchmark charts", () => {
 
   it("pair a published figure with a fixed estimate in the same unit, with the gap as a % of the published figure", () => {
     expect(parsed.rows.filter((each) => comparisonFor(each)).map((each) => each.id)).toEqual([
-      "uc_health_no_work_requirements",
-      "uc_health_element_16_24",
       "young_pip_recipients",
       "pip_spend_16_24",
       "uc_health_spend_16_24",
       "employer_nics_under_25",
     ]);
-    const health = comparisonFor(row("uc_health_no_work_requirements"));
-    expect(health).toMatchObject({ unit: "count", published: 260000, estimate: 232000 });
-    expect(health.gapPct).toBeCloseTo(((232000 - 260000) / 260000) * 100, 10);
+    const recipients = comparisonFor(row("young_pip_recipients"));
+    expect(recipients.gapPct).toBeCloseTo(((347000 - 450000) / 450000) * 100, 10);
     const nics = comparisonFor(row("employer_nics_under_25"));
     expect(nics).toMatchObject({ unit: "bn", published: 5.1, estimate: 4.65, publishedText: "£5.1bn", estimateText: "£4.65bn" });
     expect(nics.gapPct).toBeCloseTo(((4.65 - 5.1) / 5.1) * 100, 10);
@@ -187,7 +190,7 @@ describe("the benchmark charts", () => {
     expect(pip).toMatchObject({ unit: "bn", published: 3.8, estimate: 4.68 });
     expect(pip.gapPct).toBeCloseTo(((4.68 - 3.8) / 3.8) * 100, 10);
     expect(comparisonFor(row("uc_health_spend_16_24"))).toMatchObject({ unit: "bn", published: 0.92, estimate: 1.13, publishedText: "£0.92bn" });
-    expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 232000 });
+    expect(comparisonFor(row("uc_health_element_16_24"))).toBeNull();
     expect(comparisonFor(row("young_pip_recipients"))).toMatchObject({ unit: "count", published: 450000, estimate: 347000 });
     // A figure for another year, price base or policy design stays a tile: its wording is not one plain number
     for (const id of ["young_benefits_spend", "review_welfare_saving_2036", "relative_poverty_review"]) {

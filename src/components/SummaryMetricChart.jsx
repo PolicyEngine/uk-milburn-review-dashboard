@@ -121,7 +121,7 @@ export const POVERTY_CHOICES = [
   },
 ];
 
-// Absolute poverty after housing costs by default: the absolute line is
+// Absolute poverty before housing costs, all people, by default: the absolute line is
 // fixed in real terms, while the relative line (60% of the median) moves
 // with the measures' own effect on the median
 export const POVERTY_DEFAULT = { basis: "absolute", housing: "bhc", group: "all" };
