@@ -951,6 +951,32 @@ export const MILBURN_POLICY_DETAILS = [
   },
 ];
 
+// The final report's employer National Insurance proposal (paras 269-270),
+// at its end state: a £10,000 secondary threshold for 21 to 24s in retail
+// and hospitality, by the SIC division of the main job
+MILBURN_POLICY_DETAILS.push({
+  id: "milburn_report_employer_nics_threshold",
+  shortName: "Employer NI threshold £10,000, 21 to 24s, retail and hospitality",
+  noun: "a £10,000 employer National Insurance threshold for 21 to 24s in retail and hospitality",
+  sentence: "raising the employer National Insurance threshold to £10,000 for 21 to 24-year-olds in retail and hospitality",
+  summary: "Employers pay NI above £10,000, not £5,000, for 21 to 24s in retail and hospitality.",
+  points: [
+    { label: "Who", icon: "users", text: "Employees aged 21 to 24, main job in retail or hospitality." },
+    { label: "Rate", icon: "coins", text: "15% rate unchanged; only the threshold moves." },
+    { label: "Report", icon: "file", text: "A five-year glide path, when fiscal conditions allow; end state shown." },
+  ],
+  affects: "21 to 24-year-olds in retail and hospitality and their employers",
+  starts: "End state",
+  inForce: { from: "2027-04" },
+  type: "National Insurance",
+  details: [
+    "Static: employers' total cost of employment is held fixed, so the saving passes to pay; hiring does not respond.",
+    "Retail is SIC division 47 and hospitality divisions 55 and 56, by the main job.",
+    "The report gives no start date, phasing amounts or costing.",
+  ],
+  visual: { kind: "milburn-employer-nics", place: "change", limit: 25 },
+});
+
 // The final report's runs (17 November): the same rules as their 15 November
 // counterparts, from April 2029, when the report's welfare savings start
 // (annex section 1). Card text is the counterpart's, with the start moved.

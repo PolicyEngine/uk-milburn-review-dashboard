@@ -118,6 +118,13 @@
       "first_year": 2027
     },
     {
+      "id": "milburn_report_employer_nics_threshold",
+      "name": "Employer NI threshold of \u00a310,000 for 21 to 24s in retail and hospitality",
+      "description": "The report's end state: employers pay Class 1 National Insurance on earnings above \u00a310,000 a year, not \u00a35,000, for employees aged 21 to 24 whose main job is in retail (SIC division 47) or hospitality (divisions 55 and 56). The 15% rate is unchanged, and under-21s and apprentices under 25 keep their zero rate. The report gives no start date or costing and proposes a five-year glide path; the end state is shown in every year. policyengine-uk holds each employer's total cost of employment fixed, so the saving passes to employees as higher pay; hiring does not respond.",
+      "status": "computable",
+      "first_year": 2027
+    },
+    {
       "id": "severe_conditions_higher_rate",
       "name": "Higher health element for severe conditions",
       "description": "A higher Universal Credit health element for claimants who meet the severe conditions criteria.",

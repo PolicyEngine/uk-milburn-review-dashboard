@@ -288,6 +288,8 @@ it("frontend source contains no embedded Budget measure names or ids", () => {
       /export const MILBURN_POLICY_DETAILS = \[[\s\S]*?\n\];/,
       // The report's runs, each mapped to its 15 November counterpart's card
       /const REPORT_RUN_OF = \{[\s\S]*?\n\};/,
+      // The report's employer NI threshold card
+      /MILBURN_POLICY_DETAILS\.push\(\{\n  id: "milburn_report_employer_nics_threshold"[\s\S]*?\n\}\);/,
     ],
     // The Milburn review: the measures listed as not computable, in the
     // registry's own words

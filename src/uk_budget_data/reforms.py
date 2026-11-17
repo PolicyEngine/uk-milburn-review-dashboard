@@ -1768,6 +1768,7 @@ MILBURN_PROMOTED_IDS: tuple[str, ...] = (
     "milburn_report_package",
     "milburn_report_uc_health",
     "milburn_report_pip",
+    "milburn_report_employer_nics_threshold",
 )
 
 _SCOTLAND_INCLUDED = (
@@ -2080,6 +2081,38 @@ def _create_pip_removed_16_to_24_excluding_scotland() -> Reform:
     )
 
 
+
+# The final report's employer National Insurance proposal (paras 269-270):
+# the secondary threshold rises from £5,000 to £10,000 for employees aged 21
+# to 24 whose main job is in retail (SIC division 47) or hospitality (55, 56).
+# The report gives no start date or costing; this is its end state, modelled
+# in every year (milburn_employer_nics_report.py).
+from uk_budget_data.budget_measures.milburn_employer_nics_report import (  # noqa: E402
+    milburn_employer_nics_report,
+)
+
+MILBURN_REPORT_EMPLOYER_NICS_THRESHOLD_ID = "milburn_report_employer_nics_threshold"
+
+
+def _create_milburn_report_employer_nics_threshold() -> Reform:
+    return Reform(
+        id=MILBURN_REPORT_EMPLOYER_NICS_THRESHOLD_ID,
+        name="Employer NI threshold of £10,000 for 21 to 24s in retail and hospitality",
+        description=(
+            "The report's end state: employers pay Class 1 National Insurance on "
+            "earnings above £10,000 a year, not £5,000, for employees aged 21 to "
+            "24 whose main job is in retail (SIC division 47) or hospitality "
+            "(divisions 55 and 56). The 15% rate is unchanged, and under-21s and "
+            "apprentices under 25 keep their zero rate. The report gives no start "
+            "date or costing and proposes a five-year glide path; the end state "
+            "is shown in every year. policyengine-uk holds each employer's total "
+            "cost of employment fixed, so the saving passes to employees as "
+            "higher pay; hiring does not respond."
+        ),
+        simulation_modifier=milburn_employer_nics_report,
+    )
+
+
 _RESERVED_IDS = frozenset(
     {
         MILBURN_REPORT_PACKAGE_ID,
@@ -2092,6 +2125,7 @@ _RESERVED_IDS = frozenset(
         MILBURN_PACKAGE_16_TO_24_ID,
         PIP_UNDER_25_EXCLUDING_SCOTLAND_ID,
         PIP_16_TO_24_EXCLUDING_SCOTLAND_ID,
+        MILBURN_REPORT_EMPLOYER_NICS_THRESHOLD_ID,
     }
 )
 
@@ -2104,6 +2138,7 @@ _RESERVED_FACTORIES = (
     _create_milburn_report_employer_nics,
     _create_pip_removed_under_25_excluding_scotland,
     _create_pip_removed_16_to_24_excluding_scotland,
+    _create_milburn_report_employer_nics_threshold,
 )
 
 

@@ -16,6 +16,7 @@ export const MILBURN_DISPLAY_NAMES = Object.freeze({
   milburn_report_package: "The report's benefit changes (no replacement modelled)",
   milburn_report_uc_health: "UC health top-up removed for under-25s",
   milburn_report_pip: "PIP removed for 18 to 24-year-olds",
+  milburn_report_employer_nics_threshold: "Employer NI threshold £10,000 for 21 to 24s in retail and hospitality",
   milburn_package: "Full abolition, no replacements (upper bound)",
   milburn_package_central: "Central variant: severe cases kept, PIP at half rate",
   milburn_package_phased: "Full abolition, phased as claimants are reassessed",
@@ -41,7 +42,7 @@ export const MILBURN_GROUPS = Object.freeze([
   {
     id: REPORT_GROUP,
     label: "The report's measures",
-    ids: ["milburn_report_package", "milburn_report_uc_health", "milburn_report_pip"],
+    ids: ["milburn_report_package", "milburn_report_uc_health", "milburn_report_pip", "milburn_report_employer_nics_threshold"],
   },
   {
     id: PACKAGES_GROUP,
