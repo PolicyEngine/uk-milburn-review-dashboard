@@ -312,13 +312,13 @@
         "value": "29%",
         "basis": "Employed and self-employed people aged 16 to 24 whose main job is in SIC sections G or I (divisions 45 to 47, 55 and 56), UK, 2025, at the build's calibrated weights",
         "label": "PolicyEngine, build fcfac709, 2025",
-        "note": "Why ours is lower: both count main jobs in the same sections, so the gap is in the data. The run's sectors, divisions 47, 55 and 56, are 26%, so the retail and hospitality threshold may reach fewer young workers than the published share suggests"
+        "note": "Why ours is lower: ours counts the main job in the same two sections; the published table's exact basis is not given in the review. The run's sectors, divisions 47, 55 and 56, are 26%, so the retail and hospitality threshold may reach fewer young workers than the published share suggests"
       }
     },
     {
       "id": "pip_spend_trend_16_24",
       "figure": "PIP spending on people aged 16 to 24 over time, as stated in the review",
-      "value": "£3.2bn in 2024-25; around £1.3bn in 2019-20, around £6.5bn within five years",
+      "value": "Around £3.2bn in 2024-25; around £1.3bn in 2019-20, around £6.5bn within five years",
       "basis": "The review's figures (paragraph 653): annual PIP spending on people aged 16 to 24, around £3.2bn in 2024-25, up from around £1.3bn in 2019-20, and around £6.5bn within five years on the interim report's central trajectory",
       "source": "From a Welfare State to a Working State",
       "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
@@ -330,7 +330,7 @@
       "id": "uc_health_spend_young_2024",
       "figure": "Universal Credit spending on young people with a health issue, as stated in the review",
       "value": "£2.1bn in 2024-25; almost double 2019-20",
-      "basis": "The review's figure (paragraph 653): overall Universal Credit spending on people aged 16 to 24 with a health issue, all of their award and not only the health element, which almost doubled between 2019-20 and 2024-25",
+      "basis": "The review's figure (paragraph 653): the overall spend on Universal Credit for young people with a health issue, which almost doubled between 2019-20 and 2024-25",
       "source": "From a Welfare State to a Working State",
       "url": "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation",
       "date": "17 November 2026",

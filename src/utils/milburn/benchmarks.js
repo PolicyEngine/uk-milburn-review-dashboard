@@ -199,7 +199,7 @@ export const BENCHMARK_SHORT = {
   uc_health_spend_young_2024: {
     label: "UC spending on young people with a health issue, the review says",
     icon: "tag",
-    basis: "Their whole award, not only the health element (paragraph 653)",
+    basis: "Overall UC spend, almost doubled since 2019-20 (paragraph 653)",
   },
   hidden_neets_england: {
     label: "Hidden NEETs in England, the review says",
