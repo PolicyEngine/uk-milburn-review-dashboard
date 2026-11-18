@@ -356,7 +356,8 @@ export function comparisonFor(row) {
     publishedText: published.text,
     estimate: estimate.number,
     estimateText: estimate.text,
-    gapPct: ((estimate.number - published.number) / published.number) * 100,
+    // From the unrounded count where the file gives one, so rounding never moves the gap
+    gapPct: (((row.estimate.exact ?? estimate.number) - published.number) / published.number) * 100,
     // Shares differ in percentage points, never as a % of a %
     gapPp: published.unit === "pct" ? estimate.number - published.number : null,
   };
@@ -433,6 +434,8 @@ export function parseBenchmarks(json) {
         row.policyengine_estimate && typeof row.policyengine_estimate.value === "string" && row.policyengine_estimate.value.trim()
           ? {
               fixed: row.policyengine_estimate.value.trim(),
+              // The unrounded count behind a rounded figure: gaps are worked out from it
+              exact: Number.isFinite(row.policyengine_estimate.exact) ? row.policyengine_estimate.exact : null,
               basis: text(row.policyengine_estimate.basis),
               label: text(row.policyengine_estimate.label),
               note: text(row.policyengine_estimate.note),

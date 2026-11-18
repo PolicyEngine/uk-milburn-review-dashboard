@@ -196,7 +196,7 @@ describe("the benchmark charts", () => {
     // The gaps issue #1 gives, like for like: +33% (+32% on our count to the nearest thousand), -6%, -14%, +28%, +15%
     const gap = (id) => Math.round(comparisonFor(row(id)).gapPct);
     expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 233000 });
-    expect(gap("uc_health_element_16_24")).toBe(32);
+    expect(gap("uc_health_element_16_24")).toBe(33); // from the unrounded 233,407, so rounding the shown count to 233,000 never moves the gap
     // The PIP overlap: shares, so the gap is in percentage points (Max, 18 Nov; issue #4's table)
     expect(comparisonFor(row("uc_health_pip_overlap"))).toMatchObject({ unit: "pct", published: 62.5, estimate: 90.6 });
     expect(comparisonFor(row("uc_health_pip_overlap")).gapPp).toBeCloseTo(28.1, 6);

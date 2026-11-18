@@ -156,7 +156,7 @@ describe("Benchmarks cards", () => {
       "employer_nics_under_25",
     ]);
     for (const [id, gap] of [
-      ["uc_health_element_16_24", "Ours 32% higher"],
+      ["uc_health_element_16_24", "Ours 33% higher"],
       // A share differs in percentage points, never as a % of a %
       ["uc_health_pip_overlap", "Ours 28.1pp higher"],
       ["pip_spend_16_24", "Ours 14% lower"],
