@@ -14,17 +14,14 @@ import {
   BENCHMARKS_FILE,
   BENCHMARK_SHORT,
   BENCHMARK_TOPICS,
-  HERO_BAND_PCT,
   benchmarkGroups,
   comparisonFor,
   differentBasis,
   estimateFor,
-  heroRows,
   parseBenchmarks,
   topicFromSearch,
 } from "../../utils/milburn/benchmarks";
 import { usePackageTable } from "../../utils/milburn/packageRun";
-import BenchmarksHero from "./BenchmarksHero";
 import { ComparePanel, StatTile, thousands } from "./BenchmarkCards";
 import "./milburn.css";
 import "./BenchmarksTable.css";
@@ -179,12 +176,11 @@ function TopicFilter({ topic, onChange, counts }) {
 }
 
 /**
- * Population impact's Benchmarks sub-tab. At the top, "How close are our
- * estimates?": every comparable pair on one axis of % gaps, with three
- * headline chips. Then a topic filter (kept in the address as ?bm=) over
- * the sections: comparable pairs as compact cards (both figures large, the
- * gap as a badge, two thin bars, the source chip), every other figure as a
- * stat tile with a small graphic where its wording is a series. Each card's
+ * Population impact's Benchmarks sub-tab: a topic filter (kept in the
+ * address as ?bm=) over the sections, each a grid of equal-sized cards.
+ * Comparable pairs are compact cards (both figures large, the gap as a
+ * badge, two thin bars, the source chip); every other figure is a stat
+ * tile with a small graphic where its wording is a series. Each card's
  * long wording (why the two differ, both bases, our build, our saving)
  * is in its "More info". A CSV of every figure beside the filter.
  */
@@ -195,7 +191,6 @@ export default function BenchmarksTable() {
   const packageAge = usePackageTable(catalogue, "age_impact");
   const [topic, setTopic] = useTopic();
   const [expanded, setExpanded] = useState({});
-  const [focusId, setFocusId] = useState(null);
   // The figures shown (the topic chosen), drawn as the image downloads
   const [cards, setCards] = useState(null);
 
@@ -203,10 +198,6 @@ export default function BenchmarksTable() {
   const groups = useMemo(
     () => (ready ? benchmarkGroups(ready.rows) : []),
     [ready],
-  );
-  const hero = useMemo(
-    () => heroRows(groups.flatMap((group) => group.rows)),
-    [groups],
   );
   const estimates = new Map(
     (ready?.rows ?? []).map((row) => [
@@ -220,24 +211,6 @@ export default function BenchmarksTable() {
           })
         : null,
     ]),
-  );
-
-  // A hero row opens its card: its topic shown, the card scrolled to and focused
-  const showCard = useCallback(
-    (id) => {
-      const group = groups.find((each) =>
-        each.rows.some((row) => row.id === id),
-      );
-      if (group && topic !== "all" && topic !== group.key) setTopic(group.key);
-      setFocusId(id);
-      window.requestAnimationFrame(() => {
-        const card = document.getElementById(`bm-card-${id}`);
-        if (!card) return;
-        card.scrollIntoView?.({ behavior: "smooth", block: "center" });
-        card.focus?.({ preventScroll: true });
-      });
-    },
-    [groups, topic, setTopic],
   );
 
   let body;
@@ -278,7 +251,6 @@ export default function BenchmarksTable() {
     ];
     body = (
       <section className="report-section bm" aria-label="Benchmarks">
-        {hero.length > 0 && <BenchmarksHero rows={hero} onShow={showCard} />}
         <div className="bm-toolbar">
           <TopicFilter topic={topic} onChange={setTopic} counts={counts} />
           <div className="bm-toolbar-download">
@@ -293,9 +265,9 @@ export default function BenchmarksTable() {
                     `${frameFileName(frame, "benchmarks")}.csv`,
                     "text/csv;charset=utf-8",
                   ),
-                // Images: one topic's cards; under "All", the hero's plot, as every card at once is too tall to read
+                // Images: the cards of the topic shown
                 ...htmlImageFormats(
-                  () => (topic === "all" ? (cards?.parentElement?.querySelector(".bm-hero .chart-plot") ?? cards) : cards),
+                  () => cards,
                   topic === "all" ? "benchmarks" : `benchmarks-${topic}`,
                 ),
               }}
@@ -331,7 +303,6 @@ export default function BenchmarksTable() {
                       key={row.id}
                       row={row}
                       comparison={comparisonFor(row)}
-                      focusId={focusId}
                     />
                   ))}
                   {visible.map((row) => (
@@ -341,7 +312,6 @@ export default function BenchmarksTable() {
                       yearLabel={yearLabel}
                       runLabel={runLabel}
                       estimate={estimates.get(row.id)}
-                      focusId={focusId}
                     />
                   ))}
                 </ul>
@@ -387,8 +357,6 @@ export default function BenchmarksTable() {
                 Gap: the PolicyEngine estimate less the published figure, as a %
                 of the published figure, to the nearest whole per cent; given
                 only where the two count the same ages, area, year and measure.
-                The shaded band marks gaps within {HERO_BAND_PCT}% either way: a
-                reading aid, not a test of either figure.
               </span>
             </li>
             <li>
@@ -397,6 +365,15 @@ export default function BenchmarksTable() {
                 Where a pair still differs in date or area, it says so and gives
                 no gap. Our savings from the measures are in each card's More
                 info, never set against spending.
+              </span>
+            </li>
+            <li>
+              <TitleIcon name="book" bare size={14} />
+              <span>
+                The review's own estimates include replacement awards, a Youth
+                Allowance, a work allowance and more young people in work, in
+                2026-27 prices; our static runs include none of them, so no
+                PolicyEngine figure is set beside them.
               </span>
             </li>
             <li>

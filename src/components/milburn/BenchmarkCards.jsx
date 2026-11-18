@@ -1,6 +1,6 @@
 import { Info } from "lucide-react";
 import Disclosure from "../Disclosure";
-import InfoSections, { hasInfo, infoPreview } from "../InfoSections";
+import InfoSections, { hasInfo } from "../InfoSections";
 import TitleIcon from "../TitleIcon";
 import { BENCHMARK_ICON, BENCHMARK_SHORT, differentBasis, gapWords, graphicFor, moreInfo, splitValue, valueParts } from "../../utils/milburn/benchmarks";
 import { SourceLinkChip } from "./SourceChip";
@@ -27,7 +27,7 @@ export function Value({ value }) {
   );
 }
 
-/** A card's "More info", as on the Measures tab's cards: closed, one line of what is inside. */
+/** A card's "More info", as on the Measures tab's cards, closed; no preview line, to keep the face short. */
 function MoreInfo({ info }) {
   if (!hasInfo(info)) return null;
   return (
@@ -41,7 +41,6 @@ function MoreInfo({ info }) {
           </>
         }
         className="policy-card-details"
-        preview={infoPreview(info)}
       >
         <InfoSections info={info} />
       </Disclosure>
@@ -79,14 +78,14 @@ function Foot({ row, info }) {
  * from zero in the pair's own unit; the source chip; and everything else
  * (why they differ, both bases, our build, our saving) in More info.
  */
-export function ComparePanel({ row, comparison, focusId }) {
+export function ComparePanel({ row, comparison }) {
   const published = splitValue(row.value);
   const basis = differentBasis(row.id);
   const gap = comparison.gapPct;
   const max = Math.max(comparison.published, comparison.estimate);
   const width = (value) => `${max > 0 ? (value / max) * 100 : 0}%`;
   return (
-    <li id={`bm-card-${row.id}`} tabIndex={-1} className={`bm-card bm-compare${focusId === row.id ? " is-focused" : ""}`} data-benchmark={row.id}>
+    <li id={`bm-card-${row.id}`} className="bm-card bm-compare" data-benchmark={row.id}>
       <CardTitle row={row} />
       <div className="bm-pair">
         <p className="bm-figure">
@@ -205,15 +204,14 @@ function Graphic({ graphic }) {
  * a series, a split or a share, a flag where its basis is not published,
  * the source chip and More info.
  */
-export function StatTile({ row, estimate, yearLabel, runLabel, focusId }) {
+export function StatTile({ row, estimate, yearLabel, runLabel }) {
   const published = splitValue(row.value);
   const ours = row.estimate?.fixed || (estimate !== null && estimate !== undefined ? thousands(estimate) : "");
   const unpublishedBasis = /^Basis not published/.test(row.basis);
   return (
     <li
       id={`bm-card-${row.id}`}
-      tabIndex={-1}
-      className={`bm-card bm-tile${published.value ? "" : " is-estimate"}${focusId === row.id ? " is-focused" : ""}`}
+      className={`bm-card bm-tile${published.value ? "" : " is-estimate"}`}
       data-benchmark={row.id}
     >
       <CardTitle row={row} />

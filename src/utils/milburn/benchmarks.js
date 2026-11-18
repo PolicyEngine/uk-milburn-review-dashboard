@@ -22,7 +22,7 @@ export const BENCHMARK_SECTIONS = [
     key: "caseloads",
     chip: "Caseloads",
     title: "How do our caseloads compare?",
-    intro: "Published counts of young people on the UC health element or PIP, beside ours for the same ages, for 2025.",
+    intro: "Published counts of 16–24s on the UC health element or PIP, beside ours.",
     icon: "usersRound",
     ids: ["uc_health_no_work_requirements", "uc_health_element_16_24", "young_pip_recipients", "package_young_people_affected"],
   },
@@ -30,7 +30,7 @@ export const BENCHMARK_SECTIONS = [
     key: "spending",
     chip: "Spending",
     title: "How does our spending compare?",
-    intro: "Published spending and costs for 2025-26, beside ours for the same year in cash terms; our savings from the measures are in each card's More info, apart from the pair.",
+    intro: "Published spending and costs for 2025-26, beside ours in cash terms.",
     icon: "landmark",
     ids: ["pip_spend_16_24", "uc_health_spend_16_24", "young_benefits_spend", "employer_nics_under_25"],
   },
@@ -38,7 +38,7 @@ export const BENCHMARK_SECTIONS = [
     key: "jobs",
     chip: "Work",
     title: "Where do young people work?",
-    intro: "The review's share of young people's jobs in retail and hospitality, the sectors its employer NI threshold starts with, beside ours for the same industries.",
+    intro: "The review's share of young people's jobs in retail and hospitality, beside ours.",
     icon: "briefcase",
     ids: ["retail_hospitality_jobs_16_24"],
   },
@@ -46,7 +46,7 @@ export const BENCHMARK_SECTIONS = [
     key: "review",
     chip: "The review's estimates",
     title: "The review's own estimates",
-    intro: "These include replacement awards, a Youth Allowance, a work allowance and more young people in work, in 2026-27 prices; our static runs include none of them, so no PolicyEngine figure is set beside them.",
+    intro: "The review's own projections, which our static runs cannot reproduce.",
     icon: "scale",
     ids: ["review_welfare_saving_2036", "milburn_welfare_saving_10y", "relative_poverty_review", "young_net_incomes_review"],
   },
@@ -54,7 +54,7 @@ export const BENCHMARK_SECTIONS = [
     key: "poverty",
     chip: "Poverty",
     title: "Poverty",
-    intro: "What the benefits do for young people today, as published.",
+    intro: "What the benefits do for young people today.",
     icon: "percent",
     ids: ["kept_out_of_poverty", "pip_no_extra_costs"],
   },
@@ -90,144 +90,138 @@ export const BENCHMARK_SECTIONS = [
  */
 export const BENCHMARK_SHORT = {
   neet_16_24: {
-    label: "16–24s not in education, employment or training",
+    label: "NEETs, 16–24s",
     icon: "cap",
     basis: "Labour Force Survey, April to June 2026, UK: 13.0% of 16–24s",
   },
   neet_rate_projection_2036: {
-    label: "NEET rate the review projects for 2036-37",
+    label: "Projected NEET rate, 2036-37",
     icon: "arrowDown",
     basis: "16–24s, UK, from 13.1% in 2026-27; the ambition is around 5%",
   },
   into_sustained_work_2036: {
-    label: "Into sustained work by 2036, the review expects",
+    label: "Into sustained work by 2036",
     icon: "briefcase",
     basis: "All its recommendations, not the benefit changes alone",
   },
   uc_health_no_work_requirements: {
-    label: "On UC health with no work requirements",
+    label: "UC health, no work requirements",
     icon: "heartPulse",
     basis: "Basis not published: no age range, date or source given",
   },
   uc_health_element_16_24: {
-    hero: "UC health element, 16–24s",
-    label: "16–24s receiving the UC health element",
+    label: "UC health element, 16–24s",
     icon: "activity",
     estimateBasis: "Ages 16 to 24, Great Britain, 2025",
   },
   incapacity_benefits_young: {
-    label: "Young people on incapacity benefits, the review says",
+    label: "Young people on incapacity benefits",
     icon: "lifebuoy",
     basis: "More than double the number in 2012",
   },
   young_pip_recipients: {
-    hero: "PIP recipients, 16–24s",
-    label: "Young people receiving PIP",
+    label: "PIP recipients, 16–24s",
     icon: "clipboard",
     estimateBasis: "Ages 16 to 24, England and Wales, 2025",
   },
   dla_pip_16_24: {
-    label: "16–24s receiving DLA or PIP, the review says",
+    label: "DLA or PIP, 16–24s",
     icon: "layers",
     basis: "From DWP Stat-Xplore; double the number in 2012",
   },
   package_young_people_affected: {
-    label: "Young people affected by the package",
+    label: "16–24s affected by the package",
     icon: "usersRound",
     basis: "No published figure",
     estimateBasis: "16–24s in households the package makes worse off",
   },
   young_benefits_spend: {
-    hero: "PIP and UC LCWRA combined",
-    label: "PIP and UC health spending on young people",
+    label: "PIP and UC LCWRA spending",
     icon: "banknote",
     basis: "2025-26, ages 16 to 24: PIP £3.8bn, UC LCWRA £0.92bn",
     estimateBasis: "Spending in 2025, cash terms: PIP in England and Wales, the health element in Great Britain",
   },
   pip_spend_16_24: {
-    hero: "PIP spending, 16–24s",
-    label: "PIP spending, ages 16 to 24",
+    label: "PIP spending, 16–24s",
     icon: "wallet",
     basis: "Spending in 2025-26",
     estimateBasis: "Spending in 2025, England and Wales, cash terms",
   },
   uc_health_spend_16_24: {
-    hero: "UC LCWRA spending, 16–24s",
-    label: "UC LCWRA element spending, ages 16 to 24",
+    label: "UC LCWRA spending, 16–24s",
     icon: "piggy",
     basis: "Spending in 2025-26",
     estimateBasis: "Spending in 2025, Great Britain, cash terms",
   },
-  incapacity_spending_18_24: { label: "Incapacity benefit spending, ages 18 to 24", icon: "trend" },
+  incapacity_spending_18_24: { label: "Incapacity spending, 18–24s", icon: "trend" },
   review_welfare_saving_2036: {
-    label: "Annual welfare saving the review estimates",
+    label: "Annual welfare saving",
     icon: "scale",
     basis: "2026-27 prices, UK; replacement awards, a Youth Allowance and a work allowance included",
   },
   milburn_welfare_saving_10y: {
-    label: "Cumulative welfare savings by 2036-37",
+    label: "Welfare savings to 2036-37",
     icon: "coins",
     basis: "Eight years, 2029-30 to 2036-37, 2026-27 prices",
   },
   review_investment_2036: {
-    label: "Annual cost of the review's recommendations",
+    label: "Annual cost of the recommendations",
     icon: "calculator",
     basis: "Gross, 2026-27 prices; offset by £3.6bn welfare savings and £2.4bn fiscal offsets",
   },
   youth_hiring_incentives_cost: {
-    label: "Cost of the review's youth hiring incentives",
+    label: "Youth hiring incentives",
     icon: "userPlus",
     basis: "Youth Jobs Grant and apprenticeships; no separate employer NI cost",
   },
   employer_nics_under_25: {
-    hero: "Zero employer NI for under-25s",
-    label: "Cost of zero employer NI for under-25s",
+    label: "Zero employer NI, under-25s",
     icon: "building",
     basis: "Gross cost in 2025-26; not a recommendation of the review",
     estimateBasis: "Gross static cost, 2025-26, UK, cash terms",
   },
   relative_poverty_review: {
-    label: "Relative poverty after housing costs, the review estimates",
+    label: "Relative poverty, after housing costs",
     icon: "house",
     basis: "Once fully rolled out, with 440,000 more young people in work",
   },
-  kept_out_of_poverty: { label: "Kept out of poverty by UC health and/or PIP", icon: "shield" },
+  kept_out_of_poverty: { label: "Kept out of poverty by PIP or UC health", icon: "shield" },
   young_net_incomes_review: {
-    label: "Rise in young people's net incomes, the review estimates",
+    label: "Rise in young people's net incomes",
     icon: "bars",
     basis: "All its reforms, with 440,000 more young people in work (paragraphs 111 and 739)",
   },
   retail_hospitality_jobs_16_24: {
-    label: "16–24s' jobs in retail and hospitality",
+    label: "Retail and hospitality jobs",
     icon: "cart",
     basis: "ONS, by industry section, to 2025 (paragraph 50)",
   },
   pip_spend_trend_16_24: {
-    label: "PIP spending on 16–24s over time, the review says",
+    label: "PIP spending over time",
     icon: "calendar",
     basis: "Around £1.3bn in 2019-20; around £6.5bn within five years (paragraph 653)",
   },
   uc_health_spend_young_2024: {
-    label: "UC spending on young people with a health issue, the review says",
+    label: "UC health spending, young people",
     icon: "tag",
     basis: "Overall UC spend, almost doubled since 2019-20 (paragraph 653)",
   },
   hidden_neets_england: {
-    label: "Hidden NEETs in England, the review says",
+    label: "Hidden NEETs, England",
     icon: "user",
     basis: "18–24s out of work and education, not receiving benefits, 2023-24 (paragraph 275)",
   },
   disabled_neet_16_24: {
-    label: "Disabled 16–24s not in education, employment or training",
+    label: "Disabled NEET rate, 16–24s",
     icon: "users",
     basis: "2025-26: around 3.5 times the non-disabled rate (paragraph 692)",
   },
   child_dla_recipients: {
-    label: "Children receiving DLA, the review says",
+    label: "Children receiving DLA",
     icon: "clock",
     basis: "About 77% move to PIP by 17, implying about 23% do not (paragraph 759)",
   },
-  pip_no_extra_costs: { label: "Young PIP claimants reporting no extra costs", icon: "receipt" },
+  pip_no_extra_costs: { label: "PIP claimants with no extra costs", icon: "receipt" },
 };
 
 /**
@@ -388,60 +382,6 @@ export function estimateFor(row, { ageRows, packageRows, packageKey, year }) {
   if (row.estimate.metric !== "young_people_worse_off") return null;
   if (row.estimate.package) return youngPeopleWorseOff(packageRows, packageKey, year);
   return youngPeopleWorseOff(ageRows, row.estimate.reformId, year);
-}
-
-/**
- * The hero chart's band: a gap within this % of the published figure, either
- * way, sits inside the shaded band. A reading aid, not a test of either figure.
- */
-export const HERO_BAND_PCT = 15;
-
-/** The pair whose two figures are the sum of two other pairs (PIP and the UC LCWRA element). */
-export const COMBINED_PAIR = "young_benefits_spend";
-
-/**
- * Every comparable pair, in the order given, as one row of the hero chart:
- * its short label, both figures as worded, and its gap (the estimate less
- * the published figure, as a % of the published figure). A pair that
- * counts different things has no gap (`gapPct` null), never counts as
- * inside the band and goes last.
- */
-export function heroRows(rows) {
-  const all = rows
-    .map((row) => {
-      const comparison = comparisonFor(row);
-      if (!comparison) return null;
-      const basis = differentBasis(row.id);
-      const short = BENCHMARK_SHORT[row.id] ?? {};
-      return {
-        id: row.id,
-        label: short.hero ?? short.label ?? row.figure,
-        unit: comparison.unit,
-        published: comparison.publishedText,
-        estimate: comparison.estimateText,
-        gapPct: basis ? null : comparison.gapPct,
-        likeForLike: !basis,
-        differentBasis: basis,
-        within: !basis && Math.abs(comparison.gapPct) <= HERO_BAND_PCT,
-        combined: row.id === COMBINED_PAIR,
-      };
-    })
-    .filter(Boolean);
-  return [...all.filter((row) => row.likeForLike), ...all.filter((row) => !row.likeForLike)];
-}
-
-/** The hero's headline counts: like-for-like pairs, how many sit inside the band, and the largest gap either way. */
-export function heroSummary(rows) {
-  const like = rows.filter((row) => row.likeForLike);
-  const largest = like.reduce((best, row) => (!best || Math.abs(row.gapPct) > Math.abs(best.gapPct) ? row : best), null);
-  return { pairs: rows.length, like: like.length, within: like.filter((row) => row.within).length, notLike: rows.length - like.length, largest };
-}
-
-/** A gap as a short signed label, to the nearest whole per cent: "+33%", "−14%", "0%". */
-export function signedGap(gapPct) {
-  const whole = Math.round(Math.abs(gapPct));
-  if (whole === 0) return "0%";
-  return `${gapPct < 0 ? "−" : "+"}${whole}%`;
 }
 
 /** The gap in words, to the nearest whole per cent: "14% lower", "33% higher", "within 1%". */

@@ -2,8 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { BENCHMARK_GRAPHICS, BENCHMARK_TOPICS, benchmarkGroups, heroRows, heroSummary, parseBenchmarks, topicFromSearch } from "../../utils/milburn/benchmarks";
-import { heroCsv, heroDomain, heroTicks } from "./BenchmarksHero";
+import { BENCHMARK_GRAPHICS, BENCHMARK_SECTIONS, BENCHMARK_SHORT, BENCHMARK_TOPICS, benchmarkGroups, parseBenchmarks, topicFromSearch } from "../../utils/milburn/benchmarks";
 
 const benchmarks = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_benchmarks.json"), "utf8");
 const file = parseBenchmarks(JSON.parse(benchmarks));
@@ -33,8 +32,6 @@ afterEach(() => {
 // The benchmarks file's year (policyengine_estimate_year), 2029-30
 const youngRow = { reform_id: "combined--pkg", year: "2029", age_band: "16-24", people: "1000000", pct_worse_off: "10" };
 
-const LIKE_FOR_LIKE = ["uc_health_element_16_24", "pip_spend_16_24", "uc_health_spend_16_24", "young_benefits_spend", "employer_nics_under_25"];
-
 async function renderTab() {
   vi.stubGlobal("fetch", respond(benchmarks));
   state.ageRows = [youngRow];
@@ -54,54 +51,47 @@ function openMoreInfo(id) {
   return card(id).querySelector(".disclosure-content");
 }
 
-describe("Benchmarks hero", () => {
-  it("draws every comparable pair, like-for-like first, the different-basis pair flagged with no gap", async () => {
+describe("Benchmarks layout", () => {
+  it("has no hero chart: the topic filter and the all-figures download come first", async () => {
     const region = await renderTab();
-    const hero = region.querySelector(".bm-hero");
-    expect(within(hero).getByRole("heading", { name: "How close are our estimates?" })).toBeInTheDocument();
-    expect([...hero.querySelectorAll("[data-hero-row]")].map((row) => row.dataset.heroRow)).toEqual([...LIKE_FOR_LIKE, "young_pip_recipients"]);
-    // Every like-for-like pair has a dot and a gap label; the other none
-    for (const id of LIKE_FOR_LIKE) {
-      const row = hero.querySelector(`[data-hero-row="${id}"]`);
-      expect(row.querySelector(".bm-hero-dot"), id).not.toBeNull();
-      expect(row.querySelector(".bm-hero-value").textContent, id).toMatch(/^[+−]\d+%$/);
-    }
-    const flagged = hero.querySelector('[data-hero-row="young_pip_recipients"]');
-    expect(flagged.querySelector(".bm-hero-dot")).toBeNull();
-    expect(flagged.textContent).toContain("Not like for like");
-    expect(flagged.textContent).not.toMatch(/[+−]\d+%/);
-    // Headline chips
-    expect(hero.querySelector(".bm-hero-chips").textContent).toContain("3 of 5 like-for-like pairs within 15%");
-    expect(hero.querySelector(".bm-hero-chips").textContent).toContain("Largest gap: 33% higher");
-    expect(hero.querySelector(".bm-hero-chips").textContent).toContain("1 pair not like for like");
-    // A table alternative for screen readers, every pair a row
-    const table = hero.querySelector("table");
-    expect(table.querySelectorAll("tbody tr").length).toBe(6);
-    expect(table.textContent).toContain("Ours 33% higher");
-    // A download menu
-    expect(within(hero).getByRole("button", { name: /Download chart: How close are our estimates\?/ })).toBeInTheDocument();
-  });
-
-  it("counts the band on the raw gap and gives no two-decimal gap anywhere", async () => {
-    const rows = heroRows(file.rows);
-    // Employer NI is 14.7%: inside the band, though it reads as 15%
-    expect(rows.find((row) => row.id === "employer_nics_under_25").within).toBe(true);
-    expect(rows.find((row) => row.id === "uc_health_spend_16_24").within).toBe(false);
-    expect(heroSummary(rows)).toMatchObject({ pairs: 6, like: 5, within: 3, notLike: 1 });
-    expect(heroDomain(rows)).toBe(40);
-    expect(heroTicks(40)).toEqual([-40, -20, 0, 20, 40]);
-    const csv = heroCsv(rows);
-    expect(csv).toContain('"PIP spending, 16–24s",£3.8bn,£3.27bn,-14,Yes');
-    expect(csv).toContain("No: ours is England and Wales in 2025");
-    const region = await renderTab();
+    expect(region.querySelector(".bm-hero")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "How close are our estimates?" })).toBeNull();
+    expect(region.firstElementChild).toHaveClass("bm-toolbar");
+    expect(within(region.querySelector(".bm-toolbar")).getByRole("button", { name: /Download the benchmarks/ })).toBeInTheDocument();
     expect(region.textContent).not.toMatch(/\d\.\d\d%/);
   });
 
-  it("opens a pair's card from its hero row", async () => {
-    window.requestAnimationFrame = (callback) => callback();
-    await renderTab();
-    fireEvent.click(screen.getByRole("button", { name: /^PIP spending, 16–24s/ }));
-    await waitFor(() => expect(card("pip_spend_16_24")).toHaveClass("is-focused"));
+  it("builds every card the same way: a flex column, title first, the foot last", async () => {
+    const region = await renderTab();
+    fireEvent.click(screen.getByRole("button", { name: "Show all 13 figures" }));
+    for (const grid of region.querySelectorAll(".bm-cards")) {
+      // One grid a section, every child a card
+      expect([...grid.children].every((child) => child.matches("li.bm-card"))).toBe(true);
+    }
+    for (const each of region.querySelectorAll(".bm-card")) {
+      const id = each.dataset.benchmark;
+      expect(each.firstElementChild.tagName, id).toBe("H4");
+      expect(each.lastElementChild, id).toHaveClass("bm-foot");
+      // At most one line of words besides the title and figures: the gap or a flag
+      expect(each.querySelectorAll(".bm-gap").length, id).toBeLessThanOrEqual(1);
+      expect(each.querySelector(".disclosure-preview"), id).toBeNull();
+    }
+    const css = readFileSync(join(__dirname, "BenchmarksTable.css"), "utf8");
+    expect(css).toMatch(/\.bm-cards \{[^}]*align-items: stretch;/);
+    expect(css).toMatch(/grid-auto-rows: 1fr;/);
+    expect(css).toMatch(/\.bm-card \{[^}]*display: flex;[^}]*flex-direction: column;/);
+    expect(css).toMatch(/\.bm-foot \{[^}]*margin-top: auto;/);
+  });
+
+  it("keeps titles and section introductions short", () => {
+    for (const [id, short] of Object.entries(BENCHMARK_SHORT)) {
+      expect(short.label.length, id).toBeLessThanOrEqual(40);
+      expect(short.label, id).not.toMatch(/the review (says|estimates|expects|projects)/);
+    }
+    for (const section of BENCHMARK_SECTIONS) {
+      expect(section.intro.length, section.key).toBeLessThanOrEqual(90);
+      expect(section.intro.split(/[.;] /).length, section.key).toBe(1);
+    }
   });
 });
 
@@ -220,12 +210,12 @@ describe("Benchmarks cards", () => {
     const csv = benchmarksCsv(benchmarkGroups(file.rows), new Map());
     const lines = csv.replace(/^\uFEFF/, "").trim().split("\r\n").filter((line) => !/^"?#/.test(line));
     expect(lines.length - 1).toBe(file.rows.length);
-    const pip = lines.find((line) => line.includes("PIP spending, ages 16 to 24"));
+    const pip = lines.find((line) => line.includes("PIP spending, 16–24s"));
     expect(pip).toContain("https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation");
     expect(pip).toContain("17 November 2026");
     expect(pip).toContain("£3.27bn a year");
     expect(pip).toContain(",-14,Yes,");
-    expect(lines.find((line) => line.includes("Young people receiving PIP"))).toContain("No: ours is England and Wales in 2025");
+    expect(lines.find((line) => line.includes("PIP recipients, 16–24s"))).toContain("No: ours is England and Wales in 2025");
   });
 
   it("shows an unavailable state when its file is missing", async () => {
