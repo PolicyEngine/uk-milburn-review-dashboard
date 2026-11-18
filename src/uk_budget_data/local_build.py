@@ -200,7 +200,44 @@ def drop_hugging_face_token() -> list[str]:
     refuse) its own data certificate. Returns the names removed."""
     if not engine_matches():
         return []
+    fetch_dataset()
     return [name for name in TOKEN_VARIABLES if os.environ.pop(name, None)]
+
+
+# Set in a Modal container only (modal_generate.build_image): fetch the
+# build's file with the container's read token before the token is dropped,
+# as docs/milburn-local-run.md fetches it locally.
+FETCH_ENV = "MILBURN_FETCH_DATASET"
+DATASET_REPO = "policyengine/populace-uk-private"
+DATASET_REVISION = "ad84c0602ed28f694ef52662eb9b063779e4e923"
+
+
+def fetch_dataset() -> None:
+    """Download the build's file to :func:`dataset_path` when FETCH_ENV is
+    "1", a token is set and the file is not there; its SHA-256 is checked
+    when a simulation is built (:func:`check_dataset`)."""
+    if os.environ.get(FETCH_ENV) != "1" or dataset_path().is_file():
+        return
+    token = next(
+        (os.environ[name] for name in TOKEN_VARIABLES if os.environ.get(name)),
+        None,
+    )
+    if token is None:
+        return
+    import shutil
+
+    from huggingface_hub import hf_hub_download
+
+    downloaded = hf_hub_download(
+        DATASET_REPO,
+        DATASET_RELATIVE,
+        repo_type="dataset",
+        revision=DATASET_REVISION,
+        token=token,
+    )
+    destination = dataset_path()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(downloaded, destination)
 
 
 RECORD_FILE = "model_build.json"

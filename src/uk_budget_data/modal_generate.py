@@ -86,7 +86,14 @@ def build_image() -> modal.Image:
     return (
         modal.Image.debian_slim(python_version=python_version)
         .uv_sync(str(project_root), frozen=True)
-        .env({"GIT_SHA": os.environ.get("GIT_SHA", "")})
+        .env(
+            {
+                "GIT_SHA": os.environ.get("GIT_SHA", ""),
+                # The Milburn build's file, fetched with the secret's token
+                # before the package drops it (local_build.fetch_dataset)
+                "MILBURN_FETCH_DATASET": "1",
+            }
+        )
         .workdir(WORKDIR)
         .add_local_dir(
             str(project_root / "data_inputs"), f"{WORKDIR}/data_inputs"

@@ -254,11 +254,15 @@ class DistributionalImpactCalculator(BaseCalculator):
         reform_id: str,
         reform_name: str,
         year: int,
+        survey_households=None,
     ) -> tuple[list[dict], pd.DataFrame]:
         """Calculate distributional impact from microsimulations.
 
         Returns both the results list and the intermediate DataFrame
-        for use by other calculators.
+        for use by other calculators. ``survey_households`` names each
+        household's survey household (``pipeline.scatter_survey_households``):
+        given, each row also counts the survey households whose net income
+        changes (``disclosure_floor.COUNT_COLUMNS``), which the export cuts.
         """
         baseline_income = baseline.calculate(
             "household_net_income", period=year, map_to="household"
@@ -280,6 +284,11 @@ class DistributionalImpactCalculator(BaseCalculator):
                 "reform_income": reform_income.values,
                 "income_change": (reform_income - baseline_income).values,
                 "household_weight": household_weight.values,
+                **(
+                    {"survey_household": np.asarray(survey_households)}
+                    if survey_households is not None
+                    else {}
+                ),
             },
             weights="household_weight",
         )
@@ -324,10 +333,36 @@ class DistributionalImpactCalculator(BaseCalculator):
                         "year": year,
                         "decile": self.decile_names[decile_num - 1],
                         "value": rel_change,
+                        **changed_count(decile_data),
                     }
                 )
 
         return results
+
+
+# A household whose net income moves by less than this, £ a year, has not
+# changed (disclosure_floor.CHANGE_TOLERANCE).
+COUNT_CHANGE_TOLERANCE = 0.01
+
+
+def survey_count(survey, mask) -> int:
+    """The distinct survey households among ``survey[mask]``: Microcosm
+    clones of one survey household count once."""
+    return int(len(np.unique(np.asarray(survey)[np.asarray(mask, bool)])))
+
+
+def changed_count(decile_data) -> dict:
+    """The decile rows' count of survey households whose net income
+    changes, when the frame names them; else nothing."""
+    if "survey_household" not in decile_data.columns:
+        return {}
+    change = np.asarray(decile_data["income_change"].values, dtype=float)
+    return {
+        "n_survey_households_changed": survey_count(
+            decile_data["survey_household"].values,
+            np.abs(change) >= COUNT_CHANGE_TOLERANCE,
+        )
+    }
 
 
 @dataclass
@@ -372,6 +407,7 @@ class WinnersLosersCalculator(BaseCalculator):
                         "year": year,
                         "decile": str(decile_num),
                         "avg_change": avg_change,
+                        **changed_count(decile_data),
                     }
                 )
 
@@ -384,6 +420,7 @@ class WinnersLosersCalculator(BaseCalculator):
                 "year": year,
                 "decile": "all",
                 "avg_change": overall_avg,
+                **changed_count(decile_df),
             }
         )
 
@@ -407,6 +444,28 @@ POVERTY_MEASURES = {
 # (is_hbai_dependent_child: under 16, or 16-19 in non-advanced education and
 # living with a parent), as DWP's child poverty statistics count them.
 POVERTY_GROUPS = {"": None, "child_": "is_hbai_dependent_child"}
+
+
+def person_household_position(simulation, year: int) -> np.ndarray:
+    """Each person's household's position in the engine's household
+    order."""
+    households = pd.Index(
+        np.asarray(
+            simulation.calculate(
+                "household_id", period=year, map_to="household"
+            ).values
+        )
+    )
+    position = households.get_indexer(
+        np.asarray(
+            simulation.calculate(
+                "household_id", period=year, map_to="person"
+            ).values
+        )
+    )
+    if (position < 0).any():
+        raise ValueError("a person's household is not among the households")
+    return position
 
 
 def poverty_change(
@@ -486,8 +545,20 @@ class MetricsCalculator(BaseCalculator):
         reform_id: str,
         reform_name: str,
         year: int,
+        survey_households=None,
     ) -> list[dict]:
-        """Calculate summary metrics from microsimulations."""
+        """Calculate summary metrics from microsimulations.
+
+        Given ``survey_households`` (by household, in the engine's order),
+        each poverty measure also counts the survey households in which
+        someone's poverty status changes
+        (``n_survey_households_{prefix}poverty_{measure}``; for children,
+        a dependent child's), which the export cuts."""
+        person_survey = None
+        if survey_households is not None:
+            person_survey = np.asarray(survey_households)[
+                person_household_position(baseline, year)
+            ]
 
         # Calculate people affected
         baseline_income = baseline.calculate(
@@ -616,6 +687,13 @@ class MetricsCalculator(BaseCalculator):
                 )
                 row[f"{prefix}poverty_{measure}_change_pp"] = pp
                 row[f"{prefix}poverty_{measure}_change_pct"] = pct
+                if person_survey is not None:
+                    moved = np.asarray(before, bool) != np.asarray(after, bool)
+                    if in_group is not None:
+                        moved &= in_group
+                    row[f"n_survey_households_{prefix}poverty_{measure}"] = (
+                        survey_count(person_survey, moved)
+                    )
 
         # The other inequality measures, on the Gini's income and weights
         row.update(
@@ -1203,6 +1281,7 @@ class AgeImpactCalculator(BaseCalculator):
         reform_id: str,
         reform_name: str,
         year: int,
+        survey_households=None,
     ) -> list[dict]:
         def person(sim, variable):
             return np.asarray(
@@ -1234,6 +1313,10 @@ class AgeImpactCalculator(BaseCalculator):
                 "own_change": own_change,
             }
         )
+        if survey_households is not None:
+            frame["survey_household"] = np.asarray(survey_households)[
+                person_household_position(baseline, year)
+            ]
         return self.calculate_from_dataframe(
             reform_id, reform_name, year, frame
         )
@@ -1263,6 +1346,21 @@ class AgeImpactCalculator(BaseCalculator):
         direct = frame["own_change"].to_numpy() >= DIRECT_EFFECT_MIN_GBP
         weight = frame["weight"].to_numpy()
         bands = age_band_of(frame["age"].to_numpy())
+        survey = (
+            frame["survey_household"].to_numpy()
+            if "survey_household" in frame.columns
+            else None
+        )
+        changed = np.abs(change) >= COUNT_CHANGE_TOLERANCE
+        # Each published statistic's survey households (disclosure_floor):
+        # the means' changed households, each share's falling or rising
+        # ones, and those with a direct change
+        counted = {
+            "changed": changed,
+            "worse": worse,
+            "better": better,
+            "direct": direct,
+        }
 
         groups = [(label, bands == label) for label, _, _ in AGE_BANDS]
         groups.append((AGE_BAND_ALL, np.ones(len(frame), dtype=bool)))
@@ -1274,6 +1372,12 @@ class AgeImpactCalculator(BaseCalculator):
             members = singles == label
             if members.sum() >= SINGLE_AGE_MIN_RECORDS:
                 groups.append((label, members))
+        with_a_row = np.zeros(len(frame), dtype=bool)
+        for label, members in groups:
+            if label not in {band for band, _, _ in AGE_BANDS} | {
+                AGE_BAND_ALL
+            }:
+                with_a_row |= members
         rows = []
         for label, members in groups:
             w = weight[members]
@@ -1319,6 +1423,18 @@ class AgeImpactCalculator(BaseCalculator):
                     "mean_change_better_off": mean_among(better),
                 }
             )
+            if survey is not None:
+                row = rows[-1]
+                for name, flags in counted.items():
+                    row[f"n_survey_households_{name}"] = survey_count(
+                        survey, members & flags
+                    )
+                    if label in {band for band, _, _ in AGE_BANDS}:
+                        # The band's people whose age has no row, which the
+                        # band less its single ages gives back
+                        row[f"n_survey_households_{name}_other_ages"] = (
+                            survey_count(survey, members & ~with_a_row & flags)
+                        )
         return rows
 
 

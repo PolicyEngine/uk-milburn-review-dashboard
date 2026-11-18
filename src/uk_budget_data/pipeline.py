@@ -155,6 +155,7 @@ class ReformProcessor:
         baseline: Microsimulation,
         reformed: Microsimulation,
         baseline_scenario: Optional[Scenario],
+        survey_households=None,
     ) -> ReformResult:
         """Process the reform and return all metrics.
 
@@ -210,7 +211,12 @@ class ReformProcessor:
         for year in self.config.years:
             # Distributional (also returns dataframe for other calcs)
             distributional, decile_df = self.distributional_calc.calculate(
-                baseline, reformed, reform_id, reform_name, year
+                baseline,
+                reformed,
+                reform_id,
+                reform_name,
+                year,
+                survey_households=survey_households,
             )
             all_distributional.extend(distributional)
 
@@ -222,14 +228,24 @@ class ReformProcessor:
 
             # Summary metrics
             metrics = self.metrics_calc.calculate(
-                baseline, reformed, reform_id, reform_name, year
+                baseline,
+                reformed,
+                reform_id,
+                reform_name,
+                year,
+                survey_households=survey_households,
             )
             all_metrics.extend(metrics)
 
             # Results by age band
             all_age.extend(
                 self.age_calc.calculate(
-                    baseline, reformed, reform_id, reform_name, year
+                    baseline,
+                    reformed,
+                    reform_id,
+                    reform_name,
+                    year,
+                    survey_households=survey_households,
                 )
             )
 
@@ -307,6 +323,14 @@ class ReformProcessor:
         )
 
         return constituency, demographic
+
+
+# Written beside the flat CSVs, never published: each statistic's count of
+# survey households, and the cells the floor withheld (with their counts).
+# scripts/milburn_rerun_all.sh leaves them in staging.
+FLAT_COUNTS_FILE = "disclosure_counts.private.csv"
+FLAT_WITHHELD_FILE = "disclosure_withheld.private.csv"
+FLAT_RAW_DIR = "unfloored.private"
 
 
 class DataPipeline:
@@ -393,6 +417,26 @@ class DataPipeline:
         # survey household is unit-record data. The receipted artifacts
         # carry the scatter binned instead.
 
+        # The floor of survey households: withhold each thin cell and its
+        # partners, cut the count columns, and keep the counts privately
+        from uk_budget_data.publication.disclosure_floor import (
+            apply_flat_floor,
+        )
+
+        # The tables before the floor, with their counts, kept privately so
+        # the floor can be applied again without rerunning
+        for key in (
+            "age_impact",
+            "distributional_impact",
+            "winners_losers",
+            "metrics",
+        ):
+            if key in data and len(data[key]) > 0:
+                save_csv(data[key], output_dir / FLAT_RAW_DIR / f"{key}.csv")
+        data, counts, withheld = apply_flat_floor(data)
+        if counts is not None and len(counts) > 0:
+            save_csv(counts, output_dir / FLAT_COUNTS_FILE)
+            save_csv(withheld, output_dir / FLAT_WITHHELD_FILE)
         for key, filename in file_mapping.items():
             if key in data and len(data[key]) > 0:
                 # Metadata belongs to the manifest and its bound receipts.
@@ -710,14 +754,16 @@ def run_flat_unit(unit: FlatUnit) -> FlatOutcome:
             ):
                 warn(gap.reason)
     survey = None
-    if unit.tables & {"household_scatter", "income_distribution"}:
+    if flat or unit.tables & {"household_scatter", "income_distribution"}:
         survey = scatter_survey_households(baseline, dataset_path)
 
     # Every table is read while the watch runs, from the same two runs.
     with data_limits.observing(baseline, reformed) as observed:
         if flat:
+            # The survey households behind each table's cells, for the
+            # disclosure floor the export applies (disclosure_floor)
             outcome.result = ReformProcessor(reform, config).process(
-                baseline, reformed, baseline_scenario
+                baseline, reformed, baseline_scenario, survey
             )
         elif "age_impact" in unit.tables:
             calculator = AgeImpactCalculator()

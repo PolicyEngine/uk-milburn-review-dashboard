@@ -82,7 +82,8 @@ echo "  estimate   : about $(( ${#IDS[@]} * 8 )) minutes once the lock is free"
 # Written by `generate` for every run but read nowhere on the page
 # (src/utils/milburn/localBuild.js LOCAL_TABLES): left in staging, never
 # copied into public/
-UNREAD_TABLES=(income_curve.csv household_scatter_binned.csv obr_comparison.csv)
+# and the floor's private record (pipeline.FLAT_COUNTS_FILE and the rest)
+UNREAD_TABLES=(income_curve.csv household_scatter_binned.csv obr_comparison.csv "*.private.csv" "*.private")
 
 copy_plan() {
   local excludes=""

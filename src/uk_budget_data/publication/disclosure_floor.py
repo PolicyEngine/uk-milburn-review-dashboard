@@ -514,3 +514,253 @@ def survey_scatter_rows(rows: list[dict], household_ids, survey) -> list[dict]:
         {**row, "survey_household": by_household[row["household_id"]]}
         for row in rows
     ]
+
+
+# The flat route (``pipeline.DataPipeline``): the calculators count, per
+# row, the survey households behind each published statistic (columns
+# starting COUNT_PREFIX); ``apply_flat_floor`` withholds every statistic
+# resting on 1 to SURVEY_HOUSEHOLD_FLOOR - 1 of them, and its partners, then
+# cuts the counts, which are never published.
+COUNT_PREFIX = "n_survey_households_"
+# Age table: the statistics each count stands behind
+AGE_FAMILIES = {
+    "changed": ("mean_change", "mean_equivalised_change"),
+    "worse": ("pct_worse_off", "mean_change_worse_off"),
+    "better": ("pct_better_off", "mean_change_better_off"),
+    "direct": ("people_directly_affected",),
+}
+DECILE_VALUE = {
+    "distributional_impact": "value",
+    "winners_losers": "avg_change",
+}
+POVERTY_MEASURE_KEYS = ("abs_bhc", "abs_ahc", "rel_bhc", "rel_ahc")
+# metrics.csv's older headline, the same measure as abs_bhc for everyone
+LEGACY_POVERTY = ("poverty_change_pp", "poverty_change_pct")
+
+
+def is_thin(count) -> bool:
+    """Whether a count of survey households is under the floor but not
+    none (a statistic no household moves is safe to publish)."""
+    return count is not None and 0 < count < SURVEY_HOUSEHOLD_FLOOR
+
+
+def _count(row, column):
+    value = row.get(column)
+    if value is None or (isinstance(value, float) and np.isnan(value)):
+        return None
+    return int(value)
+
+
+def flat_age_withholding(rows: list[dict]) -> dict[str, set[str]]:
+    """One run-year's age rows: the columns to withhold, by row label.
+
+    Each statistic is withheld where its count is thin, with whatever
+    would give it back (``withheld_age_labels``: a single age takes its
+    band's other single ages; a thin band every row but "all"). A withheld
+    share takes ``pct_unchanged`` (100 less the two shares), and a withheld
+    side takes the other side's conditional mean, since the row's mean
+    change less the other side's share times mean gives back its total."""
+    labels = [row["age_band"] for row in rows]
+    withheld: dict[str, set[str]] = {}
+    for family, columns in AGE_FAMILIES.items():
+        column = COUNT_PREFIX + family
+        thin = [
+            row["age_band"] for row in rows if is_thin(_count(row, column))
+        ]
+        thin += [
+            row["age_band"] + OTHER_AGES
+            for row in rows
+            if is_thin(_count(row, column + "_other_ages"))
+        ]
+        if not thin:
+            continue
+        dropped = withheld_age_labels(thin, labels)
+        for label in labels if dropped is None else dropped:
+            withheld.setdefault(label, set()).update(columns)
+    for columns in withheld.values():
+        for side, other in (("worse", "better"), ("better", "worse")):
+            if f"pct_{side}_off" in columns:
+                columns.add("pct_unchanged")
+                if "mean_change" not in columns:
+                    columns.add(f"mean_change_{other}_off")
+    return {label: columns for label, columns in withheld.items() if columns}
+
+
+def flat_decile_withholding(rows: list[dict]) -> set[str]:
+    """One run-year's decile labels ("1" to "10", "all") to withhold:
+    each thin decile, and the winners and losers "all" row with any."""
+    thin = {
+        decile_label(row["decile"])
+        for row in rows
+        if is_thin(_count(row, COUNT_PREFIX + "changed"))
+    }
+    if thin:
+        thin.add("all")
+    return thin
+
+
+def flat_metrics_withholding(row: dict) -> set[str]:
+    """One metrics row's poverty columns to withhold: each measure's
+    change (points and per cent) where the survey households whose poverty
+    status changes are thin; children's count only households with a
+    dependent child whose status changes."""
+    columns = set()
+    for prefix in ("", "child_"):
+        for measure in POVERTY_MEASURE_KEYS:
+            if is_thin(
+                _count(row, f"{COUNT_PREFIX}{prefix}poverty_{measure}")
+            ):
+                columns.update(
+                    {
+                        f"{prefix}poverty_{measure}_change_pp",
+                        f"{prefix}poverty_{measure}_change_pct",
+                    }
+                )
+                if not prefix and measure == "abs_bhc":
+                    columns.update(LEGACY_POVERTY)
+    return columns
+
+
+def _count_columns(frame: pd.DataFrame) -> list[str]:
+    return [c for c in frame.columns if str(c).startswith(COUNT_PREFIX)]
+
+
+def apply_flat_floor(data: dict):
+    """The flat tables with the floor applied: ``(data, counts,
+    withheld)``.
+
+    ``data`` maps table names to frames, as ``aggregate_results`` returns
+    them. Each thin statistic and its partners are blanked (NaN, an empty
+    cell) and the count columns cut. ``counts`` (every row's counts, long)
+    and ``withheld`` (each blanked cell, with the count that withheld it or
+    "partner") are for the private record only; both are None when no table
+    carries counts (a run without survey households)."""
+    data = dict(data)
+    count_rows, withheld_rows = [], []
+    if not any(
+        _count_columns(frame)
+        for frame in data.values()
+        if isinstance(frame, pd.DataFrame)
+    ):
+        return data, None, None
+
+    def blank(table, frame, index, columns, row_label, reason_of):
+        for column in sorted(columns):
+            if column not in frame.columns:
+                continue
+            frame.loc[index, column] = np.nan
+            withheld_rows.append(
+                {
+                    "table": table,
+                    "reform_id": frame.at[index, "reform_id"],
+                    "year": int(frame.at[index, "year"]),
+                    "row": row_label,
+                    "column": column,
+                    "count": reason_of(column),
+                }
+            )
+
+    def record_counts(table, frame, label_column):
+        for _, row in frame.iterrows():
+            for column in _count_columns(frame):
+                value = _count(row, column)
+                if value is None:
+                    continue
+                count_rows.append(
+                    {
+                        "table": table,
+                        "reform_id": row["reform_id"],
+                        "year": int(row["year"]),
+                        "row": (
+                            str(row[label_column]) if label_column else "all"
+                        ),
+                        "column": column[len(COUNT_PREFIX) :],
+                        "count": value,
+                    }
+                )
+
+    age = data.get(AGE_TABLE)
+    if isinstance(age, pd.DataFrame) and _count_columns(age):
+        age = age.copy()
+        record_counts(AGE_TABLE, age, "age_band")
+        family_of = {
+            column: family
+            for family, columns in AGE_FAMILIES.items()
+            for column in columns
+        }
+        for _, group in age.groupby(["reform_id", "year"], sort=False):
+            records = group.to_dict("records")
+            plan = flat_age_withholding(records)
+            for index, row in zip(group.index, records):
+                columns = plan.get(row["age_band"])
+                if not columns:
+                    continue
+
+                def reason(column, row=row):
+                    family = family_of.get(column)
+                    count = (
+                        _count(row, COUNT_PREFIX + family) if family else None
+                    )
+                    return count if is_thin(count) else "partner"
+
+                blank(AGE_TABLE, age, index, columns, row["age_band"], reason)
+        data[AGE_TABLE] = age.drop(columns=_count_columns(age))
+
+    decile_plans = {}
+    for table in DECILE_TABLES:
+        frame = data.get(table)
+        if not isinstance(frame, pd.DataFrame) or not _count_columns(frame):
+            continue
+        frame = frame.copy()
+        record_counts(table, frame, "decile")
+        for key, group in frame.groupby(["reform_id", "year"], sort=False):
+            records = group.to_dict("records")
+            if table == "winners_losers" or key not in decile_plans:
+                decile_plans[key] = decile_plans.get(
+                    key, set()
+                ) | flat_decile_withholding(records)
+        data[table] = frame
+    for table in DECILE_TABLES:
+        frame = data.get(table)
+        if not isinstance(frame, pd.DataFrame) or not _count_columns(frame):
+            continue
+        for index, row in frame.iterrows():
+            label = decile_label(row["decile"])
+            if label in decile_plans.get((row["reform_id"], row["year"]), ()):
+                count = _count(row, COUNT_PREFIX + "changed")
+                blank(
+                    table,
+                    frame,
+                    index,
+                    {DECILE_VALUE[table]},
+                    label,
+                    lambda column, count=count: (
+                        count if is_thin(count) else "partner"
+                    ),
+                )
+        data[table] = frame.drop(columns=_count_columns(frame))
+
+    metrics = data.get("metrics")
+    if isinstance(metrics, pd.DataFrame) and _count_columns(metrics):
+        metrics = metrics.copy()
+        record_counts("metrics", metrics, None)
+        for index, row in metrics.iterrows():
+            columns = flat_metrics_withholding(row.to_dict())
+
+            def reason(column, row=row):
+                name = column.replace("_change_pp", "").replace(
+                    "_change_pct", ""
+                )
+                if name == "poverty":
+                    name = "poverty_abs_bhc"
+                return _count(row, COUNT_PREFIX + name)
+
+            blank("metrics", metrics, index, columns, "all", reason)
+        data["metrics"] = metrics.drop(columns=_count_columns(metrics))
+
+    columns = ["table", "reform_id", "year", "row", "column", "count"]
+    return (
+        data,
+        pd.DataFrame(count_rows, columns=columns),
+        pd.DataFrame(withheld_rows, columns=columns),
+    )
