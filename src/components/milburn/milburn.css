@@ -239,6 +239,100 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The year's table on Moves into work (EntryPathCards.jsx, EntryYear): icon
+   labels, figures right-aligned in tabular numerals, banded rows, the change
+   rows under their own subheading; on a phone it scrolls inside its frame */
+.milburn-table-wrap {
+  max-width: 100%;
+}
+
+.milburn-entry-table thead th {
+  white-space: normal;
+  min-width: 112px;
+  vertical-align: bottom;
+}
+
+.milburn-entry-table thead th:not(:first-child),
+.milburn-entry-table td {
+  text-align: right;
+}
+
+.milburn-entry-table td {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Every second figure row banded; the change group's first row is its subheading */
+.milburn-entry-table tbody[data-group="level"] tr:nth-child(even),
+.milburn-entry-table tbody[data-group="change"] tr:nth-child(odd):not(.milburn-entry-subhead) {
+  background: var(--c-row-band);
+}
+
+.milburn-entry-table tbody[data-group="level"] tr:last-child th,
+.milburn-entry-table tbody[data-group="level"] tr:last-child td {
+  border-bottom: 1px solid var(--c-grid);
+}
+
+.milburn-entry-table .milburn-entry-subhead th {
+  padding-top: 14px;
+  padding-bottom: 6px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--c-axis-title);
+  text-transform: none;
+  min-width: 0;
+}
+
+.milburn-entry-label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.milburn-entry-label > span:first-child {
+  flex: none;
+  margin-top: 3px;
+  color: var(--c-axis-title);
+}
+
+@media (max-width: 640px) {
+  .milburn-entry-table {
+    font-size: var(--fs-caption);
+  }
+
+  .milburn-entry-table th,
+  .milburn-entry-table td {
+    padding: 8px;
+  }
+
+  .milburn-entry-table tbody th {
+    min-width: 160px;
+  }
+
+  .milburn-entry-table thead th {
+    min-width: 88px;
+  }
+}
+
+/* A card's More info on Moves into work, as on the Benchmarks cards */
+.milburn-more {
+  min-height: 0;
+  margin-top: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--c-grid);
+}
+
+.milburn-more .disclosure-compact > .disclosure-toggle {
+  width: 100%;
+  justify-content: space-between;
+  font-size: var(--fs-small);
+}
+
+.milburn-more .disclosure-content p {
+  max-width: 90ch;
+  font-size: var(--fs-small);
+}
+
 .milburn-breakeven .milburn-table thead th {
   white-space: normal;
   min-width: 120px;

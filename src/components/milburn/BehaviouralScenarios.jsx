@@ -7,6 +7,7 @@ import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard } from "./Mi
 import { EntryShares, EntryYear } from "./EntryPathCards";
 import { MethodLink } from "../../utils/methodLink";
 import SourceChip from "./SourceChip";
+import { MoreInfoDisclosure } from "./BenchmarkCards";
 
 /** The Methodology passage on the move into work: the share, who, and why. */
 export const ENTRY_METHOD_ANCHOR = "method-behavioural-scenarios";
@@ -463,26 +464,19 @@ function EntryCases({ data, entry = null }) {
                 </tbody>
               </table>
             </FiguresTable>
-            {nationalNote && (
-              <p className="milburn-note" data-per-mover="">
-                {nationalNote}
-              </p>
-            )}
-            {(same || paragraphs.length > 0) && (
-              <details className="milburn-details" data-case-more="">
-                <summary>
-                  <TitleIcon name="info" bare size={14} />
-                  More info
-                </summary>
+            {(same || nationalNote || paragraphs.length > 0) && (
+              <MoreInfoDisclosure className="milburn-more" data-case-more="">
                 {same && (
                   <ul className="milburn-points" data-same-gain="">
                     <Point icon="scale">Same under current law and under the package.</Point>
                   </ul>
                 )}
+                {/* The entry case beside the national average per mover: not like for like */}
+                {nationalNote && <p data-per-mover="">{nationalNote}</p>}
                 {paragraphs.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
-              </details>
+              </MoreInfoDisclosure>
             )}
           </>
         }

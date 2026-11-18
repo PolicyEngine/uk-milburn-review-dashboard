@@ -2,6 +2,7 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import TitleIcon from "../TitleIcon";
 import { TOOLTIP_PROPS } from "../ChartTooltip";
 import { FiguresTable, MilburnChartCard } from "./MilburnCharts";
+import { MoreInfoDisclosure } from "./BenchmarkCards";
 import { buildChartCsv } from "../../utils/chartCsv";
 import {
   AXIS_LINE,
@@ -108,29 +109,44 @@ export function entryPathRows(data, year) {
     const value = figure?.[key]?.[side];
     return missing(value) ? FIGURE_WITHHELD : `${format(value)}${people ? peopleText(figure?.[people]?.[side]) : ""}`;
   };
-  const row = (key, label, format, people) => ({
+  const row = (key, label, icon, format, people) => ({
     key,
     label,
+    icon,
     static: text(central, key, "static", format, people),
     phasedStatic: text(rollout, key, "static", format, people),
     paths: figures.map((figure) => text(figure, key, "scenario", format, people)),
   });
-  const change = (key, label) => ({
+  // Shown under a "Change from static" subheading, so the label is the figure alone
+  const change = (key, label, icon) => ({
     key: `change_${key}`,
-    label: `${CHANGE_FROM_STATIC}: ${label}`,
+    label,
+    icon,
     change: true,
     static: "",
     phasedStatic: "",
     paths: figures.map((figure) => changeText(figure, key)),
   });
   return [
-    row("exchequer", "Exchequer saving", bnText),
-    row("povertyAbs", "Absolute poverty before housing costs, all ages (pp)", ppText, "peopleAbs"),
-    row("youngLosing", "16–24s in losing households (%)", pctText),
-    change("exchequer", "Exchequer saving (£m)"),
-    change("povertyAbs", "absolute poverty before housing costs (pp)"),
-    change("youngLosing", "16–24s in losing households (pp)"),
+    row("exchequer", "Exchequer saving", "landmark", bnText),
+    row("povertyAbs", "Absolute poverty before housing costs, all ages (pp)", "percent", ppText, "peopleAbs"),
+    row("youngLosing", "16–24s in losing households (%)", "usersRound", pctText),
+    change("exchequer", "Exchequer saving (£m)", "landmark"),
+    change("povertyAbs", "Absolute poverty before housing costs (pp)", "percent"),
+    change("youngLosing", "16–24s in losing households (pp)", "usersRound"),
   ];
+}
+
+/** A row's label with its icon. */
+function RowLabel({ row }) {
+  return (
+    <th scope="row">
+      <span className="milburn-entry-label">
+        <TitleIcon name={row.icon} bare size={14} />
+        <span>{row.label}</span>
+      </span>
+    </th>
+  );
 }
 
 /** Whether a path is on the phased package, its share of those reached (the rollout path). */
@@ -190,7 +206,7 @@ export function EntryShares({ data }) {
         id="milburn-entry-shares-heading"
         icon="briefcase"
         title={title}
-        description={`The share of ${ENTRY_GROUP} assumed in work in each year: an assumption built from two of the review's figures, not an estimate.`}
+        description="Share of non-working 18 to 24-year-olds losing the UC health element assumed in work each year: our assumption, not an estimate."
         name="share-assumed-in-work"
         csv={csv}
         legendItems={charted.map((path) => ({ color: COLOURS[path.id], label: path.label, type: "rect" }))}
@@ -311,7 +327,12 @@ export function EntryYear({ data, year }) {
         ...ENTRY_PATHS.map((path, index) => ({ key: `p${index}`, label: path.label })),
         { key: "phasedStatic", label: "Static phased package (the rollout path's comparator)" },
       ],
-      rows: rows.map((row) => ({ ...row, ...Object.fromEntries(row.paths.map((value, index) => [`p${index}`, value])) })),
+      rows: rows.map((row) => ({
+        ...row,
+        // The page groups the change rows under a subheading; the CSV names it in each
+        label: row.change ? `${CHANGE_FROM_STATIC}: ${row.label}` : row.label,
+        ...Object.fromEntries(row.paths.map((value, index) => [`p${index}`, value])),
+      })),
     });
   return (
     <section className="report-section milburn-entry" aria-labelledby="milburn-entry-year-heading">
@@ -324,6 +345,18 @@ export function EntryYear({ data, year }) {
         csv={csv}
         logo={false}
         after={
+          <>
+          {/* The table's notes, folded: what the rollout path is set against and how a change is read */}
+          <MoreInfoDisclosure className="milburn-more" data-phased-static="">
+            <p>
+              The rollout path is set against the static phased package:{" "}
+              {rows.filter((row) => !row.change).map((row) => `${row.label} ${row.phasedStatic}`).join("; ")}.
+            </p>
+            <p>
+              Each change is a path&rsquo;s figure minus its own static package&rsquo;s. People in a poverty change are a difference of counts rounded to the
+              nearest thousand, so can differ from the change in points.
+            </p>
+          </MoreInfoDisclosure>
           <details className="milburn-details" data-entry-run-comparison="">
             <summary>
               <TitleIcon name="alert" bare size={14} />
@@ -343,10 +376,11 @@ export function EntryYear({ data, year }) {
               </Point>
             </ul>
           </details>
+          </>
         }
       >
         <div className="milburn-table-wrap">
-          <table className="milburn-table" data-entry-year={year}>
+          <table className="milburn-table milburn-entry-table" data-entry-year={year}>
             <thead>
               <tr>
                 <th scope="col">Figure</th>
@@ -358,24 +392,30 @@ export function EntryYear({ data, year }) {
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.key} data-row={row.key} data-change={row.change ? "" : undefined}>
-                  <th scope="row">{row.label}</th>
-                  <td>{row.change ? "" : row.static}</td>
-                  {row.paths.map((value, index) => (
-                    <td key={ENTRY_PATHS[index].id}>{value}</td>
+            {[false, true].map((change) => (
+              <tbody key={change ? "change" : "level"} data-group={change ? "change" : "level"}>
+                {change && (
+                  <tr className="milburn-entry-subhead">
+                    <th scope="colgroup" colSpan={2 + ENTRY_PATHS.length}>
+                      {CHANGE_FROM_STATIC}
+                    </th>
+                  </tr>
+                )}
+                {rows
+                  .filter((row) => Boolean(row.change) === change)
+                  .map((row) => (
+                    <tr key={row.key} data-row={row.key} data-change={row.change ? "" : undefined}>
+                      <RowLabel row={row} />
+                      <td>{row.change ? "" : row.static}</td>
+                      {row.paths.map((value, index) => (
+                        <td key={ENTRY_PATHS[index].id}>{value}</td>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </tbody>
+              </tbody>
+            ))}
           </table>
         </div>
-        <p className="milburn-note" data-phased-static="">
-          The rollout path is set against the phased package, static: {rows.filter((row) => !row.change).map((row) => `${row.label} ${row.phasedStatic}`).join("; ")}. Each
-          change row is a path&rsquo;s figure minus its own static package&rsquo;s. The people in a poverty change are a difference of counts rounded to the
-          nearest thousand, so they can differ from the change in points.
-        </p>
       </MilburnChartCard>
     </section>
   );

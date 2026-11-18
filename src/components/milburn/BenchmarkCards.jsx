@@ -27,11 +27,15 @@ export function Value({ value }) {
   );
 }
 
-/** A card's "More info", as on the Measures tab's cards, closed; no preview line, to keep the face short. */
-function MoreInfo({ info }) {
-  if (!hasInfo(info)) return null;
+/**
+ * A card's "More info" disclosure, as on the Measures tab's cards, closed;
+ * no preview line, to keep the face short. `className` styles the row it
+ * sits in (bm-more here, milburn-more on Moves into work); other props
+ * (data attributes) go on that row.
+ */
+export function MoreInfoDisclosure({ className = "bm-more", children, ...rest }) {
   return (
-    <div className="policy-card-modelling bm-more">
+    <div className={`policy-card-modelling ${className}`} {...rest}>
       <Disclosure
         compact
         title={
@@ -42,9 +46,18 @@ function MoreInfo({ info }) {
         }
         className="policy-card-details"
       >
-        <InfoSections info={info} />
+        {children}
       </Disclosure>
     </div>
+  );
+}
+
+function MoreInfo({ info }) {
+  if (!hasInfo(info)) return null;
+  return (
+    <MoreInfoDisclosure>
+      <InfoSections info={info} />
+    </MoreInfoDisclosure>
   );
 }
 

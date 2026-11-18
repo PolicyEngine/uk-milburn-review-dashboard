@@ -127,12 +127,25 @@ describe("Moves into work (illustrative)", () => {
     expect(cells("exchequer")).toEqual(["Exchequer saving", "£4.00bn", "£4.01bn", "£4.09bn", "£4.02bn", "£2.04bn"]);
     expect(cells("povertyAbs")[4]).toBe("Withheld");
     expect(cells("povertyAbs")[1]).toBe("+1.00pp (+700,000)");
+    // The change rows sit under one "Change from static" subheading, not repeated in each label; every label has an icon
+    expect(year.querySelector('tbody[data-group="change"] .milburn-entry-subhead').textContent).toBe("Change from static");
+    expect(cells("change_exchequer")[0]).toBe("Exchequer saving (£m)");
+    expect(year.querySelectorAll("tbody tr[data-row] th svg").length).toBe(6);
+    // The table's notes are folded into More info, as on the Benchmarks cards
+    const tableNotes = year.querySelector("[data-phased-static]");
+    expect(within(tableNotes).getByRole("button", { name: "More info" })).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(within(tableNotes).getByRole("button", { name: "More info" }));
+    expect(tableNotes.textContent).toContain("The rollout path is set against the static phased package");
     expect(year.querySelector("[data-entry-run-comparison]").textContent).toContain("arithmetic on two runs");
     expect(year.querySelector("[data-entry-run-comparison]").textContent).toContain("the fall in their benefits and any tax on their earnings");
     expect(tab.textContent).not.toMatch(/25% move into work|chosen at random|Why 25%/);
     // The entry cases from the file: 16 hours at £10 an hour
     const cases = screen.getByRole("region", { name: "One young person moving into work" });
     expect(within(cases).getAllByRole("row")[1].textContent).toBe("16 hours£10.00£1,000; £2,000£3,000; £4,000");
+    // The per-mover note is in the card's More info, not on its face
+    expect(cases.querySelector("[data-per-mover]")).toBeNull();
+    fireEvent.click(within(cases.querySelector("[data-case-more]")).getByRole("button", { name: "More info" }));
+    if (cases.querySelector("[data-per-mover]")) expect(cases.querySelector("[data-per-mover]").textContent).toMatch(/^These two figures are not like for like/);
   });
 
   it("says there is no change before April 2029 rather than showing zeros", async () => {
