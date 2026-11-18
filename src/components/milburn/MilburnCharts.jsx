@@ -219,7 +219,7 @@ export function FiguresTable({ children, label = "Figures as a table" }) {
  * 2029-30, the first year of the report's benefit changes.
  */
 export const SINGLE_YEAR_RULE =
-  "Household impact and Moves into work (illustrative) are for 2029-30, the year their household examples are built for, as is the NEET table until its other years are computed; every other figure follows the year you choose.";
+  "Household impact and Moves into work (illustrative) are for 2029-30, the year their household examples are built for; every other figure follows the year you choose.";
 
 /** What the year-only chip says of a box whose figures are for one year. */
 export const yearOnlyText = (year, what = "these figures") => `${fiscalYearTick(year)} only: the year selector does not change ${what}.`;
