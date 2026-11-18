@@ -451,6 +451,24 @@ describe("headline tiles", () => {
     expect(finances).not.toMatch(/By year/);
   });
 
+  it("draw the package range only beside runs that remove the health element or PIP", () => {
+    const published = parseSummary(JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8")));
+    const other = summaryRun(published, "milburn_report_youth_allowance_work_allowance");
+    expect(other).not.toBeNull();
+    expect(financesHeadlineCsv(other, published, "Work allowance", String(published.year))).not.toContain("Package range");
+    expect(povertyHeadlineCsv(other, published, "Work allowance")).not.toContain("Package range");
+    expect(financesHeadlineCsv(summaryRun(published, HEADLINE_RUN), published, "The report's package", String(published.year))).toContain("Package range");
+  });
+
+  it("say a report run starts in April 2029 before then, not £0.00bn, 0 or withheld", () => {
+    const run = { id: "milburn_report_package", direction: "loss", savingBn: { 2027: 0 }, youngPeopleLosing: 0, youngShareLosingPct: 0, averageLossYoung: null, withheld: new Set(["average_loss_young_person_in_losing_household"]), povertyPp: {}, peopleIntoPovertyAbs: 0 };
+    const tiles = keyFigureTiles(run, 2027, { keys: ["saving", "young", "loss"] });
+    expect(tiles.map((tile) => [tile.key, tile.value])).toEqual([
+      ["saving", "Starts April 2029"],
+      ["young", "Starts April 2029"],
+    ]);
+  });
+
   it("scale a bar to the largest figure in its list", () => {
     expect(barShare(2, [4, 2])).toBe("50%");
     expect(barShare(-4, [-4, 2])).toBe("100%");
@@ -608,7 +626,7 @@ describe("measure groups", () => {
       { id: "milburn_report_package" },
       { id: "employer_nics_zero_under_25" },
     ]);
-    expect(groups.map((group) => group.label)).toEqual(["The report's measures", reportCopy().comparatorsLabel]);
+    expect(groups.map((group) => group.label)).toEqual(["Measures from the report, and our variants", reportCopy().comparatorsLabel]);
     expect(groups[0].measures.map((measure) => measure.id)).toEqual(["milburn_report_package", "milburn_report_pip"]);
     expect(groups[1].measures.map((measure) => measure.id)).toEqual(["pip_halved_under_25", "employer_nics_zero_under_25"]);
     const offered = groups.flatMap((group) => group.measures.map((measure) => measure.id));

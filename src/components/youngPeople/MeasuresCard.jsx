@@ -20,6 +20,7 @@ import { noEffectRow } from "../../utils/legendMembership";
 import "./MeasureDumbbell.css";
 import TitleIcon from "../TitleIcon";
 import { PACKAGE_PARTS } from "../../utils/milburn/measureGroups";
+import { STARTS_TEXT, notYetStarted, summaryRun, useMilburnSummary } from "../../utils/milburn/summary";
 
 
 // The card's About this chart (the measures with no effect join its caveats)
@@ -271,9 +272,12 @@ const UNIT = "Average change in household income, per person (£ a year)";
  * selected year. Every bar is one policy's own run, so nothing is added up.
  */
 function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, height, group = YOUNG_BAND, extraOptions = [], defaultCompare = ALL_BAND }) {
-  const { byId, localBuild } = useMeasureCatalogue();
+  const { byId, localBuild, manifest } = useMeasureCatalogue();
   // On the local build, one package chosen: its parts' own runs as rows under it
   const lead = localBuild && selectedPolicies.length === 1 ? selectedPolicies[0] : null;
+  // Before a report run starts (April 2029): said so, not "unavailable"
+  const { status: summaryStatus, summary } = useMilburnSummary(manifest?.snapshotSha256 ?? null, { enabled: Boolean(lead), year: selectedYear });
+  const notStarted = Boolean(lead) && summaryStatus === "ready" && notYetStarted(summaryRun(summary, lead), selectedYear);
   const parts = lead ? PACKAGE_PARTS[lead] ?? [] : [];
   const drawnPolicies = parts.length ? [lead, ...parts] : selectedPolicies;
   const chartRef = useRef(null);
@@ -406,7 +410,7 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
           />
         ) : (
           <div className="plot-empty" style={{ minHeight: height }} role="status">
-            <p>{emptyMeasuresNote({ noEffect, selectedPolicies, yearLabel })}</p>
+            <p>{notStarted ? `${STARTS_TEXT}: no change in ${yearLabel}.` : emptyMeasuresNote({ noEffect, selectedPolicies, yearLabel })}</p>
           </div>
         )}
         {strip && <PolicyStrip rows={rows} id={lead} year={selectedYear} band={band} partsShown={partsShown} />}

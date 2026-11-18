@@ -110,6 +110,20 @@ describe("NeetBreakdown", () => {
     expect(shares).toEqual(["28.00%", WITHHELD]);
   });
 
+  it("says a true zero before April 2029 starts then, not withheld", async () => {
+    // As the published file: no records losing in 2027-28, so the counts are null but not withheld
+    const before = group({ people_losing_uc_health_or_pip: null, share_losing_uc_health_or_pip_pct: null, records_losing_uc_health_or_pip: 0 });
+    const file = { ...FIXTURE, by_year: { 2027: { groups: { neet_approx: before, other_16_24: before } } } };
+    serve({ [NEET_FILE]: file, [BENCHMARKS_FILE]: BENCHMARKS });
+    const { container } = render(<NeetBreakdown selectedPolicies={[NEET_RUN]} selectedYear={2027} />);
+    await screen.findByRole("heading", { name: NEET_TITLE });
+    for (const row of ["people_losing_uc_health_or_pip", "share_losing_uc_health_or_pip_pct"]) {
+      const cells = [...container.querySelectorAll(`[data-neet-row="${row}"] td`)].map((cell) => cell.textContent);
+      expect(cells).toEqual(["Starts April 2029", "Starts April 2029"]);
+    }
+    expect(neetCsv(parseNeet(file) && { ...parseNeet(file), ...parseNeet(file).byYear.get(2027) })).toContain("Starts April 2029");
+  });
+
   it("sets our count beside the published one, read from the benchmarks file, with its source linked", async () => {
     serve({ [NEET_FILE]: FIXTURE, [BENCHMARKS_FILE]: BENCHMARKS });
     const { container } = render(<NeetBreakdown selectedPolicies={[NEET_RUN]} />);

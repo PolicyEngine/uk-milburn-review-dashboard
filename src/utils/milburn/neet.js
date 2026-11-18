@@ -35,6 +35,7 @@ const FIGURES = [
   "average_change_in_household_net_income",
   "people_losing_uc_health_or_pip",
   "share_losing_uc_health_or_pip_pct",
+  "records_losing_uc_health_or_pip",
 ];
 
 const finite = (value) => (typeof value === "number" && Number.isFinite(value) ? value : null);

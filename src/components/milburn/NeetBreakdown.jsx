@@ -4,6 +4,7 @@ import { shortSource } from "./SourceChip";
 import { yearLabel } from "../../utils/displayYears";
 import { NEET_GROUPS, neetForYear, useNeetBreakdown } from "../../utils/milburn/neet";
 import { buildChartCsv } from "../../utils/chartCsv";
+import { REPORT_START_YEAR, STARTS_TEXT } from "../../utils/milburn/summary";
 import "./NeetBreakdown.css";
 
 export const NEET_TITLE = "NEET young people";
@@ -38,7 +39,15 @@ const ROWS = [
   { key: "share_losing_uc_health_or_pip_pct", label: "Share losing the UC health element or PIP", icon: "scale", format: formatSharePct, bar: true },
 ];
 
-function Figure({ value, format, bar }) {
+/** The rows that count people losing the element or PIP: before April 2029, a true zero, not a withheld cell. */
+const LOSING_ROWS = new Set(["people_losing_uc_health_or_pip", "share_losing_uc_health_or_pip_pct"]);
+
+/** Whether a group's losing cell is a true zero before the changes start (no records losing), not withheld. */
+export const notStartedCell = (group, rowKey, year) =>
+  LOSING_ROWS.has(rowKey) && Number(year) < REPORT_START_YEAR && group?.records_losing_uc_health_or_pip === 0;
+
+function Figure({ value, format, bar, notStarted = false }) {
+  if (notStarted) return <span className="neet-breakdown-figure">{STARTS_TEXT}</span>;
   if (value === null) return <span className="neet-breakdown-figure neet-breakdown-withheld">{WITHHELD}</span>;
   return (
     <>
@@ -108,6 +117,7 @@ export function neetCsv(neet) {
       ...Object.fromEntries(
         NEET_GROUPS.map((group) => {
           const value = neet.groups[group.key][row.key];
+          if (notStartedCell(neet.groups[group.key], row.key, neet.year)) return [group.key, STARTS_TEXT];
           return [group.key, value === null ? WITHHELD : String(Math.round(value * 100) / 100)];
         }),
       ),
@@ -187,7 +197,12 @@ export default function NeetBreakdown({ selectedPolicies = [], selectedYear }) {
                   </th>
                   {NEET_GROUPS.map((group) => (
                     <td key={group.key}>
-                      <Figure value={neet.groups[group.key][row.key]} format={row.format} bar={row.bar} />
+                      <Figure
+                        value={neet.groups[group.key][row.key]}
+                        format={row.format}
+                        bar={row.bar}
+                        notStarted={notStartedCell(neet.groups[group.key], row.key, neet.year)}
+                      />
                     </td>
                   ))}
                 </tr>

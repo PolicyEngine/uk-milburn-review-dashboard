@@ -134,7 +134,7 @@ function RangeMeter({ range, values, format, tone, currentId, title, year }) {
 
 /** Poverty's headline as CSV: the tiles' counts, the change on each line, and the package range. */
 export function povertyHeadlineCsv(run, summary, name) {
-  const range = packageRange(summary);
+  const range = removesHealthOrPip(run.id) ? packageRange(summary) : [];
   const rows = [
     { figure: "People into absolute poverty, before housing costs", value: run.peopleIntoPovertyAbs, unit: "people" },
     { figure: "People into relative poverty, before housing costs", value: run.peopleIntoPovertyRel, unit: "people" },
@@ -156,7 +156,7 @@ export function povertyHeadlineCsv(run, summary, name) {
 
 /** Public finances' headline as CSV: the saving in the year shown, and the package range. */
 export function financesHeadlineCsv(run, summary, name, shown) {
-  const range = packageRange(summary);
+  const range = removesHealthOrPip(run.id) ? packageRange(summary) : [];
   const rows = [
     { figure: `Exchequer saving, ${fiscalYearTick(Number(shown))}`, value: savingInYear(run, shown), year: fiscalYearTick(Number(shown)) },
     ...range.map((row) => ({ figure: `Package range: ${row.name}`, value: row.savingValue, year: fiscalYearTick(summary.year) })),
@@ -191,7 +191,8 @@ export function PovertyHeadline({ runId, selectedYear }) {
   const withheldLine = (line) => isWithheld(run, `poverty_change_pp.${line.key}`);
   const lines = notStarted ? [] : POVERTY_LINES.filter((line) => run.povertyPp[line.key] !== null || withheldLine(line));
   const values = lines.map((line) => run.povertyPp[line.key]);
-  const range = packageRange(summary).filter((row) => row.povertyValue !== null);
+  // The packages' range sits beside the runs that remove the health element or PIP only
+  const range = removesHealthOrPip(run.id) ? packageRange(summary).filter((row) => row.povertyValue !== null) : [];
   const showRange = range.length > 1;
   // The file's subtitle names the header's selection; the fallback run is named in the title
   const title = `Poverty at a glance${fallback ? `, ${name}` : ""}, ${fiscalYearTick(summary.year)}`;
@@ -326,7 +327,10 @@ export function FinancesHeadline({ runId, selectedYear }) {
   if (!years.length) return null;
   const shown = years.includes(String(selectedYear)) ? String(selectedYear) : String(summary.year);
   const current = savingInYear(run, shown);
-  const range = packageRange(summary);
+  // Before the run starts (a report run, from April 2029): said, not £0.00bn
+  const notStarted = notYetStarted(run, shown);
+  // The packages' range sits beside the runs that remove the health element or PIP only
+  const range = removesHealthOrPip(run.id) ? packageRange(summary) : [];
   const rangeValues = range.map((row) => savingInYear(summaryRun(summary, row.id), summary.year));
   const showRange = range.length > 1;
   const word = (value) => (value >= 0 ? "saving" : "cost");
@@ -342,7 +346,10 @@ export function FinancesHeadline({ runId, selectedYear }) {
       />
       <div ref={figuresRef} className="milburn-split">
         <ul className="milburn-key-tiles" aria-label="Figures">
-          {current !== null && (
+          {notStarted && (
+            <Tile icon="calendar" value={STARTS_TEXT} label={`No change in ${fiscalYearTick(Number(shown))}`} note="The measures start in April 2029." />
+          )}
+          {!notStarted && current !== null && (
             <Tile
               icon="landmark"
               value={formatBn(Math.abs(current))}

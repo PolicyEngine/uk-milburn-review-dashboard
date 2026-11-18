@@ -111,7 +111,13 @@ export function keyFigureTiles(run, year, { keys = YOUNG_TILE_KEYS } = {}) {
   const gain = run.direction === "gain";
   const tiles = [];
   const saving = savingInYear(run, year);
-  if (saving !== null) {
+  // Before the run starts (a report run, from April 2029): its zeros say when it starts
+  const notStarted = notYetStarted(run, year);
+  if (notStarted) {
+    tiles.push({ key: "saving", icon: "landmark", value: STARTS_TEXT, label: `No change in ${yearLabel}`, definition: "The measures start in April 2029." });
+    tiles.push({ key: "young", icon: "usersRound", value: STARTS_TEXT, label: `No 16–24s affected in ${yearLabel}`, definition: "The measures start in April 2029." });
+  }
+  if (!notStarted && saving !== null) {
     tiles.push({
       key: "saving",
       icon: "landmark",
@@ -120,7 +126,7 @@ export function keyFigureTiles(run, year, { keys = YOUNG_TILE_KEYS } = {}) {
       definition: CASH_TERMS_NOTE,
     });
   }
-  if (run.youngPeopleLosing !== null) {
+  if (!notStarted && run.youngPeopleLosing !== null) {
     tiles.push({
       key: "young",
       icon: "usersRound",
@@ -130,7 +136,9 @@ export function keyFigureTiles(run, year, { keys = YOUNG_TILE_KEYS } = {}) {
       definition: "Includes siblings, partners.",
     });
   }
-  if (run.averageLossYoung !== null) {
+  if (notStarted) {
+    // Nothing to average before the start: no tile, not a withheld one
+  } else if (run.averageLossYoung !== null) {
     tiles.push({
       key: "loss",
       icon: "wallet",
