@@ -147,7 +147,7 @@ The stack is in the README's "Architecture" section. For components: React 19 ho
 ## Data Handling
 
 ### Data files
-- Files under `public/data/` are written by `uk-budget-data` and the `scripts/milburn_*.py` scripts, and served under `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/data/<file>`. The page reads the local build route (`src/utils/milburn/localBuild.js`): `milburn_measures.json` and each run's folder under `public/data/milburn/<id>/`, plus the `milburn_*.json` files, `policy_parameters.json` (Measures) and `living_standards_outlook.json` (Poverty).
+- Files under `public/data/` are written by `uk-budget-data` and the `scripts/milburn_*.py` scripts, and served under `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/data/<file>`. The page reads the local build route (`src/utils/milburn/localBuild.js`): `milburn_measures.json` and each run's folder under `public/data/milburn/<id>/`, plus the `milburn_*.json` files and `living_standards_outlook.json` (Poverty). `policy_parameters.json` (the Budget's measures) is kept but not fetched on this route.
 - Every file under `public/` is a publication and must pass the automated disclosure checks. Review rows are needed only while sign-off is on (`src/uk_budget_data/sign_off.py`, off from 28 October 2026); see "Review and sign-off" in the README.
 - The Pre-measures forecast file's shape is in `docs/DATA_CONTRACT.md`.
 
