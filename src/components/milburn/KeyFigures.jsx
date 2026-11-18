@@ -9,10 +9,14 @@ import {
   formatPounds,
   formatSignedPp,
   HEADLINE_RUN,
+  isWithheld,
+  notYetStarted,
   savingInYear,
+  STARTS_TEXT,
   summaryRun,
   useMilburnSummary,
 } from "../../utils/milburn/summary";
+import { WITHHELD_DETAIL, WITHHELD_LABEL } from "../../utils/withheld";
 import { RANGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGroups";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
@@ -75,6 +79,13 @@ export function packageRange(summary) {
 export const PARTIAL_REMOVAL_NOTE =
   "Package range: our designs. Partial removal (severe cases kept, PIP at half rate) is a pre-report run from April 2027: the report has no such run.";
 
+/**
+ * Whether a run removes the UC health element or PIP (alone, together or
+ * in a package): the runs the upper-bound and left-out replacement notes
+ * are about. Youth Allowance and employer NI runs have no replacements.
+ */
+export const removesHealthOrPip = (id) => /uc_health|pip|package/.test(String(id ?? ""));
+
 /** Every tile keyFigureTiles can make, in order. */
 export const ALL_TILE_KEYS = ["saving", "young", "loss", "poverty-abs"];
 
@@ -123,11 +134,32 @@ export function keyFigureTiles(run, year, { keys = YOUNG_TILE_KEYS } = {}) {
       label: `Their average household ${gain ? "gain" : "loss"}`,
       definition: `Annual change in household income, averaged over 16–24s in households that ${gain ? "gain" : "lose"}.`,
     });
+  } else if (isWithheld(run, "average_loss_young_person_in_losing_household")) {
+    // Withheld by the disclosure floor: said so, never left out silently
+    tiles.push({
+      key: "loss",
+      icon: "wallet",
+      value: "Withheld",
+      withheld: true,
+      label: `Their average household ${gain ? "gain" : "loss"}`,
+      definition: `${WITHHELD_LABEL}.`,
+      detail: WITHHELD_DETAIL,
+    });
   }
   // Absolute poverty first: its line is fixed in real terms, while the
   // relative line moves with the measures' effect on the median
   const povertyTile = (key, count, pp, basis, definition) => {
-    if (count === null) return;
+    // Before the run starts: its zeros say when it starts
+    if (notYetStarted(run, year)) {
+      tiles.push({ key, icon: "percent", value: STARTS_TEXT, label: `People into or out of ${basis} poverty`, definition });
+      return;
+    }
+    if (count === null) {
+      if (isWithheld(run, "people_into_poverty_abs_bhc")) {
+        tiles.push({ key, icon: "percent", value: "Withheld", withheld: true, label: `People into or out of ${basis} poverty`, definition: `${WITHHELD_LABEL}.`, detail: WITHHELD_DETAIL });
+      }
+      return;
+    }
     tiles.push({
       key,
       icon: "percent",
@@ -153,7 +185,7 @@ function tileNumbers(run, year) {
   return {
     saving: { value: saving === null ? null : Math.abs(saving), unit: "£bn a year, cash terms", decimals: 3 },
     young: { value: run.youngPeopleLosing, unit: "people", decimals: 0, extra: run.youngShareLosingPct, extraUnit: "% of 16–24s" },
-    loss: { value: run.averageLossYoung === null ? null : Math.abs(run.averageLossYoung), unit: "£ a year, per household", decimals: 0 },
+    loss: { value: run.averageLossYoung === null ? null : Math.abs(run.averageLossYoung), unit: "£ a year, per household", decimals: 0, extra: null },
     "poverty-abs": { value: run.peopleIntoPovertyAbs, unit: "people", decimals: 0, extra: run.povertyPp.abs_bhc, extraUnit: "pp change in the rate" },
   };
 }
@@ -175,7 +207,7 @@ export function keyFiguresCsv(run, year, name, { keys = YOUNG_TILE_KEYS } = {}) 
   });
   return buildChartCsv({
     title: `Key figures, ${name}, ${fiscalYearTick(year)}`,
-    units: "As each row says; values as milburn_summary.json gives them (the page rounds counts to the nearest thousand); static, with no replacement payments modelled",
+    units: `As each row says; values as milburn_summary.json gives them (the page rounds counts to the nearest thousand); static${removesHealthOrPip(run.id) ? ", with no replacement payments modelled" : ""}; an empty value is withheld to protect survey households`,
     columns: [
       { key: "figure", label: "Figure" },
       { key: "value", label: "Value", decimals: 3 },
@@ -243,7 +275,7 @@ export default function KeyFigures({ runId, selectedYear }) {
     ) : (
       <ul ref={tilesRef} className="milburn-key-tiles" aria-label="Figures">
         {tiles.map((tile) => (
-          <li key={tile.key} className="milburn-key-tile" data-key={tile.key}>
+          <li key={tile.key} className="milburn-key-tile" data-key={tile.key} data-withheld={tile.withheld ? "" : undefined} title={tile.detail}>
             <TitleIcon name={tile.icon} className="milburn-key-icon" size={18} />
             <p className="milburn-key-value">
               {tile.value}
@@ -265,7 +297,7 @@ export default function KeyFigures({ runId, selectedYear }) {
         <p className="milburn-see-also" data-see-also="">
           <TitleIcon name="arrowRight" bare size={14} />
           <span>
-            Exchequer saving: <SubTabLink sub="finances">Public finances</SubTabLink>
+            {run.direction === "gain" ? "Exchequer cost" : "Exchequer saving"}: <SubTabLink sub="finances">Public finances</SubTabLink>
             {POVERTY_FIGURES_SHOWN && (
               <>
                 {" · "}Poverty: <SubTabLink sub="poverty">Poverty</SubTabLink>
@@ -280,15 +312,20 @@ export default function KeyFigures({ runId, selectedYear }) {
           Notes and caveats
         </summary>
         <ul className="milburn-points">
-          {/* Losses are this box's subject: its one upper-bound line */}
-          <li data-replacement-note="">
-            <TitleIcon name="alert" bare size={14} />
-            <span>{REPLACEMENT_NOT_MODELLED_NOTE}</span>
-          </li>
-          <li>
-            <TitleIcon name="lifebuoy" bare size={14} />
-            <span>{REPLACEMENT_PARTS_NOTE}</span>
-          </li>
+          {/* The health element and PIP runs only: the upper bound and the
+              replacements left out (none applies to the other runs) */}
+          {removesHealthOrPip(id) && (
+            <>
+              <li data-replacement-note="">
+                <TitleIcon name="alert" bare size={14} />
+                <span>{REPLACEMENT_NOT_MODELLED_NOTE}</span>
+              </li>
+              <li>
+                <TitleIcon name="lifebuoy" bare size={14} />
+                <span>{REPLACEMENT_PARTS_NOTE}</span>
+              </li>
+            </>
+          )}
           <li>
             <TitleIcon name="calendar" bare size={14} />
             <span>{ROUNDING_NOTE}</span>

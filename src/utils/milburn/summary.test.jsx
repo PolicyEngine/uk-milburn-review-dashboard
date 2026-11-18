@@ -227,7 +227,7 @@ describe("key figure tiles", () => {
     const run = summaryRun(summary, "milburn_package");
     const lines = keyFiguresCsv(run, 2027, "Full abolition").replace(/^\uFEFF/, "").trim().split("\r\n");
     expect(lines[0]).toBe('"# Key figures, Full abolition, 2027-28"');
-    expect(lines[1]).toMatch(/^"# Units: .*static, with no replacement payments modelled \| Source: /);
+    expect(lines[1]).toMatch(/^"# Units: .*static, with no replacement payments modelled; .*\| Source: /);
     expect(lines.slice(2)).toEqual([
       "Figure,Value,Unit,Also shown,Its unit,As shown,Note",
       '16–24s in households that lose,500400,people,7.5,% of 16–24s,"500,000 7.50% of 16–24s","Includes siblings, partners."',

@@ -285,7 +285,8 @@ export function sharesBySingleAge(rows, policies, selected, year, combinedId = n
   for (let age = ages[0]; age <= ages[1]; age += 1) {
     const row = byAge.get(singleAgeKey(age)) ?? null;
     const usable = row && row.sample_size >= MIN_SAMPLE_SIZE && sharesPublished(row) ? row : null;
-    groups.push({ key: String(age), label: singleAgeKey(age), age, row: usable, suppressed: !usable });
+    const withheld = Boolean(row) && row.sample_size >= MIN_SAMPLE_SIZE && !sharesPublished(row);
+    groups.push({ key: String(age), label: singleAgeKey(age), age, row: usable, suppressed: !usable, withheld });
   }
   return { run, groups };
 }

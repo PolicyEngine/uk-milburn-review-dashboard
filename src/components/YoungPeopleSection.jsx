@@ -64,6 +64,7 @@ import {
 import { YOUNG_PEOPLE_ANCHOR } from "../utils/viewAnchors";
 import { scrollBelowBars } from "../utils/pageScroll";
 import { selectionPackageKey } from "../utils/geography/selection";
+import { WITHHELD_DETAIL, WITHHELD_LABEL } from "../utils/withheld";
 export { YOUNG_PEOPLE_ANCHOR };
 
 
@@ -799,6 +800,7 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
       ],
       // The real shares, not the widened ones drawn
       rows: data.map((row) => ({ group: row.group, ...row.real })),
+      notes: (shares?.groups ?? []).filter((entry) => entry.withheld).map((entry) => `${entry.label}: ${WITHHELD_DETAIL}`),
     });
   // Until the year is published, only its CSV (the menu says why otherwise)
   const download = {
@@ -912,7 +914,9 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
           // The one run's groups, as the per-measure view: names, a 100% bar
           // and the ▲/▼ shares in two fixed columns
           <MeasureSharesChart
-            rows={shares.groups.filter((group) => !group.suppressed).map((group) => ({ id: group.key, name: group.label, row: group.row }))}
+            rows={shares.groups
+              .filter((group) => !group.suppressed || group.withheld)
+              .map((group) => ({ id: group.key, name: group.label, row: group.row ?? {}, withheld: group.withheld }))}
             groupLabel=""
             yearLabel={yearLabel}
             emphasis={group}
@@ -920,7 +924,7 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
           />
         ) : (
           <div className="plot-empty" style={{ minHeight: height }} role="status">
-            <p>We have not published {yearLabel} shares for this selection.</p>
+            <p>{shares?.groups.some((entry) => entry.withheld) ? WITHHELD_LABEL : `We have not published ${yearLabel} shares for this selection.`}</p>
           </div>
         )}
       </SwapTransition>

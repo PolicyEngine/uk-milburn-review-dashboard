@@ -13,6 +13,7 @@ import { useMeasureCatalogue } from "../utils/measureCatalogue";
 import { FloatingTooltip, TooltipRows, useFloatingTooltip } from "./FloatingTooltip";
 import { CHART_COLOURS } from "../utils/chartTheme";
 import { formatShare, shareDecimals, visibleSegments } from "../utils/shareFormat";
+import { WITHHELD_DETAIL, WITHHELD_LABEL } from "../utils/withheld";
 import "./MeasureSharesChart.css";
 
 const OUTCOMES = [
@@ -47,7 +48,22 @@ export default function MeasureSharesChart({ rows, groupLabel, yearLabel, emphas
           <span className="msc-down">▼</span> Loss
         </span>
       </div>
-      {rows.map(({ id, name, fullName, row }, index) => {
+      {rows.map(({ id, name, fullName, row, withheld }, index) => {
+        // A row the disclosure floor withholds: said so, never drawn as 0%
+        if (withheld) {
+          return (
+            <div className={`msc-row row-band${index % 2 === 0 ? " is-banded" : ""}${id === emphasis ? " is-focus" : ""}`} role="row" key={id} data-withheld="">
+              <span className={`msc-label${id === emphasis ? " is-focus" : ""}`} role="rowheader" aria-label={fullName ?? name}>
+                {byId?.get(id) ? <MeasureRowLabel measure={byId.get(id)} name={name} /> : name}
+              </span>
+              <span className="msc-bar-cell msc-withheld" role="cell" title={WITHHELD_DETAIL}>
+                {WITHHELD_LABEL}
+              </span>
+              <span className="msc-num row-band-value" role="cell" aria-label="Withheld">–</span>
+              <span className="msc-num row-band-value" role="cell" aria-label="Withheld">–</span>
+            </div>
+          );
+        }
         const drawn = visibleSegments(Object.fromEntries(KEYS.map((key) => [key, row[key] ?? 0])), KEYS);
         return (
           <div className={`msc-row row-band${index % 2 === 0 ? " is-banded" : ""}${id === emphasis ? " is-focus" : ""}`} role="row" key={id}>

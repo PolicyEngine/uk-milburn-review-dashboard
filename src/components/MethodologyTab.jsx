@@ -19,6 +19,7 @@ import { MICROCOSM_BUILD, POLICYENGINE_UK_VERSION, POLICYENGINE_VERSION, REPLICA
 import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
 import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
 import { FINAL_REPORT, REPORT_PUBLISHED, reportCopy } from "../utils/milburn/reportStatus";
+import { WITHHELD_LABEL, WITHHELD_METHOD } from "../utils/withheld";
 
 /** The policyengine-core version this build runs, beside policyengine-uk. */
 export const POLICYENGINE_CORE_VERSION = "3.34.10";
@@ -311,6 +312,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
                   "Small groups",
                   `A group with fewer than ${MIN_SAMPLE_SIZE} records is not shown; ages 16 and 17 rest on few survey households.`,
                 ],
+                ["Withheld figures", `${WITHHELD_METHOD} The page marks each one “${WITHHELD_LABEL}”.`],
               ]}
             />
           </Topic>

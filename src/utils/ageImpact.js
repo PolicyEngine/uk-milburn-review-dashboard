@@ -229,7 +229,10 @@ export function sharesByGroup(rows, policies, selected, year, combinedId = null)
   const groups = AGE_GROUPS.map((group) => {
     const row = yearRows.find((candidate) => candidate.age_band === group.key) ?? null;
     const usable = row && row.sample_size >= MIN_SAMPLE_SIZE && sharesPublished(row) ? row : null;
-    return { key: group.key, label: group.label, short: group.short, row: usable, suppressed: !usable };
+    // A published row whose shares the disclosure floor blanked: withheld,
+    // shown as such rather than left out
+    const withheld = Boolean(row) && row.sample_size >= MIN_SAMPLE_SIZE && !sharesPublished(row);
+    return { key: group.key, label: group.label, short: group.short, row: usable, suppressed: !usable, withheld };
   });
   return { run, groups };
 }

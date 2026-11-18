@@ -8,6 +8,7 @@ const TERM_ICONS = {
   Weights: Scale,
   Projection: TrendingUp,
   "Small groups": Users,
+  "Withheld figures": ShieldCheck,
   Model: Cpu,
   Baseline: Gavel,
   Static: Pause,

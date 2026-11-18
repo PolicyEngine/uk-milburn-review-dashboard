@@ -7,14 +7,18 @@ import {
   formatPeople,
   formatSignedPp,
   HEADLINE_RUN,
+  isWithheld,
+  notYetStarted,
   savingInYear,
+  STARTS_TEXT,
   summaryRun,
   useMilburnSummary,
 } from "../../utils/milburn/summary";
+import { WITHHELD_DETAIL, WITHHELD_LABEL } from "../../utils/withheld";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
 import { buildChartCsv } from "../../utils/chartCsv";
-import { CASH_TERMS_NOTE, fallbackRunLine, packageRange, PARTIAL_REMOVAL_NOTE, ROUNDING_NOTE } from "./KeyFigures";
+import { CASH_TERMS_NOTE, fallbackRunLine, packageRange, PARTIAL_REMOVAL_NOTE, removesHealthOrPip, ROUNDING_NOTE } from "./KeyFigures";
 import { BoxDownload } from "./MilburnCharts";
 import "./milburn.css";
 
@@ -89,9 +93,9 @@ function Notes({ children }) {
   );
 }
 
-function Tile({ icon, value, extra, label, note }) {
+function Tile({ icon, value, extra, label, note, detail }) {
   return (
-    <li className="milburn-key-tile">
+    <li className="milburn-key-tile" title={detail}>
       <TitleIcon name={icon} className="milburn-key-icon" size={18} />
       <p className="milburn-key-value">
         {value}
@@ -140,7 +144,7 @@ export function povertyHeadlineCsv(run, summary, name) {
   ].filter((row) => row.value !== null && row.value !== undefined);
   return buildChartCsv({
     title: `Poverty at a glance, ${name}, ${fiscalYearTick(summary.year)}`,
-    units: "People (a negative count is people out of poverty) or percentage points, as each row says; static, with no replacement payments modelled",
+    units: `People (a negative count is people out of poverty) or percentage points, as each row says; static${removesHealthOrPip(run.id) ? ", with no replacement payments modelled" : ""}; a figure withheld to protect survey households is left out`,
     columns: [
       { key: "figure", label: "Figure" },
       { key: "value", label: "Value", decimals: 3 },
@@ -159,7 +163,7 @@ export function financesHeadlineCsv(run, summary, name, shown) {
   ].filter((row) => row.value !== null && row.value !== undefined);
   return buildChartCsv({
     title: `Public finances at a glance, ${name}`,
-    units: "£ billion a year, cash terms; a positive figure is a saving to the Exchequer, a negative one a cost; static, with no replacement payments modelled",
+    units: `£ billion a year, cash terms; a positive figure is a saving to the Exchequer, a negative one a cost; static${removesHealthOrPip(run.id) ? ", with no replacement payments modelled" : ""}`,
     columns: [
       { key: "figure", label: "Figure" },
       { key: "year", label: "Fiscal year" },
@@ -181,7 +185,11 @@ export function PovertyHeadline({ runId, selectedYear }) {
   const figuresRef = useRef(null);
   if (!local || !run) return null;
   const direction = (count) => (count >= 0 ? "into" : "out of");
-  const lines = POVERTY_LINES.filter((line) => run.povertyPp[line.key] !== null);
+  // Before the run starts (a report run, from April 2029): said, not zeros
+  const notStarted = notYetStarted(run, summary.year);
+  // A line the file withholds stays, marked withheld; one it does not carry is left out
+  const withheldLine = (line) => isWithheld(run, `poverty_change_pp.${line.key}`);
+  const lines = notStarted ? [] : POVERTY_LINES.filter((line) => run.povertyPp[line.key] !== null || withheldLine(line));
   const values = lines.map((line) => run.povertyPp[line.key]);
   const range = packageRange(summary).filter((row) => row.povertyValue !== null);
   const showRange = range.length > 1;
@@ -197,31 +205,49 @@ export function PovertyHeadline({ runId, selectedYear }) {
       />
       <div ref={figuresRef} className="milburn-box-figures">
         <ul className="milburn-key-tiles" aria-label="Figures">
-          {run.peopleIntoPovertyAbs !== null && (
-            <Tile
-              icon="usersRound"
-              value={formatPeople(run.peopleIntoPovertyAbs)}
-              extra={formatSignedPp(run.povertyPp.abs_bhc)}
-              label={`People ${direction(run.peopleIntoPovertyAbs)} absolute poverty`}
-              note="Before housing costs; line fixed in real terms."
-            />
-          )}
-          {run.peopleIntoPovertyRel !== null && (
-            <Tile
-              icon="scale"
-              value={formatPeople(run.peopleIntoPovertyRel)}
-              extra={formatSignedPp(run.povertyPp.rel_bhc)}
-              label={`People ${direction(run.peopleIntoPovertyRel)} relative poverty`}
-              note="Before housing costs; line moves with the median."
-            />
-          )}
-          {run.childPovertyPpRel !== null && (
-            <Tile
-              icon="cake"
-              value={formatSignedPp(run.childPovertyPpRel)}
-              label="Child poverty rate"
-              note="Relative, before housing costs."
-            />
+          {notStarted ? (
+            <Tile icon="calendar" value={STARTS_TEXT} label={`No change in ${fiscalYearTick(summary.year)}`} note="The measures start in April 2029." />
+          ) : (
+            <>
+              {run.peopleIntoPovertyAbs !== null ? (
+                <Tile
+                  icon="usersRound"
+                  value={formatPeople(run.peopleIntoPovertyAbs)}
+                  extra={formatSignedPp(run.povertyPp.abs_bhc)}
+                  label={`People ${direction(run.peopleIntoPovertyAbs)} absolute poverty`}
+                  note="Before housing costs; line fixed in real terms."
+                />
+              ) : (
+                isWithheld(run, "people_into_poverty_abs_bhc") && (
+                  <Tile icon="usersRound" value="Withheld" label="People into or out of absolute poverty" note={`${WITHHELD_LABEL}.`} detail={WITHHELD_DETAIL} />
+                )
+              )}
+              {run.peopleIntoPovertyRel !== null ? (
+                <Tile
+                  icon="scale"
+                  value={formatPeople(run.peopleIntoPovertyRel)}
+                  extra={formatSignedPp(run.povertyPp.rel_bhc)}
+                  label={`People ${direction(run.peopleIntoPovertyRel)} relative poverty`}
+                  note="Before housing costs; line moves with the median."
+                />
+              ) : (
+                isWithheld(run, "people_into_poverty_rel_bhc") && (
+                  <Tile icon="scale" value="Withheld" label="People into or out of relative poverty" note={`${WITHHELD_LABEL}.`} detail={WITHHELD_DETAIL} />
+                )
+              )}
+              {run.childPovertyPpRel !== null ? (
+                <Tile
+                  icon="cake"
+                  value={formatSignedPp(run.childPovertyPpRel)}
+                  label="Child poverty rate"
+                  note="Relative, before housing costs."
+                />
+              ) : (
+                isWithheld(run, "child_poverty_change_pp_rel_bhc") && (
+                  <Tile icon="cake" value="Withheld" label="Child poverty rate" note={`${WITHHELD_LABEL}.`} detail={WITHHELD_DETAIL} />
+                )
+              )}
+            </>
           )}
         </ul>
         {(lines.length > 0 || showRange) && (
@@ -238,7 +264,7 @@ export function PovertyHeadline({ runId, selectedYear }) {
                       key={line.key}
                       icon={line.icon}
                       label={line.label}
-                      value={formatSignedPp(run.povertyPp[line.key])}
+                      value={run.povertyPp[line.key] === null ? WITHHELD_LABEL : formatSignedPp(run.povertyPp[line.key])}
                       width={barShare(run.povertyPp[line.key], values)}
                       tone={run.povertyPp[line.key] > 0 ? "is-loss" : "is-gain"}
                     />

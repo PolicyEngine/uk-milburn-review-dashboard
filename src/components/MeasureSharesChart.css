@@ -146,3 +146,13 @@
     grid-auto-rows: minmax(44px, auto);
   }
 }
+
+/* A row the disclosure floor withholds: its label on a muted band, no bar */
+.msc-withheld {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  background: var(--c-muted-fill);
+  color: var(--c-tick);
+  font-size: 0.8rem;
+}

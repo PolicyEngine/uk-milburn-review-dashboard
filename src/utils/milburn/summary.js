@@ -113,7 +113,43 @@ export function parseSummaryRun(run) {
     entrantsToMatch: pick(run.entrants_to_match_income_loss, HOURS_KEYS),
     exchequerGainPerEntrant: pick(run.exchequer_gain_per_entrant, HOURS_KEYS),
     peopleDirectlyAffected: finite(run.people_directly_affected),
+    // The figures the file carries as null: withheld under the disclosure
+    // floor (a key it leaves out is not carried, never withheld). The
+    // average loss is withheld only where its basis says so: before a run
+    // starts it has no losing households to average over.
+    withheld: withheldFields(run),
   };
+}
+
+/** The file's field names whose value is null ("poverty_change_pp.abs_bhc" for a line). */
+function withheldFields(run) {
+  const out = new Set();
+  for (const [key, value] of Object.entries(run)) {
+    if (value === null && key !== "average_loss_young_person_in_losing_household") out.add(key);
+  }
+  if (run.average_loss_young_person_in_losing_household === null && /withheld/i.test(String(run.average_loss_basis ?? ""))) {
+    out.add("average_loss_young_person_in_losing_household");
+  }
+  if (run.poverty_change_pp && typeof run.poverty_change_pp === "object") {
+    for (const [key, value] of Object.entries(run.poverty_change_pp)) if (value === null) out.add(`poverty_change_pp.${key}`);
+  }
+  return out;
+}
+
+/** Whether the file withholds one of a run's figures (by its field name in the file). */
+export const isWithheld = (run, field) => Boolean(run?.withheld?.has(field));
+
+/** The report's welfare measures start in April 2029 (milburn_design.REPORT_START_YEAR). */
+export const REPORT_START_YEAR = 2029;
+export const STARTS_TEXT = "Starts April 2029";
+
+/**
+ * Whether a run has not started in a year: before April 2029, with no
+ * saving and no young people in losing households (a report run whose
+ * measures start then). Its zeros are "starts April 2029", not results.
+ */
+export function notYetStarted(run, year) {
+  return Number(year) < REPORT_START_YEAR && savingInYear(run, year) === 0 && run?.youngPeopleLosing === 0;
 }
 
 function parseRuns(list) {
