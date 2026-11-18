@@ -146,7 +146,9 @@ describe("parseFlatTable", () => {
     expect(Object.keys(narrow[0])).toEqual(columns);
     // An artifact's age_impact.csv keeps the contract's columns
     expect(() => parseTable("age_impact", `${[...columns, ...extras].join(",")}\n${base},-1200,300\n`)).toThrow(TableError);
-    // The contract's own columns are never empty
-    expect(() => parseFlatTable("age_impact", `${[...columns, ...extras].join(",")}\n${base.replace("-550", "")},-1200,300\n`)).toThrow(TableError);
+    // The contract's identifying and count columns are never empty
+    expect(() => parseFlatTable("age_impact", `${[...columns, ...extras].join(",")}\n${base.replace(",1000,", ",,")},-1200,300\n`)).toThrow(TableError);
+    // A statistic withheld under the floor of survey households is null
+    expect(parseFlatTable("age_impact", `${[...columns, ...extras].join(",")}\n${base.replace("-550", "")},-1200,300\n`)[0].mean_change).toBeNull();
   });
 });

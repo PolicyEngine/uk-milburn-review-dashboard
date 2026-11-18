@@ -19,6 +19,17 @@ RUNS = ROOT / "public" / "data" / "milburn"
 YEAR = 2029
 
 
+def num(value):
+    """A cell as a float, or None for an empty (withheld) cell: the flat
+    route blanks a statistic resting on fewer than 3 survey households
+    (publication.disclosure_floor.apply_flat_floor)."""
+    return None if value in (None, "") else float(value)
+
+
+def rounded(value, digits=None):
+    return None if value is None else round(value, digits)
+
+
 def rows(path):
     with open(path, newline="") as f:
         return list(csv.DictReader(f))
@@ -49,6 +60,10 @@ def average_loss(young: dict, gains: bool):
     column = CONDITIONAL_COLUMN[gains]
     if column in young:
         value = young[column]
+        if value in (None, "") and young.get(
+            "pct_worse_off" if column.endswith("worse_off") else "pct_better_off"
+        ) in (None, ""):
+            return None, "not available: withheld under the disclosure floor"
         if value in (None, ""):
             return None, (
                 "not available: too few survey records in "
@@ -60,8 +75,10 @@ def average_loss(young: dict, gains: bool):
             + ("gaining" if gains else "losing")
             + " households"
         )
-    better = float(young["pct_better_off"])
-    worse = float(young["pct_worse_off"])
+    better = num(young["pct_better_off"])
+    worse = num(young["pct_worse_off"])
+    if better is None or worse is None:
+        return None, "not available: withheld under the disclosure floor"
     if min(better, worse) > MIXED_SHARE_PCT:
         return None, (
             "not available: 16-24s both gain and lose and the file has no"
@@ -94,64 +111,67 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     )
     young = ages["16-24"]
     people = float(young["people"])
-    worse = float(young["pct_worse_off"]) / 100
-    better = float(young["pct_better_off"]) / 100
-    gains = better > worse
-    if gains:
-        worse = better
-    affected = people * worse
+    everyone = float(ages["all"]["people"])
+    worse = num(young["pct_worse_off"])
+    better = num(young["pct_better_off"])
+    if worse is not None and better is not None:
+        gains = better > worse
+    else:
+        # A side withheld under the floor: the run's direction is the
+        # Exchequer's (a saving is a loss to households)
+        gains = budget.get(YEAR, 0) < 0
+    share = (better if gains else worse)
+    share = None if share is None else share / 100
+    affected = None if share is None else people * share
     loss_affected, loss_basis = average_loss(young, gains)
+
+    def poverty_people(measure):
+        # A withheld rate takes its people count with it
+        pp = num(metrics[f"poverty_{measure}_change_pp"])
+        return None if pp is None else round(pp / 100 * everyone)
+
+    def pp(column):
+        return rounded(num(metrics[column]), 3)
+
     out = {
         "id": rid,
         "label": build["label"],
         "saving_bn": {str(y): round(v, 3) for y, v in sorted(budget.items())},
         "direction": "gain" if gains else "loss",
-        "young_people_in_losing_households": round(affected),
-        "share_of_16_24_in_losing_households_pct": round(worse * 100, 2),
+        "young_people_in_losing_households": rounded(affected),
+        "share_of_16_24_in_losing_households_pct": rounded(
+            None if share is None else share * 100, 2
+        ),
         "average_loss_young_person_in_losing_household": (
             round(loss_affected) if loss_affected is not None else None
         ),
         "average_loss_basis": loss_basis,
-        "everyone_in_losing_households_pct": round(
-            float(ages["all"]["pct_worse_off"]), 2
+        "everyone_in_losing_households_pct": rounded(
+            num(ages["all"]["pct_worse_off"]), 2
         ),
         "poverty_change_pp": {
-            k: round(float(metrics[f"poverty_{k}_change_pp"]), 3)
+            k: pp(f"poverty_{k}_change_pp")
             for k in ("rel_bhc", "rel_ahc", "abs_bhc", "abs_ahc")
         },
-        "people_into_poverty_abs_ahc": round(
-            float(metrics["poverty_abs_ahc_change_pp"])
-            / 100
-            * float(ages["all"]["people"])
-        ),
-        "people_into_poverty_rel_ahc": round(
-            float(metrics["poverty_rel_ahc_change_pp"])
-            / 100
-            * float(ages["all"]["people"])
-        ),
-        "child_poverty_change_pp_rel_ahc": round(
-            float(metrics["child_poverty_rel_ahc_change_pp"]), 3
+        "people_into_poverty_abs_ahc": poverty_people("abs_ahc"),
+        "people_into_poverty_rel_ahc": poverty_people("rel_ahc"),
+        "child_poverty_change_pp_rel_ahc": pp(
+            "child_poverty_rel_ahc_change_pp"
         ),
         # Before housing costs: the page's default poverty measure
-        "people_into_poverty_abs_bhc": round(
-            float(metrics["poverty_abs_bhc_change_pp"])
-            / 100
-            * float(ages["all"]["people"])
-        ),
-        "people_into_poverty_rel_bhc": round(
-            float(metrics["poverty_rel_bhc_change_pp"])
-            / 100
-            * float(ages["all"]["people"])
-        ),
-        "child_poverty_change_pp_rel_bhc": round(
-            float(metrics["child_poverty_rel_bhc_change_pp"]), 3
+        "people_into_poverty_abs_bhc": poverty_people("abs_bhc"),
+        "people_into_poverty_rel_bhc": poverty_people("rel_bhc"),
+        "child_poverty_change_pp_rel_bhc": pp(
+            "child_poverty_rel_bhc_change_pp"
         ),
     }
     # People whose own earnings or taxes change (calculators.py): the movers
-    # in a run with a move into work, none in a static run.
-    directly = ages["all"].get("people_directly_affected")
-    if directly not in (None, ""):
-        out["people_directly_affected"] = round(float(directly))
+    # in a run with a move into work, none in a static run. Null when
+    # withheld under the floor.
+    if "people_directly_affected" in ages["all"]:
+        out["people_directly_affected"] = rounded(
+            num(ages["all"]["people_directly_affected"])
+        )
     # Illustrative break-even, one definition throughout: the entrants
     # whose gains from work (16 or 25 hours at the National Living Wage)
     # would add up to the total static income loss, approximated by the
@@ -162,7 +182,7 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     # estimate.
     # The break-even uses the saving and the count of young people in
     # losing households, not the average loss, so it does not wait on it.
-    if not gains and affected > 0 and scenarios:
+    if not gains and affected and scenarios:
         cases = scenarios.get("entry_cases", [])
         saving = budget.get(YEAR, 0) * 1e9
         entrants = {
@@ -182,6 +202,18 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
             c["id"]: c["exchequer_gain_package"] for c in cases
         }
     return out
+
+
+def count_text(people, share):
+    if people is None:
+        return "withheld"
+    return f"{people/1000:.0f}k ({share:.1f}%)"
+
+
+def poverty_text(pp, people):
+    if pp is None:
+        return "withheld"
+    return f"{pp:+.2f}pp ({people/1000:.0f}k)"
 
 
 def loss_text(value):
@@ -210,11 +242,9 @@ def main():
         be = r.get("break_even_share_in_work_pct", {})
         w(
             f"| {r['id']} | £{r['saving_bn'][str(YEAR)]:.2f}bn |"
-            f" {r['young_people_in_losing_households']/1000:.0f}k"
-            f" ({r['share_of_16_24_in_losing_households_pct']:.1f}%) |"
+            f" {count_text(r['young_people_in_losing_households'], r['share_of_16_24_in_losing_households_pct'])} |"
             f" {loss_text(r['average_loss_young_person_in_losing_household'])} |"
-            f" {r['poverty_change_pp']['abs_ahc']:+.2f}pp"
-            f" ({r['people_into_poverty_abs_ahc']/1000:.0f}k) |"
+            f" {poverty_text(r['poverty_change_pp']['abs_ahc'], r['people_into_poverty_abs_ahc'])} |"
             f" {be.get('h16', '–')}% / {be.get('h25', '–')}% |\n"
         )
 

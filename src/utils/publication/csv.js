@@ -188,6 +188,28 @@ export const FLAT_EXTRA_NULLABLE = {
 };
 
 /**
+ * Columns a flat file under public/data may leave empty (null) because the
+ * statistic rests on fewer than 3 survey households, or would give such a
+ * one back (uk_budget_data.publication.disclosure_floor.apply_flat_floor):
+ * withheld, never zero. Charts and figures show such a cell as withheld.
+ */
+export const FLAT_WITHHELD_NULLABLE = {
+  age_impact: [
+    "mean_change",
+    "mean_equivalised_change",
+    "pct_better_off",
+    "pct_worse_off",
+    "pct_unchanged",
+    "people_directly_affected",
+  ],
+  metrics: [
+    "poverty_change_pp",
+    "poverty_change_pct",
+    ...TABLES.poverty_inequality.columns.map(([column]) => column).filter((column) => /poverty_.*_change_(pp|pct)$/.test(column)),
+  ],
+};
+
+/**
  * An artifact's metrics rows with its poverty_inequality rows' measures
  * added, matched by reform and year, so the charts read one row per year as
  * they do from the flat metrics.csv. Without the table (an artifact written
@@ -233,10 +255,11 @@ export function parseFlatTable(name, text) {
   const extras = FLAT_EXTRA_COLUMNS[name] ?? [];
   const [header] = parseCsv(text);
   const contracted = Object.hasOwn(TABLES, name) ? TABLES[name].columns.length : 0;
+  const withheld = FLAT_WITHHELD_NULLABLE[name] ?? [];
   if (!extras.length || !header || header.length === contracted) {
-    return parseTable(name, text, TABLES[name]?.columns, []);
+    return parseTable(name, text, TABLES[name]?.columns, withheld);
   }
-  return parseTable(name, text, [...TABLES[name].columns, ...extras], FLAT_EXTRA_NULLABLE[name] ?? []);
+  return parseTable(name, text, [...TABLES[name].columns, ...extras], [...(FLAT_EXTRA_NULLABLE[name] ?? []), ...withheld]);
 }
 
 /** The table name for a published file name, or null. */
