@@ -38,13 +38,19 @@ A test app (same code, no warm schedule, scales to zero):
     uv run --with modal modal app stop -y uk-budget-household-speedtest
 
 The Milburn review dashboard's calculator (the Household impact tab) is
-its own app, ``uk-milburn-household``: the same code, no warm schedule,
-``MIN_CONTAINERS`` 0 so it scales to zero and costs nothing while idle, at
+its own app, ``uk-milburn-household``: the same code, no warm schedule, at
 most 10 ``Household`` containers, and warm jobs that run the tab's four
-report runs for 2029-30 (``milburn_household.RUNS``). No Hugging Face token: each
-household is built from the answers.
+report runs for 2029-30 (``milburn_household.RUNS``). No Hugging Face token:
+each household is built from the answers. The tab sends one request for a
+household's four runs (``/api/milburn-household``); its seven simulations
+go out in ``GROUPS`` batches, one in the Web container
+(``WEB_BATCH``), with the speed-ups ``FAST_RUNS`` turns on. Keep as many
+``Household`` containers warm as there are batches beyond the Web's (two),
+or a batch waits on a cold one (approved by Vahid, 18 November 2026: up to
+two, about £1 a day each):
 
-    HOUSEHOLD_MODAL_APP=uk-milburn-household \
+    env -u HUGGING_FACE_TOKEN HOUSEHOLD_MODAL_APP=uk-milburn-household \
+        HOUSEHOLD_MODAL_MIN_CONTAINERS=2 \
         uv run --with modal modal deploy src/uk_budget_data/modal_household.py
     uv run --with modal modal app stop -y uk-milburn-household   # when done
 
@@ -116,6 +122,21 @@ WEB_INPUTS = int(os.environ.get("HOUSEHOLD_MODAL_WEB_INPUTS", "16"))
 # that memory instead of doing it again. ``HOUSEHOLD_MODAL_SNAPSHOT=0`` goes
 # back to doing it in every new container.
 SNAPSHOT = os.environ.get("HOUSEHOLD_MODAL_SNAPSHOT", "1") == "1"
+# The Milburn app's speed-ups (18 November 2026): lazy parameter trees and
+# one current-law simulation per household batch (HOUSEHOLD_FAST_RUNS,
+# lazy_parameters and household_impact.shared_baselines), and its runs in
+# ``GROUPS`` batches, one container each, rather than one container a run.
+# A run there took 14 to 37 s and a cold container's restore about as much
+# again, so a household's seven runs on seven containers waited on cold
+# ones; in batches they go to the warm containers. With ``WEB_BATCH`` the
+# Web container runs the last batch itself while the Household containers
+# run the others (it only waits otherwise). 0 groups: one container a run,
+# as before (the Autumn Budget app).
+FAST_RUNS = os.environ.get("HOUSEHOLD_FAST_RUNS", "1" if MILBURN else "0")
+GROUPS = int(os.environ.get("HOUSEHOLD_MODAL_GROUPS", "3" if MILBURN else "0"))
+WEB_BATCH = os.environ.get(
+    "HOUSEHOLD_MODAL_WEB_BATCH", "1" if MILBURN else "0"
+)
 # What the image carries so a container reads the same settings as the
 # deploy that built it (the decorators below are evaluated in both).
 DEPLOY_SETTINGS = {
@@ -124,6 +145,9 @@ DEPLOY_SETTINGS = {
     "HOUSEHOLD_MODAL_SNAPSHOT": "1" if SNAPSHOT else "0",
     "HOUSEHOLD_MODAL_CPU": str(CPU),
     "HOUSEHOLD_MODAL_WEB_INPUTS": str(WEB_INPUTS),
+    "HOUSEHOLD_FAST_RUNS": FAST_RUNS,
+    "HOUSEHOLD_MODAL_GROUPS": str(GROUPS),
+    "HOUSEHOLD_MODAL_WEB_BATCH": WEB_BATCH,
     # The Web's deadline for a household answer (household_deadline)
     "HOUSEHOLD_MODAL_DEADLINE_SECONDS": os.environ.get(
         "HOUSEHOLD_MODAL_DEADLINE_SECONDS", "100"
@@ -133,6 +157,7 @@ DEPLOY_SETTINGS = {
 from uk_budget_data.household_runs import (  # noqa: E402
     container_build,
     fan_out_answers,
+    fan_out_grouped_answers,
     run_answer,
 )
 from uk_budget_data.household_warm import warm_target  # noqa: E402
@@ -200,6 +225,12 @@ def build_image() -> modal.Image:
 
 
 app = modal.App(APP_NAME, image=build_image())
+
+
+def mh_runs() -> tuple:
+    from uk_budget_data import milburn_household as mh
+
+    return mh.RUNS
 
 
 def milburn_warm_jobs() -> list:
@@ -281,8 +312,7 @@ class Household:
 
             # Without a snapshot every new container pays for its start-up,
             # so it runs one side only, as before.
-            for job in warm_jobs() if SNAPSHOT else warm_jobs()[:1]:
-                hi.run_scenario(*job)
+            hi.run_batch(warm_jobs() if SNAPSHOT else warm_jobs()[:1])
         except Exception:
             self.start_error = traceback.format_exc()
 
@@ -306,6 +336,46 @@ class Household:
             container_build(),
         )
 
+    @modal.method()
+    def run_batch(self, jobs: list) -> list:
+        """Several runs (one household's, from ``fan_out``) in turn, each
+        answered as ``run`` answers one."""
+        if self.start_error:
+            raise RuntimeError(
+                f"Container start-up failed:\n{self.start_error}"
+            )
+        return timed_batch(jobs)
+
+
+def timed_batch(jobs: list) -> list:
+    """``household_impact.run_batch``, each run's answer as ``run_answer``
+    with its own time, in this container."""
+    from uk_budget_data import household_impact as hi
+
+    answers = []
+    with hi.shared_baselines():
+        for job in jobs:
+            started = time.perf_counter()
+            result = hi.run_scenario(*job)
+            answers.append(
+                run_answer(
+                    result,
+                    time.perf_counter() - started,
+                    os.environ.get("MODAL_TASK_ID", ""),
+                    container_build(),
+                )
+            )
+    return answers
+
+
+def web_and_household_batches(batches: list) -> list:
+    """The last batch (the smallest) here, in the Web container, while the
+    Household containers run the others; every batch's answers, in
+    order."""
+    calls = [Household().run_batch.spawn(batch) for batch in batches[:-1]]
+    last = timed_batch(batches[-1])
+    return [*(call.get() for call in calls), last]
+
 
 def fan_out(jobs: list) -> list:
     """Each job in its own ``Household`` container, at once, in order.
@@ -315,6 +385,23 @@ def fan_out(jobs: list) -> list:
             change-over) answered any run; the page then asks Cloud Run.
     """
     return fan_out_answers(Household().run.map, jobs)
+
+
+def fan_out_batches(jobs: list) -> list:
+    """The Milburn app's ``fan_out`` (``household_impact._compute`` takes it
+    when ``HOUSEHOLD_MODAL_GROUPS`` is set): the jobs in ``GROUPS``
+    batches, one ``Household`` container each, the last in the Web
+    container when ``WEB_BATCH``.
+
+    Raises:
+        OtherBuildError: as ``fan_out``.
+    """
+    batches = (
+        web_and_household_batches
+        if WEB_BATCH == "1"
+        else Household().run_batch.map
+    )
+    return fan_out_grouped_answers(batches, jobs, GROUPS)
 
 
 @app.cls(
@@ -343,6 +430,23 @@ class Web:
         from uk_budget_data.api import app as api
 
         self.api = api
+        if MILBURN:
+            # Into the snapshot: the Milburn runs' sides (measure_sides, about
+            # 20 s on a fresh container), and one batch of each side, which
+            # the Web runs itself (WEB_BATCH)
+            # Logged, not raised: a start-up that raises makes Modal restart
+            # the container again and again; a request then does the work.
+            import traceback
+
+            from uk_budget_data import household_impact as hi
+
+            try:
+                for run in mh_runs():
+                    hi.measure_sides(run["policies"])
+                if WEB_BATCH == "1":
+                    hi.run_batch(warm_jobs())
+            except Exception:
+                print(f"Web warm-up failed:\n{traceback.format_exc()}")
 
     # The label keeps the production URL the function had:
     # https://policyengine--uk-budget-household-web.us-east.modal.run

@@ -3,7 +3,8 @@
  * answers as the household API takes them, the stored examples
  * (public/data/milburn_household_presets.json, written by
  * scripts/precompute_milburn_household_presets.py) and a custom household's
- * request, one POST per run to NEXT_PUBLIC_HOUSEHOLD_API_URL.
+ * request, one POST to the API's Milburn route for all four runs
+ * (milburnHouseholdUrl, beside NEXT_PUBLIC_HOUSEHOLD_API_URL).
  *
  * The runs mirror src/uk_budget_data/milburn_household.py RUNS: the
  * package is its two removals together; the other three are separate runs,
@@ -296,40 +297,65 @@ export function withUcWithdrawn(programmes) {
 }
 
 /**
- * How long a custom household waits for a scaled-to-zero service: the
- * Budget calculator's retries (RETRY_POLICY) over up to four minutes, as a
- * Modal cold start of the Milburn app has taken close to three.
+ * How long a custom household waits while the service starts: the Budget
+ * calculator's retries (RETRY_POLICY) over up to four minutes. With a
+ * container kept warm an answer takes seconds; after a deploy, or when
+ * many households arrive at once, new containers start, which has taken a
+ * minute or two.
  */
 export const COLD_START_RETRY = Object.freeze({ budgetMs: 240_000, maxRetries: 6 });
+
+/**
+ * What the waiting panel says (ProcessingPanel's `times`): a custom
+ * household's four runs, measured on the Modal app with a container warm
+ * (see uk_budget_data/modal_household.py), and when to say it is taking
+ * longer: past `stillWorking` seconds a new container may be starting.
+ */
+export const CALCULATION_TIMES = Object.freeze({
+  typical: 15,
+  slow: 90,
+  text: "Usually about 10–15 seconds",
+  stillWorking: 25,
+  stillWorkingText: "Still working: after a quiet spell or a busy moment this can take a minute or two",
+});
+export const STARTING_UP_TEXT = "After a quiet spell or a busy moment this can take a minute or two. Your result will appear here.";
 
 /** Whether custom households can be calculated on this build. */
 export const customAvailable = () => Boolean(householdApiUrl());
 
 /**
- * One custom household's four answers: one POST per run (`runs`, with each
- * one's policies, from parsePresets), the first alone and then the other
- * three together, to the household API as the
- * Autumn Budget calculator posts (NEXT_PUBLIC_HOUSEHOLD_API_URL is the
- * endpoint itself, …/api/household-impact), retried while a scaled-to-zero
- * service starts up (postHouseholdImpactRetrying). Rejects with the API
- * client's error (HouseholdApiError: its kind, message and the answers it
- * names), which SingleYearError shows.
+ * The address of the API's Milburn route (/api/milburn-household), beside
+ * the household route NEXT_PUBLIC_HOUSEHOLD_API_URL names
+ * (…/api/household-impact); null without one.
+ */
+export function milburnHouseholdUrl() {
+  const url = householdApiUrl();
+  if (!url) return null;
+  const [path, query] = url.split("?");
+  const base = path.replace(/\/household-impact\/?$/, "");
+  return `${base === path ? path.replace(/\/$/, "") : base}/milburn-household${query ? `?${query}` : ""}`;
+}
+
+const hasEveryRun = (runs) => (payload) => Boolean(payload?.runs) && runs.every((run) => isRunResult(payload.runs[run.key]));
+
+/**
+ * One custom household's four answers, by run key: one POST to the API's
+ * Milburn route (milburnHouseholdUrl), which runs the four report runs
+ * together (their current-law side once) and answers each exactly as the
+ * household route answers that run; retried while the service starts up
+ * (postHouseholdImpactRetrying). `runs` (from parsePresets) are the runs
+ * the answer must hold. Rejects with the API client's error
+ * (HouseholdApiError: its kind, message and the answers it names), which
+ * SingleYearError shows.
  */
 export async function calculateHousehold(answers, { runs, fetchImpl, signal, onRetry } = {}) {
   if (!householdApiUrl()) throw Object.assign(new Error("Custom households need the household API, which this build does not have."), { kind: "unavailable" });
   if (!runs?.length) throw new Error("The runs to calculate are not available.");
-  const household = householdRequest(answers);
-  const post = (run) =>
-    postHouseholdImpactRetrying(
-      { year: YEAR, policies: run.policies, household, include: ["by_policy"] },
-      { fetchImpl, signal, timeoutMs: MODAL_TIMEOUT_MS, onRetry, retry: COLD_START_RETRY },
-    );
-  // The first run alone, through a cold start; the others once the
-  // service answers, together
-  const [first, ...rest] = runs;
-  const firstResult = await post(first);
-  const others = await Promise.all(rest.map(async (run) => [run.key, await post(run)]));
-  return Object.fromEntries([[first.key, firstResult], ...others]);
+  const payload = await postHouseholdImpactRetrying(
+    { household: householdRequest(answers) },
+    { url: milburnHouseholdUrl(), isAnswer: hasEveryRun(runs), fetchImpl, signal, timeoutMs: MODAL_TIMEOUT_MS, onRetry, retry: COLD_START_RETRY },
+  );
+  return Object.fromEntries(runs.map((run) => [run.key, payload.runs[run.key]]));
 }
 
 /** The example id in the address (?example=), or null. */

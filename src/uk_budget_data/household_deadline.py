@@ -38,7 +38,7 @@ DEADLINE_SECONDS = float(
 # What the page waits before asking again: long enough for containers that
 # have started to finish, short against the page's 150 s budget.
 RETRY_AFTER_SECONDS = 10
-WATCHED_PATHS = ("/api/household-impact",)
+WATCHED_PATHS = ("/api/household-impact", "/api/milburn-household")
 # Requests answered 503 whose calculation runs on: held here, as the event
 # loop keeps only a weak reference to a task
 _LATE: set = set()

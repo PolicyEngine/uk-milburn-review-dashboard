@@ -782,6 +782,73 @@ async def calculate_household_impact(
         raise HTTPException(status_code=500, detail=f"Calculation error: {e}")
 
 
+# --- The Milburn tab's four runs at once: POST /api/milburn-household -------
+
+
+class MilburnHouseholdRequest(BaseModel):
+    """One household for the Milburn review dashboard's Household impact
+    tab: its four report runs in 2029-30 (``milburn_household.RUNS``)."""
+
+    household: HouseholdAnswersRequest = Field(
+        ..., description="The household's answers, as /api/household-impact"
+    )
+
+
+@functools.lru_cache(maxsize=64)
+def _cached_milburn_household(household_json: str) -> dict:
+    """Answers by household, as ``_cached_household_impact``."""
+    from uk_budget_data import milburn_household
+
+    return milburn_household.run_household(
+        json.loads(household_json), workers=household_workers()
+    )
+
+
+@app.post("/api/milburn-household")
+async def calculate_milburn_household(
+    data: MilburnHouseholdRequest, response: Response
+):
+    """The Milburn tab's four runs for one household: each run's answer,
+    by run key (``runs``), exactly as ``/api/household-impact`` answers that
+    run with ``include: ["by_policy"]``, its split by measure described for
+    these runs. One request: their current-law side is run once, and the
+    runs' simulations go out together (``milburn_household.run_household``).
+    Through the household route's limiter; errors as that route's."""
+    from uk_budget_data import milburn_household
+
+    # As the API reads them: the answers' defaults filled in, key order aside
+    household = data.household.model_dump(mode="json", exclude_unset=True)
+    key = json.dumps(household, sort_keys=True)
+    try:
+        received = time.perf_counter()
+        runs, calculating = await anyio.to_thread.run_sync(
+            timed,
+            lambda household_json: copy.deepcopy(
+                _cached_milburn_household(household_json)
+            ),
+            key,
+            limiter=HOUSEHOLD_REQUESTS,
+        )
+        response.headers["Server-Timing"] = server_timing(
+            calculating,
+            time.perf_counter() - received - calculating,
+            memory_peak_bytes(),
+        )
+        return {
+            "year": milburn_household.YEAR,
+            "fiscal_year": milburn_household.FISCAL_YEAR,
+            "runs": runs,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except TimeoutError as e:
+        raise HTTPException(
+            status_code=504, detail=f"Calculation timed out: {e}"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Calculation error: {e}")
+
+
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint."""

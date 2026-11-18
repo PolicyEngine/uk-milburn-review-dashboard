@@ -233,9 +233,11 @@ export function useElapsedSeconds(active, startedAt) {
 
 /** The panels' time line: the usual time, or that it is running late. */
 export function timeText(seconds, stage = "headline") {
-  const times = STAGE_TIMES[stage];
+  // A stage's name, or its own times (as STAGE_TIMES' entries, with
+  // optional stillWorking seconds and text)
+  const times = typeof stage === "string" ? STAGE_TIMES[stage] : stage;
   if (seconds > times.slow) return "Taking longer than usual; still working";
-  if (seconds > STILL_WORKING_SECONDS) return STILL_WORKING_TEXT;
+  if (seconds > (times.stillWorking ?? STILL_WORKING_SECONDS)) return times.stillWorkingText ?? STILL_WORKING_TEXT;
   return times.text;
 }
 
@@ -257,7 +259,7 @@ export function progressShare(seconds, typical = STAGE_TIMES.headline.typical) {
  * is happening, the usual time with the seconds so far, and a slim bar that
  * fills over the usual time.
  */
-export function ProcessingPanel({ seconds, startingUp = false }) {
+export function ProcessingPanel({ seconds, startingUp = false, times = STAGE_TIMES.headline, startingUpText = STARTING_UP_TEXT }) {
   return (
     <div className="processing-panel" role="status" data-starting-up={startingUp || undefined}>
       <span className="processing-icon" aria-hidden="true">
@@ -266,9 +268,9 @@ export function ProcessingPanel({ seconds, startingUp = false }) {
       </span>
       <div className="processing-text">
         <p className="processing-title">{startingUp ? STARTING_UP_TITLE : "Calculating your household"}</p>
-        <p className="processing-time">{startingUp ? STARTING_UP_TEXT : timeText(seconds)}</p>
+        <p className="processing-time">{startingUp ? startingUpText : timeText(seconds, times)}</p>
         <div className="processing-bar" aria-hidden="true">
-          <span style={{ transform: `scaleX(${progressShare(seconds)})` }} />
+          <span style={{ transform: `scaleX(${progressShare(seconds, times.typical)})` }} />
         </div>
       </div>
     </div>

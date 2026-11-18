@@ -260,29 +260,63 @@ BY_POLICY_METHOD = (
 )
 
 
-def run_household(household: dict, runs=RUNS) -> dict:
-    """Each run's answer for one household (the API's household answers),
-    by run key: validated and computed as ``/api/household-impact`` does,
-    with the split by measure and no earnings sweep."""
+def run_requests(household: dict, runs=RUNS) -> list:
+    """Each run's request, as ``/api/household-impact`` validates it: the
+    run's key and the validated request."""
     from uk_budget_data.api import HouseholdImpactRequest
 
-    results = {}
-    for run in runs:
-        request = HouseholdImpactRequest.model_validate(
-            {
-                "year": YEAR,
-                "policies": run["policies"],
-                "household": household,
-                "include": ["by_policy"],
-            }
+    return [
+        (
+            run["key"],
+            HouseholdImpactRequest.model_validate(
+                {
+                    "year": YEAR,
+                    "policies": run["policies"],
+                    "household": household,
+                    "include": ["by_policy"],
+                }
+            ),
         )
+        for run in runs
+    ]
+
+
+def run_household(household: dict, runs=RUNS, workers: int = 1) -> dict:
+    """Each run's answer for one household (the API's household answers),
+    by run key: validated and computed as ``/api/household-impact`` does,
+    with the split by measure and no earnings sweep.
+
+    The runs' simulations are run first, all together (one ``_run_all``),
+    so the current-law side they share is run once and, on Modal, the
+    batches go out at once (``modal_household.fan_out``); each run's own
+    calculation then reads them back from ``household_impact._RUNS``, so
+    every answer is exactly the one its own request gets.
+    """
+    requests = run_requests(household, runs)
+    jobs: list = []
+    seen: set = set()
+    for _, request in requests:
+        for job in hi.household_plan(
+            request.household.answers(),
+            request.policies,
+            request.year,
+            tuple(request.include),
+        )["jobs"]:
+            key = hi._run_key(job)
+            if key not in seen:
+                seen.add(key)
+                jobs.append(job)
+    hi._run_all(jobs, workers)
+    results = {}
+    for key, request in requests:
         result = hi.calculate_household_impact(
             request.household.answers(),
             request.policies,
             request.year,
             include=tuple(request.include),
+            workers=workers,
         )
         if isinstance(result.get("by_policy"), dict):
             result["by_policy"]["method"] = BY_POLICY_METHOD
-        results[run["key"]] = result
+        results[key] = result
     return results

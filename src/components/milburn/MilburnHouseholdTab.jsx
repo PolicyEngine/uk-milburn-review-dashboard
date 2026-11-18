@@ -19,6 +19,7 @@ import { CHART_COLOURS } from "../../utils/chartTheme";
 import { prefersReducedMotion } from "../../utils/chartMotion";
 import { scrollBelowBars } from "../../utils/pageScroll";
 import {
+  CALCULATION_TIMES,
   DEFAULT_ANSWERS,
   EDUCATION_AGE,
   FISCAL_YEAR,
@@ -28,6 +29,7 @@ import {
   RUNS,
   SECTOR_OPTIONS,
   YEAR,
+  STARTING_UP_TEXT,
   answersFromHousehold,
   calculateHousehold,
   customAvailable,
@@ -376,7 +378,7 @@ function RunBars({ views }) {
  * and breakdown table) for one household under current law and the
  * report's four runs in 2029-30. The eight stored examples answer at once
  * (public/data/milburn_household_presets.json); any other answers are sent
- * with Calculate to the household API, one request per run.
+ * with Calculate to the household API, one request for all four runs.
  */
 export default function MilburnHouseholdTab({ presets: given = undefined, fetchImpl = undefined }) {
   const [loaded, setLoaded] = useState(given === undefined ? undefined : given);
@@ -704,7 +706,7 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
           yearBars={false}
           positions={false}
           subtitle={`Young people in ${FISCAL_YEAR} under current law and the report's runs. Enter your own household, or start from an example below.`}
-          yoursLead="See how the report's runs change your income. The first calculation after a quiet spell can take up to about three minutes."
+          yoursLead="See how the report's runs change your income. A calculation usually takes about 10–15 seconds; after a quiet spell or a busy moment it can take a minute or two."
           figureTip={() => `Change in net income in ${FISCAL_YEAR} from the health element and PIP removal (no replacement awards)`}
           cardExtra={(example) => {
             const summary = summarise(example.results);
@@ -788,7 +790,7 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
             {running ? (
               <div className="single-year-headline" aria-busy="true">
                 <div className="card processing-card">
-                  {(showLoading || custom.startingUp) && <ProcessingPanel seconds={seconds} startingUp={custom.startingUp} />}
+                  {(showLoading || custom.startingUp) && <ProcessingPanel seconds={seconds} startingUp={custom.startingUp} times={CALCULATION_TIMES} startingUpText={STARTING_UP_TEXT} />}
                 </div>
               </div>
             ) : submitted.household === "yours" && custom.status === "unavailable" ? (

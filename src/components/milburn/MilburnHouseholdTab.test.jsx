@@ -14,6 +14,7 @@ import {
   answersFromHousehold,
   calculateHousehold,
   householdRequest,
+  milburnHouseholdUrl,
   parsePresets,
   withUcWithdrawn,
   storedExampleFor,
@@ -121,44 +122,53 @@ describe("householdCalculator", () => {
     expect(uc.children.at(-1).id).toBe("uc_withdrawn");
   });
 
-  it("sends the first run alone, then the other three, waiting up to four minutes for a cold start", async () => {
+  it("posts one request for all four runs to the API's Milburn route", async () => {
     vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
-    const log = [];
-    let releaseFirst;
-    const fetchImpl = vi.fn((_url, init) => {
-      const key = PRESETS.runs.find((run) => run.policies.join() === JSON.parse(init.body).policies.join()).key;
-      log.push(`start ${key}`);
-      const answer = { ok: true, json: async () => example("lone_parent").results[key] };
-      if (key !== "package") return Promise.resolve(answer);
-      return new Promise((resolve) => {
-        releaseFirst = () => {
-          log.push("package answered");
-          resolve(answer);
-        };
-      });
-    });
-    const pending = calculateHousehold(answersFromHousehold(example("lone_parent").household), { runs: PRESETS.runs, fetchImpl });
-    await waitFor(() => expect(log).toEqual(["start package"]));
-    releaseFirst();
-    const results = await pending;
-    expect(log.slice(0, 2)).toEqual(["start package", "package answered"]);
-    expect(log).toHaveLength(5);
-    expect(Object.keys(results)).toEqual(RUNS.map((run) => run.key));
-    expect(COLD_START_RETRY.budgetMs).toBeGreaterThanOrEqual(240_000);
-  });
-
-  it("posts one request per run to the household API", async () => {
-    vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
-    const bodies = [];
+    const calls = [];
     const fetchImpl = vi.fn(async (url, init) => {
-      bodies.push({ url, body: JSON.parse(init.body) });
-      return { ok: true, json: async () => example("lone_parent").results.package };
+      calls.push({ url, body: JSON.parse(init.body) });
+      return { ok: true, json: async () => ({ year: 2029, runs: example("lone_parent").results }) };
     });
     const results = await calculateHousehold(answersFromHousehold(example("lone_parent").household), { runs: PRESETS.runs, fetchImpl });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(calls[0].url).toBe("http://api.test/api/milburn-household");
+    expect(calls[0].body).toEqual({ household: example("lone_parent").household });
     expect(Object.keys(results)).toEqual(RUNS.map((run) => run.key));
-    expect(bodies.map((call) => call.url)).toEqual(Array(4).fill(API));
-    expect(bodies.map((call) => call.body.policies)).toEqual(FILE.runs.map((run) => run.policies));
-    expect(bodies[0].body).toMatchObject({ year: 2029, household: example("lone_parent").household, include: ["by_policy"] });
+    expect(results.package).toEqual(example("lone_parent").results.package);
+  });
+
+  it("names the Milburn route beside the household route", () => {
+    vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", "https://x.modal.run/api/household-impact");
+    expect(milburnHouseholdUrl()).toBe("https://x.modal.run/api/milburn-household");
+    vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", "http://localhost:8010/api/household-impact/");
+    expect(milburnHouseholdUrl()).toBe("http://localhost:8010/api/milburn-household");
+    vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", "");
+    expect(milburnHouseholdUrl()).toBeNull();
+  });
+
+  it("asks again while the service starts up, for up to four minutes, and refuses an answer missing a run", async () => {
+    vi.useFakeTimers();
+    try {
+      vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
+      const starting = { ok: false, status: 503, headers: new Headers({ "retry-after": "1" }), json: async () => ({ detail: "starting up", retry_after_seconds: 1 }) };
+      const answered = { ok: true, json: async () => ({ runs: example("lone_parent").results }) };
+      const fetchImpl = vi.fn().mockResolvedValueOnce(starting).mockResolvedValueOnce(answered);
+      const onRetry = vi.fn();
+      const pending = calculateHousehold(answersFromHousehold(example("lone_parent").household), { runs: PRESETS.runs, fetchImpl, onRetry });
+      await vi.runAllTimersAsync();
+      const results = await pending;
+      expect(fetchImpl).toHaveBeenCalledTimes(2);
+      expect(onRetry).toHaveBeenCalledTimes(1);
+      expect(Object.keys(results)).toEqual(RUNS.map((run) => run.key));
+      expect(COLD_START_RETRY.budgetMs).toBeGreaterThanOrEqual(240_000);
+      const { package: _left, ...partial } = example("lone_parent").results;
+      const missing = vi.fn(async () => ({ ok: true, json: async () => ({ runs: partial }) }));
+      const refused = calculateHousehold(answersFromHousehold(example("lone_parent").household), { runs: PRESETS.runs, fetchImpl: missing }).catch((error) => error);
+      await vi.runAllTimersAsync();
+      expect((await refused).kind).toBe("server");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
@@ -350,10 +360,8 @@ describe("MilburnHouseholdTab", () => {
     const answer = example("hospitality_health").results;
     const bodies = [];
     const fetchImpl = vi.fn(async (_url, init) => {
-      const body = JSON.parse(init.body);
-      bodies.push(body);
-      const run = PRESETS.runs.find((item) => item.policies.join() === body.policies.join());
-      return { ok: true, json: async () => answer[run.key] };
+      bodies.push(JSON.parse(init.body));
+      return { ok: true, json: async () => ({ year: 2029, runs: answer }) };
     });
     const { container } = render(<MilburnHouseholdTab presets={PRESETS} fetchImpl={fetchImpl} />);
     openForm();
@@ -370,8 +378,7 @@ describe("MilburnHouseholdTab", () => {
       fireEvent.click(screen.getAllByRole("button", { name: /Calculate/ })[0]);
     });
     await waitFor(() => expect(screen.getByRole("region", { name: "Your result" })).toBeTruthy());
-    expect(fetchImpl).toHaveBeenCalledTimes(4);
-    expect(bodies.map((body) => body.policies)).toEqual(FILE.runs.map((run) => run.policies));
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
     expect(bodies[0].household).toMatchObject({
       age: 21,
       limited_capability_for_work_related_activity: true,

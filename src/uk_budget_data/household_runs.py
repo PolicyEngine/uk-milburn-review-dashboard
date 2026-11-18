@@ -101,3 +101,50 @@ def fan_out_answers(
         f"{time.perf_counter() - started:.1f} s {detail}"
     )
     return results
+
+
+def job_groups(count: int, groups: int) -> list[list[int]]:
+    """``count`` jobs' indices dealt round-robin into at most ``groups``
+    batches, none empty: the first job (a request's current-law side) and
+    every ``groups``-th after it in the first batch, and so on."""
+    groups = max(1, min(groups, count))
+    return [list(range(start, count, groups)) for start in range(groups)]
+
+
+def fan_out_grouped_answers(
+    batch_map: Callable[[list], Iterable],
+    jobs: list,
+    groups: int,
+    environ: Mapping[str, str] = os.environ,
+) -> list:
+    """``fan_out_answers`` with the jobs in at most ``groups`` batches,
+    each run in turn in one ``Household`` container
+    (``Household().run_batch.map``), which answers a list, one answer per
+    job: the runs' results in the jobs' order, logged with their times.
+
+    A batch of one household's runs shares that household's current-law
+    simulation (``household_impact.shared_baselines``), and as many batches
+    as warm containers start no cold ones.
+
+    Raises:
+        OtherBuildError: as ``fan_out_answers``.
+    """
+    started = time.perf_counter()
+    batches = job_groups(len(jobs), groups)
+    answers: list = [None] * len(jobs)
+    for indices, batch in zip(
+        batches, batch_map([[jobs[i] for i in group] for group in batches])
+    ):
+        batch = list(batch) if isinstance(batch, (list, tuple)) else [batch]
+        for index, answer in zip(indices, batch):
+            answers[index] = answer
+    try:
+        results, detail = kept_results(answers, container_build(environ))
+    except OtherBuildError as error:
+        print(f"household fan-out refused: {error}")
+        raise
+    print(
+        f"household fan-out: {len(jobs)} runs in {len(batches)} batches in "
+        f"{time.perf_counter() - started:.1f} s {detail}"
+    )
+    return results

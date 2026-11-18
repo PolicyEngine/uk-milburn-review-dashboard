@@ -452,6 +452,8 @@ function readJson(response, signal) {
   });
 }
 
+const hasNetIncome = (payload) => Boolean(payload.net_income);
+
 /**
  * POST one stage. Resolves with the parsed JSON; rejects with a
  * HouseholdApiError, or a DefinitionMismatchError naming any selected
@@ -460,15 +462,18 @@ function readJson(response, signal) {
  *
  * @param {Object} body - From buildHouseholdRequest
  * @param {{ signal?: AbortSignal, timeoutMs?: number, fetchImpl?: typeof fetch,
- *   definitions?: Object<string, {git_sha: string}>, url?: string }} [options] -
+ *   definitions?: Object<string, {git_sha: string}>, url?: string,
+ *   isAnswer?: (payload: Object) => boolean }} [options] -
  *   `definitions`: the asked measures' approved definitions, whose
  *   commits the request names so the answer reports each measure's
  *   definition at its own (`definitions` in the answer); `url`: another
- *   address for the same API (the detail URL), which takes the same query
+ *   address for the same API (the detail URL), which takes the same query;
+ *   `isAnswer`: whether a 2xx body is an answer this caller can read (by
+ *   default, one with `net_income`)
  */
 export async function postHouseholdImpact(
   body,
-  { signal, timeoutMs = REQUEST_TIMEOUT_MS, fetchImpl, definitions, url: urlOverride } = {},
+  { signal, timeoutMs = REQUEST_TIMEOUT_MS, fetchImpl, definitions, url: urlOverride, isAnswer = hasNetIncome } = {},
 ) {
   const apiUrl = urlOverride ?? householdApiUrl();
   if (!apiUrl) {
@@ -519,7 +524,7 @@ export async function postHouseholdImpact(
   }
 
   if (response.ok) {
-    if (!payload || typeof payload !== "object" || !payload.net_income) {
+    if (!payload || typeof payload !== "object" || !isAnswer(payload)) {
       throw new HouseholdApiError("server", "The calculation service sent an answer this page cannot read.", {
         status: response.status,
         empty: true,

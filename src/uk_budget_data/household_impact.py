@@ -46,6 +46,7 @@ import os
 import threading
 from collections import OrderedDict
 from concurrent.futures import Future
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Optional
@@ -74,6 +75,7 @@ from policyengine_uk.variables.household.demographic.locations import (
 )
 from policyengine_uk.variables.input.council_tax_band import CouncilTaxBand
 
+from uk_budget_data import lazy_parameters
 from uk_budget_data.budget_measures.bus_fare_cap_2027 import (
     bus_fare_cap_2027,
 )
@@ -107,6 +109,10 @@ from uk_budget_data.reforms import (
     get_reform,
 )
 from uk_budget_data.runtime_identity import runtime_identity
+
+# Off by default; the Milburn household app turns it on
+# (HOUSEHOLD_FAST_RUNS, lazy_parameters and shared_baselines)
+lazy_parameters.install_if_enabled()
 
 # The UK regions and tenures policyengine-uk knows, as the form offers them
 REGIONS = (
@@ -1888,6 +1894,82 @@ def run_scenario(
     return out
 
 
+# One batch's current-law simulations (shared_baselines), for this thread
+_SHARED = threading.local()
+_SHARED_LOCK = threading.Lock()
+
+
+@contextmanager
+def shared_baselines():
+    """Within it, the runs of one household share one current-law
+    simulation as their ``baseline``.
+
+    policyengine-uk builds every simulation given a scenario (and every run
+    has one: the forecast, ``with_forecast``) a second, scenario-free
+    simulation of the same situation as its ``baseline``, which a few
+    formulas read (the employer cost the employer NI runs pass to pay, for
+    one). That simulation is the same for every side of one household: the
+    engine's current law, with no forecast and no measure. Here it is built
+    once per situation and handed to each run, so a batch of a household's
+    runs (``run_batch``) builds it once rather than once a run. It is
+    current law only: a run's own changes are on its own simulation.
+
+    Only with ``HOUSEHOLD_FAST_RUNS=1`` (the Milburn household app); a
+    no-op otherwise. It swaps the engine module's ``Simulation`` name, which
+    ``Simulation.__init__`` builds the baseline from, for the batch, so
+    batches take turns (a lock); a simulation built in another thread
+    meanwhile is built as before.
+    """
+    if not lazy_parameters.enabled():
+        yield
+        return
+    import policyengine_uk.simulation as engine
+
+    with _SHARED_LOCK:
+        original = engine.Simulation
+        _SHARED.baselines = {}
+
+        def simulation(*args, **kwargs):
+            baselines = getattr(_SHARED, "baselines", None)
+            shareable = (
+                baselines is not None
+                and not args
+                and kwargs.get("scenario") is None
+                and kwargs.get("situation") is not None
+                and kwargs.get("dataset") is None
+                and not kwargs.get("trace")
+                and kwargs.get("capital_gains_projection") is None
+                and set(kwargs)
+                <= {
+                    "scenario",
+                    "situation",
+                    "dataset",
+                    "trace",
+                    "capital_gains_projection",
+                }
+            )
+            if not shareable:
+                return original(*args, **kwargs)
+            key = json.dumps(kwargs["situation"], sort_keys=True, default=str)
+            if key not in baselines:
+                baselines[key] = original(**kwargs)
+            return baselines[key]
+
+        engine.Simulation = simulation
+        try:
+            yield
+        finally:
+            engine.Simulation = original
+            _SHARED.baselines = None
+
+
+def run_batch(jobs: list) -> list:
+    """``run_scenario`` for each job, in turn, in this process, sharing
+    each household's current-law simulation (``shared_baselines``)."""
+    with shared_baselines():
+        return [run_scenario(*job) for job in jobs]
+
+
 def _programme_rows(entities: dict) -> dict:
     """Each programme row summed over the household; a row with no
     variable as the sum of its children, and each group's "other" row as
@@ -2138,6 +2220,12 @@ def _compute(jobs: list, todo: list, workers: int) -> list:
     if os.environ.get("HOUSEHOLD_RUNNER") == "modal":
         # On Modal (modal_household.py): every run in its own container at
         # once, each with the engine already loaded.
+        # The Milburn app (HOUSEHOLD_MODAL_GROUPS): in batches, one
+        # container each, so they go to the warm ones.
+        if int(os.environ.get("HOUSEHOLD_MODAL_GROUPS") or 0) > 0:
+            from uk_budget_data.modal_household import fan_out_batches
+
+            return fan_out_batches([jobs[i] for i in todo])
         from uk_budget_data.modal_household import fan_out
 
         return fan_out([jobs[i] for i in todo])
@@ -2154,7 +2242,7 @@ def _compute(jobs: list, todo: list, workers: int) -> list:
             CALCULATION_TIMEOUT_SECONDS,
             slots=household_slots(),
         )
-    return [run_scenario(*jobs[i]) for i in todo]
+    return run_batch([jobs[i] for i in todo])
 
 
 def _run_all(jobs: list, workers: int) -> list:
@@ -2411,32 +2499,18 @@ def provably_unaffected(
     return False
 
 
-def calculate_household_impact(
+def household_plan(
     answers: HouseholdAnswers,
     reform_ids: list[str],
     year: int,
     include: tuple = PARTS,
-    workers: int = 1,
     skip_unaffected: bool = True,
 ) -> dict:
-    """The household's net income in ``year`` before and after the
-    selected measures, and the programmes; with "by_policy" in
-    ``include``, each measure's own effect and the interaction residual;
-    with "sweep", the earnings sweep.
-
-    Raises:
-        ValueError: for a year outside the Budget's policy years, a
-            salary year after it, or measures ``measure_sides`` refuses.
-    """
-    if year not in POLICY_YEARS:
-        raise ValueError(f"{year} is not one of the Budget's policy years.")
-    if answers.salary_year > year:
-        raise ValueError(
-            f"The salary year {answers.salary_year} is after {year}."
-        )
-    unknown = sorted(set(include) - set(PARTS))
-    if unknown:
-        raise ValueError(f"Not a part of the answer: {', '.join(unknown)}")
+    """The runs ``calculate_household_impact`` needs (``jobs``, in the
+    order it reads them) and what it builds them from. A caller that runs
+    several requests' jobs at once (``milburn_household.run_household``)
+    reads ``jobs`` here, so those runs are then kept (``_run_all``) and
+    each request's own call reuses them."""
     sides = measure_sides(reform_ids)
     people, benunit, household = household_entities(answers, year)
     salary, partner_salary = salaries_in(answers, year)
@@ -2481,6 +2555,57 @@ def calculate_household_impact(
             ),
             job(sides.after, net_income_only=True, members=raised, parts=True),
         ]
+    return {
+        "sides": sides,
+        "people": people,
+        "benunit": benunit,
+        "household": household,
+        "salary": salary,
+        "partner_salary": partner_salary,
+        "pension": pension,
+        "partner_pension": partner_pension,
+        "jobs": jobs,
+        "to_run": to_run,
+        "by_policy": by_policy,
+        "many": many,
+        "sweep": sweep,
+        "grid": grid if sweep else None,
+    }
+
+
+def calculate_household_impact(
+    answers: HouseholdAnswers,
+    reform_ids: list[str],
+    year: int,
+    include: tuple = PARTS,
+    workers: int = 1,
+    skip_unaffected: bool = True,
+) -> dict:
+    """The household's net income in ``year`` before and after the
+    selected measures, and the programmes; with "by_policy" in
+    ``include``, each measure's own effect and the interaction residual;
+    with "sweep", the earnings sweep.
+
+    Raises:
+        ValueError: for a year outside the Budget's policy years, a
+            salary year after it, or measures ``measure_sides`` refuses.
+    """
+    if year not in POLICY_YEARS:
+        raise ValueError(f"{year} is not one of the Budget's policy years.")
+    if answers.salary_year > year:
+        raise ValueError(
+            f"The salary year {answers.salary_year} is after {year}."
+        )
+    unknown = sorted(set(include) - set(PARTS))
+    if unknown:
+        raise ValueError(f"Not a part of the answer: {', '.join(unknown)}")
+    plan = household_plan(answers, reform_ids, year, include, skip_unaffected)
+    sides, household = plan["sides"], plan["household"]
+    salary, partner_salary = plan["salary"], plan["partner_salary"]
+    pension, partner_pension = plan["pension"], plan["partner_pension"]
+    jobs, to_run = plan["jobs"], plan["to_run"]
+    by_policy, many = plan["by_policy"], plan["many"]
+    sweep, grid = plan["sweep"], plan["grid"]
     outputs = _run_all(jobs, workers)
     before, after = outputs[0], outputs[1]
     base_net = before["household_net_income"]
