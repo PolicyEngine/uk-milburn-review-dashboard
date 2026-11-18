@@ -82,8 +82,10 @@ function writeTopic(topic) {
 function useTopic() {
   const [topic, setTopicState] = useState(() => (typeof window === "undefined" ? "all" : topicFromSearch(window.location.search)));
   useEffect(() => {
-    // The topic is this sub-tab's own: out of the address once another sub-tab or tab opens
-    // (checked a moment later, so a remount in place, as in development, keeps it)
+    // The topic is this sub-tab's own: out of the address when the panel unmounts with
+    // another sub-tab open (checked a moment later, so a remount in place keeps it). A panel
+    // kept mounted but hidden leaves ?bm= in place; other sub-tabs ignore it, and Benchmarks
+    // reopens on that topic.
     return () => {
       window.setTimeout(() => {
         const params = new URLSearchParams(window.location.search);
@@ -283,7 +285,7 @@ export default function BenchmarksTable() {
             <span className="bm-toolbar-label">All figures</span>
             <ChartDownloadMenu
               chartTitle="Benchmarks"
-              ariaLabel="Download the benchmarks: every figure (CSV), or the figures shown (PNG, SVG)"
+              ariaLabel="Download the benchmarks: every figure (CSV), or an image of the topic shown (PNG, SVG)"
               formats={{
                 csv: (frame) =>
                   downloadFile(
@@ -291,7 +293,11 @@ export default function BenchmarksTable() {
                     `${frameFileName(frame, "benchmarks")}.csv`,
                     "text/csv;charset=utf-8",
                   ),
-                ...htmlImageFormats(() => cards, "benchmarks"),
+                // Images: one topic's cards; under "All", the hero's plot, as every card at once is too tall to read
+                ...htmlImageFormats(
+                  () => (topic === "all" ? (cards?.parentElement?.querySelector(".bm-hero .chart-plot") ?? cards) : cards),
+                  topic === "all" ? "benchmarks" : `benchmarks-${topic}`,
+                ),
               }}
             />
           </div>

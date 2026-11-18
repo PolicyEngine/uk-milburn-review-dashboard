@@ -315,17 +315,12 @@
 
 /* ---------- Toolbar: topic filter and the all-figures download ---------- */
 .bm-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 3;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px 16px;
-  margin: 0 -4px;
-  padding: 10px 4px;
-  background: var(--c-surface);
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--c-grid);
 }
 
@@ -619,6 +614,17 @@
   gap: 6px;
 }
 
+/* A long source name wraps inside the card rather than running past it */
+.bm-foot-source .source-link-chip {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.bm-foot-source .source-link-text {
+  min-width: 0;
+  white-space: normal;
+}
+
 .bm-more {
   min-height: 0;
   padding-top: 4px;
@@ -838,10 +844,6 @@
 
   .bm-hero-flag-more {
     display: none;
-  }
-
-  .bm-toolbar {
-    position: static;
   }
 
   .bm-value-main {

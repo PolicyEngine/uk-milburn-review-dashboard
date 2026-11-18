@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { BENCHMARK_GRAPHICS, BENCHMARK_TOPICS, heroRows, heroSummary, parseBenchmarks, topicFromSearch } from "../../utils/milburn/benchmarks";
+import { BENCHMARK_GRAPHICS, BENCHMARK_TOPICS, benchmarkGroups, heroRows, heroSummary, parseBenchmarks, topicFromSearch } from "../../utils/milburn/benchmarks";
 import { heroCsv, heroDomain, heroTicks } from "./BenchmarksHero";
 
 const benchmarks = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_benchmarks.json"), "utf8");
@@ -213,6 +213,19 @@ describe("Benchmarks cards", () => {
       expect(row, id).toBeTruthy();
       for (const point of graphic.points) expect(`${row.value} ${row.basis}`, `${id} ${point.text}`).toContain(point.text);
     }
+  });
+
+  it("writes every figure to the CSV once, with its source, link and date as in the file", async () => {
+    const { benchmarksCsv } = await import("./BenchmarksTable");
+    const csv = benchmarksCsv(benchmarkGroups(file.rows), new Map());
+    const lines = csv.replace(/^\uFEFF/, "").trim().split("\r\n").filter((line) => !/^"?#/.test(line));
+    expect(lines.length - 1).toBe(file.rows.length);
+    const pip = lines.find((line) => line.includes("PIP spending, ages 16 to 24"));
+    expect(pip).toContain("https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation");
+    expect(pip).toContain("17 November 2026");
+    expect(pip).toContain("£3.27bn a year");
+    expect(pip).toContain(",-14,Yes,");
+    expect(lines.find((line) => line.includes("Young people receiving PIP"))).toContain("No: ours is England and Wales in 2025");
   });
 
   it("shows an unavailable state when its file is missing", async () => {
