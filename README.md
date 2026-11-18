@@ -7,7 +7,8 @@ Public repository. Figures are PolicyEngine UK static microsimulation estimates 
 | | |
 |---|---|
 | Team test (Claude artifact; share from its Share menu) | https://claude.ai/artifact/45qJVmEjGX1sL8RLrzqv2f |
-| Household API (Modal app `uk-milburn-household`) | https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact |
+| Household API (Modal app `uk-milburn-household`) | https://policyengine--uk-milburn-household-web.us-east.modal.run/api/milburn-household |
+| Live dashboard (Vercel project `uk-milburn-review`) | https://uk-milburn-review.vercel.app/uk/milburn-review |
 | Local | `bun run dev`, then http://localhost:3000/uk/milburn-review |
 | Report-day runbook and reviews | [`docs/report-day/`](docs/report-day/) |
 | What the report proposes, and what we model | [`docs/report-day/05-report-measures.md`](docs/report-day/05-report-measures.md) |
@@ -87,14 +88,14 @@ HOUSEHOLD_WORKERS=2 PORT=8010 uv run uk-budget-api                  # a local AP
 NEXT_PUBLIC_HOUSEHOLD_API_URL=http://localhost:8010/api/household-impact bun run dev
 ```
 
-Custom households on a deployed page use the Modal app `uk-milburn-household` (no warm schedule, scales to zero, at most 10 workers; see the docstring of `src/uk_budget_data/modal_household.py`). Deployed on 17 November 2026 from b8a7b490; redeploy after any change to the household code:
+Custom households on a deployed page use the Modal app `uk-milburn-household` (at most 10 workers; see the docstring of `src/uk_budget_data/modal_household.py`). It keeps 2 Household workers and 1 Web container warm (about £2–3 a day), and the Milburn image sets `HOUSEHOLD_FAST_RUNS=1` (lazy parameter trees, one shared baseline per household). The tab sends all four runs in one request to `/api/milburn-household`, answered in about 10–20 s. Deploy from a clean checkout of pushed `main` (Modal uploads `src/uk_budget_data` from disk), and redeploy after any change to the household code:
 
 ```bash
-HOUSEHOLD_MODAL_APP=uk-milburn-household uv run --with modal modal deploy src/uk_budget_data/modal_household.py
+env -u HUGGING_FACE_TOKEN HOUSEHOLD_MODAL_APP=uk-milburn-household HOUSEHOLD_MODAL_MIN_CONTAINERS=2 uv run --with modal modal deploy src/uk_budget_data/modal_household.py
 uv run --with modal modal app stop -y uk-milburn-household          # stop it
 ```
 
-Then build the page with `NEXT_PUBLIC_HOUSEHOLD_API_URL=https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact` (confirmed by the deploy). The first request after an idle spell takes one to two minutes while containers start; the page retries. Without the variable the build passes with a warning: the tab shows the stored examples only and says custom households are not available yet.
+Then build the page with `NEXT_PUBLIC_HOUSEHOLD_API_URL=https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact` (the tab derives the `/api/milburn-household` route from it). After a quiet spell or under load a request can take a minute or two; the page retries for up to 4 minutes. Without the variable the build passes with a warning: the tab shows the stored examples only and says custom households are not available yet.
 
 Tests and lint: `bunx vitest run --pool=forks`, `bunx eslint .`, `.venv/bin/pytest -n 4` (without `HUGGING_FACE_TOKEN`; the Milburn design and household checks alone: `.venv/bin/pytest tests/test_milburn_design.py tests/test_milburn_measures.py -n 2`), `.venv/bin/black --check src/ tests/` and `.venv/bin/ruff check src/ tests/`.
 
