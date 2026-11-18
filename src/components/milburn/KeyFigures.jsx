@@ -12,6 +12,7 @@ import {
   isWithheld,
   notYetStarted,
   savingInYear,
+  REPORT_START_YEAR,
   STARTS_TEXT,
   summaryRun,
   useMilburnSummary,
@@ -61,6 +62,10 @@ const RANGE_NAMES = ["Full removal", "Partial removal", "Phased"];
  * Public finances draws the savings, Poverty the people.
  */
 export function packageRange(summary) {
+  // Before April 2029 the report's runs have not started, while the partial
+  // removal (a pre-report run from April 2027) has: the three would not be
+  // like for like, so the range is shown from 2029-30 only.
+  if (Number(summary?.year) < REPORT_START_YEAR) return [];
   return RANGE_IDS.map((id, index) => {
     const run = summaryRun(summary, id);
     if (!run) return null;

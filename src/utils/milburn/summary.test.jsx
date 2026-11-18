@@ -333,8 +333,9 @@ describe("KeyFigures", () => {
 
   it("keeps the packages' range for Public finances and Poverty", () => {
     // The fixture lists only the report's package of the range's runs: the others are left out
-    expect(packageRange(summary).map((row) => [row.id, row.name, row.saving, row.povertyValue])).toEqual([
-      ["milburn_report_package", "Full removal", "£4.50bn", 290000],
+    // The fixture's year is before April 2029, when the range is not shown; read it as 2029-30
+    expect(packageRange({ ...summary, year: 2029 }).map((row) => [row.id, row.name, row.povertyValue])).toEqual([
+      ["milburn_report_package", "Full removal", 290000],
     ]);
     expect(PARTIAL_REMOVAL_NOTE).toMatch(/^Package range: our designs\. Partial removal .* the report has no such run\.$/);
   });
@@ -502,6 +503,11 @@ describe("the published summary", () => {
       ["Partial removal", "£2.64bn", "about 99,000"],
       ["Phased", "£2.77bn", "about 156,000"],
     ]);
+  });
+
+  it("shows the range from 2029-30 only: before April 2029 only the pre-report partial removal has started", () => {
+    for (const year of [2027, 2028]) expect(packageRange(summaryForYear(published, year)), String(year)).toEqual([]);
+    for (const year of [2029, 2030, 2031]) expect(packageRange(summaryForYear(published, year)).length, String(year)).toBe(3);
   });
 
   it("defines the break-even share like for like: entrants needed over the young people in losing households", () => {
