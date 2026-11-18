@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { packageStaticBn, parseScenarios } from "./scenarios";
 import { youngPeopleWorseOff } from "./youngPeople";
 import { packageKeyOf, packageYearShown } from "./packageRun";
-import { BENCHMARK_SHORT, DIFFERENT_BASIS, comparisonFor, differentBasis, estimateFor, figureNumber, figureRange, figureShare, parseBenchmarks } from "./benchmarks";
+import { BENCHMARK_SHORT, DIFFERENT_BASIS, comparisonFor, differentBasis, toleranceFor, toleranceWords, estimateFor, figureNumber, figureRange, figureShare, parseBenchmarks } from "./benchmarks";
 import { NOT_COMPUTABLE_MEASURES } from "./notComputable";
 import { CALCULATOR_ONLY_MEASURES, withCalculatorOnly } from "../calculatorOnlyMeasures";
 
@@ -108,6 +108,7 @@ describe("the benchmarks file", () => {
     // fixed figure from the named build, like for like (issue #1); every other row is blank
     expect(parsed.rows.filter((row) => row.estimate).map((row) => row.id)).toEqual([
       "uc_health_element_16_24",
+      "uc_health_pip_overlap",
       "young_pip_recipients",
       "package_young_people_affected",
       "young_benefits_spend",
@@ -165,6 +166,7 @@ describe("the benchmark charts", () => {
     expect(figureNumber("260,000")).toEqual({ number: 260000, unit: "count", text: "260,000" });
     expect(figureNumber("£4.43bn a year")).toEqual({ number: 4.43, unit: "bn", text: "£4.43bn" });
     expect(figureNumber("£0.92bn a year")).toEqual({ number: 0.92, unit: "bn", text: "£0.92bn" });
+    expect(figureNumber("62.5%")).toEqual({ number: 62.5, unit: "pct", text: "62.5%" });
     for (const wording of [
       "About 1.0 million",
       "About £8bn a year",
@@ -183,6 +185,7 @@ describe("the benchmark charts", () => {
   it("pair a published figure with a fixed estimate in the same unit, with the gap as a % of the published figure", () => {
     expect(parsed.rows.filter((each) => comparisonFor(each)).map((each) => each.id)).toEqual([
       "uc_health_element_16_24",
+      "uc_health_pip_overlap",
       "young_pip_recipients",
       "young_benefits_spend",
       "pip_spend_16_24",
@@ -193,6 +196,9 @@ describe("the benchmark charts", () => {
     const gap = (id) => Math.round(comparisonFor(row(id)).gapPct);
     expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 233407 });
     expect(gap("uc_health_element_16_24")).toBe(33);
+    // The PIP overlap: shares, so the gap is in percentage points (Max, 18 Nov; issue #4's table)
+    expect(comparisonFor(row("uc_health_pip_overlap"))).toMatchObject({ unit: "pct", published: 62.5, estimate: 90.6 });
+    expect(comparisonFor(row("uc_health_pip_overlap")).gapPp).toBeCloseTo(28.1, 6);
     expect(gap("young_benefits_spend")).toBe(-6);
     expect(gap("pip_spend_16_24")).toBe(-14);
     expect(gap("uc_health_spend_16_24")).toBe(28);
@@ -203,7 +209,12 @@ describe("the benchmark charts", () => {
     // Like-for-like pairs print their gap; the PIP caseload still differs in date and area, and says so
     expect(Object.keys(DIFFERENT_BASIS)).toEqual(["young_pip_recipients"]);
     expect(differentBasis("young_pip_recipients")).toMatch(/England and Wales in 2025/);
-    for (const id of ["uc_health_element_16_24", "young_benefits_spend", "pip_spend_16_24", "uc_health_spend_16_24", "employer_nics_under_25"]) expect(differentBasis(id), id).toBeNull();
+    for (const id of ["uc_health_element_16_24", "uc_health_pip_overlap", "young_benefits_spend", "pip_spend_16_24", "uc_health_spend_16_24", "employer_nics_under_25"]) expect(differentBasis(id), id).toBeNull();
+    // The 15% tolerance (Max, 18 Nov) is tested only where ages, area and period match: every pair says which
+    for (const id of parsed.rows.filter((each) => comparisonFor(each)).map((each) => each.id)) expect(toleranceFor(row(id)), id).not.toBeNull();
+    expect(toleranceFor(row("young_pip_recipients"))).toMatchObject({ tested: true, within: true });
+    expect(toleranceFor(row("employer_nics_under_25"))).toMatchObject({ tested: false });
+    expect(toleranceWords({ tested: true, within: false, against: "X" })).toBe("Outside 15% of X");
     // A figure for another year, price base or policy design stays a tile with no PolicyEngine pair
     for (const id of ["review_welfare_saving_2036", "relative_poverty_review"]) expect(comparisonFor(row(id)), id).toBeNull();
     // Different units, or no fixed estimate, are never paired

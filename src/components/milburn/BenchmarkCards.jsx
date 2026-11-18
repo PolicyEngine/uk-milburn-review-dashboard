@@ -2,7 +2,7 @@ import { Info } from "lucide-react";
 import Disclosure from "../Disclosure";
 import InfoSections, { hasInfo } from "../InfoSections";
 import TitleIcon from "../TitleIcon";
-import { BENCHMARK_ICON, BENCHMARK_SHORT, differentBasis, gapWords, graphicFor, moreInfo, splitValue, valueParts } from "../../utils/milburn/benchmarks";
+import { BENCHMARK_ICON, BENCHMARK_SHORT, comparisonGapWords, differentBasis, graphicFor, moreInfo, splitValue, toleranceFor, toleranceWords, valueParts } from "../../utils/milburn/benchmarks";
 import { SourceLinkChip } from "./SourceChip";
 
 /** The one name of every Benchmarks card's disclosure. */
@@ -58,6 +58,18 @@ function CardTitle({ row }) {
   );
 }
 
+/** The 15% tolerance verdict, where the row has one: tested against a matched figure, or why not (in More info). */
+function ToleranceBadge({ row }) {
+  const verdict = toleranceFor(row);
+  if (!verdict) return null;
+  return (
+    <p className={`bm-gap bm-tolerance${verdict.tested ? "" : " is-flag"}`} data-tolerance={verdict.tested ? (verdict.within ? "within" : "outside") : "untested"}>
+      <TitleIcon name={verdict.tested ? (verdict.within ? "check" : "alert") : "info"} bare size={13} />
+      <span>{toleranceWords(verdict)}</span>
+    </p>
+  );
+}
+
 /** A card's foot: the source chip (source and date, a link), then More info. */
 function Foot({ row, info }) {
   return (
@@ -109,9 +121,10 @@ export function ComparePanel({ row, comparison }) {
       ) : (
         <p className="bm-gap" data-gap="">
           <TitleIcon name={Math.round(Math.abs(gap)) === 0 ? "equal" : gap < 0 ? "arrowDown" : "arrowUp"} bare size={13} />
-          <span>Ours {gapWords(gap)}</span>
+          <span>Ours {comparisonGapWords(comparison)}</span>
         </p>
       )}
+      <ToleranceBadge row={row} />
       <div className="bm-bars" aria-hidden="true">
         <span className="bm-bar is-published" style={{ width: width(comparison.published) }} />
         <span className="bm-bar is-estimate" style={{ width: width(comparison.estimate) }} />

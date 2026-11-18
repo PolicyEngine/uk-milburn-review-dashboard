@@ -14,8 +14,12 @@ import {
   BENCHMARKS_FILE,
   BENCHMARK_SHORT,
   BENCHMARK_TOPICS,
+  OURS_TOPIC,
+  groupsForTopic,
   benchmarkGroups,
   comparisonFor,
+  toleranceFor,
+  toleranceWords,
   differentBasis,
   estimateFor,
   parseBenchmarks,
@@ -119,8 +123,14 @@ export function benchmarksCsv(groups, estimates) {
           ? row.estimate.basis
           : (row.estimate?.label ?? ""),
         build: row.estimate?.fixed ? row.estimate.label : "",
-        gap: comparison && !basis ? Math.round(comparison.gapPct) : null,
+        gap: comparison && !basis && comparison.gapPp == null ? Math.round(comparison.gapPct) : null,
+        gapPp: comparison && !basis && comparison.gapPp != null ? Math.round(comparison.gapPp * 10) / 10 : null,
         likeForLike: comparison ? (basis ? `No: ${basis}` : "Yes") : "",
+        tolerance: (() => {
+          const verdict = toleranceFor(row);
+          if (!verdict) return "";
+          return verdict.tested ? toleranceWords(verdict) : `Not tested: ${verdict.reason}`;
+        })(),
         why: row.estimate?.note ?? "",
         saving: row.saving ? `${row.saving.label}: ${row.saving.value}` : "",
       };
@@ -142,7 +152,9 @@ export function benchmarksCsv(groups, estimates) {
       { key: "estimateBasis", label: "PolicyEngine basis" },
       { key: "build", label: "PolicyEngine build" },
       { key: "gap", label: "Gap (%)", decimals: 0 },
+      { key: "gapPp", label: "Gap (pp), for shares", decimals: 1 },
       { key: "likeForLike", label: "Like for like" },
+      { key: "tolerance", label: "15% tolerance" },
       { key: "why", label: "Why they differ" },
       { key: "saving", label: "Our saving or net cost, apart" },
     ],
@@ -236,11 +248,10 @@ export default function BenchmarksTable() {
       .join(", ");
     const counts = Object.fromEntries([
       ["all", ready.rows.length],
+      [OURS_TOPIC, ready.rows.filter((row) => row.estimate).length],
       ...groups.map((group) => [group.key, group.rows.length]),
     ]);
-    const shown = groups.filter(
-      (group) => topic === "all" || group.key === topic,
-    );
+    const shown = groupsForTopic(groups, topic);
     // The builds our fixed figures come from, once, in the folded notes
     const builds = [
       ...new Set(

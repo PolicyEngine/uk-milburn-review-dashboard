@@ -72,8 +72,9 @@ describe("Benchmarks layout", () => {
       const id = each.dataset.benchmark;
       expect(each.firstElementChild.tagName, id).toBe("H4");
       expect(each.lastElementChild, id).toHaveClass("bm-foot");
-      // At most one line of words besides the title and figures: the gap or a flag
-      expect(each.querySelectorAll(".bm-gap").length, id).toBeLessThanOrEqual(1);
+      // At most one line of words besides the title and figures (the gap or a flag), and the 15% verdict
+      expect(each.querySelectorAll(".bm-gap:not(.bm-tolerance)").length, id).toBeLessThanOrEqual(1);
+      expect(each.querySelectorAll(".bm-tolerance").length, id).toBeLessThanOrEqual(1);
       expect(each.querySelector(".disclosure-preview"), id).toBeNull();
     }
     const css = readFileSync(join(__dirname, "BenchmarksTable.css"), "utf8");
@@ -110,6 +111,20 @@ describe("Benchmarks topic filter", () => {
     expect(new URLSearchParams(window.location.search).has("bm")).toBe(false);
   });
 
+  it("picks out the cards with a PolicyEngine figure, across sections (issue #6, item 9)", async () => {
+    await renderTab();
+    const filter = screen.getByRole("group", { name: "Show figures on" });
+    const ours = within(filter).getByRole("button", { name: /^With a PolicyEngine figure/ });
+    const withOurs = file.rows.filter((row) => row.estimate);
+    expect(ours.querySelector(".bm-filter-count").textContent).toBe(String(withOurs.length));
+    fireEvent.click(ours);
+    expect(ours).toHaveAttribute("aria-pressed", "true");
+    expect(new URLSearchParams(window.location.search).get("bm")).toBe("ours");
+    expect([...document.querySelectorAll("[data-benchmark]")].map((card) => card.dataset.benchmark).sort()).toEqual(withOurs.map((row) => row.id).sort());
+    expect([...document.querySelectorAll(".bm-group")].map((group) => group.dataset.section)).toEqual(["caseloads", "spending"]);
+    fireEvent.click(within(filter).getByRole("button", { name: /^All/ }));
+  });
+
   it("opens on the address's topic and ignores one it does not know", async () => {
     expect(topicFromSearch("?bm=context")).toBe("context");
     expect(topicFromSearch("?bm=nonsense")).toBe("all");
@@ -133,6 +148,7 @@ describe("Benchmarks cards", () => {
     const region = await renderTab();
     expect([...region.querySelectorAll(".bm-compare")].map((panel) => panel.dataset.benchmark)).toEqual([
       "uc_health_element_16_24",
+      "uc_health_pip_overlap",
       "young_pip_recipients",
       "pip_spend_16_24",
       "uc_health_spend_16_24",
@@ -141,6 +157,8 @@ describe("Benchmarks cards", () => {
     ]);
     for (const [id, gap] of [
       ["uc_health_element_16_24", "Ours 33% higher"],
+      // A share differs in percentage points, never as a % of a %
+      ["uc_health_pip_overlap", "Ours 28.1pp higher"],
       ["pip_spend_16_24", "Ours 14% lower"],
       ["uc_health_spend_16_24", "Ours 28% higher"],
       ["young_benefits_spend", "Ours 6% lower"],
@@ -157,9 +175,15 @@ describe("Benchmarks cards", () => {
     const pip = card("young_pip_recipients");
     expect(pip.querySelector("[data-different-basis]").textContent).toBe("Not like for like");
     expect(pip.textContent).not.toMatch(/Ours \d+% (higher|lower)/);
+    // The 15% tolerance: tested only against a matched figure (DWP's count), else marked untested
+    expect(pip.querySelector("[data-tolerance]").dataset.tolerance).toBe("within");
+    expect(pip.querySelector("[data-tolerance]").textContent).toBe("Within 15% of DWP's 2025 count");
+    for (const id of ["uc_health_element_16_24", "uc_health_pip_overlap", "pip_spend_16_24", "uc_health_spend_16_24", "young_benefits_spend", "employer_nics_under_25"]) {
+      expect(card(id).querySelector("[data-tolerance]").dataset.tolerance, id).toBe("untested");
+    }
   });
 
-  it("holds why they differ, both bases, our build and saving, and the source in More info", async () => {
+  it("holds why they differ, both bases, our build and saving in More info; the source only in the foot", async () => {
     await renderTab();
     const info = openMoreInfo("pip_spend_16_24");
     expect(info.textContent).toContain("Why they differ");
@@ -167,10 +191,9 @@ describe("Benchmarks cards", () => {
     expect(info.textContent).toContain("Published: £3.8bn a year; £1.3bn in 2019-20, forecast at £8.1bn in 2036-37.");
     expect(info.textContent).toContain("PolicyEngine, build fcfac709, 2025, cash terms: £3.27bn a year.");
     expect(info.textContent).toContain("Our saving from removing PIP at 16 to 24, 2029-30, cash terms: £4.68bn a year.");
-    const source = within(info).getByRole("link", { name: /From a Welfare State to a Working State/ });
-    expect(source).toHaveAttribute("target", "_blank");
-    expect(source).toHaveAttribute("rel", "noopener noreferrer");
-    expect(info.textContent).toContain("17 November 2026");
+    // The source is the foot's chip, not repeated in More info (issue #6, item 8)
+    expect(within(info).queryByRole("link", { name: /From a Welfare State to a Working State/ })).toBeNull();
+    expect(info.textContent).toContain("Not tested against the 15% tolerance: the review's figure gives no area.");
     // The different-basis pair says how, and DWP's count
     const pip = openMoreInfo("young_pip_recipients");
     expect(pip.textContent).toContain("Not like for like: ours is England and Wales in 2025; the published figure is current, for November 2026.");
@@ -214,7 +237,9 @@ describe("Benchmarks cards", () => {
     expect(pip).toContain("https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation");
     expect(pip).toContain("17 November 2026");
     expect(pip).toContain("£3.27bn a year");
-    expect(pip).toContain(",-14,Yes,");
+    expect(pip).toContain(",-14,,Yes,Not tested: the review's figure gives no area,");
+    // A share's gap in percentage points, in its own column
+    expect(lines.find((line) => line.includes("UC health element and PIP, 16–24s"))).toContain(",,28.1,Yes,");
     expect(lines.find((line) => line.includes("PIP recipients, 16–24s"))).toContain("No: ours is England and Wales in 2025");
   });
 

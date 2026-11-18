@@ -24,7 +24,7 @@ export const BENCHMARK_SECTIONS = [
     title: "How do our caseloads compare?",
     intro: "Published counts of 16–24s on the UC health element or PIP, beside ours.",
     icon: "usersRound",
-    ids: ["uc_health_no_work_requirements", "uc_health_element_16_24", "young_pip_recipients", "package_young_people_affected"],
+    ids: ["uc_health_no_work_requirements", "uc_health_element_16_24", "uc_health_pip_overlap", "young_pip_recipients", "package_young_people_affected"],
   },
   {
     key: "spending",
@@ -112,6 +112,12 @@ export const BENCHMARK_SHORT = {
   uc_health_element_16_24: {
     label: "UC health element, 16–24s",
     icon: "activity",
+    estimateBasis: "Ages 16 to 24, Great Britain, 2025",
+  },
+  uc_health_pip_overlap: {
+    label: "UC health element and PIP, 16–24s",
+    icon: "hbars",
+    basis: "Share also receiving PIP; no source, date or area given",
     estimateBasis: "Ages 16 to 24, Great Britain, 2025",
   },
   incapacity_benefits_young: {
@@ -240,6 +246,47 @@ export function differentBasis(id) {
   return Object.hasOwn(DIFFERENT_BASIS, id) ? DIFFERENT_BASIS[id] : null;
 }
 
+/**
+ * The 15% tolerance: a pair is tested against it only where the published
+ * figure states its ages, area and period and ours matches all three. Each
+ * like-for-like row says which: `against` (the matched figure, its wording,
+ * and ours) for a tested row, or `untested` (why not, in a few words).
+ * The gap is tested unrounded, so 14.7% is within.
+ */
+export const TOLERANCE_PCT = 15;
+export const TOLERANCE = Object.freeze({
+  uc_health_element_16_24: { untested: "the published count gives no source, date or area" },
+  uc_health_pip_overlap: { untested: "the published counts give no source, date or area" },
+  young_pip_recipients: {
+    against: { label: "DWP's 2025 count", published: 407505, estimate: 406919 },
+  },
+  young_benefits_spend: { untested: "a sum of two figures whose gaps offset" },
+  pip_spend_16_24: { untested: "the review's figure gives no area" },
+  uc_health_spend_16_24: { untested: "the review's figure gives no area" },
+  employer_nics_under_25: { untested: "another model's estimate, not an official count" },
+});
+
+/**
+ * A row's 15% verdict: { tested: true, within, gapPct, against } where a
+ * matched figure exists, { tested: false, reason } where none does, or null
+ * for a row with no PolicyEngine pair.
+ */
+export function toleranceFor(row) {
+  const rule = TOLERANCE[row?.id];
+  if (!rule) return null;
+  if (rule.untested) return { tested: false, reason: rule.untested };
+  const { published, estimate, label } = rule.against;
+  const gapPct = ((estimate - published) / published) * 100;
+  return { tested: true, within: Math.abs(gapPct) <= TOLERANCE_PCT, gapPct, against: label };
+}
+
+/** A verdict in a few words, for a badge: "Within 15% of DWP's 2025 count…", "No 15% test". */
+export function toleranceWords(verdict) {
+  if (!verdict) return "";
+  if (!verdict.tested) return `No ${TOLERANCE_PCT}% test`;
+  return `${verdict.within ? "Within" : "Outside"} ${TOLERANCE_PCT}% of ${verdict.against}`;
+}
+
 /** The icon of a figure with none of its own. */
 export const BENCHMARK_ICON = "fileText";
 
@@ -255,6 +302,8 @@ export function figureNumber(value) {
   if (count) return { number: Number(count[1].replace(/,/g, "")), unit: "count", text: count[1] };
   const billions = /^(£(\d+(?:\.\d+)?)bn)(?: a year)?$/.exec(words);
   if (billions) return { number: Number(billions[2]), unit: "bn", text: billions[1] };
+  const share = /^((\d{1,3}(?:\.\d+)?)%)$/.exec(words);
+  if (share) return { number: Number(share[2]), unit: "pct", text: share[1] };
   return null;
 }
 
@@ -276,6 +325,8 @@ export function comparisonFor(row) {
     estimate: estimate.number,
     estimateText: estimate.text,
     gapPct: ((estimate.number - published.number) / published.number) * 100,
+    // Shares differ in percentage points, never as a % of a %
+    gapPp: published.unit === "pct" ? estimate.number - published.number : null,
   };
 }
 
@@ -360,6 +411,7 @@ export function parseBenchmarks(json) {
               reformId: typeof row.policyengine_estimate.reform_id === "string" ? row.policyengine_estimate.reform_id : null,
               metric: text(row.policyengine_estimate.metric),
               label: text(row.policyengine_estimate.label),
+              note: text(row.policyengine_estimate.note),
             }
           : null,
       saving: separateFigure(row.policyengine_saving),
@@ -387,6 +439,12 @@ export function estimateFor(row, { ageRows, packageRows, packageKey, year }) {
 /** The gap in words, to the nearest whole per cent: "14% lower", "33% higher", "within 1%". */
 export const gapWords = (gapPct) =>
   Math.round(Math.abs(gapPct)) === 0 ? "within 1%" : `${Math.round(Math.abs(gapPct))}% ${gapPct < 0 ? "lower" : "higher"}`;
+
+/** A pair's gap in words: percentage points for shares ("28.1pp higher"), else gapWords. */
+export const comparisonGapWords = (comparison) =>
+  comparison.gapPp != null
+    ? `${Math.abs(comparison.gapPp).toFixed(1)}pp ${comparison.gapPp < 0 ? "lower" : "higher"}`
+    : gapWords(comparison.gapPct);
 
 /**
  * Small graphics for figures whose wording holds a series or a split, by
@@ -447,7 +505,21 @@ export function graphicFor(row) {
 }
 
 /** The topics of the filter: every section, after "All". */
-export const BENCHMARK_TOPICS = [{ key: "all", chip: "All" }, ...BENCHMARK_SECTIONS.map(({ key, chip }) => ({ key, chip }))];
+/** "ours": only the figures with a PolicyEngine figure beside them, across sections (issue #6, item 9). */
+export const OURS_TOPIC = "ours";
+export const BENCHMARK_TOPICS = [
+  { key: "all", chip: "All" },
+  { key: OURS_TOPIC, chip: "With a PolicyEngine figure" },
+  ...BENCHMARK_SECTIONS.map(({ key, chip }) => ({ key, chip })),
+];
+
+/** The groups a topic shows: one section, every section, or every section's rows with a PolicyEngine figure. */
+export function groupsForTopic(groups, topic) {
+  if (topic === OURS_TOPIC) {
+    return groups.map((group) => ({ ...group, rows: group.rows.filter((row) => row.estimate) })).filter((group) => group.rows.length > 0);
+  }
+  return groups.filter((group) => topic === "all" || group.key === topic);
+}
 
 /** The address's topic (?bm=), or "all" for none or one we do not know. */
 export function topicFromSearch(search) {
@@ -464,12 +536,18 @@ const sentence = (text) => {
  * What a card's "More info" holds, as InfoSections parts: why the two
  * differ (a pair's own note, after its different basis), the published
  * figure as worded with its basis, ours with its build, year, area and
- * price basis (and our saving, apart), and the source with its date.
+ * price basis (and our saving, apart); the source is the foot's chip, not repeated.
  * `estimate` is a worked-out estimate's text, where the row has no fixed one.
  */
 export function moreInfo(row, { estimate = null, runLabel = "" } = {}) {
   const basis = differentBasis(row.id);
-  const why = [basis && `Not like for like: ${basis}.`, sentence(row.estimate?.note)].filter(Boolean).join(" ");
+  const verdict = toleranceFor(row);
+  const test = !verdict
+    ? ""
+    : verdict.tested
+      ? `${toleranceWords(verdict)}: ours ${Math.round(Math.abs(verdict.gapPct) * 10) / 10}% ${verdict.gapPct < 0 ? "lower" : "higher"}.`
+      : `Not tested against the ${TOLERANCE_PCT}% tolerance: ${verdict.reason}.`;
+  const why = [basis && `Not like for like: ${basis}.`, sentence(row.estimate?.note), test].filter(Boolean).join(" ");
   const how = [];
   if (row.estimate?.fixed) how.push(`${row.estimate.label || "PolicyEngine"}: ${row.estimate.fixed}. ${sentence(row.estimate.basis)}`.trim());
   else if (row.estimate && estimate) how.push(`${row.estimate.label || "PolicyEngine"}: ${estimate}${runLabel ? ` (${runLabel})` : ""}.`);
@@ -478,6 +556,7 @@ export function moreInfo(row, { estimate = null, runLabel = "" } = {}) {
     lead: why ? { title: "Why they differ", body: why } : undefined,
     shows: row.value ? `Published: ${row.value}. ${sentence(row.basis)}`.trim() : sentence(row.basis) || null,
     how,
-    sources: row.source ? [{ label: row.source, href: row.url ?? undefined, date: row.date }] : [],
+    // The card's foot carries the source chip; More info does not repeat it
+    sources: [],
   };
 }
