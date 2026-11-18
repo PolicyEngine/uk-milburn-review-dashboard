@@ -1,12 +1,14 @@
 /**
  * The example households' results, precomputed so choosing one shows it at
- * once. public/data/household_presets.json holds the household API's
+ * once. The file (household_presets.json under the data path) held the household API's
  * answer for each example over the form's defaults, with every measure
  * selected, for each year a reader can choose;
  * scripts/precompute_household_presets.py writes it from the requests built
  * here (scripts/household-preset-requests.mjs), so the keys match the page's
  * own requests byte for byte. Any other request (an edited answer, another set
- * of measures) goes to the live API.
+ * of measures) goes to the live API. The Milburn route does not render this
+ * calculator, so the file is no longer served: it is kept as a test fixture
+ * (src/test/fixtures/household_presets.json), and a load finds none.
  */
 import { takeEarlyResponse } from "./publication/early";
 import { SELECTABLE_YEARS } from "./displayYears";

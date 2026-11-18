@@ -6,7 +6,7 @@ provisional, ``public/data/manifest.json``) and sends them to the household
 API it calls. An API deployed from an older commit
 refuses a measure it doesn't register ("Unknown measures: …"), so the
 Household impact tab shows an error. The example cards read
-``public/data/household_presets.json`` instead, so stale presets show the
+``src/test/fixtures/household_presets.json`` instead, so stale presets show the
 previous measures' answers without any error. Drill 5 hit both (#144).
 The household request also carries the calculator-only measures
 (``src/utils/calculatorOnlyMeasures.js``), which no manifest lists, so the
@@ -39,7 +39,7 @@ from typing import Optional
 
 from uk_budget_data.publication import manifest as m
 
-PRESETS_FILE = Path("public/data/household_presets.json")
+PRESETS_FILE = Path("src/test/fixtures/household_presets.json")
 # The measures the Household calculator adds to every request
 CALCULATOR_ONLY_FILE = Path("src/utils/calculatorOnlyMeasures.js")
 HOUSEHOLD_IMPACT_ROUTE = "/api/household-impact"

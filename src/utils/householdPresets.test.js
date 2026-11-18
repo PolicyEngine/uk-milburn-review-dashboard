@@ -13,7 +13,7 @@ import { IDENTITY_FIELDS } from "./publication/definitions";
 vi.mock("./calculatorOnlyMeasures", async (original) => (await import("../test/calculatorOnlyFixture")).mockCalculatorOnly(await original()));
 
 
-const committed = JSON.parse(readFileSync("public/data/household_presets.json", "utf8"));
+const committed = JSON.parse(readFileSync("src/test/fixtures/household_presets.json", "utf8"));
 // What the receipts approved for each of the file's measures (synthetic),
 // and the file recording them, as the precompute writes them (#136): the
 // page uses its answers only then. The committed file's own are checked
@@ -27,7 +27,7 @@ const lock = readFileSync("uv.lock", "utf8");
 /** A package's version in uv.lock. */
 const locked = (name) => lock.match(new RegExp(`\\[\\[package\\]\\]\\nname = "${name}"\\nversion = "([^"]+)"`))?.[1];
 
-describe("the examples' precomputed results (public/data/household_presets.json)", () => {
+describe("the examples' precomputed results (src/test/fixtures/household_presets.json)", () => {
   it("cover every example in every year a reader can choose, with every measure", () => {
     expect(file.years).toEqual([...SELECTABLE_YEARS]);
     expect(file.policies.length).toBeGreaterThan(0);
@@ -74,7 +74,7 @@ describe("the examples' precomputed results (public/data/household_presets.json)
     }
   });
 
-  // Skipped: public/data/household_presets.json holds the Autumn Budget
+  // Skipped: src/test/fixtures/household_presets.json holds the Autumn Budget
   // examples' answers on the bundle's policyengine-uk, while uv.lock now
   // overrides the engine to 2.177.7 for the Milburn local build
   // (docs/milburn-local-run.md). The presets cannot be re-run on this build

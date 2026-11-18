@@ -4,7 +4,7 @@
  * start from.
  *
  * The examples do not take the form's defaults (WIZARD_DEFAULTS) or any
- * prefill: their results are precomputed (public/data/household_presets.json,
+ * prefill: their results are precomputed (src/test/fixtures/household_presets.json,
  * keyed by the exact request), so an example whose request moved with a
  * default, or with a prefill such as the rent, would no longer match its
  * precomputed answer and its card would fall back to "Calculated when

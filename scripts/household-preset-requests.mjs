@@ -2,7 +2,7 @@
 // builds them: each example over the form's defaults, with every measure
 // selected, for each year a reader can choose. Prints JSON to stdout for
 // scripts/precompute_household_presets.py, which runs them and writes
-// public/data/household_presets.json.
+// src/test/fixtures/household_presets.json (a test fixture, not served).
 //
 //   bun scripts/household-preset-requests.mjs > requests.json
 import { readFileSync } from "node:fs";

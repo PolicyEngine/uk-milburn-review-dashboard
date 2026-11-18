@@ -4,9 +4,10 @@
 Reads the requests the page builds for its example households
 (scripts/household-preset-requests.mjs), runs each through the household
 API's own validation and calculation (no server, no dataset), and writes
-public/data/household_presets.json. The page shows these answers at once
-when an example is chosen with the default measures; anything else goes to
-the live API.
+src/test/fixtures/household_presets.json, a test fixture of the Budget
+calculator's tests (not served: the Milburn route has no reader for it).
+The Budget page showed these answers at once when an example was chosen
+with the default measures; anything else went to the live API.
 
     bun scripts/household-preset-requests.mjs > /tmp/requests.json
     uv run python scripts/precompute_household_presets.py /tmp/requests.json
@@ -28,7 +29,7 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import date
 from pathlib import Path
 
-OUT = Path("public/data/household_presets.json")
+OUT = Path("src/test/fixtures/household_presets.json")
 PUBLISHED = json.loads(Path("public/data/policy_parameters.json").read_text())["measures"]
 
 

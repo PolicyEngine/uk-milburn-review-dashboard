@@ -165,9 +165,6 @@ def relativise():
 # data/living_standards_outlook.json (Poverty), data/policy_parameters.json
 # (Measures), data/milburn_*.json and six files in each run's folder.
 SKIP_PUBLISHED = (
-    # The Budget's household presets: a test of the household calculator
-    # reads them (src/components/personal/AcrossEarnings.test.jsx)
-    "data/household_presets.json",
     # Written for every run, drawn nowhere on this route; no longer copied
     # into public/ (scripts/milburn_rerun_all.sh), skipped if they are
     "data/milburn/*/income_curve.csv",

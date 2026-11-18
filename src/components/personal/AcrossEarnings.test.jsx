@@ -8,7 +8,7 @@ import { AcrossEarnings } from "./SingleYearResults";
 import { normaliseHouseholdImpact } from "../../utils/householdImpactApi";
 
 // A real answer with both cards' parts: the middle earner who lets a flat, 2027-28
-const file = JSON.parse(readFileSync(join(fileURLToPath(import.meta.url), "..", "..", "..", "..", "public", "data", "household_presets.json"), "utf8"));
+const file = JSON.parse(readFileSync(join(fileURLToPath(import.meta.url), "..", "..", "..", "test", "fixtures", "household_presets.json"), "utf8"));
 const answer = (id, year = 2027) =>
   normaliseHouseholdImpact(file.entries.find((entry) => entry.preset_id === id && entry.year === year).response);
 
