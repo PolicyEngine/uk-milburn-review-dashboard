@@ -52,7 +52,7 @@ export const MILBURN_SELECTOR_SUMMARIES = Object.freeze({
   milburn_report_youth_allowance_independent: "The 25-and-over UC rate for under-25s with housing costs, from April 2029",
   milburn_report_employer_nics_threshold: "Employers pay NI above £10,000, not £5,000; the end state from April 2027 (assumed)",
   milburn_report_employer_nics_threshold_glide_path: "Assumed steps: £6,000 in 2027-28, rising £1,000 a year to £10,000",
-  milburn_report_youth_allowance_work_allowance: "Under-25 UC claims get the work allowance claims with a child or health condition get today; the amount is our assumption, from April 2029",
+  milburn_report_youth_allowance_work_allowance: "Every under-25 UC claim gets the current work allowance (our assumed amount), from April 2029",
   milburn_report_youth_allowance_work_allowance_15h: "15 hours a week at the minimum wage, about £900 a month in 2029-30 (our assumption)",
   milburn_report_employer_nics_threshold_all_sectors: "The £10,000 end state in every sector, an upper bound (para 270 says to consider extending it), from April 2027 (assumed)",
   milburn_report_youth_allowance_combined: "The higher rate and the work allowance run together, our design, from April 2029",

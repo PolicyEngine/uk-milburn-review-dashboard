@@ -381,7 +381,7 @@ describe("headline tiles", () => {
     expect(poverty.textContent).not.toMatch(/Static|upper bound/);
     expect(poverty.querySelector("details[data-notes] > summary").textContent).toBe("Notes and caveats");
     expect(poverty.querySelector("details[data-notes]").textContent).toContain(ROUNDING_NOTE);
-    expect(ROUNDING_NOTE).toBe("Counts rounded to the nearest thousand.");
+    expect(ROUNDING_NOTE).toBe("Counts rounded to the nearest thousand; figures may not sum due to rounding.");
     expect(poverty.querySelector(".milburn-key-heading [data-source-kind]")).toBeNull();
     expect(poverty.querySelector(".milburn-key-heading .milburn-status-chip:not([data-year-only])")).toBeNull();
     // Its figures follow the year selector: no year-only chip

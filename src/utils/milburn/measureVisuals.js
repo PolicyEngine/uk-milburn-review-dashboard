@@ -59,6 +59,10 @@ export const MILBURN_RATES = Object.freeze({
   workAllowance: { withHousing: 441.94, withoutHousing: 734.85 },
   // An hour, aged 21 and over
   minimumWage: 13.21,
+  // The same in 2029-30, when the report's work allowance would start
+  // (gov/hmrc/minimum_wage/non_apprentice at 21, policyengine-uk 2.177.7):
+  // the 15-hour card is drawn at it, as the run uses that year's rate
+  minimumWage2029: 13.85,
   employerNics: { rate: 0.15, zeroRateBelowAge: 21, apprenticeZeroRateBelowAge: 25, upperSecondaryThreshold: 50270, secondaryThreshold: 5000 },
 });
 
@@ -341,8 +345,10 @@ function workAllowanceView(visual, name) {
 function workAllowanceHoursView(visual, name) {
   const hours = visual.hours;
   if (!(Number.isInteger(hours) && hours >= 1 && hours <= 48)) return null;
-  const when = ratesYearText(visual);
-  const { minimumWage } = MILBURN_RATES;
+  // At 2029-30's minimum wage, the year the run's allowance starts, so the
+  // card matches "about £900 a month in 2029-30"
+  const when = "2029-30";
+  const minimumWage = MILBURN_RATES.minimumWage2029;
   const monthly = (hours * minimumWage * 52) / 12;
   const { withoutHousing } = MILBURN_RATES.workAllowance;
   if (!(monthly > 0)) return null;

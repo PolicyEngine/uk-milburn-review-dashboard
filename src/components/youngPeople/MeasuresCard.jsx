@@ -435,7 +435,7 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
           <NoEffectList
             items={noEffectItems}
             title={`No effect in ${yearLabel}`}
-            info={MEASURES_INFO}
+            info={parts.length ? MEASURES_INFO : { ...MEASURES_INFO, caveats: [] }}
           />
         </div>
       )}

@@ -46,7 +46,7 @@ export const REPLACEMENT_PARTS_NOTE =
 export const CASH_TERMS_NOTE = "Cash terms; the review’s figures are in 2026-27 prices.";
 
 /** Where a box shows counts of people: how they are rounded. */
-export const ROUNDING_NOTE = "Counts rounded to the nearest thousand.";
+export const ROUNDING_NOTE = "Counts rounded to the nearest thousand; figures may not sum due to rounding.";
 
 /**
  * The range strip's short names for its runs, by position in RANGE_IDS: what

@@ -140,7 +140,8 @@ const CHOICES = {
     label: "Sector",
     select: true,
     options: SECTOR_OPTIONS,
-    hint: () => "The employer National Insurance run applies to 21 to 24-year-olds in retail and hospitality.",
+    // The hint fits the run chosen in the header
+    hint: (answers, runId) => sectorHint(runId),
     hintAs: "tooltip",
   },
   health: { label: "Health condition limiting work-related activity", options: YES_NO, hint: () => LCWRA_HINT, hintAs: "tooltip" },
@@ -273,6 +274,19 @@ export function pipKnockOn(view) {
     return `${name} (${formatSignedPounds(part.change)}) includes ${formatSignedPounds(extra)} from Universal Credit's housing element: without PIP daily living, a young single renter is paid the shared accommodation rate.`;
   }
   return `${name} (${formatSignedPounds(part.change)}) includes ${formatSignedPounds(extra)} from changes to other benefits, besides the PIP itself.`;
+}
+
+/** What the sector does under the run chosen in the header. */
+export function sectorHint(runId) {
+  const id = String(runId ?? "");
+  if (id === "milburn_report_employer_nics_threshold_all_sectors") {
+    return "This run raises the employer threshold for 21 to 24-year-olds in every sector, so the sector does not change it.";
+  }
+  if (id.startsWith("milburn_report_employer_nics_threshold")) {
+    return "This run raises the employer threshold for 21 to 24-year-olds in retail and hospitality only.";
+  }
+  if (id === "employer_nics_zero_under_25") return "This run removes employer National Insurance for every under-25, in any sector.";
+  return "Only the employer National Insurance runs use the sector; the policy chosen does not.";
 }
 
 /**
@@ -633,7 +647,7 @@ export default function MilburnHouseholdTab({ runId = null, presets: given = und
       field = <SelectField id="rent_from" label="Rent from" options={CHOICES.rentFrom.options} value={answers.tenure} onChange={(value) => change({ tenure: value })} />;
     } else if (CHOICES[id]) {
       const config = CHOICES[id];
-      const hint = config.hint?.(answers);
+      const hint = config.hint?.(answers, run?.id);
       const Control = config.select ? SelectField : ChoiceTiles;
       field = (
         <Control
