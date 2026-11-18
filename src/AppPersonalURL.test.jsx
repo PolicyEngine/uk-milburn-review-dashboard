@@ -58,7 +58,7 @@ describe("a later snapshot keeps the reader's selection", () => {
     open("/?tab=dashboard", await serve(), calls);
     await waitFor(() => expect(chosenName()).toBeTruthy());
     expect(policies()?.split(",")).toHaveLength(1);
-    fireEvent.click(screen.getByRole("button", { name: /^Policies / }));
+    fireEvent.click(screen.getByRole("button", { name: /^Policy / }));
     expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
     expect(screen.queryByRole("button", { name: "Select all" })).toBeNull();
     const radios = screen.getAllByRole("radio");

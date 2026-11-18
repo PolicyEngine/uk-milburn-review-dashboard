@@ -48,6 +48,8 @@ function PolicySelector({ policies: providedPolicies, selectedPolicies, onPolicy
     (policy) => policy.displayable !== false,
   );
   const [isExpanded, setIsExpanded] = useState(false);
+  // One policy at a time: the pill, its name and the sheet say "Policy"
+  const word = single ? "Policy" : "Policies";
   const presence = usePresence(isExpanded);
   const dropdownRef = useRef(null);
   const toggleRef = useRef(null);
@@ -146,13 +148,13 @@ function PolicySelector({ policies: providedPolicies, selectedPolicies, onPolicy
         aria-label={
           // A faded pill says why first, even while the policies load
           inactiveReason && (loading || none)
-            ? `Policies: ${inactiveReason}`
+            ? `${word}: ${inactiveReason}`
             : loading
-            ? "Policies: loading"
+            ? `${word}: loading`
             : none
             ? `No policies yet${reason ? `: ${reason}` : ""}`
             : chosen
-            ? `Policies ${shortNameOf(chosen)}${inactiveReason ? `: ${inactiveReason}` : reason ? `: ${reason}` : ", choose one policy"}`
+            ? `${word} ${shortNameOf(chosen)}${inactiveReason ? `: ${inactiveReason}` : reason ? `: ${reason}` : ", choose one policy"}`
             : `Policies ${selectedCount === policies.length ? "All " : ""}${selectedCount}${selectedCount === policies.length ? "" : ` of ${policies.length}`} ${unit(policies.length)}${
                 inactiveReason ? `: ${inactiveReason}` : reason ? `: ${reason}` : ", choose which to include"
               }`
@@ -164,12 +166,12 @@ function PolicySelector({ policies: providedPolicies, selectedPolicies, onPolicy
         <span className="band-control-text">
           {loading ? (
             // While the publication loads: the label alone, never "0 of 0"
-            <span className="band-control-value">Policies</span>
+            <span className="band-control-value">{word}</span>
           ) : none ? (
             <span className="band-control-value">No policies yet</span>
           ) : chosen ? (
             <>
-              <span className="band-control-label">Policies</span>
+              <span className="band-control-label">{word}</span>
               {" "}
               <span className="band-control-value policy-selector-chosen">{shortNameOf(chosen)}</span>
             </>
@@ -199,8 +201,8 @@ function PolicySelector({ policies: providedPolicies, selectedPolicies, onPolicy
       {presence.mounted && (
         <div className={`policy-selector-dropdown ${popoverClass(presence.shown)}`} {...leavingProps(presence.shown)}>
           {/* The sheet's own title on a phone, where the pill is out of sight */}
-          <div className="policy-selector-sheet-title" aria-hidden="true">Policies</div>
-          <div className="policy-list" role={single ? "radiogroup" : "group"} aria-label="Policies" ref={listRef} onKeyDown={handleListKeyDown}>
+          <div className="policy-selector-sheet-title" aria-hidden="true">{word}</div>
+          <div className="policy-list" role={single ? "radiogroup" : "group"} aria-label={word} ref={listRef} onKeyDown={handleListKeyDown}>
             {/* The Milburn runs in their groups (packages, single measures,
                 comparators), each under its heading; otherwise one list */}
             {(localBuild

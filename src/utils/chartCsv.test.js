@@ -101,8 +101,8 @@ describe("years not yet published", () => {
     ];
     const rows = lines(revenueCsv(data, ["Measure A"]));
     expect(rows.slice(2)).toEqual([
-      "Fiscal year,Measure A,Net change",
-      "2030-31,1.5,1.5",
+      "Fiscal year,Measure A",
+      "2030-31,1.5",
       "# 2031-32: Not yet published",
     ]);
   });
@@ -124,8 +124,11 @@ describe("years not yet published", () => {
 it("uses published CSV headings while reading namespaced measure keys", () => {
   const policy = { seriesKey: "measure:synthetic", label: "netImpact" };
   const revenue = revenueCsv([{ year: 2029, [policy.seriesKey]: 2, netImpact: 2, unpublished: false }], [policy]);
-  expect(revenue).toContain("Fiscal year,netImpact,Net change");
-  expect(revenue).toContain("2029-30,2,2");
+  // One policy: its own column, no net column repeating it
+  expect(revenue).toContain("Fiscal year,netImpact\r\n");
+  expect(revenue).toContain("2029-30,2\r\n");
+  expect(revenue).toContain("# Exchequer impact of the selected policy");
+  expect(revenue).toContain("a positive figure is a saving to the Exchequer");
   const decile = decileCsv([{ decile: "1st", [policy.seriesKey]: 2, netChange: 2 }], [policy], { kind: "relative", year: 2029 });
   expect(decile).toContain("Income decile,netImpact,Net change");
   expect(decile).toContain("1,2,2");

@@ -124,9 +124,9 @@ export function measureOrder(data, catalogue) {
 }
 
 // Chart metadata for export
-const CHART_TITLE = "Revenue impact";
+export const CHART_TITLE = "Exchequer impact, by year";
 const CHART_DESCRIPTION =
-  `Change in government revenue each year, £bn. Above zero raises revenue; below zero costs the government.`;
+  `The change in the Exchequer's position each year, £bn. Above zero is a saving to the Exchequer; below zero is a cost.`;
 
 // The card's "About this chart"
 // The net line's gap from a run of all the policies together: interactions
@@ -279,7 +279,7 @@ function BudgetaryImpactChart({ data, selectedYear, selectedPolicies = [] }) {
         <div>
           <h3>
             <TitleIcon name="landmark" />
-            <span className="title-text">Revenue impact</span>
+            <span className="title-text">{CHART_TITLE}</span>
           </h3>
           {/* One plain sentence for the selected year; what the chart
               measures is in About this chart */}
@@ -295,7 +295,7 @@ function BudgetaryImpactChart({ data, selectedYear, selectedPolicies = [] }) {
         {noRevenue ? (
           <div className="plot-empty" style={{ minHeight: 240 }} role="status">
             <p>
-              {selectedPolicies.length === 1 ? "The selected policy changes no revenue" : "None of the selected policies changes revenue"} in {yearSpan}.
+              {selectedPolicies.length === 1 ? "The selected policy makes no difference to the Exchequer" : "None of the selected policies makes a difference to the Exchequer"} in {yearSpan}.
               {outOfYears.length > 0 && ` ${outOfYears.join("; ")}.`}
             </p>
           </div>

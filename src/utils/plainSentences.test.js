@@ -34,11 +34,11 @@ describe("plain card sentences", () => {
   });
 
   it("puts the revenue for the selected year in words", () => {
-    expect(revenueSentence(4.26, "2027-28")).toBe("In 2027-28, the selected policies raise £4.3 billion for the government.");
-    expect(revenueSentence(-0.42, "2027-28")).toBe("In 2027-28, the selected policies cost the government £420 million.");
+    expect(revenueSentence(4.26, "2027-28")).toBe("In 2027-28, the selected policies save the Exchequer £4.26bn.");
+    expect(revenueSentence(-0.42, "2027-28")).toBe("In 2027-28, the selected policies cost the Exchequer £0.42bn.");
     expect(revenueSentence(null, "2027-28")).toBeNull();
     // A measure not in force that year changes nothing: not "roughly balance"
-    expect(revenueSentence(0, "2027-28")).toBe("In 2027-28, the selected policies change no revenue.");
+    expect(revenueSentence(0, "2027-28")).toBe("In 2027-28, the selected policies make no difference to the Exchequer.");
     expect(revenueSentence(0.02, "2027-28")).toMatch(/roughly balance/);
   });
 
@@ -257,7 +257,7 @@ describe("plain card sentences", () => {
 
   it("never names a later revenue year than one whose own sentence already shows the turn", () => {
     const net = fc.oneof(fc.integer({ min: -30, max: 30 }).map((n) => n / 100), fc.integer({ min: -100, max: 100 }).map((n) => n / 10));
-    const says = (sentence) => (/change no revenue|roughly balance/.test(sentence) ? "none" : /raise/.test(sentence) ? "gain" : "loss");
+    const says = (sentence) => (/no difference|roughly balance/.test(sentence) ? "none" : /save/.test(sentence) ? "gain" : "loss");
     fc.assert(
       fc.property(net, fc.array(net, { maxLength: LABELS.length }), (selected, values) => {
         const later = values.map((value, index) => ({ yearLabel: LABELS[index], net: value }));
@@ -268,9 +268,9 @@ describe("plain card sentences", () => {
         const note = laterRevenueNote(selected, later);
         expect(note !== null).toBe(years.some(clearTurn));
         if (note === null) return;
-        const m = note.match(/^Later years differ: in (\S+), the selected policies (raise|cost) revenue\.$/);
+        const m = note.match(/^Later years differ: in (\S+), the selected policies (save|cost) the Exchequer money\.$/);
         expect(m).not.toBeNull();
-        const dir = m[2] === "raise" ? "gain" : "loss";
+        const dir = m[2] === "save" ? "gain" : "loss";
         const at = years.findIndex(({ yearLabel }) => yearLabel === m[1]);
         expect(dir).not.toBe(was);
         expect(years[at].says).toBe(dir);
@@ -301,18 +301,18 @@ describe("plain card sentences", () => {
       { yearLabel: "2029-30", net: null },
       { yearLabel: "2030-31", net: 3.2 },
     ];
-    expect(laterRevenueNote(-8.9, later)).toBe("Later years differ: in 2030-31, the selected policies raise revenue.");
+    expect(laterRevenueNote(-8.9, later)).toBe("Later years differ: in 2030-31, the selected policies save the Exchequer money.");
     expect(laterRevenueNote(4.3, [{ yearLabel: "2031-32", net: -1.2 }])).toBe(
-      "Later years differ: in 2031-32, the selected policies cost revenue.",
+      "Later years differ: in 2031-32, the selected policies cost the Exchequer money.",
     );
     // From roughly balancing to a clear effect (at least £0.1bn) by 2031-32,
     // named from 2029-30, whose own sentence already says they raise £60m
-    expect(revenueSentence(0.06, "2029-30")).toBe("In 2029-30, the selected policies raise £60 million for the government.");
+    expect(revenueSentence(0.06, "2029-30")).toBe("In 2029-30, the selected policies save the Exchequer £0.06bn.");
     expect(laterRevenueNote(0.02, [{ yearLabel: "2029-30", net: 0.06 }, { yearLabel: "2031-32", net: 3.77 }])).toBe(
-      "Later years differ: in 2029-30, the selected policies raise revenue.",
+      "Later years differ: in 2029-30, the selected policies save the Exchequer money.",
     );
     expect(laterRevenueNote(-0.01, [{ yearLabel: "2031-32", net: -0.1 }])).toBe(
-      "Later years differ: in 2031-32, the selected policies cost revenue.",
+      "Later years differ: in 2031-32, the selected policies cost the Exchequer money.",
     );
   });
 
@@ -331,12 +331,12 @@ describe("plain card sentences", () => {
 });
 
 describe("the revenue sentence's rounding", () => {
-  it("rounds as the chart's labels and tooltip do (£m to the nearest £5m, £bn to one decimal)", async () => {
+  it("gives £bn to two decimals, as the page's £X.XXbn format", async () => {
     const { revenueSentence } = await import("./plainSentences");
     const { formatBnOrM } = await import("./moneyFormat");
-    expect(revenueSentence(-0.6172, "2027-28")).toBe("In 2027-28, the selected policies cost the government £615 million.");
+    expect(revenueSentence(-0.6172, "2027-28")).toBe("In 2027-28, the selected policies cost the Exchequer £0.62bn.");
     expect(formatBnOrM(-0.6172)).toBe("−£615m");
-    expect(revenueSentence(2.36, "2028-29")).toBe("In 2028-29, the selected policies raise £2.4 billion for the government.");
+    expect(revenueSentence(2.36, "2028-29")).toBe("In 2028-29, the selected policies save the Exchequer £2.36bn.");
   });
 });
 
@@ -347,16 +347,16 @@ describe("the revenue sentence with one policy selected", () => {
 
   it("names it, in quotes, with a singular verb", () => {
     expect(revenueSentence(-0.88, "2029-30", one)).toBe(
-      "In 2029-30, “Work allowance for under-25s in work (illustrative)” costs the government £880 million.",
+      "In 2029-30, “Work allowance for under-25s in work (illustrative)” costs the Exchequer £0.88bn.",
     );
     expect(revenueSentence(3.1, "2029-30", one)).toBe(
-      "In 2029-30, “Work allowance for under-25s in work (illustrative)” raises £3.1 billion for the government.",
+      "In 2029-30, “Work allowance for under-25s in work (illustrative)” saves the Exchequer £3.10bn.",
     );
-    expect(revenueSentence(0, "2029-30", one)).toBe("In 2029-30, “Work allowance for under-25s in work (illustrative)” changes no revenue.");
+    expect(revenueSentence(0, "2029-30", one)).toBe("In 2029-30, “Work allowance for under-25s in work (illustrative)” makes no difference to the Exchequer.");
     expect(revenueSentence(0.02, "2029-30", one)).toBe(
-      "In 2029-30, “Work allowance for under-25s in work (illustrative)” roughly balances: it neither raises nor costs much revenue.",
+      "In 2029-30, “Work allowance for under-25s in work (illustrative)” roughly balances: it neither saves nor costs the Exchequer much.",
     );
-    expect(laterRevenueNote(-2, [{ yearLabel: "2031-32", net: 1.2 }], one)).toBe("Later years differ: in 2031-32, it raises revenue.");
+    expect(laterRevenueNote(-2, [{ yearLabel: "2031-32", net: 1.2 }], one)).toBe("Later years differ: in 2031-32, it saves the Exchequer money.");
   });
 
   it("never says 'the selected policies' for any run the selector offers", () => {

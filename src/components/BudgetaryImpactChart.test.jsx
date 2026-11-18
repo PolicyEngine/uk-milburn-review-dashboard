@@ -53,7 +53,7 @@ describe("BudgetaryImpactChart", () => {
     const { container } = render(
       <MeasureCatalogueProvider catalogue={catalogue}><BudgetaryImpactChart data={zero} selectedYear={YEAR} selectedPolicies={[ALPHA]} /></MeasureCatalogueProvider>,
     );
-    expect(screen.getByRole("status")).toHaveTextContent("The selected policy changes no revenue in");
+    expect(screen.getByRole("status")).toHaveTextContent("The selected policy makes no difference to the Exchequer in");
     // Only the selection's reasons: an unselected measure is never named
     expect(screen.getByRole("status")).not.toHaveTextContent(catalogue.byId.get(BETA).name);
     expect(screen.queryByTestId("recharts-responsive-container")).not.toBeInTheDocument();
@@ -146,7 +146,7 @@ describe("BudgetaryImpactChart", () => {
       </MeasureCatalogueProvider>,
     );
     expect(view.container.querySelector(".later-years-note")).toHaveTextContent(
-      `Later years differ: in ${YEAR + 1}-${String(YEAR + 2).slice(-2)}, the selected policies raise revenue.`,
+      `Later years differ: in ${YEAR + 1}-${String(YEAR + 2).slice(-2)}, the selected policies save the Exchequer money.`,
     );
     view.unmount();
     // No turn after the year shown: no pointer

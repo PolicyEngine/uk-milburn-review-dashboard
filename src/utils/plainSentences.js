@@ -68,22 +68,24 @@ export function selectionSubject(names) {
 /** A verb in the subject's number: "raise" for "the selected policies", "raises" for one. */
 export const verbFor = (subject, verb) => (subject.plural ? verb : `${verb}s`);
 
-/** The revenue chart's line for the selected year; null without a figure. */
+/**
+ * The Exchequer chart's line for the selected year, in £X.XXbn: "In
+ * 2029-30, “X” saves the Exchequer £4.67bn." or "… costs the Exchequer
+ * £0.22bn."; null without a figure. A positive net is a saving.
+ */
 export function revenueSentence(net, yearLabel, subject = selectionSubject()) {
   if (net == null || !Number.isFinite(net)) return null;
-  // The chart's own rounding (moneyFormat: £m to the nearest £5m under
-  // £1bn, £bn to one decimal), in words, so text and tooltip agree
-  const bn = formatBnOrM(Math.abs(net)).replace(/m$/, " million").replace(/bn$/, " billion");
+  const bn = `£${Math.abs(net).toFixed(2)}bn`;
   const who = subject.text;
   const v = (verb) => verbFor(subject, verb);
   // Exactly nothing (a measure not in force that year) is not "roughly balance"
-  if (Math.abs(net) < 0.0005) return `In ${yearLabel}, ${who} ${v("change")} no revenue.`;
+  if (Math.abs(net) < 0.0005) return `In ${yearLabel}, ${who} ${v("make")} no difference to the Exchequer.`;
   if (Math.abs(net) < 0.05) {
-    return `In ${yearLabel}, ${who} roughly ${v("balance")}: ${subject.pronoun} neither ${subject.plural ? "raise" : "raises"} nor ${subject.plural ? "cost" : "costs"} much revenue.`;
+    return `In ${yearLabel}, ${who} roughly ${v("balance")}: ${subject.pronoun} neither ${subject.plural ? "save" : "saves"} nor ${subject.plural ? "cost" : "costs"} the Exchequer much.`;
   }
   return net > 0
-    ? `In ${yearLabel}, ${who} ${v("raise")} ${bn} for the government.`
-    : `In ${yearLabel}, ${who} ${v("cost")} the government ${bn}.`;
+    ? `In ${yearLabel}, ${who} ${v("save")} the Exchequer ${bn}.`
+    : `In ${yearLabel}, ${who} ${v("cost")} the Exchequer ${bn}.`;
 }
 
 // "Later years differ" (ideas issue, 27 October): a short pointer when a
@@ -206,8 +208,8 @@ export function laterDecileNote(selected, later, kind, { standalone = false } = 
 }
 
 const REVENUE_WORDS = {
-  gain: "raise revenue",
-  loss: "cost revenue",
+  gain: "save the Exchequer money",
+  loss: "cost the Exchequer money",
 };
 
 /** Revenue within the revenue sentence's "roughly balance" band reads as none. */
@@ -230,7 +232,9 @@ export function laterRevenueNote(net, later, subject = selectionSubject()) {
   const turn = firstShownTurn({ net: revenueRounded(net) }, points, revenueRounded, CLEAR_REVENUE_CHANGE);
   if (!turn) return null;
   // One policy, named in the sentence before: "it raises revenue"
-  const [verb, rest] = REVENUE_WORDS[turn.turns.net].split(" ");
+  const words = REVENUE_WORDS[turn.turns.net];
+  const verb = words.slice(0, words.indexOf(" "));
+  const rest = words.slice(words.indexOf(" ") + 1);
   const who = subject.plural ? subject.text : subject.pronoun;
   return `Later years differ: in ${turn.point.yearLabel}, ${who} ${verbFor(subject, verb)} ${rest}.`;
 }

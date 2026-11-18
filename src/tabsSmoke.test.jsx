@@ -104,7 +104,7 @@ const LOADED = {
   ...(POVERTY_FIGURES_SHOWN
     ? { poverty: (panel) => within(panel).findAllByRole("heading", { name: /Change in the poverty rate/ }) }
     : { povertyFallback: (panel) => within(panel).findAllByText(/Results by age are not available/) }),
-  finances: (panel) => within(panel).findAllByRole("heading", { name: /Revenue impact/ }),
+  finances: (panel) => within(panel).findAllByRole("heading", { name: /Exchequer impact, by year/ }),
   // Population impact's Young people sub-tab (?sub=young): the cards
   // render once age_impact.csv is read.
   // Young people and Pensioners read the age table from verified artifacts;

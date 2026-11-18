@@ -72,14 +72,15 @@ const policyColumn = (policy, decimals) => ({
 });
 
 export function revenueCsv(data, policyNames) {
+  // One policy: its own column, with no net column repeating it
+  const one = policyNames.length === 1;
   return buildChartCsv({
-    title: "Revenue impact of the selected policies",
-    units:
-      "£ billion per fiscal year; positive values are revenue for the Government, negative values are costs",
+    title: `Exchequer impact of the selected ${one ? "policy" : "policies"}`,
+    units: "£ billion per fiscal year; a positive figure is a saving to the Exchequer, a negative one a cost",
     columns: [
       { key: "fiscal_year", label: "Fiscal year" },
       ...policyNames.map((policy) => policyColumn(policy, 4)),
-      { key: "netImpact", label: "Net change", decimals: 4 },
+      ...(one ? [] : [{ key: "netImpact", label: "Net change", decimals: 4 }]),
     ],
     // A year not yet published is a note, never a row of zeros
     rows: data

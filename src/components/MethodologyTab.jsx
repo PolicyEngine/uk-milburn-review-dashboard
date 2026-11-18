@@ -381,7 +381,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
           <Topic id={METHOD_ANCHORS.publicFinances} title="Public finances" preview="Net effect on revenue and spending, by year">
             <p className="method-more">
               The change in government revenue less the change in spending on benefits, from the static model, by
-              fiscal year. A positive figure is a gain to the Exchequer.{" "}
+              fiscal year. A positive figure is a saving to the Exchequer.{" "}
               {published ? (
                 <>
                   The review&apos;s <AnnexLink />{" "}
@@ -489,7 +489,7 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
                   : []),
                 [
                   "Entry cases",
-                  "One young person moving into work for 16 or 25 hours a week at a given wage: their household's gain and the gain to the Exchequer, from household calculations.",
+                  "One young person moving into work for 16 or 25 hours a week at a given wage: their household's gain and the saving to the Exchequer, from household calculations.",
                 ],
                 [
                   "Break-even",
