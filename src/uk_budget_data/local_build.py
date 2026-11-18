@@ -58,13 +58,15 @@ LABEL = (
     f"build {BUILD_SHORT}, policyengine-uk {ENGINE['policyengine-uk']}, "
     f"certified in policyengine {POLICYENGINE_RELEASE}"
 )
-# Where the build lives on this machine; MILBURN_DATASET overrides it (the
-# file must still have the build's SHA-256).
+# Where the build file is read from: MILBURN_DATASET, else the documented
+# default under the user's home directory (docs/milburn-local-run.md says
+# how to fetch it there). Either way the file must have the build's SHA-256.
 DATASET_ENV = "MILBURN_DATASET"
-DEFAULT_DATASET = Path(
-    "/Users/vahid/data/microcosm/releases/microcosm-uk-2024-25-national/"
+DATASET_RELATIVE = (
+    "releases/microcosm-uk-2024-25-national/"
     f"{BUILD_ID}/microcosm_uk_2024_25.h5"
 )
+DEFAULT_DATASET = Path.home() / "data" / "microcosm" / DATASET_RELATIVE
 # Tests only: lets the plumbing run on the invented synthetic dataset
 # (uk_budget_data.synthetic_dataset), whose receipts are never certified.
 # Never set it for a real run.
@@ -129,8 +131,10 @@ def check_dataset(path=None) -> Path:
     if not path.is_file():
         raise LocalBuildError(
             f"{path} not found: the Milburn dashboard runs on Microcosm "
-            f"build {BUILD_ID} (set {DATASET_ENV} to its "
-            "microcosm_uk_2024_25.h5)."
+            f"build {BUILD_ID}. Set {DATASET_ENV} to its "
+            "microcosm_uk_2024_25.h5, or fetch it to the default "
+            f"({DEFAULT_DATASET}) with the command in "
+            "docs/milburn-local-run.md."
         )
     actual = file_sha256(path)
     if actual != DATASET_SHA256:

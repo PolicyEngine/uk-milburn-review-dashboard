@@ -165,7 +165,7 @@ is described as "not done" (`docs/milburn-local-run.md:64-68`).
 | `NEXT_PUBLIC_BASE_PATH` | build | Leave unset (`/uk/milburn-review`). |
 | `NEXT_PUBLIC_MOCK` | build | Must be unset in production. |
 | `HUGGING_FACE_TOKEN` | data runs, CI | Path A only. On the local build the token must be **absent** from the shell (`docs/milburn-local-run.md`). |
-| `MILBURN_DATASET` | data runs | Optional path to the build file; default is under `/Users/vahid/data/microcosm/...` (`local_build.py`), so the re-run happens on that machine unless the file is copied. |
+| `MILBURN_DATASET` | data runs | Optional path to the build file; default is `~/data/microcosm/releases/...` (`local_build.py`, `docs/milburn-local-run.md` fetches it there); a missing file fails with an error naming both. |
 | `MILBURN_ALLOW_TEST_DATASET` | never | Must not be set for a real run. |
 
 ### 2.3 Steps to a public deploy

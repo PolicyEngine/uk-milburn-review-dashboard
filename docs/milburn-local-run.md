@@ -26,6 +26,13 @@ data build the review uses.
 | Bundle | policyengine 6.20.2, whose UK data release certifies this build |
 | Label carried into outputs | `build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2` |
 
+Version labels: runs made before the final report was published
+record `certified in policyengine 6.20.1` in their `model_build.json`, and
+later runs `6.20.2`. Both bundles pin the same engine (policyengine-uk
+2.177.7, policyengine-core 3.34.10) and certify the same build fcfac709
+(same SHA-256), so the figures are comparable; only the bundle's release
+number differs.
+
 Fetch the file once (it reads the Hugging Face CLI token; nothing is printed):
 
 ```bash
@@ -34,7 +41,7 @@ import shutil; from pathlib import Path
 from huggingface_hub import hf_hub_download
 path = "releases/microcosm-uk-2024-25-national/uk-frs-calibration-attempt-20261115T104657Z-fcfac709/microcosm_uk_2024_25.h5"
 f = hf_hub_download("policyengine/populace-uk-private", path, repo_type="dataset", revision="ad84c0602ed28f694ef52662eb9b063779e4e923")
-dest = Path("/Users/vahid/data/microcosm") / path; dest.parent.mkdir(parents=True, exist_ok=True); shutil.copy2(f, dest)
+dest = Path.home() / "data" / "microcosm" / path; dest.parent.mkdir(parents=True, exist_ok=True); shutil.copy2(f, dest)
 PY
 ```
 `src/uk_budget_data/local_build.py` holds the build id, hash, engine and
@@ -42,9 +49,11 @@ label, and every national simulation goes through it
 (`pipeline.build_microsimulation`):
 
 - it refuses any other policyengine-uk or policyengine-core version;
-- it refuses any file whose SHA-256 is not the build's (the default path is
-  `/Users/vahid/data/microcosm/releases/microcosm-uk-2024-25-national/<build>/microcosm_uk_2024_25.h5`;
-  `MILBURN_DATASET` points elsewhere, with the same hash);
+- it reads the file from `MILBURN_DATASET` if set, else from
+  `~/data/microcosm/releases/microcosm-uk-2024-25-national/<build>/microcosm_uk_2024_25.h5`
+  (where the command above puts it); a missing file fails with an error
+  naming both;
+- it refuses any file whose SHA-256 is not the build's;
 - it never loads the bundle's eeb6093e dataset: the living standards
   projections, which only run on the bundle's dataset, refuse on this
   engine;

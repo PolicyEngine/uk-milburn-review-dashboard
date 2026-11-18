@@ -1,5 +1,15 @@
 # Milburn review: pre-publication analysis (draft, 15 November 2026)
 
+> **Historical.** This note was written before the final report, on the
+> uncertified Microcosm build 6f918b81, with the pre-report packages, 2027-28
+> start dates and the netted average loss. None of its figures is current.
+> The dashboard now runs on build fcfac709 (policyengine 6.20.1 and 6.20.2,
+> same engine and data; see docs/milburn-local-run.md) with the report's
+> measures from April 2029; current figures are in
+> `public/data/milburn_summary.json` and `public/data/milburn/<run>/`, and the
+> design choices in `src/uk_budget_data/budget_measures/milburn_design.py`.
+> Kept as a record of the pre-publication analysis.
+
 Internal working note. Not for publication: figures come from a local build
 (Microcosm build 6f918b81, policyengine-uk 2.177.7, not in a policyengine.py
 release) and will be re-run on the report's actual proposals on 17 November.
