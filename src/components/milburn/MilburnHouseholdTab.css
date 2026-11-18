@@ -57,3 +57,12 @@
   line-height: 1.5;
   color: var(--c-axis-title);
 }
+
+/* Long labels ("With parents", "Own outright") get room: padding inside
+   each tile, and a second line rather than touching the borders */
+.milburn-household .choice-segmented .choice-tile {
+  padding: 4px 10px;
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
+}
