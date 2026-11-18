@@ -39,6 +39,7 @@ import { METHOD_ANCHORS } from "./methodology/anchors";
 import { shortNameOf } from "../utils/policyDetails";
 import { selectionSubject, verbFor } from "../utils/plainSentences";
 import MeasureEffectsView, { EFFECT_VIEWS, yearEffects } from "./MeasureEffectsView";
+import { WITHHELD_DETAIL, WITHHELD_LABEL, isWithheldCell, withheldFor } from "../utils/withheld";
 
 // The dashboard's bar style: each bar rounds its end away from zero (chartTheme)
 const VALUE_BAR_SHAPE = barShape(["value"]);
@@ -452,8 +453,38 @@ export function metricByYear(rows, run, metric, years = DISPLAY_YEARS) {
       (candidate) => candidate.reform_id === run && Number(candidate.year) === year,
     );
     const value = metricValue(row, metric.key);
-    return { year, value: value === null ? null : value * (metric.scale ?? 1) };
+    // An empty cell in a published row: withheld by the disclosure floor
+    return { year, value: value === null ? null : value * (metric.scale ?? 1), withheld: value === null && isWithheldCell(row, metric.key) };
   });
+}
+
+/**
+ * Each withheld year's slot on a bar chart: a muted band with "Withheld"
+ * on it, in the colour tokens, so an empty slot never reads as zero.
+ */
+export function WithheldYears({ xAxisMap, yAxisMap, years }) {
+  const xAxis = xAxisMap && Object.values(xAxisMap)[0];
+  const yAxis = yAxisMap && Object.values(yAxisMap)[0];
+  if (!xAxis?.scale || !yAxis || !years?.length) return null;
+  const width = xAxis.scale.bandwidth?.() ?? 0;
+  if (!width) return null;
+  return (
+    <g className="summary-metric-withheld" data-withheld-years={years.join(",")}>
+      {years.map((year) => {
+        const x = xAxis.scale(year);
+        if (x === undefined || Number.isNaN(x)) return null;
+        const centre = x + width / 2;
+        return (
+          <g key={year}>
+            <rect x={x} y={yAxis.y} width={width} height={yAxis.height} fill={CHART_COLOURS.mutedFill} />
+            <text x={centre} y={yAxis.y + 16} textAnchor="middle" fontSize={11} fill={CHART_COLOURS.tick}>
+              Withheld
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  );
 }
 
 /**
@@ -516,10 +547,16 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
   const shown = byMeasure
     ? byMeasure.flatMap((m) => m.points).filter((point) => point.value !== null)
     : data.filter((point) => point.value !== null);
+  // The years the disclosure floor withholds: marked on the plot, never
+  // drawn as zero or counted as "does not change"
+  const withheldYears = byMeasure ? [] : data.filter((point) => point.withheld).map((point) => point.year);
   // Every shown value reads as zero at the tooltip's precision (a measure
-  // that moves no one across the poverty line): a note, not a plot of zeros
+  // that moves no one across the poverty line): a note, not a plot of
+  // zeros. A withheld year draws the chart instead, its slot marked.
   const allZero =
-    shown.length > 0 && shown.every((point) => Number(Math.abs(point.value).toFixed(metric.decimals)) === 0);
+    shown.length > 0 &&
+    withheldYears.length === 0 &&
+    shown.every((point) => Number(Math.abs(point.value).toFixed(metric.decimals)) === 0);
   // Fitted to the data: from zero when every bar has one sign, fitted to
   // each side when they go both ways, with round ticks (tightAxis)
   const { domain, ticks } = tightAxis(shown.map((point) => point.value));
@@ -569,6 +606,7 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
               { key: "value", label: metric.csvLabel ?? metric.unit, decimals: 4 },
             ],
             rows: shown.map((point) => ({ ...point, year: fiscalYearTick(point.year) })),
+            notes: withheldYears.map((year) => `${fiscalYearTick(year)}: ${WITHHELD_DETAIL}`),
           }),
     published: shown.length > 0,
   };
@@ -590,6 +628,8 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
               ) : (
                 metricSentence(metric, fiscalYearTick(selectedYear), selected.value, selectedCount, who)
               )
+            ) : selected?.withheld ? (
+              withheldFor(fiscalYearTick(selectedYear))
             ) : byMeasure ? (
               (() => {
                 const top = yearEffects(byMeasure, selectedYear, metric.decimals).rows[0];
@@ -632,9 +672,15 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
           <div className="plot-empty" style={{ minHeight: height }} role="status">
             <p>{selectedPolicies.length === 1 ? "This chart does not cover the selected policy" : "This chart covers none of the selected policies"}</p>
           </div>
+        ) : shown.length === 0 && withheldYears.length > 0 ? (
+          // Every year with a row is withheld: said as withheld, never as
+          // not yet published
+          <div className="plot-empty" style={{ minHeight: height }} role="status">
+            <p>{WITHHELD_LABEL}</p>
+          </div>
         ) : shown.length === 0 ? (
-          // On Budget day a run (the combined one last) can be named
-          // before its rows are published: say so, never draw zeros
+          // A run can be named before its rows are published: say so,
+          // never draw zeros
           <div className="plot-empty" style={{ minHeight: height }} role="status">
             <p>Not yet published for this selection</p>
           </div>
@@ -652,6 +698,7 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
               <CartesianGrid {...GRID_PROPS} />
               {/* The header-selected year, shaded as on every year chart */}
               <Customized component={<SelectedYearShade value={selectedYear} />} />
+              {withheldYears.length > 0 && <Customized component={<WithheldYears years={withheldYears} />} />}
               <XAxis
                 dataKey="year"
                 tick={TICK_STYLE}
@@ -679,7 +726,7 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
                     showPlus
                     showZero
                     grouped={false}
-                    note={(point) => (point?.value ? peopleText(point.year, point.value) : null)}
+                    note={(point) => (point?.withheld ? WITHHELD_DETAIL : point?.value ? peopleText(point.year, point.value) : null)}
                   />
                 }
               />
@@ -713,6 +760,12 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
           </ResponsiveContainer>
         )}
       </div>
+      {/* The withheld years, named under a drawn plot */}
+      {shown.length > 0 && withheldYears.length > 0 && !allZero && (
+        <p className="chart-note" data-withheld-note="">
+          {WITHHELD_LABEL}: {withheldYears.map((year) => fiscalYearTick(year)).join(", ")}.
+        </p>
+      )}
       {/* What the chart measures, in About this chart */}
       <div className="chart-footer">
         <ChartMoreInfo

@@ -122,6 +122,45 @@ describe("SummaryMetricChart", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Not yet published for this selection");
   });
 
+  it("never reads withheld years as no change: draws the chart, marks and names them", () => {
+    // As milburn_report_youth_allowance_independent's poverty rows: zero
+    // before April 2029, withheld from then
+    const run = "fuel_duty_rise_deferral";
+    const rows = [2027, 2028, 2029, 2030, 2031].map((year) => ({
+      reform_id: run,
+      year: String(year),
+      poverty_change_pp: year < 2029 ? "0.0" : "",
+    }));
+    expect(metricByYear(rows, run, SUMMARY_METRICS.poverty).find((point) => point.year === 2029).withheld).toBe(true);
+    expect(metricByYear(rows, run, SUMMARY_METRICS.poverty).find((point) => point.year === 2027).withheld).toBe(false);
+    render(
+      <SummaryMetricChart
+        metric={SUMMARY_METRICS.poverty}
+        rows={rows}
+        policies={POLICIES}
+        selectedPolicies={[run]}
+        selectedYear={2029}
+      />,
+    );
+    expect(document.body).not.toHaveTextContent("does not change the poverty rate in any year");
+    expect(document.querySelector(".chart-description")).toHaveTextContent("Withheld for 2029-30.");
+    expect(document.querySelector("[data-withheld-note]")).toHaveTextContent(/Withheld to protect survey households: 2029-30, 2030-31, 2031-32/);
+  });
+
+  it("says withheld, not not yet published, when every year with a row is withheld", () => {
+    const run = "fuel_duty_rise_deferral";
+    render(
+      <SummaryMetricChart
+        metric={SUMMARY_METRICS.poverty}
+        rows={[2027, 2028].map((year) => ({ reform_id: run, year: String(year), poverty_change_pp: "" }))}
+        policies={POLICIES}
+        selectedPolicies={[run]}
+        selectedYear={2027}
+      />,
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Withheld to protect survey households");
+  });
+
   it("says a selection changes nothing rather than drawing a plot of zeros", () => {
     render(
       <SummaryMetricChart
