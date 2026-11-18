@@ -114,7 +114,6 @@ describe("the benchmarks file", () => {
       "pip_spend_16_24",
       "uc_health_spend_16_24",
       "employer_nics_under_25",
-      "retail_hospitality_jobs_16_24",
     ]);
     for (const row of parsed.rows.filter((each) => each.estimate?.fixed)) {
       // Each is for 2025 (2025-26 rules), the published figures' own year; money in cash terms
@@ -131,10 +130,8 @@ describe("the benchmarks file", () => {
     expect(fixed("pip_spend_16_24")).toBe("£3.27bn a year");
     expect(fixed("uc_health_spend_16_24")).toBe("£1.18bn a year");
     expect(fixed("employer_nics_under_25")).toBe("£5.85bn a year");
-    // Sections G and I among employed 16-24s, as the review's 37% (paragraph 50, footnote 14)
-    expect(fixed("retail_hospitality_jobs_16_24")).toBe("29%");
     // The RF figure with no published basis, and the review's own estimates, have no PolicyEngine pair
-    for (const id of ["uc_health_no_work_requirements", "relative_poverty_review", "review_welfare_saving_2036"]) expect(parsed.rows.find((row) => row.id === id).estimate, id).toBeNull();
+    for (const id of ["uc_health_no_work_requirements", "retail_hospitality_jobs_16_24", "relative_poverty_review", "review_welfare_saving_2036"]) expect(parsed.rows.find((row) => row.id === id).estimate, id).toBeNull();
     expect(parsed.rows.find((row) => row.id === "uc_health_no_work_requirements").basis).toMatch(/^Basis not published/);
     // Our savings are kept apart, labelled as savings (or a net cost), never set against spending
     const saving = (id) => parsed.rows.find((row) => row.id === id).saving;

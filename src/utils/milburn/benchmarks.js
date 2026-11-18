@@ -188,8 +188,7 @@ export const BENCHMARK_SHORT = {
   retail_hospitality_jobs_16_24: {
     label: "16–24s' jobs in retail and hospitality",
     icon: "cart",
-    basis: "ONS, sections G and I, to 2025 (paragraph 50); ours is 26% in the run's divisions 47, 55 and 56",
-    estimateBasis: "Main job in sections G or I, ages 16 to 24, UK, 2025",
+    basis: "ONS, by industry section, to 2025 (paragraph 50)",
   },
   pip_spend_trend_16_24: {
     label: "PIP spending on 16–24s over time, the review says",

@@ -33,6 +33,7 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Optional
 
+from uk_budget_data.budget_measures import milburn_design
 from uk_budget_data.budget_measures import (
     state_pension_only_income_tax_allowance as _sp_threshold,
 )
@@ -54,10 +55,6 @@ from uk_budget_data.budget_measures.employer_ni_relief_ages_21_to_24 import (
 from uk_budget_data.budget_measures.household_energy_payment_2026 import (
     household_energy_payment_2026,
 )
-from uk_budget_data.budget_measures.pension_tax_allowance import (
-    pension_tax_allowance,
-)
-from uk_budget_data.budget_measures import milburn_design
 from uk_budget_data.budget_measures.milburn_report import (
     milburn_report_employer_nics,
     milburn_report_package_phased,
@@ -68,6 +65,9 @@ from uk_budget_data.budget_measures.milburn_report import (
 from uk_budget_data.budget_measures.milburn_variants import (
     milburn_package_phased,
     milburn_package_with_entry_25pct,
+)
+from uk_budget_data.budget_measures.pension_tax_allowance import (
+    pension_tax_allowance,
 )
 from uk_budget_data.budget_measures.pip_removed_ages_18_to_24 import (
     pip_halved_ages_18_to_24,
@@ -2273,12 +2273,12 @@ def _create_milburn_report_employer_nics_threshold() -> Reform:
 # housing costs element, the annex's proxy for living independently (para
 # 748); from April 2029; no work allowance change (the report gives no
 # amount). milburn_youth_allowance_report.py
-from uk_budget_data.budget_measures.milburn_youth_allowance_report import (  # noqa: E402
-    milburn_report_youth_allowance as _youth_allowance_independent,
-)
 from uk_budget_data.budget_measures.milburn_employer_nics_report import (  # noqa: E402
     milburn_employer_nics_report_all_sectors,
     milburn_employer_nics_report_glide_path,
+)
+from uk_budget_data.budget_measures.milburn_youth_allowance_report import (  # noqa: E402
+    milburn_report_youth_allowance as _youth_allowance_independent,
 )
 
 MILBURN_REPORT_YOUTH_ALLOWANCE_INDEPENDENT_ID = (
@@ -2359,6 +2359,8 @@ from uk_budget_data.budget_measures.milburn_child_dla_report import (  # noqa: E
 )
 from uk_budget_data.budget_measures.milburn_youth_allowance_report import (  # noqa: E402
     milburn_report_youth_allowance_work_allowance as _youth_work_allowance,
+)
+from uk_budget_data.budget_measures.milburn_youth_allowance_report import (  # noqa: E402
     milburn_report_youth_allowance_work_allowance_15h as _youth_work_allowance_15h,
 )
 

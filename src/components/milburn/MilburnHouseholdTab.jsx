@@ -696,7 +696,7 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
           yearBars={false}
           positions={false}
           subtitle={`Young people in ${FISCAL_YEAR} under current law and the report's runs. Enter your own household, or start from an example below.`}
-          yoursLead="See how the report's runs change your income. The first calculation after a quiet spell can take a minute or two."
+          yoursLead="See how the report's runs change your income. The first calculation after a quiet spell can take up to about three minutes."
           figureTip={() => `Change in net income in ${FISCAL_YEAR} from the health element and PIP removal (no replacement awards)`}
           cardExtra={(example) => {
             const summary = summarise(example.results);
