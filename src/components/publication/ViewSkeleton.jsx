@@ -22,9 +22,9 @@ import "./publication.css";
 export const SKELETON_SUB_TABS = {
   dashboard: [
     { value: "age", label: "Young people", icon: "usersRound" },
+    { value: "finances", label: "Public finances", icon: "landmark" },
     // Only while the poverty figures are shown (povertyFigures.js)
     ...(POVERTY_FIGURES_SHOWN ? [{ value: "poverty", label: "Poverty", icon: "percent" }] : []),
-    { value: "finances", label: "Public finances", icon: "landmark" },
     { value: "scenarios", label: "Moves into work (illustrative)", icon: "sliders" },
     { value: "benchmarks", label: "Benchmarks", icon: "scale" },
     // Less the sub-tabs the report-day switch hides (milburn/reportDay.js)

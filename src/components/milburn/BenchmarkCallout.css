@@ -1,193 +1,32 @@
-/* Published figures (BenchmarkCallout.jsx): a quiet strip inside a headline box */
+/* Published figures (BenchmarkCallout.jsx): one line at the foot of a
+   headline box, set like the "Notes and caveats" line above it */
 .bm-callout {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--c-grid);
-}
-
-.bm-callout-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: auto;
-  font-size: var(--fs-caption);
-  font-weight: 600;
-  color: var(--c-gain-text);
-}
-
-/* Published figures as small cards (PublishedCards): icon tile, value, title, basis, source chip */
-.pub-cards {
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
-}
-
-.pub-card {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  min-width: 0;
-  padding: 18px 18px 14px;
-  border: 1px solid var(--c-grid);
-  border-left: 3px solid var(--c-gain);
-  border-radius: 12px;
-  background: var(--c-surface);
-  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--c-grid);
+  font-size: var(--fs-small);
+  color: var(--c-gain-text);
+  font-weight: 600;
 }
 
-.pub-card:hover {
-  border-color: var(--c-gain);
-}
-
-.pub-card-icon {
+.bm-callout > span[aria-hidden] {
   display: inline-flex;
   flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--c-highlight-band);
-  color: var(--c-gain-text);
 }
 
-.pub-card-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  align-self: stretch;
+.bm-callout a {
+  color: inherit;
+  text-decoration: none;
 }
 
-.pub-card p {
-  margin: 0;
-  line-height: 1.4;
-}
-
-.pub-card-value {
-  color: var(--c-text);
-}
-
-.pub-card-value strong {
-  color: var(--c-gain-text);
-  font-size: 1.4rem;
-  letter-spacing: -0.01em;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.pub-card-qualifier {
-  font-size: var(--fs-caption);
-  color: var(--c-axis-title);
-}
-
-.pub-card-label {
-  font-size: var(--fs-small);
-  font-weight: 600;
-  color: var(--c-text);
-}
-
-.pub-card-basis {
-  font-size: var(--fs-caption);
-  line-height: 1.5;
-  color: var(--c-axis-title);
-}
-
-.pub-card p.pub-card-source {
-  display: flex;
-  min-width: 0;
-  margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px dashed var(--c-grid);
+.bm-callout a:hover {
+  text-decoration: underline;
 }
 
 .bm-callout a:focus-visible {
-  outline: 2px solid var(--c-gain-text);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-/* Folded strip: the summary row reads as a button, chevron first */
-.bm-callout-summary {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 10px;
-  padding: 8px 12px;
-  border: 1px solid var(--c-grid);
-  border-radius: 8px;
-  background: var(--c-surface);
-  cursor: pointer;
-  list-style: none;
-  font-size: var(--fs-small);
-  color: var(--c-text);
-  transition: background-color 150ms ease-out, border-color 150ms ease-out;
-}
-
-.bm-callout-summary::-webkit-details-marker {
-  display: none;
-}
-
-.bm-callout-summary:hover {
-  border-color: var(--c-gain);
-  background: var(--c-hover);
-}
-
-.bm-callout-chevron {
-  display: inline-flex;
-  flex: none;
-  color: var(--c-gain-text);
-  transition: transform 150ms ease-out;
-}
-
-.bm-callout-details[open] .bm-callout-chevron {
-  transform: rotate(90deg);
-}
-
-.bm-callout-title {
-  font-weight: 600;
-  color: var(--c-gain-text);
-}
-
-.bm-callout-details:not([open]) .bm-callout-hide,
-.bm-callout-details[open] .bm-callout-show {
-  display: none;
-}
-
-.bm-callout-hint {
-  color: var(--c-subtab-muted);
-  font-size: var(--fs-caption);
-}
-
-.bm-callout-details .bm-callout-more {
-  display: inline-flex;
-  margin-top: 12px;
-}
-
-.bm-callout-summary:focus-visible {
   outline: 2px solid var(--c-gain);
   outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bm-callout-summary,
-  .bm-callout-chevron,
-  .pub-card {
-    transition: none;
-  }
-}
-
-/* On a phone: the title may take two lines, and the source chip the card's full width under the icon */
-@media (max-width: 480px) {
-  .pub-card p.pub-card-source {
-    margin-left: -48px;
-  }
-
-  .pub-card-source .source-link-chip > span[aria-hidden]:first-child {
-    display: none;
-  }
 }

@@ -3,6 +3,9 @@ import { FloatingTooltip, TooltipRows, useFloatingTooltip } from "../FloatingToo
 import TitleIcon from "../TitleIcon";
 import { magnitudeColours } from "../../utils/chartTheme";
 import { useId, useRef } from "react";
+import ChartDownloadMenu from "../ChartDownloadMenu";
+import { buildChartCsv } from "../../utils/chartCsv";
+import { CHART_LOGO } from "../../utils/chartLogo";
 
 /**
  * The chart's text alternative (read out, not shown: the tiles above say
@@ -71,6 +74,30 @@ function waterfallRows(totals, steps, afterName = "With the policies") {
 }
 
 /**
+ * The waterfall as CSV: a row each bar, net income where it ends and the
+ * change it makes (none for the before and after totals), with `notes`
+ * after the rows.
+ */
+export function waterfallCsv(totals, steps, { title, yearLabel, afterName, notes = [] }) {
+  const rows = waterfallRows(totals, steps, afterName).map((row) => ({
+    name: row.name,
+    netIncome: row.to,
+    change: row.total ? null : row.rounded,
+  }));
+  return buildChartCsv({
+    title: `${title}, ${yearLabel}`,
+    units: "£ a year, household net income; each step's change is from where the previous bar ends",
+    columns: [
+      { key: "name", label: "Step" },
+      { key: "netIncome", label: "Net income after this step (£)", decimals: 2 },
+      { key: "change", label: "Change (£)", decimals: 2 },
+    ],
+    rows,
+    notes,
+  });
+}
+
+/**
  * Where the bars start: a round £100 below the lowest point by more than
  * the steps span, so the before and after bars stay long and each step
  * readable. Said under "About this result"; drawn as the axis's one tick.
@@ -104,6 +131,8 @@ export function waterfallScaleStart(totals, steps) {
  *   (policyDetails.js), as the table's VAT row reads it
  * @param {string} [props.title] - The panel's title
  * @param {string} [props.afterName] - The last bar's name
+ * @param {{name: string, notes?: string[]}|null} [props.download] - Offer a
+ *   Download menu: the file name, and lines for the CSV's foot
  */
 export default function NetIncomeWaterfall({
   totals,
@@ -113,6 +142,7 @@ export default function NetIncomeWaterfall({
   typeOf = null,
   title = "How each policy changes your income",
   afterName = "With the policies",
+  download = null,
 }) {
   const wrapperRef = useRef(null);
   const sentenceId = useId();
@@ -146,10 +176,25 @@ export default function NetIncomeWaterfall({
           sentence is the chart's text alternative, shown only when
           nothing changes */}
       <div className="waterfall-header">
-        <h3 className="forecast-tile-head waterfall-title">
-          <TitleIcon name="bars" className="forecast-tile-icon" />
-          <span className="forecast-tile-name">{title}</span>
-        </h3>
+        <div className="waterfall-title-row">
+          <h3 className="forecast-tile-head waterfall-title">
+            <TitleIcon name="bars" className="forecast-tile-icon" />
+            <span className="forecast-tile-name">{title}</span>
+          </h3>
+          {/* A Download menu (CSV, PNG, SVG) when the page asks for one
+              (`download`: { name, notes }), the bars as the image */}
+          {download && (
+            <ChartDownloadMenu
+              chartTitle={title}
+              download={{
+                chartRef: wrapperRef,
+                name: download.name,
+                csv: () => waterfallCsv(totals, steps, { title, yearLabel, afterName, notes: download.notes ?? [] }),
+                exportOptions: { title, logo: CHART_LOGO },
+              }}
+            />
+          )}
+        </div>
         {!noChange && fuelDuty && (
           // The fuel duty policy also moves the VAT row in the table below
           // (HH5); no line otherwise (Vahid, 28 October)

@@ -36,7 +36,7 @@ import { isLocalBuildRoute, localBuildNotice } from "./utils/milburn/localBuild"
 import LocalBuildLabel from "./components/milburn/LocalBuildLabel";
 import { milburnDefaultMeasure } from "./utils/milburn/measureGroups";
 import { DownloadContext, policiesLabel } from "./utils/downloadContext";
-import { OPEN_VIEW_EVENT } from "./utils/methodLink";
+import { MethodLink, OPEN_VIEW_EVENT } from "./utils/methodLink";
 import { lazyView, preloadViewCode } from "./utils/lazyView";
 import { trackEngagement, trackEvent, trackLinkClicks } from "./utils/analytics";
 import { createBandIntent, createSiteNavIntent, isProgrammaticScroll, LANDSCAPE_PHONE_QUERY, isTouchOnly, pointerWantsSiteNav, SITE_NAV_DWELL_MS, landAt, scrollBelowBars, scrollTopFor, settleHeadings } from "./utils/pageScroll";
@@ -99,9 +99,18 @@ function viewFallback(value) {
 // the band's pills apply to a view; the others stay in the band, faded and
 // inactive, their reason in their accessible names. Policies describes
 // every measure and Methodology is text: no pill applies to them.
-// Impact's sub-tabs (Young people, Poverty, Public finances, Return to
+// Impact's sub-tabs (Young people, Public finances, Poverty, Moves into
 // work, Benchmarks) are in PopulationImpactView. The URL values stay as
 // they were ("dashboard", "policies"); only the labels changed.
+/**
+ * Said once over every Impact sub-tab on the Milburn route (beside the
+ * header hint), not in each box: the figures are static, with no
+ * replacement payments. Its link opens Methodology's "Model and measures"
+ * (MethodologyTab's METHOD_SECTIONS.model; a test keeps the two equal).
+ */
+export const STATIC_CAVEAT_LINE = "Static estimates with no replacement payments modelled";
+export const STATIC_CAVEAT_ANCHOR = "method-model";
+
 export const VIEWS = [
   { value: "dashboard", label: "Impact", year: true, policies: true },
   // One household under current law and the report's runs, 2029-30
@@ -953,6 +962,26 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
       </p>
     );
 
+  // On the Milburn route: where to change what the charts show (Vahid, 18 Nov)
+  const headerHint = catalogue.localBuild && (
+    <p className="milburn-header-hint" data-header-hint="">
+      <TitleIcon name="layers" bare size={14} />
+      <span>
+        Choose the <strong>policies</strong> and the <strong>year</strong> in the header above; the charts below follow your choice.
+      </span>
+    </p>
+  );
+
+  // On the Milburn route: the caveats every box shares, said once here, not in each box
+  const staticLine = catalogue.localBuild && (
+    <p className="milburn-static-line" data-static-line="">
+      <TitleIcon name="alert" bare size={14} />
+      <span>
+        {STATIC_CAVEAT_LINE}: see <MethodLink anchor={STATIC_CAVEAT_ANCHOR}>Methodology</MethodLink>
+      </span>
+    </p>
+  );
+
   // With no policies chosen, the policy-driven views offer the full Budget
   const emptyState = (
     <div className="empty-state">
@@ -1209,7 +1238,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         ) : (
           // Impact and its sub-tabs (populationPanel)
           // Hidden under the landing page, it leaves the address alone
-          <PopulationImpactView note={<div className="milburn-status">{showingLine}<LocalBuildLabel /></div>} active={activeTab === value && !landing}>
+          <PopulationImpactView note={<div className="milburn-status">{headerHint}{staticLine}{showingLine}<LocalBuildLabel /></div>} active={activeTab === value && !landing}>
             {populationPanel}
           </PopulationImpactView>
         )}

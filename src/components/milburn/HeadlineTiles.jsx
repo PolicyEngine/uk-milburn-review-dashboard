@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { shortNameOf } from "../../utils/policyDetails";
 import { fiscalYearTick } from "../../utils/chartTheme";
@@ -12,8 +13,9 @@ import {
 } from "../../utils/milburn/summary";
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
-import { CASH_TERMS_NOTE, fallbackRunLine, packageRange, REPLACEMENT_NOT_MODELLED_NOTE, STATIC_NOTE } from "./KeyFigures";
-import { YearOnlyChip } from "./MilburnCharts";
+import { buildChartCsv } from "../../utils/chartCsv";
+import { CASH_TERMS_NOTE, fallbackRunLine, packageRange, PARTIAL_REMOVAL_NOTE, ROUNDING_NOTE } from "./KeyFigures";
+import { BoxDownload, YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
 /** The four poverty lines the summary carries, absolute before housing costs first. */
@@ -56,7 +58,7 @@ function useHeadlineRun(runId) {
   return { local: Boolean(catalogue.localBuild), name: measure ? shortNameOf(measure) : id, fallback: !runId, summary, run };
 }
 
-function Heading({ title, name, fallback, onlyYear }) {
+function Heading({ title, name, fallback, onlyYear, download = null }) {
   return (
     <div className="milburn-key-heading">
       <h3>
@@ -67,15 +69,13 @@ function Heading({ title, name, fallback, onlyYear }) {
       {fallback ? <p data-fallback-run="">{fallbackRunLine(name)}</p> : <p className="visually-hidden">{name}</p>}
       {/* The box's figures are for this year whatever year is chosen above the page */}
       {onlyYear !== undefined && <YearOnlyChip year={onlyYear} />}
+      {download}
     </div>
   );
 }
 
 /** How the Public finances figures are signed. */
 export const SAVING_SIGN_NOTE = "A positive figure is a saving to the Exchequer; a negative one is a cost.";
-
-/** What "static" means, where no counts are shown. */
-export const STATIC_SHORT_NOTE = "Static: nobody changes their work or claims.";
 
 /** A box's folded "Notes and caveats". */
 function Notes({ children }) {
@@ -104,106 +104,213 @@ function Tile({ icon, value, extra, label, note }) {
   );
 }
 
+/** The package range as meter rows: one per package, the run shown above marked. */
+function RangeMeter({ range, values, format, tone, currentId, title, year }) {
+  return (
+    <div className="milburn-meter" data-range-meter="">
+      <h4>
+        <TitleIcon name="layers" bare size={14} />
+        {title}, {fiscalYearTick(year)}
+      </h4>
+      <ul>
+        {range.map((row, index) => (
+          <MeterRow
+            key={row.id}
+            icon="scale"
+            label={row.name}
+            value={format(row, index)}
+            width={barShare(values[index], values)}
+            tone={tone}
+            current={row.id === currentId}
+          />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Poverty's headline as CSV: the tiles' counts, the change on each line, and the package range. */
+export function povertyHeadlineCsv(run, summary, name) {
+  const range = packageRange(summary);
+  const rows = [
+    { figure: "People into absolute poverty, before housing costs", value: run.peopleIntoPovertyAbs, unit: "people" },
+    { figure: "People into relative poverty, before housing costs", value: run.peopleIntoPovertyRel, unit: "people" },
+    { figure: "Child poverty rate, relative, before housing costs", value: run.childPovertyPpRel, unit: "pp change" },
+    ...POVERTY_LINES.map((line) => ({ figure: `Poverty rate change: ${line.label.toLowerCase()}`, value: run.povertyPp[line.key], unit: "pp change" })),
+    ...range.map((row) => ({ figure: `Package range: ${row.name}, people into absolute poverty before housing costs`, value: row.povertyValue, unit: "people" })),
+  ].filter((row) => row.value !== null && row.value !== undefined);
+  return buildChartCsv({
+    title: `Poverty at a glance, ${name}, ${fiscalYearTick(summary.year)}`,
+    units: "People (a negative count is people out of poverty) or percentage points, as each row says; static, with no replacement payments modelled",
+    columns: [
+      { key: "figure", label: "Figure" },
+      { key: "value", label: "Value", decimals: 3 },
+      { key: "unit", label: "Unit" },
+    ],
+    rows,
+  });
+}
+
+/** Public finances' headline as CSV: the saving in the year shown, and the package range. */
+export function financesHeadlineCsv(run, summary, name, shown) {
+  const range = packageRange(summary);
+  const rows = [
+    { figure: `Exchequer saving, ${fiscalYearTick(Number(shown))}`, value: savingInYear(run, shown), year: fiscalYearTick(Number(shown)) },
+    ...range.map((row) => ({ figure: `Package range: ${row.name}`, value: row.savingValue, year: fiscalYearTick(summary.year) })),
+  ].filter((row) => row.value !== null && row.value !== undefined);
+  return buildChartCsv({
+    title: `Public finances at a glance, ${name}`,
+    units: "£ billion a year, cash terms; a positive figure is a saving to the Exchequer, a negative one a cost; static, with no replacement payments modelled",
+    columns: [
+      { key: "figure", label: "Figure" },
+      { key: "year", label: "Fiscal year" },
+      { key: "value", label: "Saving (£bn)", decimals: 3 },
+    ],
+    rows,
+  });
+}
+
 /**
  * Poverty's headline, over its charts on the local build route: the people
- * moved across the absolute and relative lines, child poverty, and the
- * change on each of the four lines side by side, from milburn_summary.json
- * for the summary's year only (the file has no other year's poverty
- * figures), and labelled so. Nothing while the run or the file is missing.
+ * moved across the absolute and relative lines, child poverty, the change
+ * on each of the four lines side by side, and the packages' range of
+ * people moved into absolute poverty, from milburn_summary.json for the
+ * summary's year only (the file has no other year's poverty figures), and
+ * labelled so. Nothing while the run or the file is missing.
  */
 export function PovertyHeadline({ runId }) {
   const { local, name, fallback, summary, run } = useHeadlineRun(runId);
+  const figuresRef = useRef(null);
   if (!local || !run) return null;
   const direction = (count) => (count >= 0 ? "into" : "out of");
   const lines = POVERTY_LINES.filter((line) => run.povertyPp[line.key] !== null);
   const values = lines.map((line) => run.povertyPp[line.key]);
+  const range = packageRange(summary).filter((row) => row.povertyValue !== null);
+  const showRange = range.length > 1;
+  // The file's subtitle names the header's selection; the fallback run is named in the title
+  const title = `Poverty at a glance${fallback ? `, ${name}` : ""}, ${fiscalYearTick(summary.year)}`;
   return (
     <section className="report-section milburn-key card" aria-label="Poverty headline">
-      <Heading title="Poverty at a glance" name={name} fallback={fallback} onlyYear={summary.year} />
-      <ul className="milburn-key-tiles" aria-label="Figures">
-        {run.peopleIntoPovertyAbs !== null && (
-          <Tile
-            icon="usersRound"
-            value={formatPeople(run.peopleIntoPovertyAbs)}
-            extra={formatSignedPp(run.povertyPp.abs_bhc)}
-            label={`People ${direction(run.peopleIntoPovertyAbs)} absolute poverty`}
-            note="Before housing costs; line fixed in real terms."
-          />
-        )}
-        {run.peopleIntoPovertyRel !== null && (
-          <Tile
-            icon="scale"
-            value={formatPeople(run.peopleIntoPovertyRel)}
-            extra={formatSignedPp(run.povertyPp.rel_bhc)}
-            label={`People ${direction(run.peopleIntoPovertyRel)} relative poverty`}
-            note="Before housing costs; line moves with the median."
-          />
-        )}
-        {run.childPovertyPpRel !== null && (
-          <Tile
-            icon="cake"
-            value={formatSignedPp(run.childPovertyPpRel)}
-            label="Child poverty rate"
-            note="Relative, before housing costs."
-          />
-        )}
-      </ul>
-      {lines.length > 0 && (
-        <div className="milburn-meter">
-          <h4>
-            <TitleIcon name="percent" bare size={14} />
-            Change in the poverty rate, by line
-          </h4>
-          <ul>
-            {lines.map((line) => (
-              <MeterRow
-                key={line.key}
-                icon={line.icon}
-                label={line.label}
-                value={formatSignedPp(run.povertyPp[line.key])}
-                width={barShare(run.povertyPp[line.key], values)}
-                tone={run.povertyPp[line.key] > 0 ? "is-loss" : "is-gain"}
+      <Heading
+        title="Poverty at a glance"
+        name={name}
+        fallback={fallback}
+        onlyYear={summary.year}
+        download={<BoxDownload title={title} name="poverty-at-a-glance" targetRef={figuresRef} csv={() => povertyHeadlineCsv(run, summary, name)} />}
+      />
+      <div ref={figuresRef} className="milburn-box-figures">
+        <ul className="milburn-key-tiles" aria-label="Figures">
+          {run.peopleIntoPovertyAbs !== null && (
+            <Tile
+              icon="usersRound"
+              value={formatPeople(run.peopleIntoPovertyAbs)}
+              extra={formatSignedPp(run.povertyPp.abs_bhc)}
+              label={`People ${direction(run.peopleIntoPovertyAbs)} absolute poverty`}
+              note="Before housing costs; line fixed in real terms."
+            />
+          )}
+          {run.peopleIntoPovertyRel !== null && (
+            <Tile
+              icon="scale"
+              value={formatPeople(run.peopleIntoPovertyRel)}
+              extra={formatSignedPp(run.povertyPp.rel_bhc)}
+              label={`People ${direction(run.peopleIntoPovertyRel)} relative poverty`}
+              note="Before housing costs; line moves with the median."
+            />
+          )}
+          {run.childPovertyPpRel !== null && (
+            <Tile
+              icon="cake"
+              value={formatSignedPp(run.childPovertyPpRel)}
+              label="Child poverty rate"
+              note="Relative, before housing costs."
+            />
+          )}
+        </ul>
+        {(lines.length > 0 || showRange) && (
+          <div className="milburn-split milburn-meters">
+            {lines.length > 0 && (
+              <div className="milburn-meter">
+                <h4>
+                  <TitleIcon name="percent" bare size={14} />
+                  Change in the poverty rate, by line
+                </h4>
+                <ul>
+                  {lines.map((line) => (
+                    <MeterRow
+                      key={line.key}
+                      icon={line.icon}
+                      label={line.label}
+                      value={formatSignedPp(run.povertyPp[line.key])}
+                      width={barShare(run.povertyPp[line.key], values)}
+                      tone={run.povertyPp[line.key] > 0 ? "is-loss" : "is-gain"}
+                    />
+                  ))}
+                </ul>
+              </div>
+            )}
+            {/* The packages side by side: people into absolute poverty, before housing costs */}
+            {showRange && (
+              <RangeMeter
+                range={range}
+                values={range.map((row) => row.povertyValue)}
+                format={(row) => formatPeople(row.povertyValue)}
+                tone="is-loss"
+                currentId={run.id}
+                title="Package range (our designs): people into absolute poverty"
+                year={summary.year}
               />
-            ))}
-          </ul>
-        </div>
-      )}
-      <BenchmarkCallout place="poverty" />
+            )}
+          </div>
+        )}
+      </div>
       <Notes>
         <li>
           <TitleIcon name="calculator" bare size={14} />
-          <span>{STATIC_NOTE}</span>
+          <span>{ROUNDING_NOTE}</span>
         </li>
-        <li data-replacement-note="">
-          <TitleIcon name="alert" bare size={14} />
-          <span>{REPLACEMENT_NOT_MODELLED_NOTE}</span>
-        </li>
+        {showRange && (
+          <li data-range-note="">
+            <TitleIcon name="layers" bare size={14} />
+            <span>{PARTIAL_REMOVAL_NOTE}</span>
+          </li>
+        )}
       </Notes>
+      {/* Published figures: a link to Benchmarks */}
+      <BenchmarkCallout place="poverty" />
     </section>
   );
 }
 
 /**
  * Public finances' headline, over its chart on the local build route: the
- * run's Exchequer saving in each year, the chosen year marked, beside the
- * range strip's runs (RANGE_IDS), from milburn_summary.json. Nothing while the run
- * or the file is missing.
+ * run's Exchequer saving in the chosen year (the chart below shows every
+ * year) beside the packages' range (RANGE_IDS), from milburn_summary.json.
+ * Nothing while the run or the file is missing.
  */
 export function FinancesHeadline({ runId, selectedYear }) {
   const { local, name, fallback, summary, run } = useHeadlineRun(runId);
+  const figuresRef = useRef(null);
   if (!local || !run) return null;
   const years = Object.keys(run.savingBn).sort();
   if (!years.length) return null;
   const shown = years.includes(String(selectedYear)) ? String(selectedYear) : String(summary.year);
   const current = savingInYear(run, shown);
-  const savings = years.map((year) => run.savingBn[year]);
   const range = packageRange(summary);
   const rangeValues = range.map((row) => savingInYear(summaryRun(summary, row.id), summary.year));
+  const showRange = range.length > 1;
   const word = (value) => (value >= 0 ? "saving" : "cost");
+  // The file's subtitle names the header's selection; the fallback run is named in the title
+  const title = `Public finances at a glance${fallback ? `, ${name}` : ""}`;
   return (
     <section className="report-section milburn-key card" aria-label="Public finances headline">
-      <Heading title="Public finances at a glance" name={name} fallback={fallback} />
-      <div className="milburn-split">
+      <Heading
+        title="Public finances at a glance"
+        name={name}
+        fallback={fallback}
+        download={<BoxDownload title={title} name="public-finances-at-a-glance" targetRef={figuresRef} csv={() => financesHeadlineCsv(run, summary, name, shown)} />}
+      />
+      <div ref={figuresRef} className="milburn-split">
         <ul className="milburn-key-tiles" aria-label="Figures">
           {current !== null && (
             <Tile
@@ -214,58 +321,32 @@ export function FinancesHeadline({ runId, selectedYear }) {
             />
           )}
         </ul>
-        <div className="milburn-meter">
-          <h4>
-            <TitleIcon name="calendar" bare size={14} />
-            By year
-          </h4>
-          <ul>
-            {years.map((year) => (
-              <MeterRow
-                key={year}
-                icon="banknote"
-                label={fiscalYearTick(Number(year))}
-                value={formatBn(run.savingBn[year])}
-                width={barShare(run.savingBn[year], savings)}
-                tone={run.savingBn[year] >= 0 ? "is-gain" : "is-loss"}
-                current={year === shown}
-              />
-            ))}
-          </ul>
-        </div>
-        {range.length > 1 && (
-          <div className="milburn-meter">
-            <h4>
-              <TitleIcon name="layers" bare size={14} />
-              Package range (our designs), {fiscalYearTick(summary.year)}
-            </h4>
-            <ul>
-              {range.map((row, index) => (
-                <MeterRow
-                  key={row.id}
-                  icon="scale"
-                  label={row.name}
-                  value={row.saving}
-                  width={barShare(rangeValues[index], rangeValues)}
-                  tone="is-gain"
-                  current={row.id === run.id}
-                />
-              ))}
-            </ul>
-          </div>
+        {showRange && (
+          <RangeMeter
+            range={range}
+            values={rangeValues}
+            format={(row) => row.saving}
+            tone="is-gain"
+            currentId={run.id}
+            title="Package range (our designs)"
+            year={summary.year}
+          />
         )}
       </div>
-      <BenchmarkCallout place="finances" />
       <Notes>
         <li>
           <TitleIcon name="scale" bare size={14} />
           <span>{SAVING_SIGN_NOTE}</span>
         </li>
-        <li>
-          <TitleIcon name="calculator" bare size={14} />
-          <span>{STATIC_SHORT_NOTE}</span>
-        </li>
+        {showRange && (
+          <li data-range-note="">
+            <TitleIcon name="layers" bare size={14} />
+            <span>{PARTIAL_REMOVAL_NOTE}</span>
+          </li>
+        )}
       </Notes>
+      {/* Published figures: a link to Benchmarks */}
+      <BenchmarkCallout place="finances" />
     </section>
   );
 }

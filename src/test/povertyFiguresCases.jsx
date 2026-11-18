@@ -61,7 +61,7 @@ export function describePovertyFigures(shown, { files, catalogueRef, ageRowsRef 
       const { SKELETON_SUB_TABS } = await import("../components/publication/ViewSkeleton");
       for (const values of [POPULATION_SUB_TABS.map((t) => t.value), BOOT_SUBS.dashboard, SKELETON_SUB_TABS.dashboard.map((t) => t.value)]) {
         expect(values.includes("poverty")).toBe(shown);
-        expect(values).toEqual(["age", ...(shown ? ["poverty"] : []), "finances", "scenarios", "benchmarks"]);
+        expect(values).toEqual(["age", "finances", ...(shown ? ["poverty"] : []), "scenarios", "benchmarks"]);
       }
       expect(BOOT_SUBS.outlook).toBeUndefined();
     });

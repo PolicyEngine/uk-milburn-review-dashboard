@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import MilburnHouseholdTab, { MILBURN_STEPS, formatSignedPounds, milburnStepSummary, pipKnockOn, resetSavedMilburnForm } from "./MilburnHouseholdTab";
 import { normaliseHouseholdImpact } from "../../utils/householdImpactApi";
+import { downloadMenus, STANDARD_FORMATS } from "../../test/downloadMenus";
+import { waterfallCsv } from "../personal/NetIncomeWaterfall";
 import {
   COLD_START_RETRY,
   DEFAULT_ANSWERS,
@@ -193,6 +195,40 @@ describe("MilburnHouseholdTab", () => {
     expect(screen.getByRole("note").textContent).toMatch(/not\s+added to the health element and PIP removal or to each other/);
     expect(fetchImpl).not.toHaveBeenCalled();
     expect(new URLSearchParams(window.location.search).get("example")).toBe("renting_health");
+  });
+
+  it("offers every result chart and table as CSV, PNG and SVG", () => {
+    const { container } = render(<MilburnHouseholdTab presets={PRESETS} />);
+    fireEvent.click(within(screen.getByRole("group", { name: "Example households" })).getByRole("button", { name: "22, renting alone" }));
+    const menus = downloadMenus(container);
+    // The waterfall, the runs' bars and the breakdown table
+    expect(menus.map((menu) => menu.name)).toEqual([
+      "Download chart: How each removal changes your income",
+      expect.stringMatching(/^Download chart: Change in net income by run, 2029-30/),
+      expect.stringMatching(/^Download table: /),
+    ]);
+    for (const menu of menus) expect(menu.formats, menu.name).toEqual(STANDARD_FORMATS);
+  });
+
+  it("writes the waterfall's bars to CSV: net income after each, and each step's change", () => {
+    const csv = waterfallCsv(
+      { before: 10000, after: 8500, change: -1500 },
+      [
+        { id: "a", name: "Health element removal", rounded: -1000 },
+        { id: "b", name: "PIP removal", rounded: -500 },
+      ],
+      { title: "How each removal changes your income", yearLabel: "2029-30", afterName: "With the removals", notes: ["Your change: −£1,500 a year"] },
+    );
+    const lines = csv.replace(/^\uFEFF/, "").trim().split("\r\n");
+    expect(lines[0]).toBe('"# How each removal changes your income, 2029-30"');
+    expect(lines.slice(2)).toEqual([
+      "Step,Net income after this step (£),Change (£)",
+      "Current law,10000,",
+      "Health element removal,9000,-1000",
+      "PIP removal,8500,-500",
+      "With the removals,8500,",
+      '"# Your change: −£1,500 a year"',
+    ]);
   });
 
   it("opens an example from the address, by id or by number", () => {

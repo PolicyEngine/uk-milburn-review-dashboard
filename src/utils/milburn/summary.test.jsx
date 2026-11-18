@@ -7,14 +7,13 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   BREAK_EVEN_ENTRANTS_DEFINITION,
   BREAK_EVEN_SHARE_DEFINITION,
   ENTRY_ASSUMPTION_TEXT,
   MORE_ENTRANTS_THAN_GROUP,
-  RELATIVE_LINE_NOTE,
   breakEvenText,
   entryMovers,
   formatBn,
@@ -34,17 +33,20 @@ import { loadLocalBuildParts } from "./localBuild";
 import { dashboardFromParts } from "../loadDashboard";
 import { MeasureCatalogueProvider } from "../measureCatalogue";
 import KeyFigures, {
+  ALL_TILE_KEYS,
   fallbackRunLine,
-  RANGE_WITH_SELECTION,
-  RANGE_WITHOUT_SELECTION,
+  keyFiguresCsv,
+  PARTIAL_REMOVAL_NOTE,
   REPLACEMENT_NOT_MODELLED_NOTE,
   REPLACEMENT_PARTS_NOTE,
-  STATIC_NOTE,
+  ROUNDING_NOTE,
   keyFigureTiles,
   packageRange,
 } from "../../components/milburn/KeyFigures";
 import { yearOnlyText } from "../../components/milburn/MilburnCharts";
-import { FinancesHeadline, PovertyHeadline, barShare } from "../../components/milburn/HeadlineTiles";
+import { FinancesHeadline, PovertyHeadline, barShare, financesHeadlineCsv, povertyHeadlineCsv } from "../../components/milburn/HeadlineTiles";
+import { OPEN_POPULATION_SUB } from "../populationSub";
+import { downloadMenus, STANDARD_FORMATS } from "../../test/downloadMenus";
 import { reportCopy } from "./reportStatus";
 import {
   BreakEven,
@@ -199,7 +201,7 @@ describe("formatting", () => {
 
 describe("key figure tiles", () => {
   it("label a loss run's figures as losses and a saving", () => {
-    const tiles = keyFigureTiles(summaryRun(summary, "milburn_package"), 2027);
+    const tiles = keyFigureTiles(summaryRun(summary, "milburn_package"), 2027, { keys: ALL_TILE_KEYS });
     const byKey = Object.fromEntries(tiles.map((tile) => [tile.key, tile]));
     expect(byKey.saving.label).toBe("Exchequer saving, 2027-28");
     expect(byKey.young.label).toContain("households that lose");
@@ -213,7 +215,7 @@ describe("key figure tiles", () => {
   });
 
   it("label a gain run's figures as gains and a cost", () => {
-    const tiles = keyFigureTiles(summaryRun(summary, "youth_allowance_at_25_plus_rate"), 2027);
+    const tiles = keyFigureTiles(summaryRun(summary, "youth_allowance_at_25_plus_rate"), 2027, { keys: ALL_TILE_KEYS });
     const byKey = Object.fromEntries(tiles.map((tile) => [tile.key, tile]));
     expect(byKey.saving.label).toBe("Exchequer cost, 2027-28");
     expect(byKey.saving.value).toBe("£0.80bn");
@@ -222,6 +224,22 @@ describe("key figure tiles", () => {
     expect(byKey.loss.value).toBe("£1,100");
     expect(byKey["poverty-abs"].label).toBe("People out of absolute poverty");
     expect(byKey["poverty-abs"].extra).toBe("−0.13pp");
+  });
+
+  it("are, on Young people, only the 16–24s affected and their average change: the saving and poverty have their own sub-tabs", () => {
+    expect(keyFigureTiles(summaryRun(summary, "milburn_package"), 2027).map((tile) => tile.key)).toEqual(["young", "loss"]);
+  });
+
+  it("download as CSV with the figures unrounded, their units and the run's name and year", () => {
+    const run = summaryRun(summary, "milburn_package");
+    const lines = keyFiguresCsv(run, 2027, "Full abolition").replace(/^\uFEFF/, "").trim().split("\r\n");
+    expect(lines[0]).toBe('"# Key figures, Full abolition, 2027-28"');
+    expect(lines[1]).toMatch(/^"# Units: .*static, with no replacement payments modelled \| Source: /);
+    expect(lines.slice(2)).toEqual([
+      "Figure,Value,Unit,Also shown,Its unit,As shown,Note",
+      '16–24s in households that lose,500400,people,7.5,% of 16–24s,"500,000 7.50% of 16–24s","Includes siblings, partners."',
+      'Their average household loss,12000,"£ a year, per household",,,"£12,000 a year","Per household, not per person."',
+    ]);
   });
 });
 
@@ -235,29 +253,70 @@ describe("KeyFigures", () => {
       </MeasureCatalogueProvider>,
     );
     const panel = await screen.findByRole("list", { name: "Figures" });
-    expect(panel.textContent).toContain("£4.00bn");
     expect(panel.textContent).toContain("500,000");
+    // The saving and the poverty count are on their own sub-tabs, not repeated here
+    expect(panel.textContent).not.toContain("£4.00bn");
+    expect(panel.textContent).not.toContain("280,000");
+    expect([...panel.querySelectorAll("[data-key]")].map((tile) => tile.dataset.key)).toEqual(["young", "loss"]);
     const region = screen.getByRole("region", { name: "Key figures" });
     // The heading carries no estimate chip and no policy chip: the run's name is for screen readers only
     expect(region.querySelector(".milburn-key-heading [data-source-kind]")).toBeNull();
     expect(region.querySelector(".milburn-key-heading .milburn-status-chip:not([data-year-only])")).toBeNull();
     expect(region.querySelector(".milburn-key-heading .visually-hidden").textContent).toBe("Full abolition, no replacements");
-    // "Static" is said once, in the folded notes
-    expect(region.textContent.match(/Static/g)).toHaveLength(1);
-    expect([...region.querySelectorAll("details.milburn-details")].at(-1).textContent).toContain(STATIC_NOTE);
-    // An upper bound on losses, never said of the saving
+    // "Static" is said once over the page (App.jsx), not in the box
+    expect(region.textContent).not.toMatch(/Static/);
+    // No range strip, no relative poverty: Public finances and Poverty hold them
+    expect(region.querySelector("table")).toBeNull();
+    expect(region.textContent).not.toMatch(/Relative poverty|relative line/i);
+    // One upper-bound line, of losses (this box's subject), never of the saving
     expect(region.textContent).not.toMatch(/\(upper bound\)|upper bound on the saving/i);
-    expect(region.textContent).toContain(RELATIVE_LINE_NOTE);
-    expect(region.textContent).toContain("Relative poverty (60% of median, before housing costs): 130,000 people move into it (+0.30pp).");
-    expect(region.textContent).toContain(REPLACEMENT_NOT_MODELLED_NOTE);
-    expect(region.textContent).toContain(REPLACEMENT_PARTS_NOTE);
-    // The pre-report package is not in the range: nothing is picked out
-    expect(region.textContent).toContain(RANGE_WITHOUT_SELECTION);
-    expect(region.querySelectorAll("tr.is-selected")).toHaveLength(0);
+    const notes = [...region.querySelectorAll("details.milburn-details")].at(-1);
+    expect(notes.querySelector("[data-replacement-note]").textContent).toBe(REPLACEMENT_NOT_MODELLED_NOTE);
+    expect(notes.textContent).toContain(REPLACEMENT_PARTS_NOTE);
+    expect(notes.textContent).toContain(ROUNDING_NOTE);
+    expect(region.textContent.match(/upper bound/g)).toHaveLength(1);
     // One policy selected: no fallback line
     expect(region.querySelector("[data-fallback-run]")).toBeNull();
     // The figures are for the summary's year whatever year is chosen: said
     expect(region.querySelector("[data-year-only]").textContent).toBe(yearOnlyText(2027));
+  });
+
+  it("links to the sub-tabs that hold the saving and poverty, and to Benchmarks for published figures", async () => {
+    vi.stubGlobal("fetch", fixtureFetch());
+    const catalogue = await localCatalogue();
+    render(
+      <MeasureCatalogueProvider catalogue={catalogue}>
+        <KeyFigures runId="milburn_package" />
+      </MeasureCatalogueProvider>,
+    );
+    await screen.findByRole("list", { name: "Figures" });
+    const region = screen.getByRole("region", { name: "Key figures" });
+    const line = region.querySelector("[data-see-also]");
+    expect(line.textContent).toBe("Exchequer saving: Public finances · Poverty: Poverty");
+    const opened = vi.fn();
+    const onOpen = (event) => opened(event.detail);
+    window.addEventListener(OPEN_POPULATION_SUB, onOpen);
+    for (const link of within(line).getAllByRole("link")) fireEvent.click(link);
+    fireEvent.click(within(region.querySelector(".bm-callout")).getByRole("link", { name: "Benchmarks" }));
+    window.removeEventListener(OPEN_POPULATION_SUB, onOpen);
+    expect(opened.mock.calls.map(([sub]) => sub)).toEqual(["finances", "poverty", "benchmarks"]);
+    expect(region.querySelector(".bm-callout").textContent).toBe("Published figures for comparison: see Benchmarks");
+    // No published figures repeated in the box
+    expect(region.querySelector(".pub-card, details.bm-callout-details")).toBeNull();
+  });
+
+  it("offers the box's figures as CSV, PNG and SVG", async () => {
+    vi.stubGlobal("fetch", fixtureFetch());
+    const catalogue = await localCatalogue();
+    render(
+      <MeasureCatalogueProvider catalogue={catalogue}>
+        <KeyFigures runId="milburn_package" />
+      </MeasureCatalogueProvider>,
+    );
+    await screen.findByRole("list", { name: "Figures" });
+    const menus = downloadMenus(screen.getByRole("region", { name: "Key figures" }));
+    // The header names the one selected policy (the file's subtitle): the title gives the year
+    expect(menus).toEqual([{ name: "Download chart: Key figures, 2027-28", formats: STANDARD_FORMATS }]);
   });
 
   it("shows the report's package, named on the card, when no single policy is chosen", async () => {
@@ -268,41 +327,23 @@ describe("KeyFigures", () => {
         <KeyFigures />
       </MeasureCatalogueProvider>,
     );
-    const panel = await screen.findByRole("list", { name: "Figures" });
+    await screen.findByRole("list", { name: "Figures" });
     expect(HEADLINE_RUN).toBe("milburn_report_package");
-    expect(panel.textContent).toContain("£4.50bn");
     const region = screen.getByRole("region", { name: "Key figures" });
     // Named in visible text, not only for screen readers
     const line = region.querySelector(".milburn-key-heading [data-fallback-run]");
     expect(line.textContent).toBe(fallbackRunLine("milburn_report_package"));
     expect(line.classList.contains("visually-hidden")).toBe(false);
-    // The report's package is in the range, and picked out
-    expect(region.textContent).toContain(RANGE_WITH_SELECTION);
-    expect(region.querySelectorAll("tr.is-selected")).toHaveLength(1);
     // Its upper bound covers the timing too
     expect(REPLACEMENT_NOT_MODELLED_NOTE).toMatch(/not at reassessment/);
   });
 
-  it("shows the packages' range strip whatever run is selected", async () => {
-    vi.stubGlobal("fetch", fixtureFetch());
-    const catalogue = await localCatalogue();
-    render(
-      <MeasureCatalogueProvider catalogue={catalogue}>
-        <KeyFigures runId="youth_allowance_at_25_plus_rate" />
-      </MeasureCatalogueProvider>,
-    );
-    const strip = await screen.findByRole("table");
-    const rows = within(strip).getAllByRole("row");
+  it("keeps the packages' range for Public finances and Poverty", () => {
     // The fixture lists only the report's package of the range's runs: the others are left out
-    expect(rows).toHaveLength(2);
-    expect(rows[1].textContent).toBe("Full removal£4.50bnabout 290,000");
-    // Not a package: no row is picked out, and nothing is said to be selected
-    const region = screen.getByRole("region", { name: "Key figures" });
-    expect(region.textContent).toContain(RANGE_WITHOUT_SELECTION);
-    expect(region.textContent).not.toContain(RANGE_WITH_SELECTION);
-    expect(RANGE_WITHOUT_SELECTION).not.toMatch(/selected|full colour/);
-    expect(region.querySelectorAll("tr.is-selected")).toHaveLength(0);
-    expect(packageRange(summary).map((row) => row.id)).toEqual(["milburn_report_package"]);
+    expect(packageRange(summary).map((row) => [row.id, row.name, row.saving, row.povertyValue])).toEqual([
+      ["milburn_report_package", "Full removal", "£4.50bn", 290000],
+    ]);
+    expect(PARTIAL_REMOVAL_NOTE).toMatch(/^Package range: our designs\. Partial removal .* the report has no such run\.$/);
   });
 
   it("says a run missing from the summary has not yet run", async () => {
@@ -314,6 +355,8 @@ describe("KeyFigures", () => {
       </MeasureCatalogueProvider>,
     );
     expect((await screen.findByText(/Not yet run/)).textContent).toContain("PIP removed for 18 to 24-year-olds");
+    // Nothing to download, and no links to figures that are not there
+    expect(document.querySelector(".chart-download, [data-see-also]")).toBeNull();
   });
 
   it("says so when the summary file is missing", async () => {
@@ -341,16 +384,19 @@ describe("headline tiles", () => {
     expect(poverty.textContent).toContain("280,000");
     expect(poverty.textContent).toContain("+0.40pp");
     expect(poverty.textContent).toContain("130,000");
-    // Static and rounding: once, in the folded notes; no estimate or policy chip in the heading
-    expect(poverty.textContent.match(/Static/g)).toHaveLength(1);
+    // Static and the replacements are said once over the page (App.jsx): the notes keep the rounding
+    expect(poverty.textContent).not.toMatch(/Static|upper bound/);
     expect(poverty.querySelector("details[data-notes] > summary").textContent).toBe("Notes and caveats");
-    expect(poverty.querySelector("details[data-notes]").textContent).toContain(STATIC_NOTE);
-    expect(STATIC_NOTE).toBe("Static: nobody changes their work or claims. Counts rounded to the nearest thousand.");
+    expect(poverty.querySelector("details[data-notes]").textContent).toContain(ROUNDING_NOTE);
+    expect(ROUNDING_NOTE).toBe("Counts rounded to the nearest thousand.");
     expect(poverty.querySelector(".milburn-key-heading [data-source-kind]")).toBeNull();
     expect(poverty.querySelector(".milburn-key-heading .milburn-status-chip:not([data-year-only])")).toBeNull();
     // Its figures are for the summary's year whatever year is chosen: said
     expect(poverty.querySelector("[data-year-only]").textContent).toBe(yearOnlyText(2027));
     expect(yearOnlyText(2027)).toBe("2027-28 only: the year selector does not change these figures.");
+    // Published figures: one line to Benchmarks
+    expect(poverty.querySelector(".bm-callout").textContent).toBe("Published figures for comparison: see Benchmarks");
+    expect(downloadMenus(poverty).map((menu) => menu.formats)).toEqual([STANDARD_FORMATS]);
     unmount();
     render(
       <MeasureCatalogueProvider catalogue={catalogue}>
@@ -362,11 +408,14 @@ describe("headline tiles", () => {
     expect(finances.textContent).toContain("Exchequer saving, 2027-28");
     expect(finances.querySelector(".milburn-key-heading [data-source-kind]")).toBeNull();
     expect(finances.querySelector(".milburn-key-heading .milburn-status-chip")).toBeNull();
-    // The sign convention and "static": once each, in the folded notes
+    // No "By year" meter: the Revenue impact chart below shows every year
+    expect(finances.textContent).not.toContain("By year");
+    // The sign convention once, in the folded notes; "static" is said over the page
     const notes = finances.querySelector("details[data-notes]");
     expect(notes.textContent).toContain("A positive figure is a saving to the Exchequer; a negative one is a cost.");
-    expect(notes.textContent).toContain("Static: nobody changes their work or claims.");
-    expect(finances.textContent.match(/Static/g)).toHaveLength(1);
+    expect(finances.textContent).not.toMatch(/Static/);
+    expect(finances.querySelector(".bm-callout").textContent).toBe("Published figures for comparison: see Benchmarks");
+    expect(downloadMenus(finances).map((menu) => menu.formats)).toEqual([STANDARD_FORMATS]);
   });
 
   it("show the report's package, named in visible text, with more than one policy selected", async () => {
@@ -382,8 +431,8 @@ describe("headline tiles", () => {
     const line = poverty.querySelector(".milburn-key-heading [data-fallback-run]");
     expect(line.textContent).toBe(fallbackRunLine("milburn_report_package"));
     expect(line.classList.contains("visually-hidden")).toBe(false);
-    // The upper bound covers the timing as well as the replacements
-    expect(poverty.querySelector("details[data-notes] [data-replacement-note]").textContent).toBe(REPLACEMENT_NOT_MODELLED_NOTE);
+    // One package in the range: no range meter and no note on it
+    expect(poverty.querySelector("[data-range-meter], [data-range-note]")).toBeNull();
     unmount();
     render(
       <MeasureCatalogueProvider catalogue={catalogue}>
@@ -393,6 +442,20 @@ describe("headline tiles", () => {
     const finances = await screen.findByRole("region", { name: "Public finances headline" });
     expect(finances.textContent).toContain("£4.50bn");
     expect(finances.querySelector(".milburn-key-heading [data-fallback-run]").textContent).toBe(fallbackRunLine("milburn_report_package"));
+  });
+
+  it("draw the package range on both boxes, with its note, when the summary has more than one package", async () => {
+    const published = parseSummary(JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8")));
+    const range = packageRange(published);
+    expect(range.length).toBeGreaterThan(1);
+    const run = summaryRun(published, HEADLINE_RUN);
+    // Poverty's CSV carries the range's people, Public finances' its savings
+    const poverty = povertyHeadlineCsv(run, published, "The report's package");
+    for (const row of range) expect(poverty).toContain(`"Package range: ${row.name}, people into absolute poverty before housing costs",${row.povertyValue},people`);
+    const finances = financesHeadlineCsv(run, published, "The report's package", String(published.year));
+    expect(finances.split("\r\n")[2]).toBe("Figure,Fiscal year,Saving (£bn)");
+    for (const row of range) expect(finances).toContain(`Package range: ${row.name},`);
+    expect(finances).not.toMatch(/By year/);
   });
 
   it("scale a bar to the largest figure in its list", () => {

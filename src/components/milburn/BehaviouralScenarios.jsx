@@ -440,10 +440,11 @@ export function ReviewComparison({ summary, review, catalogue }) {
   return (
     <section className="report-section milburn-entry milburn-review" aria-labelledby="milburn-review-heading">
       <MilburnChartCard
+        logo={false}
         id="milburn-review-heading"
         icon="scale"
         title={REVIEW_COMPARISON_TITLE}
-        description={`People moving into work. ${DIFFERENT_EXERCISES_SENTENCE} ${ASSUMED_NOT_ESTIMATED_SENTENCE}`}
+        description={`Different exercises, not a check on each other: ours assumes ${ENTRY_ASSUMPTION.share} move into work.`}
         name="beside-the-reviews-own-estimate"
         csv={csv}
         after={
@@ -861,6 +862,7 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null, gainY
   return (
     <section className="report-section milburn-breakeven" aria-labelledby="milburn-breakeven-heading">
       <MilburnChartCard
+        logo={false}
         id="milburn-breakeven-heading"
         icon="calculator"
         title="Break-even arithmetic"

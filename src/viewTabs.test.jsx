@@ -261,9 +261,9 @@ describe("the view tabs", () => {
     expect(document.querySelector(".view-tabs-bar")).toHaveClass("has-notch");
     expect(subTabs().map((tab) => tab.textContent)).toEqual([
       "Young people",
+      "Public finances",
       // Only while the poverty figures are shown (povertyFigures.js)
       ...(POVERTY_FIGURES_SHOWN ? ["Poverty"] : []),
-      "Public finances",
       "Moves into work (illustrative)",
       "Benchmarks",
     ]);

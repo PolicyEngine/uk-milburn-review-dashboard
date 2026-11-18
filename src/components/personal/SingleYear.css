@@ -913,6 +913,14 @@
   margin: 0;
 }
 
+/* The title, and a Download menu at the row's end when there is one */
+.waterfall-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .waterfall-title .forecast-tile-icon svg {
   display: block;
 }

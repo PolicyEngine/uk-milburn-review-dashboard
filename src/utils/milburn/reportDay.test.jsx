@@ -14,7 +14,7 @@ import { POPULATION_SUB_TABS, populationSubTabs } from "../../components/Populat
 import { LandingBoxes, landingBoxes } from "../../components/LandingPage";
 import { POVERTY_FIGURES_SHOWN } from "../povertyFigures";
 
-const ALWAYS = ["age", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : []), "finances"];
+const ALWAYS = ["age", "finances", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : [])];
 const values = (tabs) => tabs.map((tab) => tab.value);
 const hrefs = () => screen.getAllByRole("link").map((link) => link.getAttribute("href"));
 
@@ -48,7 +48,7 @@ describe("the switch", () => {
 });
 
 describe("Impact's sub-tabs", () => {
-  it("off: Young people, Poverty, Public finances, Moves into work (illustrative), Benchmarks", () => {
+  it("off: Young people, Public finances, Poverty, Moves into work (illustrative), Benchmarks", () => {
     expect(values(populationSubTabs({ reportDay: false }))).toEqual([...ALWAYS, "scenarios", "benchmarks"]);
     expect(populationSubTabs({ reportDay: false }).map((tab) => tab.label).slice(-2)).toEqual(["Moves into work (illustrative)", "Benchmarks"]);
   });

@@ -242,6 +242,8 @@ export function MeasureKey({ members, netLabel, highlight = null, onHighlight, p
   const muted = members.filter((member) => member.muted);
   // One flat row, no group labels: raising measures first, then costing ones
   const ordered = [...active.filter(raises), ...active.filter((member) => !raises(member))];
+  // One measure and no net line: the key would only repeat the selection (Vahid, 18 Nov)
+  if (members.length <= 1 && !netLabel) return null;
   return (
     <div
       className={`measure-key is-${placement}`}

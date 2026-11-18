@@ -7,8 +7,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, render, waitFor } from "@testing-library/react";
-import App from "./App";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import App, { STATIC_CAVEAT_ANCHOR, STATIC_CAVEAT_LINE } from "./App";
 
 vi.mock("./components/MethodologyTab", () => ({ default: () => <div data-testid="methodology-view" />, METHOD_SECTIONS: {} }));
 
@@ -70,5 +70,30 @@ describe("the local build route's page", () => {
     down = false;
     await act(async () => { window.dispatchEvent(new Event("focus")); });
     await waitFor(() => expect(calls).toContain("milburn/milburn_package/age_impact.csv"));
+  });
+
+  it("says over the Impact sub-tabs where to choose the policies and year, and the caveat every box shares, once", async () => {
+    const { fetchImpl } = countingFetch();
+    vi.stubGlobal("fetch", fetchImpl);
+    window.history.replaceState({}, "", "/?tab=dashboard&sub=finances");
+    render(<App />);
+    const hint = await waitFor(() => {
+      const found = document.querySelector("[data-header-hint]");
+      expect(found).not.toBeNull();
+      return found;
+    });
+    expect(hint.textContent).toBe("Choose the policies and the year in the header above; the charts below follow your choice.");
+    const line = document.querySelector("[data-static-line]");
+    expect(line.textContent).toBe(`${STATIC_CAVEAT_LINE}: see Methodology`);
+    expect(line.textContent).toBe("Static estimates with no replacement payments modelled: see Methodology");
+    // Both in the status row above the sub-tab's content, one of each
+    expect(hint.parentElement).toBe(line.parentElement);
+    expect(hint.parentElement).toHaveClass("milburn-status");
+    expect(document.querySelectorAll("[data-header-hint], [data-static-line]")).toHaveLength(2);
+    // Its link opens Methodology in place, at the model's section
+    const link = within(line).getByRole("link", { name: "Methodology" });
+    expect(link).toHaveAttribute("href", `?tab=methodology#${STATIC_CAVEAT_ANCHOR}`);
+    fireEvent.click(link);
+    expect(await screen.findByTestId("methodology-view")).toBeInTheDocument();
   });
 });

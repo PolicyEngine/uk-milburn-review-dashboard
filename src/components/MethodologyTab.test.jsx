@@ -25,6 +25,8 @@ describe("MethodologyTab", () => {
   it("keeps the anchors other views link to", () => {
     // The age cards link to these
     expect(METHOD_SECTIONS.young).toBe("method-young");
+    // The Impact sub-tabs' static caveat line links here (App.jsx STATIC_CAVEAT_ANCHOR)
+    expect(METHOD_SECTIONS.model).toBe("method-model");
     const { container } = renderTab();
     for (const id of Object.values(METHOD_SECTIONS)) {
       expect(container.querySelector(`#${id}`)).not.toBeNull();

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import NeetBreakdown, { NEET_DEFINITION_LINE, NEET_TITLE, WITHHELD, formatChange, formatPeople, formatSharePct } from "./NeetBreakdown";
+import NeetBreakdown, { NEET_DEFINITION_LINE, NEET_TITLE, WITHHELD, formatChange, formatPeople, formatSharePct, neetCsv } from "./NeetBreakdown";
+import { downloadMenus, STANDARD_FORMATS } from "../../test/downloadMenus";
 import { NEET_FILE, parseNeet } from "../../utils/milburn/neet";
 import { BENCHMARKS_FILE } from "../../utils/milburn/benchmarks";
 
@@ -73,6 +74,30 @@ describe("NeetBreakdown", () => {
     expect(cells("share_in_losing_households_pct")).toEqual(["21.50%", "4.25%"]);
     expect(cells("average_change_in_household_net_income")).toEqual(["−£1,235", "−£300"]);
     expect([...container.querySelectorAll("thead th")].map((cell) => cell.textContent)).toEqual(["2029-30", "NEET (approximated)", "Other 16–24s"]);
+  });
+
+  it("offers the table as CSV, PNG and SVG, with no logo on the page", async () => {
+    serve({ [NEET_FILE]: FIXTURE, [BENCHMARKS_FILE]: BENCHMARKS });
+    const { container } = render(<NeetBreakdown selectedPolicies={[NEET_RUN]} />);
+    await screen.findByRole("heading", { name: NEET_TITLE });
+    expect(downloadMenus(container)).toEqual([{ name: `Download chart: ${NEET_TITLE}`, formats: STANDARD_FORMATS }]);
+    expect(container.querySelector(".chart-logo")).toBeNull();
+  });
+
+  it("writes the table's figures to CSV, unrounded, a withheld one as withheld", () => {
+    const lines = neetCsv(parseNeet(FIXTURE)).replace(/^\uFEFF/, "").trim().split("\r\n");
+    expect(lines[0]).toBe('"# NEET young people, 2029-30"');
+    expect(lines[1]).toMatch(/^"# Units: .*no earnings and not in full-time education.* \| Source: /);
+    expect(lines.slice(2, 8)).toEqual([
+      "Figure,Unit,NEET (approximated),Other 16–24s",
+      "People,people,1234567,6000400",
+      "Share in households that lose,%,21.5,4.25",
+      '"Average change in household net income, a year",£ a year,-1234.56,-300.4',
+      `People losing the UC health element or PIP,people,345678,${WITHHELD}`,
+      `Share losing the UC health element or PIP,%,28,${WITHHELD}`,
+    ]);
+    // The file's notes follow the rows
+    expect(lines.slice(8)).toEqual(["# The survey data has no NEET flag.", "# Thin cells are withheld."]);
   });
 
   it("says a withheld figure is withheld, never zero", async () => {

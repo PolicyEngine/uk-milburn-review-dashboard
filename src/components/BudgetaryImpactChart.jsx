@@ -395,8 +395,7 @@ function BudgetaryImpactChart({ data, selectedYear, selectedPolicies = [] }) {
 
       {/* The measures' key under the plot (MeasureKey), unboxed in the card: click
           chips to highlight several together. The logo below it. */}
-      {/* One measure: the key would only repeat the selection (Vahid, 17 Nov) */}
-      {!noRevenue && keyMembers.length > 1 && (
+      {!noRevenue && (
       <div className="revenue-key">
         <MeasureKey
           members={keyMembers}

@@ -3,6 +3,7 @@ import { MilburnChartCard } from "./MilburnCharts";
 import { shortSource } from "./SourceChip";
 import { yearLabel } from "../../utils/displayYears";
 import { NEET_GROUPS, useNeetBreakdown } from "../../utils/milburn/neet";
+import { buildChartCsv } from "../../utils/chartCsv";
 import "./NeetBreakdown.css";
 
 export const NEET_TITLE = "NEET young people";
@@ -81,6 +82,40 @@ function CountLine({ neet, benchmark }) {
   );
 }
 
+/** The units of each row, for the CSV. */
+const ROW_UNITS = {
+  population: "people",
+  share_in_losing_households_pct: "%",
+  average_change_in_household_net_income: "£ a year",
+  people_losing_uc_health_or_pip: "people",
+  share_losing_uc_health_or_pip_pct: "%",
+};
+
+/** The table as CSV: a row each, a column each group; a withheld figure says so, never a zero. */
+export function neetCsv(neet) {
+  const year = yearLabel(neet.year);
+  return buildChartCsv({
+    title: `${NEET_TITLE}, ${year}`,
+    units: `As each row's unit says; NEET is ${NEET_DEFINITION_LINE}; the page rounds people to the nearest thousand`,
+    columns: [
+      { key: "label", label: "Figure" },
+      { key: "unit", label: "Unit" },
+      ...NEET_GROUPS.map((group) => ({ key: group.key, label: group.label })),
+    ],
+    rows: ROWS.map((row) => ({
+      label: row.label,
+      unit: ROW_UNITS[row.key],
+      ...Object.fromEntries(
+        NEET_GROUPS.map((group) => {
+          const value = neet.groups[group.key][row.key];
+          return [group.key, value === null ? WITHHELD : String(Math.round(value * 100) / 100)];
+        }),
+      ),
+    })),
+    notes: neet.notes,
+  });
+}
+
 /**
  * Impact, Young people: the report package's effect on 16 to 24-year-olds
  * who are approximately NEET, beside the other 16 to 24-year-olds. The
@@ -99,9 +134,12 @@ export default function NeetBreakdown({ selectedPolicies = [] }) {
       {/* The card's frame comes from the stack, as the other tabs' cards */}
       <div className="charts-stack">
       <MilburnChartCard
+        logo={false}
         icon="cap"
         title={NEET_TITLE}
         description={description}
+        name="neet-young-people"
+        csv={() => neetCsv(neet)}
         after={
           <details className="milburn-details">
             <summary>

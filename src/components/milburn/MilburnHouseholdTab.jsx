@@ -327,6 +327,14 @@ function ResultCard({ views }) {
           yearLabel={FISCAL_YEAR}
           title="How each removal changes your income"
           afterName="With the removals"
+          download={{
+            name: "household-net-income-by-removal",
+            notes: [
+              `Your change: ${changeWords(totals.change)} a year in ${FISCAL_YEAR}, from the health element and PIP removal, with no replacement awards`,
+              ...(share === null ? [] : [`Share of your income: ${share.toFixed(2)}% of net income under current law (before housing costs, with no Council Tax)`]),
+              ...(knockOn ? [knockOn] : []),
+            ],
+          }}
         />
         {knockOn && (
           <p className="single-year-quiet milburn-waterfall-note" data-note="pip-knock-on">

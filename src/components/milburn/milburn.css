@@ -280,6 +280,42 @@
   margin: 0 !important;
 }
 
+.milburn-header-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--c-highlight-band);
+  color: var(--c-text);
+  font-size: var(--fs-small);
+  line-height: 1.4;
+}
+
+.milburn-header-hint > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  color: var(--c-gain-text);
+}
+
+/* One caveat line for every Impact sub-tab, beside the header hint */
+.milburn-static-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+  line-height: 1.4;
+}
+
+.milburn-static-line > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  color: var(--c-gain-text);
+}
+
 .milburn-status-chip {
   display: inline-flex;
   align-items: center;
@@ -468,6 +504,44 @@
 
 .milburn-split > .milburn-meter {
   margin-top: 0;
+}
+
+/* Poverty's meters under its tiles: by line beside the package range */
+.milburn-split.milburn-meters {
+  margin-top: 16px;
+}
+
+/* A headline box's Download menu, at the end of its heading row */
+.milburn-key-heading .chart-download {
+  margin-left: auto;
+}
+
+/* Young people's pointer to the sub-tabs that hold the saving and the poverty count */
+.milburn-see-also {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+}
+
+.milburn-see-also > span[aria-hidden] {
+  display: inline-flex;
+  flex: none;
+  color: var(--c-gain-text);
+}
+
+.milburn-see-also a,
+.milburn-static-line a {
+  color: var(--c-gain-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.milburn-see-also a:hover,
+.milburn-static-line a:hover {
+  text-decoration: underline;
 }
 
 .milburn-meter h4 {

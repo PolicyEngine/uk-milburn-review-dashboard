@@ -237,6 +237,8 @@ describe("each of the four tabs and Population impact's sub-tabs, on a verified 
       await new Promise((resolve) => setTimeout(resolve, 50));
       // Every Options pill on the tab names every choice its dialog holds
       expectCompletePills(panel);
+      // The header hint and the static caveat line are the Milburn build's only (AppLocalRoute.test.jsx)
+      expect(document.querySelector("[data-header-hint], [data-static-line]")).toBeNull();
       // Every card's Download offers the same formats (CSV, PNG, SVG)
       const menus = downloadMenus(panel);
       for (const menu of menus) expect(menu.formats, menu.name).toEqual(STANDARD_FORMATS);

@@ -17,8 +17,8 @@ import { REPORT_DAY, subShownOnReportDay } from "../utils/milburn/reportDay";
 export function populationSubTabs({ reportDay = REPORT_DAY } = {}) {
   return [
     { value: "age", label: "Young people", icon: "usersRound" },
-    { value: "poverty", label: "Poverty", icon: "percent" },
     { value: "finances", label: "Public finances", icon: "landmark" },
+    { value: "poverty", label: "Poverty", icon: "percent" },
     { value: "scenarios", label: "Moves into work (illustrative)", icon: "sliders" },
     { value: "benchmarks", label: "Benchmarks", icon: "scale" },
   ]

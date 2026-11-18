@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
 import { shortNameOf } from "../../utils/policyDetails";
 import { fiscalYearTick } from "../../utils/chartTheme";
@@ -8,7 +9,6 @@ import {
   formatPounds,
   formatSignedPp,
   HEADLINE_RUN,
-  RELATIVE_LINE_NOTE,
   savingInYear,
   summaryRun,
   useMilburnSummary,
@@ -17,8 +17,8 @@ import { RANGE_IDS, milburnDisplayName } from "../../utils/milburn/measureGroups
 import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
 import { buildChartCsv } from "../../utils/chartCsv";
-import { CHART_COLOURS } from "../../utils/chartTheme";
-import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, YearOnlyChip } from "./MilburnCharts";
+import { POVERTY_FIGURES_SHOWN } from "../../utils/povertyFigures";
+import { BoxDownload, SubTabLink, YearOnlyChip } from "./MilburnCharts";
 import "./milburn.css";
 
 /**
@@ -41,8 +41,8 @@ export const REPLACEMENT_PARTS_NOTE =
 /** Beside our £ figures: they are cash, where the review's sit in 2026-27 prices. */
 export const CASH_TERMS_NOTE = "Cash terms; the review’s figures are in 2026-27 prices.";
 
-/** Said once in a box's folded notes: what "static" means, and how counts are rounded. */
-export const STATIC_NOTE = "Static: nobody changes their work or claims. Counts rounded to the nearest thousand.";
+/** Where a box shows counts of people: how they are rounded. */
+export const ROUNDING_NOTE = "Counts rounded to the nearest thousand.";
 
 /**
  * The range strip's short names for its runs, by position in RANGE_IDS: what
@@ -54,6 +54,7 @@ const RANGE_NAMES = ["Full removal", "Partial removal", "Phased"];
  * The packages' range, whatever run is selected: each package's saving and
  * the people moved into absolute poverty before housing costs, from
  * milburn_summary.json. A package the file does not list is left out.
+ * Public finances draws the savings, Poverty the people.
  */
 export function packageRange(summary) {
   return RANGE_IDS.map((id, index) => {
@@ -70,104 +71,25 @@ export function packageRange(summary) {
   }).filter(Boolean);
 }
 
-/** Under the range's title when the run shown above is one of the packages. */
-export const RANGE_WITH_SELECTION =
-  "Our designs, side by side; the one shown above is in full colour. Partial removal (severe cases kept, PIP at half rate) is a pre-report run from April 2027: the report has no such run.";
+/** In the notes of a box that draws the package range: the one run the report has no counterpart for. */
+export const PARTIAL_REMOVAL_NOTE =
+  "Package range: our designs. Partial removal (severe cases kept, PIP at half rate) is a pre-report run from April 2027: the report has no such run.";
 
-/** Under the range's title when the run shown above is not a package: nothing is picked out. */
-export const RANGE_WITHOUT_SELECTION =
-  "Our designs, for context: the report’s health element and PIP changes with no replacement, the same phased in, and a pre-report partial removal (severe cases kept, PIP at half rate) that the report has no run for.";
+/** Every tile keyFigureTiles can make, in order. */
+export const ALL_TILE_KEYS = ["saving", "young", "loss", "poverty-abs"];
 
-function RangeStrip({ summary, selectedId }) {
-  const rows = packageRange(summary);
-  if (!rows.length) return null;
-  const yearLabel = fiscalYearTick(summary.year);
-  const title = `Package range (our designs), ${yearLabel}`;
-  // The selected package at full strength, the others faded; all at full
-  // strength, and none said to be selected, when the selection is not one
-  // of the packages
-  const packageSelected = rows.some((row) => row.id === selectedId);
-  const faded = (row) => packageSelected && row.id !== selectedId;
-  const csv = () =>
-    buildChartCsv({
-      title,
-      units: "Exchequer saving in £bn; people moved into absolute poverty before housing costs",
-      columns: [
-        { key: "name", label: "Package" },
-        { key: "savingValue", label: "Exchequer saving (£bn)", decimals: 3 },
-        { key: "povertyValue", label: "People into absolute poverty before housing costs", decimals: 0 },
-      ],
-      rows,
-    });
-  return (
-    <MilburnChartCard
-      as="h4"
-      icon="layers"
-      title={title}
-      description={packageSelected ? RANGE_WITH_SELECTION : RANGE_WITHOUT_SELECTION}
-      name="package-range"
-      csv={csv}
-      className="milburn-range"
-      after={
-        <FiguresTable>
-          <table className="milburn-table">
-            <caption className="visually-hidden">{title}</caption>
-            <thead>
-              <tr>
-                <th scope="col">Package</th>
-                <th scope="col">Exchequer saving</th>
-                <th scope="col">Into absolute poverty (before housing costs)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id} data-run={row.id} className={row.id === selectedId ? "is-selected" : undefined}>
-                  <th scope="row">{row.name}</th>
-                  <td>{row.saving || "Not in the summary"}</td>
-                  <td>{row.poverty || "Not in the summary"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </FiguresTable>
-      }
-    >
-      <div className="milburn-chart-grid cols-2">
-        <ChartPanel icon="landmark" title="Exchequer saving (£bn)">
-          <HorizontalBars
-            ariaLabel={`Exchequer saving by package: ${rows.map((row) => `${row.name} ${row.saving}`).join(", ")}`}
-            format={(value) => `£${value}bn`}
-            labelWidth={96}
-            rows={rows.map((row) => ({ name: row.name, value: row.savingValue, label: row.saving, color: CHART_COLOURS.gain, faded: faded(row) }))}
-          />
-        </ChartPanel>
-        <ChartPanel icon="percent" title="People into absolute poverty, before housing costs">
-          <HorizontalBars
-            ariaLabel={`People moved into absolute poverty before housing costs by package: ${rows.map((row) => `${row.name} ${row.poverty}`).join(", ")}`}
-            format={(value) => (Math.abs(value) >= 1000 ? `${value / 1000}k` : String(value))}
-            labelWidth={96}
-            rows={rows.map((row) => ({ name: row.name, value: row.povertyValue, label: row.poverty, color: CHART_COLOURS.loss, faded: faded(row) }))}
-          />
-        </ChartPanel>
-      </div>
-    </MilburnChartCard>
-  );
-}
-
-/** The relative poverty figure as one footnote sentence, or null when the run carries none. */
-export function relativePovertySentence(run) {
-  const count = run?.peopleIntoPovertyRel;
-  if (count === null || count === undefined) return null;
-  const pp = run.povertyPp.rel_bhc;
-  return `Relative poverty (60% of median, before housing costs): ${formatPeople(count)} people move ${count >= 0 ? "into" : "out of"} it${pp !== null ? ` (${formatSignedPp(pp)})` : ""}.`;
-}
+/**
+ * Young people's tiles: the 16 to 24s affected and their average change.
+ * The saving is on Public finances and the poverty count on Poverty.
+ */
+export const YOUNG_TILE_KEYS = ["young", "loss"];
 
 /**
  * The tiles for one run of milburn_summary.json, in its year: each a
  * figure, a short label and a one-line definition. A figure the file does
  * not carry is left out, never shown as zero.
  */
-export function keyFigureTiles(run, year) {
+export function keyFigureTiles(run, year, { keys = YOUNG_TILE_KEYS } = {}) {
   const yearLabel = fiscalYearTick(year);
   // A gain run's "losing" fields hold the gaining households (summary.js)
   const gain = run.direction === "gain";
@@ -222,7 +144,49 @@ export function keyFigureTiles(run, year) {
     "absolute",
     "Before housing costs, all ages.",
   );
-  return tiles;
+  return tiles.filter((tile) => keys.includes(tile.key));
+}
+
+/** The numbers behind each tile keyFigureTiles makes, by key: the figure, its unit and the extra figure. */
+function tileNumbers(run, year) {
+  const saving = savingInYear(run, year);
+  return {
+    saving: { value: saving === null ? null : Math.abs(saving), unit: "£bn a year, cash terms", decimals: 3 },
+    young: { value: run.youngPeopleLosing, unit: "people", decimals: 0, extra: run.youngShareLosingPct, extraUnit: "% of 16–24s" },
+    loss: { value: run.averageLossYoung === null ? null : Math.abs(run.averageLossYoung), unit: "£ a year, per household", decimals: 0 },
+    "poverty-abs": { value: run.peopleIntoPovertyAbs, unit: "people", decimals: 0, extra: run.povertyPp.abs_bhc, extraUnit: "pp change in the rate" },
+  };
+}
+
+/** The Key figures box's CSV: one row a tile, its figure unrounded beside the text the tile shows. */
+export function keyFiguresCsv(run, year, name, { keys = YOUNG_TILE_KEYS } = {}) {
+  const numbers = tileNumbers(run, year);
+  const rows = keyFigureTiles(run, year, { keys }).map((tile) => {
+    const number = numbers[tile.key];
+    return {
+      figure: tile.label,
+      value: number.value,
+      unit: number.unit,
+      extra: number.extra ?? null,
+      extraUnit: number.extra === null || number.extra === undefined ? "" : number.extraUnit,
+      shown: [tile.value, tile.extra].filter(Boolean).join(" "),
+      note: tile.definition ?? "",
+    };
+  });
+  return buildChartCsv({
+    title: `Key figures, ${name}, ${fiscalYearTick(year)}`,
+    units: "As each row says; values as milburn_summary.json gives them (the page rounds counts to the nearest thousand); static, with no replacement payments modelled",
+    columns: [
+      { key: "figure", label: "Figure" },
+      { key: "value", label: "Value", decimals: 3 },
+      { key: "unit", label: "Unit" },
+      { key: "extra", label: "Also shown", decimals: 3 },
+      { key: "extraUnit", label: "Its unit" },
+      { key: "shown", label: "As shown" },
+      { key: "note", label: "Note" },
+    ],
+    rows,
+  });
 }
 
 /**
@@ -236,10 +200,16 @@ export default function KeyFigures({ runId }) {
   const id = runId || HEADLINE_RUN;
   const measure = catalogue.byId?.get(id);
   const name = measure ? shortNameOf(measure) : id;
+  // The tiles, for the box's image download
+  const tilesRef = useRef(null);
   // Read afresh whenever the runs the page read change
   const { status, summary } = useMilburnSummary(catalogue.manifest?.snapshotSha256 ?? null);
   if (!catalogue.localBuild) return null;
 
+  const run = status === "ready" ? summaryRun(summary, id) : null;
+  const tiles = run ? keyFigureTiles(run, summary.year) : [];
+  // The file's subtitle names the header's selection; the fallback run is named in the title
+  const title = `Key figures${runId ? "" : `, ${name}`}${status === "ready" ? `, ${fiscalYearTick(summary.year)}` : ""}`;
   const heading = (
     <div className="milburn-key-heading">
       <h3>
@@ -249,6 +219,9 @@ export default function KeyFigures({ runId }) {
       {/* One selected policy: the header's button names it (screen readers only here); otherwise the fallback is named on the card */}
       {runId ? <p className="visually-hidden">{name}</p> : <p data-fallback-run="">{fallbackRunLine(name)}</p>}
       {status === "ready" && <YearOnlyChip year={summary.year} />}
+      {tiles.length > 0 && (
+        <BoxDownload title={title} name="key-figures" targetRef={tilesRef} csv={() => keyFiguresCsv(run, summary.year, name)} />
+      )}
     </div>
   );
   let body;
@@ -261,8 +234,6 @@ export default function KeyFigures({ runId }) {
   } else if (status !== "ready") {
     body = <p className="milburn-key-missing" role="status">Key figures are not available: the summary file has not been written yet.</p>;
   } else {
-    const run = summaryRun(summary, id);
-    const tiles = run ? keyFigureTiles(run, summary.year) : [];
     body = !run ? (
       <p className="milburn-key-missing" role="status">
         Not yet run: the key figures for {name} appear here once its national run has finished.
@@ -270,7 +241,7 @@ export default function KeyFigures({ runId }) {
     ) : !tiles.length ? (
       <p className="milburn-key-missing" role="status">The summary file carries no key figures for {name}.</p>
     ) : (
-      <ul className="milburn-key-tiles" aria-label="Figures">
+      <ul ref={tilesRef} className="milburn-key-tiles" aria-label="Figures">
         {tiles.map((tile) => (
           <li key={tile.key} className="milburn-key-tile" data-key={tile.key}>
             <TitleIcon name={tile.icon} className="milburn-key-icon" size={18} />
@@ -289,26 +260,27 @@ export default function KeyFigures({ runId }) {
     <section className="report-section milburn-key card" aria-label="Key figures">
       {heading}
       {body}
-      {/* Under the tiles, once the run has figures to set them beside */}
-      {status === "ready" && summaryRun(summary, id) && <BenchmarkCallout place="young" />}
-      {status === "ready" && <RangeStrip summary={summary} selectedId={id} />}
+      {/* The saving and the poverty count have their own sub-tabs: linked, not repeated */}
+      {run && (
+        <p className="milburn-see-also" data-see-also="">
+          <TitleIcon name="arrowRight" bare size={14} />
+          <span>
+            Exchequer saving: <SubTabLink sub="finances">Public finances</SubTabLink>
+            {POVERTY_FIGURES_SHOWN && (
+              <>
+                {" · "}Poverty: <SubTabLink sub="poverty">Poverty</SubTabLink>
+              </>
+            )}
+          </span>
+        </p>
+      )}
       <details className="milburn-details">
         <summary>
           <TitleIcon name="alert" bare size={14} />
           Notes and caveats
         </summary>
         <ul className="milburn-points">
-          {/* Relative poverty, folded with the notes (Vahid, 17 Nov) */}
-          {status === "ready" && relativePovertySentence(summaryRun(summary, id)) && (
-            <li data-poverty-note="">
-              <TitleIcon name="percent" bare size={14} />
-              <span>{relativePovertySentence(summaryRun(summary, id))}</span>
-            </li>
-          )}
-          <li>
-            <TitleIcon name="scale" bare size={14} />
-            <span>{RELATIVE_LINE_NOTE}</span>
-          </li>
+          {/* Losses are this box's subject: its one upper-bound line */}
           <li data-replacement-note="">
             <TitleIcon name="alert" bare size={14} />
             <span>{REPLACEMENT_NOT_MODELLED_NOTE}</span>
@@ -319,10 +291,12 @@ export default function KeyFigures({ runId }) {
           </li>
           <li>
             <TitleIcon name="calendar" bare size={14} />
-            <span>{STATIC_NOTE}</span>
+            <span>{ROUNDING_NOTE}</span>
           </li>
         </ul>
       </details>
+      {/* Published figures: a link to Benchmarks, once the run has figures to set them beside */}
+      {run && <BenchmarkCallout place="young" />}
     </section>
   );
 }

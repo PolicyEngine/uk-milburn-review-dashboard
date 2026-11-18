@@ -75,13 +75,20 @@ describe("MeasureKey", () => {
 describe("the chips' names", () => {
   it("show policyDetails.js's short name only while it describes the published measure", () => {
     const { writtenFor, shortName } = POLICY_DETAILS.find((entry) => entry.id === FUEL.id);
-    const { rerender } = render(<MeasureKey members={[{ ...FUEL, description: writtenFor }]} />);
+    const { rerender } = render(<MeasureKey members={[{ ...FUEL, description: writtenFor }, NI]} />);
     // Its name starts with the short text it shows, then the full name
     const chip = screen.getByRole("button", { name: `${shortName}: ${FUEL.name}` });
     expect(chip.querySelector(".measure-key-label")).toHaveTextContent(shortName);
     // Changed since (on Budget day, say): its published name
-    rerender(<MeasureKey members={[{ ...FUEL, description: "Fuel duty rises are deferred for two years." }]} />);
+    rerender(<MeasureKey members={[{ ...FUEL, description: "Fuel duty rises are deferred for two years." }, NI]} />);
     expect(screen.getByRole("button", { name: FUEL.name }).querySelector(".measure-key-label")).toHaveTextContent(FUEL.name);
+  });
+});
+
+describe("MeasureKey: one measure", () => {
+  it("draws no key for a single measure with no net line", () => {
+    const { container } = render(<MeasureKey members={[FUEL]} />);
+    expect(container.querySelector(".measure-key")).toBeNull();
   });
 });
 

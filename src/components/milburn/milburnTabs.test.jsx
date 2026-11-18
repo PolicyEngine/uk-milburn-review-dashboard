@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
 const fixture = readFileSync(join(__dirname, "..", "..", "test", "fixtures", "milburn", "milburn_scenarios.json"), "utf8");
 const reviewFigures = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_review_figures.json"), "utf8");
@@ -136,7 +136,8 @@ describe("Moves into work (illustrative)", () => {
     // No bars on one axis: an assumed figure is not drawn against the review's estimate
     expect(section.querySelector("[data-single-chart]")).toBeNull();
     expect(section.querySelector("[role=img]")).toBeNull();
-    expect(section.textContent).toContain("not drawn on one scale");
+    // Its one line under the title says the two are different exercises, ours an assumed share
+    expect(section.querySelector(".chart-description").textContent).toBe("Different exercises, not a check on each other: ours assumes 25% move into work.");
     // No source line in view: the table and the full citation, with its link, are folded away
     expect(section.querySelector("[data-review-source-short]")).toBeNull();
     expect(section.textContent).not.toContain("Source: the review");
@@ -145,8 +146,30 @@ describe("Moves into work (illustrative)", () => {
     expect(section.querySelector("details[data-full-comparison] table")).not.toBeNull();
     expect(section.querySelector("details[data-review-more] > summary").textContent).toBe("More info");
     expect(section.querySelector("details[data-review-more] [data-review-source]").textContent).toMatch(/^Source for the review’s figures: /);
-    // Two exercises, neither called right
-    expect(section.textContent).toContain(DIFFERENT_EXERCISES_SENTENCE);
+    // Two exercises, neither called right (the full sentence is in the card's CSV units line)
+    expect(section.textContent).toContain("Different exercises, not a check on each other");
+    expect(DIFFERENT_EXERCISES_SENTENCE).toMatch(/neither figure is a check on the other/);
+    // The card's CSV keeps the full sentence in its units line
+    const blobs = [];
+    const createUrl = vi.spyOn(URL, "createObjectURL").mockImplementation((blob) => {
+      blobs.push(blob);
+      return "blob:review";
+    });
+    const revokeUrl = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+    const clickLink = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    fireEvent.click(section.querySelector(".chart-download-button"));
+    fireEvent.click(section.querySelector('[data-format="csv"]'));
+    await waitFor(() => expect(blobs).toHaveLength(1));
+    const text = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsText(blobs[0]);
+    });
+    const units = text.split("\r\n")[1];
+    expect(units).toContain(DIFFERENT_EXERCISES_SENTENCE);
+    createUrl.mockRestore();
+    revokeUrl.mockRestore();
+    clickLink.mockRestore();
     expect(section.textContent).not.toMatch(/overstat|understat|too high|too low|optimistic|pessimistic|more accurate|unrealistic|correct/i);
     // The report is cited, every link opening in a new tab
     const links = within(section).getAllByRole("link");

@@ -14,7 +14,7 @@ export const BOOT_SUBS = Object.freeze({
   // Poverty only while its figures are shown (povertyFigures.js), as PopulationImpactView
   // Less the sub-tabs the report-day switch hides (milburn/reportDay.js)
   dashboard: Object.freeze(
-    ["age", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : []), "finances", "scenarios", "benchmarks"].filter((sub) =>
+    ["age", "finances", ...(POVERTY_FIGURES_SHOWN ? ["poverty"] : []), "scenarios", "benchmarks"].filter((sub) =>
       subShownOnReportDay(sub),
     ),
   ),

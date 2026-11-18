@@ -4,6 +4,7 @@ import ChartDownloadMenu from "../ChartDownloadMenu";
 import { TOOLTIP_PROPS } from "../ChartTooltip";
 import TitleIcon from "../TitleIcon";
 import { CHART_LOGO } from "../../utils/chartLogo";
+import { openPopulationSub, populationSubHref } from "../../utils/populationSub";
 import {
   AXIS_LINE,
   BAR_RADIUS,
@@ -31,7 +32,7 @@ const REFERENCE_LABEL_ROW = 16;
  * logo. `single` says the card holds one Recharts chart. `after` goes under the logo (notes,
  * the figures as a table).
  */
-export function MilburnChartCard({ as: Heading = "h3", id, icon, title, description, name, csv, single = false, legendItems = [], className = "", children, after }) {
+export function MilburnChartCard({ as: Heading = "h3", id, icon, title, description, name, csv, single = false, legendItems = [], className = "", children, after, logo = true }) {
   const chartRef = useRef(null);
   const download = csv
     ? {
@@ -75,12 +76,46 @@ export function MilburnChartCard({ as: Heading = "h3", id, icon, title, descript
           ))}
         </ul>
       )}
-      <div className="chart-logo">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={CHART_LOGO.href} alt="PolicyEngine" />
-      </div>
+      {/* The logo marks a plot; cards of text or tables go without (Vahid, 18 Nov) */}
+      {logo && (
+        <div className="chart-logo">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={CHART_LOGO.href} alt="PolicyEngine" />
+        </div>
+      )}
       {after}
     </div>
+  );
+}
+
+/**
+ * A headline box's Download menu (CSV, PNG and SVG), as the chart cards'
+ * menus: the CSV from `csv`, the image the element in `targetRef` (the
+ * box's figures, not its notes) redrawn from the page (exportDomAsSvg) in
+ * the frame, with the logo, whether or not the page shows one there.
+ */
+export function BoxDownload({ title, name, csv, targetRef }) {
+  return (
+    <ChartDownloadMenu
+      download={{ chartRef: targetRef, name, csv, exportOptions: { title, logo: CHART_LOGO } }}
+      chartTitle={title}
+    />
+  );
+}
+
+/** A link to another Impact sub-tab, switched to in place (openPopulationSub); a real link for a new tab. */
+export function SubTabLink({ sub, children }) {
+  return (
+    <a
+      href={populationSubHref(sub)}
+      onClick={(event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+        event.preventDefault();
+        openPopulationSub(sub);
+      }}
+    >
+      {children}
+    </a>
   );
 }
 
