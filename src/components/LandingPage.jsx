@@ -44,7 +44,7 @@ function LandingBox({ tab, sub, icon, title, description, onOpen }) {
  */
 export const landingBoxes = ({ reportDay = REPORT_DAY, published = REPORT_PUBLISHED } = {}) => [
   ["dashboard", "age", "usersRound", "Young people", "Who gains or loses, and the cost"],
-  ["dashboard", "scenarios", "sliders", "Moves into work (illustrative)", "The package if some young people move into work"],
+  ["dashboard", "scenarios", "sliders", "Moves into work (illustrative)", "If some young people find work"],
   ["policies", undefined, "list", "Measures we model", reportCopy(published).measuresBoxLine],
 ].filter(([, sub]) => subShownOnReportDay(sub, reportDay));
 

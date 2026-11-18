@@ -73,7 +73,7 @@ describe("the landing page", () => {
     // Each box: a title, one short line and "Explore", and no figure
     expect(within(page).getAllByRole("link", { name: /Explore$/ }).map((link) => [link.getAttribute("href"), link.textContent])).toEqual([
       ["?tab=dashboard&sub=age", "Young peopleWho gains or loses, and the costExplore→"],
-      ...(RETURN_TO_WORK_SHOWN ? [["?tab=dashboard&sub=scenarios", "Moves into work (illustrative)The package if some young people move into workExplore→"]] : []),
+      ...(RETURN_TO_WORK_SHOWN ? [["?tab=dashboard&sub=scenarios", "Moves into work (illustrative)If some young people find workExplore→"]] : []),
       ["?tab=policies", `Measures we model${COPY.measuresBoxLine}Explore→`],
     ]);
     expect(page.querySelector(".landing-box-figure")).toBeNull();
@@ -325,7 +325,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
     const rows = within(within(nav).getByRole("list", { name: "In this dashboard" })).getAllByRole("link");
     expect(rows.map((row) => row.textContent)).toEqual([
       "Young peopleWho gains or loses, and the cost",
-      ...(RETURN_TO_WORK_SHOWN ? ["Moves into work (illustrative)The package if some young people move into work"] : []),
+      ...(RETURN_TO_WORK_SHOWN ? ["Moves into work (illustrative)If some young people find work"] : []),
       `Measures we model${COPY.measuresBoxLine}`,
     ]);
     const site = within(within(nav).getByRole("region", { name: "More from PolicyEngine" })).getByRole("link");
