@@ -968,7 +968,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     <p className="milburn-header-hint" data-header-hint="">
       <TitleIcon name="layers" bare size={14} />
       <span>
-        Choose the <strong>policy</strong> and the <strong>year</strong> in the header above; the charts below follow your choice. {SINGLE_YEAR_RULE}
+        Choose the <strong>policy</strong> and <strong>year</strong> above. {SINGLE_YEAR_RULE}
       </span>
     </p>
   );

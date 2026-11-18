@@ -220,7 +220,7 @@ export function FiguresTable({ children, label = "Figures as a table" }) {
  * cases and break-even card each say their own year.
  */
 export const SINGLE_YEAR_RULE =
-  "Household impact is for 2029-30, and Benchmarks give each figure's own year; every other figure on Impact follows the year you choose, except where a card states its own year.";
+  "Household impact is for 2029-30; cards that name a year keep it.";
 
 /** What the year-only chip says of a box whose figures are for one year. */
 export const yearOnlyText = (year, what = "these figures") => `${fiscalYearTick(year)} only: the year selector does not change ${what}.`;

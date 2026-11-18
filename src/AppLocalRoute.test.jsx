@@ -84,7 +84,7 @@ describe("the local build route's page", () => {
       return found;
     });
     // The one rule for what stays on one year, said once, here
-    expect(hint.textContent).toBe(`Choose the policy and the year in the header above; the charts below follow your choice. ${SINGLE_YEAR_RULE}`);
+    expect(hint.textContent).toBe(`Choose the policy and year above. ${SINGLE_YEAR_RULE}`);
     expect(document.querySelectorAll("[data-year-only]").length).toBe(0);
     const line = document.querySelector("[data-static-line]");
     expect(line.textContent).toBe(`${STATIC_CAVEAT_LINE}: see Methodology`);
