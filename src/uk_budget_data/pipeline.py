@@ -754,8 +754,20 @@ def run_flat_unit(unit: FlatUnit) -> FlatOutcome:
             ):
                 warn(gap.reason)
     survey = None
-    if flat or unit.tables & {"household_scatter", "income_distribution"}:
+    if unit.tables & {"household_scatter", "income_distribution"}:
         survey = scatter_survey_households(baseline, dataset_path)
+    elif flat:
+        # The floor of survey households needs them; a stand-in simulation
+        # with no dataset tables (tests) has none, and its CSVs are written
+        # without the floor, said loudly
+        try:
+            survey = scatter_survey_households(baseline, dataset_path)
+        except AttributeError as error:
+            say(
+                f"[bold red]NO DISCLOSURE FLOOR[/bold red] {escape(reform.id)}: no "
+                f"survey households ({escape(str(error))}); the disclosure "
+                "floor is not applied to its tables."
+            )
 
     # Every table is read while the watch runs, from the same two runs.
     with data_limits.observing(baseline, reformed) as observed:
