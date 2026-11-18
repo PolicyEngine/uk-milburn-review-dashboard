@@ -193,6 +193,109 @@ def _employment_response(
     return sim
 
 
+def _has_award(category) -> np.ndarray:
+    if hasattr(category, "possible_values"):
+        return category != category.possible_values.NONE
+    return np.asarray(category).astype(str) != "NONE"
+
+
+def entry_group(
+    sim,
+    year,
+    lowest_age,
+    age_limit,
+    uc_upper_age,
+    uc_lower_age=0,
+    include_pip=False,
+    include_scotland=True,
+    reach=None,
+):
+    """Who can move into work in the report's entry runs in ``year``: aged
+    ``lowest_age`` to ``age_limit`` - 1, with no employment or
+    self-employment income, and either losing the health element (the UC
+    assessed claimant, not the other member of a single claim, with LCWRA,
+    in a benefit unit where no claimant with LCWRA keeps it: aged
+    ``uc_upper_age`` or over, under ``uc_lower_age``, or not reached) or,
+    with ``include_pip``, losing PIP (an award, in the removal's ages and
+    area, reached). ``reach`` is a function of (person, period) giving who
+    the new rules have reached (None: everyone). Read on the run's own
+    current-law values, before any change."""
+    person = sim.populations["person"]
+    benunit = sim.populations["benunit"]
+    period = as_period(year)
+    age = person("age", period)
+    earnings = np.array(sim.calculate("employment_income", year))
+    self_employed = np.array(sim.calculate("self_employment_income", year))
+    reached_now = (
+        np.ones(person.count, dtype=bool)
+        if reach is None
+        else np.asarray(reach(person, period))
+    )
+    claimant = person("is_uc_assessed_claimant", period) & ~(
+        other_member_of_single_claim(person, period)
+    )
+    lcwra = claimant & person("uc_limited_capability_for_WRA", period)
+    keeps = lcwra & (
+        (age >= uc_upper_age) | (age < uc_lower_age) | ~reached_now
+    )
+    element = np.array(sim.calculate("uc_LCWRA_element", year))
+    loses_element = (
+        lcwra & (element > 0) & ~benunit.project(benunit.any(keeps))
+    )
+    loses = loses_element
+    if include_pip:
+        has_pip = _has_award(person("pip_dl_category", period)) | _has_award(
+            person("pip_m_category", period)
+        )
+        pip_removed = has_pip & reached_now
+        if not include_scotland:
+            country = person.household("country", period)
+            pip_removed = pip_removed & (
+                country != country.possible_values.SCOTLAND
+            )
+        loses = loses | pip_removed
+    return (
+        (age >= lowest_age)
+        & (age < age_limit)
+        & (earnings <= 0)
+        & (self_employed <= 0)
+        & loses
+    )
+
+
+def employment_response_in_group(
+    sim,
+    group,
+    share,
+    start_year,
+    end_year,
+    hours=design.ENTRY_HOURS,
+    draws_below=True,
+):
+    """Move a seeded ``share`` of each year's ``group(sim, year)`` into
+    ``hours`` a week at their minimum wage, in the reform only. ``share``
+    1 moves everyone (no draw). ``draws_below`` False moves the complement
+    of a share's draw (draw at or above ``share``), for the linearity
+    check. Every group is read before any earnings change, then the
+    simulation's calculated values are dropped so nothing read before the
+    move is reused after it."""
+    person = sim.populations["person"]
+    draws = _draws(person.count, 1)
+    pick = (draws < share) if draws_below else (draws >= share)
+    if share >= 1 and draws_below:
+        pick = np.ones(person.count, dtype=bool)
+    plan = {}
+    for year in range(start_year, end_year + 1):
+        moves = group(sim, year) & pick
+        wage = np.array(sim.calculate("minimum_wage", year))
+        earnings = np.array(sim.calculate("employment_income", year))
+        plan[year] = np.where(moves, hours * 52 * wage, earnings)
+    for year, new in plan.items():
+        sim.set_input("employment_income", year, new)
+    sim.drop_computed_arrays()
+    return sim
+
+
 def milburn_package_with_entry_25pct(sim):
     """The full package, with a quarter of affected non-working young
     people moving into 16 hours a week at their minimum wage."""

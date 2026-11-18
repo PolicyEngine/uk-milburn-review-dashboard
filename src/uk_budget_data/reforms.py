@@ -57,7 +57,12 @@ from uk_budget_data.budget_measures.household_energy_payment_2026 import (
 )
 from uk_budget_data.budget_measures.milburn_report import (
     milburn_report_employer_nics,
+    milburn_report_package_entry_all_uc_health,
+    milburn_report_package_entry_all_with_pip,
+    milburn_report_package_entry_check_complement_with_pip,
+    milburn_report_package_entry_check_with_pip,
     milburn_report_package_phased,
+    milburn_report_package_phased_entry_all_uc_health,
     milburn_report_package_with_entry_25pct,
     milburn_report_pip,
     milburn_report_uc_health,
@@ -2179,6 +2184,96 @@ def _create_milburn_report_package_entry_25pct() -> Reform:
     )
 
 
+# The phased move into work's runs (docs/milburn-phased-scenario-design.md):
+# reserved, never promoted. The page's figures are arithmetic on them
+# (scripts/milburn_entry_path.py); none is published as a run.
+MILBURN_REPORT_ENTRY_ALL_UC_HEALTH_ID = (
+    "milburn_report_package_entry_all_uc_health"
+)
+MILBURN_REPORT_ENTRY_ALL_WITH_PIP_ID = (
+    "milburn_report_package_entry_all_with_pip"
+)
+MILBURN_REPORT_PHASED_ENTRY_ALL_UC_HEALTH_ID = (
+    "milburn_report_package_phased_entry_all_uc_health"
+)
+MILBURN_REPORT_ENTRY_CHECK_ID = "milburn_report_package_entry_check_with_pip"
+MILBURN_REPORT_ENTRY_CHECK_COMPLEMENT_ID = (
+    "milburn_report_package_entry_check_complement_with_pip"
+)
+MILBURN_REPORT_ENTRY_RUN_IDS = (
+    MILBURN_REPORT_ENTRY_ALL_UC_HEALTH_ID,
+    MILBURN_REPORT_ENTRY_ALL_WITH_PIP_ID,
+    MILBURN_REPORT_PHASED_ENTRY_ALL_UC_HEALTH_ID,
+    MILBURN_REPORT_ENTRY_CHECK_ID,
+    MILBURN_REPORT_ENTRY_CHECK_COMPLEMENT_ID,
+)
+
+
+def _entry_text(who: str, base: str) -> str:
+    d = milburn_design
+    return (
+        f"{base}, with {who} moving from no work into {d.ENTRY_HOURS} "
+        "hours a week at the minimum wage for their age, from "
+        f"{d.start_date_text(d.REPORT_START_YEAR)}. An input to the page's "
+        "arithmetic for an assumed share moving into work, not a scenario "
+        "of its own." + _report_without_employer_nics_text()
+    )
+
+
+_UC_HEALTH_LOSERS = (
+    "every 18 to 24-year-old with no earnings who loses the Universal "
+    "Credit health element"
+)
+
+
+def _create_milburn_report_entry_runs() -> list[Reform]:
+    d = milburn_design
+    check = d.percent_text(d.REPORT_ENTRY_CHECK_SHARE)
+    pip_too = _UC_HEALTH_LOSERS + ", or loses PIP,"
+    return [
+        Reform(
+            id=MILBURN_REPORT_ENTRY_ALL_UC_HEALTH_ID,
+            name="Health element and PIP removal from April 2029, everyone losing the health element moving into work (input)",
+            description=_entry_text(_UC_HEALTH_LOSERS, "The report package"),
+            simulation_modifier=milburn_report_package_entry_all_uc_health,
+        ),
+        Reform(
+            id=MILBURN_REPORT_ENTRY_ALL_WITH_PIP_ID,
+            name="Health element and PIP removal from April 2029, everyone losing either moving into work (input)",
+            description=_entry_text(pip_too, "The report package"),
+            simulation_modifier=milburn_report_package_entry_all_with_pip,
+        ),
+        Reform(
+            id=MILBURN_REPORT_PHASED_ENTRY_ALL_UC_HEALTH_ID,
+            name="Phased health element and PIP removal from April 2029, everyone reached losing the health element moving into work (input)",
+            description=_entry_text(
+                _UC_HEALTH_LOSERS + " once the new rules reach them",
+                "The phased report package",
+            ),
+            simulation_modifier=milburn_report_package_phased_entry_all_uc_health,
+        ),
+        Reform(
+            id=MILBURN_REPORT_ENTRY_CHECK_ID,
+            name=f"Health element and PIP removal from April 2029, a random {check} of those losing either moving into work (check)",
+            description=_entry_text(
+                f"a randomly chosen {check} of those losing either",
+                "The report package",
+            ),
+            simulation_modifier=milburn_report_package_entry_check_with_pip,
+        ),
+        Reform(
+            id=MILBURN_REPORT_ENTRY_CHECK_COMPLEMENT_ID,
+            name=f"Health element and PIP removal from April 2029, the other {d.percent_text(1 - d.REPORT_ENTRY_CHECK_SHARE)} of those losing either moving into work (check)",
+            description=_entry_text(
+                "the rest of those losing either (the complement of the "
+                f"{check} check)",
+                "The report package",
+            ),
+            simulation_modifier=milburn_report_package_entry_check_complement_with_pip,
+        ),
+    ]
+
+
 def _create_milburn_report_youth_allowance() -> Optional[Reform]:
     """The report's youth allowance at given amounts; None while
     ``REPORT_YOUTH_ALLOWANCE_MONTHLY`` is None (at the under-25 rate no
@@ -2480,6 +2575,7 @@ _RESERVED_IDS = frozenset(
         MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_ID,
         MILBURN_REPORT_EMPLOYER_NICS_ALL_SECTORS_ID,
         MILBURN_REPORT_YOUTH_WORK_ALLOWANCE_15H_ID,
+        *MILBURN_REPORT_ENTRY_RUN_IDS,
     }
 )
 
@@ -2549,6 +2645,7 @@ def _get_reserved() -> dict[str, Reform]:
     if _RESERVED_CACHE is None:
         milburn_design.check_report_design()
         singles = [factory() for factory in _RESERVED_FACTORIES]
+        singles += _create_milburn_report_entry_runs()
         reserved = {r.id: r for r in singles if r is not None}
         name, _ = _report_uc_health_text()
         pip_name, _ = _report_pip_text()

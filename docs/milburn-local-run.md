@@ -359,7 +359,9 @@ page until promoted):
 | `milburn_report_package` | The report's health element and PIP changes together (`combine_measures` of the two below), with `milburn_report_employer_nics` when a rate is set |
 | `milburn_report_uc_health`, `milburn_report_pip` | Its parts |
 | `milburn_report_package_phased` | The report package by natural migration |
-| `milburn_report_package_entry_25pct` | The report package with the illustrative move into work |
+| `milburn_report_package_entry_25pct` | The report package with the illustrative move into work (old selection; not run) |
+| `milburn_report_package_entry_all_uc_health`, `milburn_report_package_entry_all_with_pip`, `milburn_report_package_phased_entry_all_uc_health` | Everyone in the group moving into work: inputs to the phased move into work's arithmetic (`scripts/milburn_entry_path.py`), staged outside `public/`, never promoted |
+| `milburn_report_package_entry_check_with_pip`, `milburn_report_package_entry_check_complement_with_pip` | The arithmetic's linearity check: a seeded 25% of the with-PIP group, and the other 75% |
 | `milburn_report_youth_allowance` | Exists only while `REPORT_YOUTH_ALLOWANCE_MONTHLY` is set (not part of the report package) |
 | `milburn_report_employer_nics` | Exists only while `REPORT_EMPLOYER_NICS_UNDER_25_RATE` is set; then also a member of `milburn_report_package` |
 | `milburn_package_16_to_24` | 15 November health element removal with PIP removed from 16 |

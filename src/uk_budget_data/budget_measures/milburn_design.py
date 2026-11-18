@@ -121,6 +121,57 @@ REPORT_YOUTH_ALLOWANCE_MONTHLY = None
 REPORT_EMPLOYER_NICS_UNDER_25_RATE = None
 REPORT_EMPLOYER_NICS_AGE_LIMIT = 25
 
+# The phased move into work (docs/milburn-phased-scenario-design.md). Our
+# scenario, built from two of the review's figures: the analytical annex's
+# "additional employment impact of 9%" for UC health claimants (section 1),
+# read as percentage points (the annex does not say points or per cent),
+# and the timing of its NEET path (data tables, table 3: baseline less the
+# rate with the recommendations, percentage points), counted from the year
+# before the benefit changes. The page's figures are arithmetic on the
+# everyone-moves runs (scripts/milburn_entry_path.py), not a run of the
+# shares themselves.
+REPORT_ENTRY_EFFECT = 0.09
+REPORT_NEET_GAP_PP = {
+    2026: 0.0,
+    2027: 0.3,
+    2028: 0.9,
+    2029: 1.7,
+    2030: 2.7,
+    2031: 3.7,
+    2036: 6.6,
+}
+# The gap year the 9% is taken as reached in (the last the review publishes)
+REPORT_NEET_GAP_END_YEAR = 2036
+# The year the path is counted from (None: not rebased); must be the year
+# before REPORT_START_YEAR
+REPORT_ENTRY_REBASE_YEAR = 2028
+# The seeded share of the linearity check's direct runs
+REPORT_ENTRY_CHECK_SHARE = 0.25
+ENTRY_PATHS = ("table3", "table3_unrebased", "flat")
+
+
+def report_entry_share(year, path="table3"):
+    """The share of the group's non-workers assumed in work in fiscal year
+    ``year``: 0 before REPORT_START_YEAR; then REPORT_ENTRY_EFFECT times
+    Table 3's gap as a share of its end-year gap (rebased to
+    REPORT_ENTRY_REBASE_YEAR for "table3", not for "table3_unrebased"), or
+    REPORT_ENTRY_EFFECT flat ("flat")."""
+    if path not in ENTRY_PATHS:
+        raise ValueError(f"Unknown entry path {path!r}.")
+    if year < REPORT_START_YEAR:
+        return 0.0
+    if path == "flat":
+        return REPORT_ENTRY_EFFECT
+    gaps = REPORT_NEET_GAP_PP
+    base = (
+        gaps[REPORT_ENTRY_REBASE_YEAR]
+        if path == "table3" and REPORT_ENTRY_REBASE_YEAR is not None
+        else 0.0
+    )
+    end = gaps[REPORT_NEET_GAP_END_YEAR]
+    return REPORT_ENTRY_EFFECT * (gaps[year] - base) / (end - base)
+
+
 _MONTHS = (
     "January",
     "February",
@@ -244,5 +295,43 @@ def check_report_design():
                 "REPORT_YOUTH_ALLOWANCE_MONTHLY must give every year "
                 f"{min(wanted)} to {max(wanted)} and no other."
             )
+    problems += _entry_path_problems()
     if problems:
         raise ValueError("Milburn report design: " + " ".join(problems))
+
+
+def _entry_path_problems():
+    problems = []
+    if not 0 <= REPORT_ENTRY_EFFECT <= 1:
+        problems.append("REPORT_ENTRY_EFFECT must be in [0, 1].")
+    gaps = REPORT_NEET_GAP_PP
+    years = sorted(gaps)
+    if any(gaps[a] > gaps[b] for a, b in zip(years, years[1:])):
+        problems.append("REPORT_NEET_GAP_PP must not fall year on year.")
+    wanted = set(range(REPORT_START_YEAR, LAST_POLICY_YEAR + 1))
+    wanted |= {REPORT_NEET_GAP_END_YEAR}
+    if REPORT_ENTRY_REBASE_YEAR is not None:
+        wanted.add(REPORT_ENTRY_REBASE_YEAR)
+        if REPORT_ENTRY_REBASE_YEAR != REPORT_START_YEAR - 1:
+            problems.append(
+                "REPORT_ENTRY_REBASE_YEAR must be the year before "
+                "REPORT_START_YEAR (or None)."
+            )
+    if not wanted <= set(gaps):
+        problems.append(
+            "REPORT_NEET_GAP_PP needs every year "
+            f"{', '.join(map(str, sorted(wanted - set(gaps))))}."
+        )
+    elif REPORT_NEET_GAP_END_YEAR <= LAST_POLICY_YEAR:
+        problems.append("REPORT_NEET_GAP_END_YEAR must follow the window.")
+    else:
+        base = (
+            gaps[REPORT_ENTRY_REBASE_YEAR]
+            if REPORT_ENTRY_REBASE_YEAR is not None
+            else 0.0
+        )
+        if not gaps[REPORT_NEET_GAP_END_YEAR] > base:
+            problems.append("Table 3's end gap must exceed the rebase gap.")
+    if not 0 < REPORT_ENTRY_CHECK_SHARE < 1:
+        problems.append("REPORT_ENTRY_CHECK_SHARE must be in (0, 1).")
+    return problems

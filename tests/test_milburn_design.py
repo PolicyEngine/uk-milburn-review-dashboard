@@ -82,6 +82,9 @@ NOT_LISTED = {
     "milburn_package_16_to_24",
     "pip_removed_under_25_excluding_scotland",
     "pip_removed_16_to_24_excluding_scotland",
+    # The phased move into work's runs: inputs to the page's arithmetic
+    # (scripts/milburn_entry_path.py), never listed
+    *reforms.MILBURN_REPORT_ENTRY_RUN_IDS,
 }
 
 
