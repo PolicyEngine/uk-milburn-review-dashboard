@@ -60,9 +60,12 @@ def average_loss(young: dict, gains: bool):
     column = CONDITIONAL_COLUMN[gains]
     if column in young:
         value = young[column]
-        if value in (None, "") and young.get(
-            "pct_worse_off" if column.endswith("worse_off") else "pct_better_off"
-        ) in (None, ""):
+        # Withheld under the disclosure floor: with its own side's share,
+        # or with the other side's (whose total it would give back)
+        if value in (None, "") and (
+            young.get("pct_worse_off") in (None, "")
+            or young.get("pct_better_off") in (None, "")
+        ):
             return None, "not available: withheld under the disclosure floor"
         if value in (None, ""):
             return None, (
