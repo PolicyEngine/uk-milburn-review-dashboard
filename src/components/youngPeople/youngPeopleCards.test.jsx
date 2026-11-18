@@ -282,11 +282,13 @@ describe("young people cards", () => {
     render(<TrendCard {...props} selectedYear={2028} />);
     const description = document.querySelector(".young-people-trend .chart-description");
     expect(description.querySelector("strong")).toBeNull();
-    expect(description).toHaveTextContent(
+    expect(description.querySelector(".trend-headline")).toHaveTextContent(
       /^16 to 24-year-olds gain about £30 a person in 2028-29( and lose about £230 from 2029-30, when the [\w ]+ applies)?\.$/,
     );
-    // Why other ages change is said once on the view, on the first age card, not on this one
-    expect(description.querySelector("[data-age-household-note]")).toBeNull();
+    // Why other ages change, on this card too (María, #6 item 3)
+    expect(description.querySelector("[data-age-household-note]")).toHaveTextContent(
+      "Other ages change only because they share a household with someone in the targeted ages.",
+    );
     expect(description).not.toHaveTextContent(/£ a year/);
   });
 
@@ -343,7 +345,7 @@ describe("young people cards", () => {
     render(<TrendCard {...props} selectedYear={2029} />);
     const first = DISPLAY_YEARS[0];
     const last = DISPLAY_YEARS[DISPLAY_YEARS.length - 1];
-    const title = new RegExp(`Change by year, ${first}-${String(first + 1).slice(-2)} to ${last}-${String(last + 1).slice(-2)}`);
+    const title = new RegExp(`Change by year, average per person, ${first}-${String(first + 1).slice(-2)} to ${last}-${String(last + 1).slice(-2)}`);
     expect(screen.getByRole("heading", { level: 3, name: title })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Download chart: Change by year/ })).toBeInTheDocument();
     expect(screen.getByTestId("recharts-responsive-container")).toBeInTheDocument();

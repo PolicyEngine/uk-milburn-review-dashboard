@@ -44,6 +44,7 @@ import { nounOf, shortNameOf } from "../../utils/policyDetails";
 import TitleIcon from "../TitleIcon";
 import ChartMoreInfo from "../ChartMoreInfo";
 import { BY_YEAR_METHOD } from "../methodology/anchors";
+import { AgeHouseholdNote } from "../milburn/SourceChip";
 
 /** Every age group's line, 16 to 24 first. */
 export const SERIES = AGE_GROUPS.map((group) => ({
@@ -561,7 +562,9 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
   const unpublished = raw.filter((point) => !point.published);
   const first = fiscalYearTick(shownYears[0]);
   const last = fiscalYearTick(shownYears[shownYears.length - 1]);
-  const title = `Change by year, ${first} to ${last}`;
+  // "Average per person" in the title (María, #6 item 3): each line is a
+  // group's average, so the lines do not nest as totals would
+  const title = `Change by year, average per person, ${first} to ${last}`;
   const description = cumulative ? cumulativeDescription(shownYears[0]) : TREND_DESCRIPTION;
 
   // The headline, one plain sentence with the units folded in: the
@@ -726,6 +729,7 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
                 when there is no headline */}
             {headline ? <span className="trend-headline">{headline}</span> : description}
             {stepsLine ? ` ${stepsLine}` : null}
+            <AgeHouseholdNote />
           </p>
         </div>
         <ChartDownloadMenu download={download} chartTitle={title} />
@@ -920,7 +924,11 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
           year={Number(selectedYear)}
           info={{
             shows: "Average change in household income per person in each age group, each year, with all ages for comparison.",
-            how: ["Running total adds up the years from the first one we show."],
+            how: [
+              "Running total adds up the years from the first one we show.",
+              // Averages do not nest (María, #6 item 3)
+              "All ages averages over everyone, most of whom the policy does not reach, so its line is smaller than the targeted group's.",
+            ],
             caveats: [
               unpublished.length > 0 &&
                 `Not yet published: ${unpublished.map((point) => fiscalYearTick(point.year)).join(", ")}.`,

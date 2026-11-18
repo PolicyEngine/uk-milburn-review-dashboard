@@ -108,10 +108,12 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
           <SectionHeading
             id="age-who-gains"
             icon="userPlus"
-            title="Gains and losses, and which policies drive them"
-            subtitle={`How many ${subject.toLowerCase()} gain or lose, and from which policies.`}
+            // One policy at a time, never stacked: no "which policies drive
+            // them" (María, #6 item 4)
+            title="Gains and losses"
+            subtitle={`How much ${subject.toLowerCase()} gain or lose on average, and how many, with the selected policy.`}
           />
-          <section className="report-section young-people-section" aria-label="Gains and losses, and which policies drive them">
+          <section className="report-section young-people-section" aria-label="Gains and losses">
             <div className="charts-grid">
               {/* 16 to 24 (the default group) against 25 to 34 at first */}
               <MeasuresCard {...props} defaultCompare="25-34" height={narrow ? 460 : 400} />
@@ -124,10 +126,10 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
           <SectionHeading
             id="age-who-gains"
             icon="userPlus"
-            title="Which policies drive the change"
-            subtitle={`The average change from each policy for ${subject.toLowerCase()}.`}
+            title="Effect of the selected policy"
+            subtitle={`The average change from the selected policy for ${subject.toLowerCase()}.`}
           />
-          <section className="report-section young-people-section" aria-label="Which policies drive the change">
+          <section className="report-section young-people-section" aria-label="Effect of the selected policy">
             <div className="charts-grid">
               {/* 16 to 24 (the default group) against 25 to 34 at first */}
               <MeasuresCard {...props} defaultCompare="25-34" height={narrow ? 460 : 400} />

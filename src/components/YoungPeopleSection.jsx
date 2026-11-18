@@ -47,6 +47,7 @@ import { groupAges } from "../utils/ageGroups";
 import { SINGLE_AGE_FIRST, SINGLE_AGE_LAST, fitRange, sharesBySingleAge, singleAgeBars } from "./youngPeople/youngPeopleData";
 import { X_AXIS_HEIGHT, plotMargin } from "./youngPeople/chartRows";
 import "./YoungPeopleSection.css";
+import { AGE_SHARES_NOTE, AgeHouseholdNote } from "./milburn/SourceChip";
 import { chartMotion, netDotTitled } from "../utils/chartMotion";
 import TitleIcon from "./TitleIcon";
 import ChartMoreInfo from "./ChartMoreInfo";
@@ -523,7 +524,7 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
       </div>
       <SwapTransition swapKey={view} ref={chartRef} className="chart-plot young-people-plot">
         {published && incomplete && (
-          <UnavailableNotice reason="Some selected policies have no published results by age. The net change is unavailable for those age groups." />
+          <UnavailableNotice reason={`${selectedPolicies.length === 1 ? "The selected policy has" : "Some selected policies have"} no published results by age. The net change is unavailable for those age groups.`} />
         )}
         {!published ? (
           <UnpublishedPlot height={height} yearLabel={yearLabel} />
@@ -533,7 +534,7 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
           // measure with no published result by age is not 'no change',
           // nor is one whose bands are held back for too few survey records
           <div className="plot-empty" style={{ minHeight: height }} role="status">
-            <p>{noHouseholdChange(yearLabel)}</p>
+            <p>{noHouseholdChange(yearLabel, selectedPolicies.length)}</p>
           </div>
         ) : single ? (
           // As tall as the plot row in a pair (globals.css), else `height`;
@@ -820,6 +821,8 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
           </h3>
           <p className="chart-description">
             {description}
+            {/* Why groups the policy does not target move (María, #6 item 4) */}
+            {!perMeasure && <AgeHouseholdNote text={AGE_SHARES_NOTE} />}
           </p>
         </div>
         <ChartDownloadMenu
@@ -941,7 +944,11 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
                   // Each row's policy on its own is in the description (round 3)
                   "No published run covers this selection together, so you can't add up the rows' shares across policies.",
                 ]
-              : ["Shares come from one run of the whole selection, so they include how the policies interact."],
+              : [
+                  // One run, never several added up (María, #6 item 5)
+                  "Shares come from the selected policy's own run against current law.",
+                  "A person gains or loses when their household's net income changes by more than 0.01%, so everyone in a household counts its change.",
+                ],
             method: AGE_METHOD,
           }}
         />
@@ -1002,10 +1009,10 @@ function YoungPeopleSection({ selectedPolicies, selectedYear, policies }) {
           <SectionHeading
             id="young-people-who-gains"
             icon="userPlus"
-            title="Gains and losses, and which policies drive them"
-            subtitle="How many young people gain or lose, and from which policies."
+            title="Gains and losses"
+            subtitle="How much young people gain or lose on average, and how many."
           />
-          <section className="report-section young-people-section" aria-label="Gains and losses, and which policies drive them">
+          <section className="report-section young-people-section" aria-label="Gains and losses">
             <div className="charts-grid">
               <MeasuresCard {...props} height={narrow ? 460 : 400} />
               <SharesCard {...props} height={narrow ? 340 : 400} />

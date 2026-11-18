@@ -841,10 +841,10 @@ function PensionersSection({ selectedPolicies, selectedYear, policies }) {
       <SectionHeading
         id="pensioners-who-gains"
         icon="userPlus"
-        title="Gains and losses, and which policies drive them"
-        subtitle="How many pensioners gain or lose, and from which policies."
+        title="Gains and losses"
+        subtitle="How much pensioners gain or lose on average, and how many."
       />
-      <section className="report-section young-people-section" aria-label="Gains and losses, and which policies drive them">
+      <section className="report-section young-people-section" aria-label="Gains and losses">
         <div className="charts-grid">
           <MeasuresCard {...props} height={narrow ? 460 : 400} />
           <PensionerSharesCard {...props} height={narrow ? 260 : 400} />

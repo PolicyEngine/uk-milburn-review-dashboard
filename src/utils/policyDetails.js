@@ -1151,7 +1151,7 @@ MILBURN_POLICY_DETAILS.push(
     shortName: "Work allowance for under-25s in work (illustrative)",
     noun: "an illustrative work allowance for under-25s in work",
     sentence: "giving every under-25 Universal Credit claim with earnings a work allowance",
-    summary: "Gives under-25 UC claims today's work allowance for claims with a child or health condition.",
+    summary: "Under-25 UC claims get today's work allowance for a child or health condition: our assumption.",
     points: [
       { label: "Who", icon: "users", text: "UC claims, every claimant under 25, with earnings." },
       { label: "Amount", icon: "coins", text: "Assumed: today's, lower with housing costs; the report gives none." },

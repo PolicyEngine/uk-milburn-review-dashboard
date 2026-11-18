@@ -6,6 +6,13 @@ export const AGE_HOUSEHOLD_NOTE =
   "Other ages change only because they share a household with someone in the targeted ages.";
 
 /**
+ * Why Gains and losses shows gains and losses in age groups the selected
+ * policy does not target (María, #6 item 4).
+ */
+export const AGE_SHARES_NOTE =
+  "Each person carries their household's change, so groups the policy does not target move too: a parent living with a 20-year-old who loses PIP counts as worse off.";
+
+/**
  * A publisher's name as a chip or a list says it: the review's report, annex
  * and data tables are "the review"; ONS and IFS by their initials; any other
  * source as the file names it.
@@ -83,12 +90,12 @@ export default function SourceChip({ kind = "estimate", source, className = "" }
 }
 
 /** The age charts' one line on why other ages change, on its own line at the end of a card's description. */
-export function AgeHouseholdNote() {
+export function AgeHouseholdNote({ text = AGE_HOUSEHOLD_NOTE }) {
   return (
     // Read as part of the card's description, one paragraph (Vahid, 17 Nov)
     <span className="age-household-note age-household-note--inline" data-age-household-note="">
       {" "}
-      {AGE_HOUSEHOLD_NOTE}
+      {text}
     </span>
   );
 }

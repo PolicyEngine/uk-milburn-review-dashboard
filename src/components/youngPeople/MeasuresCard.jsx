@@ -74,7 +74,7 @@ export function MeasureDumbbell({ rows, domain, ticks: allTicks, groupName, year
     <div
       className="measure-dumbbell"
       role="table"
-      aria-label={`Effect of each policy, ${yearLabel}`}
+      aria-label={`Average change by policy, ${yearLabel}`}
       style={height ? { "--md-height": `${height}px` } : undefined}
     >
       {rows.map((row, index) => {
@@ -239,9 +239,24 @@ export function PolicyStrip({ rows, id, year, band, partsShown }) {
   );
 }
 
-/** "Average change in household income from each policy, for 16 to 24-year-olds and people of all ages." */
-export const measuresDescription = (band, compareKey = ALL_BAND) =>
-  `Average change in household income from each policy, for ${groupSubject(band).toLowerCase()} and ${groupSubject(compareKey).toLowerCase()}.`;
+/**
+ * "Average change in household income from each policy, for 16 to
+ * 24-year-olds and people of all ages." `from` names what is drawn: the
+ * selected policy, or a package and its parts, when one run is chosen.
+ */
+export const measuresDescription = (band, compareKey = ALL_BAND, from = "each policy") =>
+  `Average change in household income from ${from}, for ${groupSubject(band).toLowerCase()} and ${groupSubject(compareKey).toLowerCase()}.`;
+
+/**
+ * What the card draws, in its title and description. One run is chosen at
+ * a time and runs are never added up (María, #6 item 4), so with one chosen
+ * the card names it, or the package and its parts, not "each policy".
+ */
+export function measuresSubject(selectedPolicies, partsShown) {
+  if (partsShown) return { title: "Effect of the package and its parts", from: "the selected package and each of its parts" };
+  if (selectedPolicies?.length === 1) return { title: "Effect of the selected policy", from: "the selected policy" };
+  return { title: "Effect of each policy", from: "each policy" };
+}
 
 const BAND_OPTIONS = [
   ...AGE_BANDS.map((band) => ({ value: band.key, label: band.label })),
@@ -276,9 +291,10 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
   const single = band === compareKey;
   const compareName = compareKey === ALL_BAND ? "All ages" : AGE_BANDS.find((b) => b.key === compareKey)?.label ?? compareKey;
   const GROUPS = groupsFor(band).map((item) => (item.key === "all" ? { ...item, label: compareName } : item));
+  const subject = measuresSubject(selectedPolicies, parts.length > 0);
   const description = single
-    ? "Average change in household income from each policy, for people of all ages."
-    : measuresDescription(band, compareKey);
+    ? `Average change in household income from ${subject.from}, for people of all ages.`
+    : measuresDescription(band, compareKey, subject.from);
   const yearLabel = fiscalYearTick(selectedYear);
   const published = isPublished(rows, selectedYear);
   // A policy withheld for the group is left out, with no note (Vahid, 29 Oct)
@@ -296,7 +312,7 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
 
   // The local build's strip under the rows, for the one policy chosen
   const strip = Boolean(lead) && published && shown.length > 0 && band !== "pensioners";
-  const title = `Effect of each policy, ${yearLabel}`;
+  const title = `${subject.title}, ${yearLabel}`;
   const exportOptions = {
     title,
     description,
