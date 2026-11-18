@@ -267,7 +267,9 @@ export const TOLERANCE = Object.freeze({
   // neet_16_24 has no pair, so no entry: ONS publishes the NEET counts by
   // quarter only (the LFS NEET dataset), with no 2025 average to link. A
   // mean of its four 2025 quarters (943,416, not seasonally adjusted) is our
-  // arithmetic, not an ONS figure (issue #5).
+  // arithmetic, not an ONS figure (issue #5). Our NEET count is also
+  // income-based (no earnings, not in full-time education), not the LFS
+  // measure, so the two would differ in definition even for one period.
 });
 
 /**
