@@ -713,7 +713,7 @@ export default function MilburnHouseholdTab({ runId = null, presets: given = und
           yearBars={false}
           positions={false}
           subtitle={`Young people in ${FISCAL_YEAR} under current law and the policy chosen in the header: ${name}. Enter your own household, or start from an example below.`}
-          yoursLead="See how the policy chosen in the header changes your income. A calculation usually takes 10–20 seconds; after a quiet spell or when many people use it at once it can take longer, up to a minute or two."
+          yoursLead="See how the policy chosen in the header changes your income. A calculation usually takes 15–30 seconds; after a quiet spell or when many people use it at once it can take longer, up to a minute or two."
           figureTip={() => `Change in net income in ${FISCAL_YEAR} from ${name}, against current law`}
           noFigureText={run.covered ? undefined : "Not covered"}
         />

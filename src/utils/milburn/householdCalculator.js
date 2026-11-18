@@ -294,7 +294,7 @@ export const COLD_START_RETRY = Object.freeze({ budgetMs: 240_000, maxRetries: 6
 export const CALCULATION_TIMES = Object.freeze({
   typical: 15,
   slow: 90,
-  text: "Usually 10–20 seconds",
+  text: "Usually 15–30 seconds",
   stillWorking: 25,
   stillWorkingText: "Still working: when many people use it at once this can take a minute or two",
 });
