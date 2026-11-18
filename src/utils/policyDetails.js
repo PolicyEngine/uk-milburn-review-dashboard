@@ -1151,10 +1151,10 @@ MILBURN_POLICY_DETAILS.push(
     shortName: "Work allowance for under-25s in work (illustrative)",
     noun: "an illustrative work allowance for under-25s in work",
     sentence: "giving every under-25 Universal Credit claim with earnings a work allowance",
-    summary: "Gives every under-25 UC claim a work allowance, at the current amounts: our assumption.",
+    summary: "Gives under-25 UC claims today's work allowance for claims with a child or health condition.",
     points: [
       { label: "Who", icon: "users", text: "UC claims, every claimant under 25, with earnings." },
-      { label: "Amount", icon: "coins", text: "Assumed: the current work allowance, lower with housing costs." },
+      { label: "Amount", icon: "coins", text: "Assumed: today's, lower with housing costs; the report gives none." },
       // Report 6.5, para 749
       { label: "Report", icon: "file", text: "Proposes a work allowance; gives no amount." },
     ],
@@ -1166,7 +1166,7 @@ MILBURN_POLICY_DETAILS.push(
       "Static: claimants do not change their work or claims in response.",
       // Report 6.5, para 749
       "The report proposes a work allowance for everyone on the Youth Allowance in work (paragraph 749), with no amount.",
-      "The amount is our assumption: the current Universal Credit work allowance, uprated each year.",
+      "The report gives no amount, so using today's is our assumption, uprated each year.",
       "Claims with a child or limited capability for work have a work allowance already and are unchanged.",
       "The 55% taper and the standard allowance are unchanged.",
       "The chart shows 2027-28 rates, policyengine-uk's projections where not yet set.",

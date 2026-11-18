@@ -41,6 +41,16 @@ describe("measureCategoryOf", () => {
     expect(measureCategoryOf({ id: "uc_work_allowance_threshold" }).label).toBe("Benefits");
   });
 
+  it("files the Youth Allowance runs under Benefits, though a description names housing costs before Universal Credit", () => {
+    expect(
+      measureCategoryOf({
+        id: "milburn_report_youth_allowance_combined",
+        name: "Higher Youth Allowance and work allowance (illustrative) for under-25s, from April 2029 (combined)",
+        description: "Our combination of two of the report's Youth Allowance proposals: the 25-and-over standard allowance for under-25 claims with a housing costs element, and a work allowance for every Universal Credit claim.",
+      }),
+    ).toEqual({ label: "Benefits", icon: "piggy" });
+  });
+
   it("gives an unknown Budget-day measure a sensible category and icon", () => {
     expect(measureCategoryOf({ id: "budget_2026_new_levy" })).toEqual({ label: "Business", icon: "building" });
     expect(measureCategoryOf({ id: "budget_2026_mystery", name: "Something new" })).toEqual(OTHER_CATEGORY);
