@@ -15,16 +15,17 @@ export const BENCHMARKS_FILE = "milburn_benchmarks.json";
 /**
  * The sections of the Benchmarks sub-tab, in order: the question each
  * answers, a one-line introduction, its icon (TitleIcon) and the rows it
- * holds; a row no section lists goes under the last, the review's context.
+ * holds. Only listed rows are shown; the file's other figures stay in it
+ * (the Methodology tab, tests and briefing cite them) but are not on the tab.
  */
 export const BENCHMARK_SECTIONS = [
   {
     key: "caseloads",
     chip: "Caseloads",
     title: "How do our caseloads compare?",
-    intro: "Published counts of 16–24s on the UC health element or PIP, beside ours.",
+    intro: "Published counts of 16–24s on the UC health element or PIP, beside ours, and NEETs.",
     icon: "usersRound",
-    ids: ["uc_health_no_work_requirements", "uc_health_element_16_24", "uc_health_pip_overlap", "young_pip_recipients", "package_young_people_affected"],
+    ids: ["uc_health_element_16_24", "uc_health_pip_overlap", "young_pip_recipients", "package_young_people_affected", "neet_16_24"],
   },
   {
     key: "spending",
@@ -35,50 +36,12 @@ export const BENCHMARK_SECTIONS = [
     ids: ["pip_spend_16_24", "uc_health_spend_16_24", "young_benefits_spend", "employer_nics_under_25"],
   },
   {
-    key: "jobs",
-    chip: "Work",
-    title: "Where do young people work?",
-    intro: "The review's share of young people's jobs in retail and hospitality.",
-    icon: "briefcase",
-    ids: ["retail_hospitality_jobs_16_24"],
-  },
-  {
     key: "review",
     chip: "The review's estimates",
     title: "The review's own estimates",
-    intro: "The review's own projections, which our static runs cannot reproduce.",
+    intro: "The review's key figures, most counting moves into work that our static runs leave out.",
     icon: "scale",
-    ids: ["review_welfare_saving_2036", "milburn_welfare_saving_10y", "relative_poverty_review", "young_net_incomes_review"],
-  },
-  {
-    key: "poverty",
-    chip: "Poverty",
-    title: "Poverty",
-    intro: "What the benefits do for young people today.",
-    icon: "percent",
-    ids: ["kept_out_of_poverty", "pip_no_extra_costs"],
-  },
-  {
-    key: "context",
-    chip: "Context",
-    title: "Context from the review",
-    intro: "Published figures on young people, work and costs, not set beside a PolicyEngine figure.",
-    icon: "book",
-    ids: [
-      "neet_16_24",
-      "neet_rate_projection_2036",
-      "hidden_neets_england",
-      "disabled_neet_16_24",
-      "incapacity_benefits_young",
-      "dla_pip_16_24",
-      "child_dla_recipients",
-      "pip_spend_trend_16_24",
-      "uc_health_spend_young_2024",
-      "into_sustained_work_2036",
-      "review_investment_2036",
-      "youth_hiring_incentives_cost",
-      "incapacity_spending_18_24",
-    ],
+    ids: ["review_welfare_saving_2036", "relative_poverty_review", "into_sustained_work_2036", "kept_out_of_poverty"],
   },
 ];
 
@@ -395,16 +358,11 @@ export function valueParts(value) {
   return match ? { main: match[1], qualifier: match[2] } : { main: words, qualifier: "" };
 }
 
-/** The rows by section, each in its section's own order; a row no section lists goes under the last; a section with no rows is left out. */
+/** The rows by section, each in its section's own order; a row no section lists is not shown; a section with no rows is left out. */
 export function benchmarkGroups(rows) {
-  const known = new Set(BENCHMARK_SECTIONS.flatMap((section) => section.ids));
-  const last = BENCHMARK_SECTIONS.length - 1;
-  return BENCHMARK_SECTIONS.map((section, index) => ({
+  return BENCHMARK_SECTIONS.map((section) => ({
     ...section,
-    rows: [
-      ...section.ids.map((id) => rows.find((row) => row.id === id)).filter(Boolean),
-      ...(index === last ? rows.filter((row) => !known.has(row.id)) : []),
-    ],
+    rows: section.ids.map((id) => rows.find((row) => row.id === id)).filter(Boolean),
   })).filter((group) => group.rows.length > 0);
 }
 

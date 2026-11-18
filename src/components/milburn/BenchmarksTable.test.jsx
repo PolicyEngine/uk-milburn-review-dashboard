@@ -6,6 +6,8 @@ import { BENCHMARK_GRAPHICS, BENCHMARK_SECTIONS, BENCHMARK_SHORT, BENCHMARK_TOPI
 
 const benchmarks = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_benchmarks.json"), "utf8");
 const file = parseBenchmarks(JSON.parse(benchmarks));
+// The figures the tab shows, in order (each section lists its pairs before its other figures)
+const shownIds = BENCHMARK_SECTIONS.flatMap((section) => section.ids);
 
 const state = vi.hoisted(() => ({ ageRows: null, measureRows: null, catalogue: { combinedId: null } }));
 
@@ -63,7 +65,6 @@ describe("Benchmarks layout", () => {
 
   it("builds every card the same way: a flex column, title first, the foot last", async () => {
     const region = await renderTab();
-    fireEvent.click(screen.getByRole("button", { name: "Show all 13 figures" }));
     for (const grid of region.querySelectorAll(".bm-cards")) {
       // One grid a section, every child a card
       expect([...grid.children].every((child) => child.matches("li.bm-card"))).toBe(true);
@@ -102,7 +103,7 @@ describe("Benchmarks topic filter", () => {
     const filter = screen.getByRole("group", { name: "Show figures on" });
     expect(within(filter).getAllByRole("button").map((button) => button.dataset.topic)).toEqual(BENCHMARK_TOPICS.map((topic) => topic.key));
     expect(within(filter).getByRole("button", { name: /^All/ })).toHaveAttribute("aria-pressed", "true");
-    expect(document.querySelectorAll(".bm-group").length).toBe(6);
+    expect([...document.querySelectorAll(".bm-group")].map((group) => group.dataset.section)).toEqual(["caseloads", "spending", "review"]);
     fireEvent.click(within(filter).getByRole("button", { name: /^Spending/ }));
     expect(within(filter).getByRole("button", { name: /^Spending/ })).toHaveAttribute("aria-pressed", "true");
     expect([...document.querySelectorAll(".bm-group")].map((group) => group.dataset.section)).toEqual(["spending"]);
@@ -126,20 +127,24 @@ describe("Benchmarks topic filter", () => {
   });
 
   it("opens on the address's topic and ignores one it does not know", async () => {
-    expect(topicFromSearch("?bm=context")).toBe("context");
+    expect(topicFromSearch("?bm=spending")).toBe("spending");
     expect(topicFromSearch("?bm=nonsense")).toBe("all");
+    // The sections cut on 18 November 2026 fall back to All
+    expect(topicFromSearch("?bm=context")).toBe("all");
     window.history.replaceState({}, "", "/?sub=benchmarks&bm=review");
     await renderTab();
     await waitFor(() => expect([...document.querySelectorAll(".bm-group")].map((group) => group.dataset.section)).toEqual(["review"]));
   });
 
-  it("folds the context figures past eight behind Show all", async () => {
-    await renderTab();
-    const context = document.querySelector('[data-section="context"]');
-    expect(context.querySelectorAll("[data-benchmark]").length).toBe(8);
-    fireEvent.click(within(context).getByRole("button", { name: "Show all 13 figures" }));
-    expect(context.querySelectorAll("[data-benchmark]").length).toBe(13);
-    expect(within(context).getByRole("button", { name: "Show fewer" })).toHaveAttribute("aria-expanded", "true");
+  it("shows only the essential figures, about a dozen, with nothing folded", async () => {
+    const region = await renderTab();
+    expect([...region.querySelectorAll("[data-benchmark]")].map((each) => each.dataset.benchmark)).toEqual(shownIds);
+    expect(shownIds.length).toBe(13);
+    expect(within(region).queryByRole("button", { name: /^Show all/ })).toBeNull();
+    // Every row with a PolicyEngine figure is kept; the rest stay in the file, not on the tab
+    for (const row of file.rows.filter((each) => each.estimate)) expect(shownIds, row.id).toContain(row.id);
+    expect(card("retail_hospitality_jobs_16_24")).toBeNull();
+    expect(file.rows.some((row) => row.id === "retail_hospitality_jobs_16_24")).toBe(true);
   });
 });
 
@@ -205,13 +210,12 @@ describe("Benchmarks cards", () => {
 
   it("lists every figure once, with its source, and the package's estimate from its own run", async () => {
     const region = await renderTab();
-    fireEvent.click(screen.getByRole("button", { name: "Show all 13 figures" }));
-    expect(region.querySelectorAll("[data-benchmark]").length).toBe(file.rows.length);
+    expect(region.querySelectorAll("[data-benchmark]").length).toBe(shownIds.length);
     for (const each of region.querySelectorAll("[data-benchmark]")) {
       expect(each.querySelectorAll("[data-source-link]").length, each.dataset.benchmark).toBe(each.dataset.benchmark === "package_young_people_affected" ? 0 : 1);
     }
     expect(card("package_young_people_affected").textContent).toContain("100,000");
-    expect(card("uc_health_no_work_requirements").querySelector("[data-unpublished-basis]")).not.toBeNull();
+    expect(card("uc_health_no_work_requirements")).toBeNull();
     expect(card("review_welfare_saving_2036").querySelector(".bm-value").textContent).toBe("£3.6bn in 2036-37");
     expect(card("review_welfare_saving_2036").querySelector(".is-estimate")).toBeNull();
     for (const link of within(region).getAllByRole("link")) {
@@ -233,7 +237,7 @@ describe("Benchmarks cards", () => {
     const { benchmarksCsv } = await import("./BenchmarksTable");
     const csv = benchmarksCsv(benchmarkGroups(file.rows), new Map());
     const lines = csv.replace(/^\uFEFF/, "").trim().split("\r\n").filter((line) => !/^"?#/.test(line));
-    expect(lines.length - 1).toBe(file.rows.length);
+    expect(lines.length - 1).toBe(shownIds.length);
     const pip = lines.find((line) => line.includes("PIP spending, 16–24s"));
     expect(pip).toContain("https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation");
     expect(pip).toContain("17 November 2026");
