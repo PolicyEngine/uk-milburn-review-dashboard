@@ -18,6 +18,7 @@ DATA_FILES=(
   milburn_scenarios.json
   milburn_household_presets.json
   milburn_neet.json
+  milburn_entry_path.json
 )
 # Read the same run catalogue and required file names as the app. A
 # not-computable measure has no output files to serve.

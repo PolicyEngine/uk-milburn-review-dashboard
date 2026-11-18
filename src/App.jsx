@@ -1017,7 +1017,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   const populationContent = (sub) => {
     // Illustrative and reference material: neither follows the band's
     // selection or year (each says what it reads)
-    if (sub === "scenarios") return <BehaviouralScenarios selectedRun={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} />;
+    if (sub === "scenarios") return <BehaviouralScenarios selectedRun={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} year={distributionalYear} />;
     if (sub === "benchmarks") return <BenchmarksTable />;
     if (selectedPolicies.length === 0) return emptyState;
     // The sub-tab is not offered while the poverty figures are withheld

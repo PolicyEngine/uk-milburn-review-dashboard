@@ -3,7 +3,8 @@ import SectionHeading from "../SectionHeading";
 import TitleIcon from "../TitleIcon";
 import { Bar, BarChart, CartesianGrid, LabelList, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { TOOLTIP_PROPS } from "../ChartTooltip";
-import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard, yearOnlyText } from "./MilburnCharts";
+import { ChartPanel, FiguresTable, HorizontalBars, MilburnChartCard } from "./MilburnCharts";
+import { EntryShares, EntryYear } from "./EntryPathCards";
 import { MethodLink } from "../../utils/methodLink";
 import SourceChip from "./SourceChip";
 
@@ -31,44 +32,23 @@ import {
   BREAK_EVEN_ENTRANTS_DEFINITION,
   BREAK_EVEN_HOURS,
   BREAK_EVEN_SHARE_DEFINITION,
-  DEFAULT_SUMMARY_RUN,
-  ENTRY_ASSUMPTION,
-  ENTRY_ASSUMPTION_TEXT,
-  ENTRY_RUN,
+  HEADLINE_RUN,
   MORE_ENTRANTS_THAN_GROUP,
   breakEvenText,
-  entryMovers,
-  formatBn,
   formatPeople,
   formatPounds,
-  formatSignedPp,
-  savingInYear,
   summaryRun,
   useMilburnSummary,
   useReviewFigures,
 } from "../../utils/milburn/summary";
 import { shortNameOf } from "../../utils/policyDetails";
+import { ENTRY_GROUP, ENTRY_WORK, pathYear, shareText, useEntryPath } from "../../utils/milburn/entryPath";
 import "./milburn.css";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 /** The label the sub-tab carries. */
-export const SCENARIOS_LABEL = `Assumes ${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group} take 16 hours’ work at their minimum wage`;
-
-/** Said in place of a figure the run's summary carries as null. */
-export const FIGURE_NOT_AVAILABLE = "Not available";
-
-/** The lead card's one line: the year, what is removed, and the two runs compared. */
-export const entryDescription = (yearLabel, movers) =>
-  `${yearLabel}: the report’s two benefit removals, static and with ${
-    movers === null || movers === undefined
-      ? `${ENTRY_ASSUMPTION.share} of the young people who have them assumed to move into work`
-      : `about ${formatPeople(movers)} young people assumed to move into work (an assumed ${ENTRY_ASSUMPTION.share})`
-  }.`;
-
-/** What the lead card's runs remove, in its folded notes. */
-export const entryRunsNote = (fullName) =>
-  `Both runs: ${fullName}, the same two removals as the report’s benefit changes, applied from April 2027.`;
+export const SCENARIOS_LABEL = `Assumes a share of ${ENTRY_GROUP} take ${ENTRY_WORK}: none before April 2029, then a phased share rising to 4.4% by 2031-32, or 9% with no ramp`;
 
 const pounds = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const penceExact = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -98,24 +78,6 @@ function useScenariosFile() {
 export const SAME_GAIN_SENTENCE =
   "In the household case used, the gain from work is the same under current law and under the package.";
 
-/** The heading over what the run with a move into work does. */
-export const ENTRY_RUN_HEADING = "What the run changes";
-
-/**
- * What the run with a move into work does, a point each: who moves (their
- * number from the run's own results, left out when the file carries none),
- * into what work, and what the figures beside it then count.
- */
-export function entryRunPoints(movers) {
-  const share = `${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group}, chosen at random`;
-  return [
-    movers === null || movers === undefined ? `Who moves: an assumed ${share}.` : `Who moves: about ${formatPeople(movers)} people, an assumed ${share}.`,
-    `Each moves from no work into ${ENTRY_ASSUMPTION.work}.`,
-    "The Exchequer saving then counts the taxes paid on their earnings and any fall in their benefits.",
-    "The average loss covers every 16 to 24-year-old in a losing household, whether or not they move.",
-  ];
-}
-
 /** A bullet with an icon (the caveats and reading notes). */
 function Point({ icon = "pin", children, ...rest }) {
   return (
@@ -123,179 +85,6 @@ function Point({ icon = "pin", children, ...rest }) {
       <TitleIcon name={icon} bare size={14} />
       <span>{children}</span>
     </li>
-  );
-}
-
-/** "+0.59pp (about 410,000 people)": the change and its count, either left out when missing. */
-function povertyText(run) {
-  const pp = run.povertyPp.abs_bhc;
-  const count = run.peopleIntoPovertyAbs;
-  if (pp === null && count === null) return "Not in the summary";
-  const people = count !== null ? `about ${formatPeople(count)} people` : "";
-  if (pp === null) return people;
-  return people ? `${formatSignedPp(pp)} (${people})` : formatSignedPp(pp);
-}
-
-/**
- * The lead: the full abolition package as a static run beside the same
- * package with a quarter of non-working 18 to 24-year-olds who themselves
- * have PIP or the health element moving into work, microsimulated, from
- * milburn_summary.json.
- */
-export function EntryComparison({ summary, catalogue }) {
-  const full = summaryRun(summary, DEFAULT_SUMMARY_RUN);
-  const entry = summaryRun(summary, ENTRY_RUN);
-  const yearLabel = fiscalYearTick(summary.year);
-  if (!full || !entry) {
-    return <p role="status">Not yet run: the comparison appears here once both national runs have finished.</p>;
-  }
-  const fullMeasure = catalogue?.byId?.get(DEFAULT_SUMMARY_RUN);
-  const fullName = fullMeasure ? shortNameOf(fullMeasure) : DEFAULT_SUMMARY_RUN;
-  const movers = entryMovers(entry);
-  const fullSaving = savingInYear(full, summary.year);
-  const entrySaving = savingInYear(entry, summary.year);
-  const signedBn = (value) => `${value >= 0 ? "+" : "−"}${formatBn(Math.abs(value))}`;
-  const signedPounds = (value) => `${value >= 0 ? "+" : "−"}${formatPounds(Math.abs(value))}`;
-  const difference = (after, before) => (after !== null && before !== null ? after - before : null);
-  // A fall in poverty or in the loss is the better outcome; a rise in the saving is
-  const tone = (delta, betterWhen) => (delta === null || delta === 0 ? "flat" : Math.sign(delta) === betterWhen ? "more" : "less");
-  const savingDelta = difference(entrySaving, fullSaving);
-  const povertyDelta = difference(entry.povertyPp.abs_bhc, full.povertyPp.abs_bhc);
-  const lossDelta = difference(entry.averageLossYoung, full.averageLossYoung);
-  const rows = [
-    {
-      key: "saving",
-      icon: "landmark",
-      label: `Exchequer saving, ${yearLabel}`,
-      short: "Exchequer saving (£bn)",
-      full: formatBn(fullSaving),
-      entry: formatBn(entrySaving),
-      values: [fullSaving, entrySaving],
-      format: (value) => `£${value}bn`,
-      delta: savingDelta === null ? null : signedBn(savingDelta),
-      tone: tone(savingDelta, 1),
-    },
-    {
-      key: "poverty",
-      icon: "percent",
-      label: "Absolute poverty before housing costs, all ages",
-      short: "Absolute poverty rate (pp)",
-      full: povertyText(full),
-      entry: povertyText(entry),
-      values: [full.povertyPp.abs_bhc, entry.povertyPp.abs_bhc],
-      barLabels: [formatSignedPp(full.povertyPp.abs_bhc), formatSignedPp(entry.povertyPp.abs_bhc)],
-      format: (value) => `${value}pp`,
-      delta: povertyDelta === null ? null : formatSignedPp(povertyDelta),
-      tone: tone(povertyDelta, -1),
-    },
-    {
-      key: "loss",
-      icon: "wallet",
-      label: "Average loss, young people in losing households (£ a year)",
-      short: "Average household loss (£ a year)",
-      // Null when the summary could not find it (milburn_summary.py): said, not drawn
-      full: formatPounds(full.averageLossYoung) || FIGURE_NOT_AVAILABLE,
-      entry: formatPounds(entry.averageLossYoung) || FIGURE_NOT_AVAILABLE,
-      values: [full.averageLossYoung, entry.averageLossYoung],
-      format: (value) => `£${value.toLocaleString("en-GB")}`,
-      delta: lossDelta === null ? null : signedPounds(lossDelta),
-      tone: tone(lossDelta, -1),
-    },
-  ];
-  const SERIES = [
-    { name: "Static", color: CHART_COLOURS.before },
-    { name: "25% move into work", color: CHART_COLOURS.after },
-  ];
-  const title = "With a quarter moving into work";
-  const csv = () =>
-    buildChartCsv({
-      title: `${title}: ${fullName}, ${yearLabel}`,
-      units: `As each row says; static, and with ${ENTRY_ASSUMPTION_TEXT}`,
-      columns: [
-        { key: "label", label: "Figure" },
-        { key: "full", label: "Static" },
-        { key: "entry", label: "25% move into work" },
-      ],
-      rows,
-    });
-  return (
-    <section className="report-section milburn-entry" aria-labelledby="milburn-entry-heading">
-      <MilburnChartCard
-        id="milburn-entry-heading"
-        icon="briefcase"
-        title={title}
-        description={entryDescription(yearLabel, movers)}
-        name="quarter-moving-into-work"
-        csv={csv}
-        legendItems={SERIES.map((series) => ({ color: series.color, label: series.name, type: "rect" }))}
-        after={
-          <>
-            <FiguresTable>
-              <table className="milburn-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Figure</th>
-                    <th scope="col">Static</th>
-                    <th scope="col">25% move into work</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr key={row.key} data-row={row.key}>
-                      <th scope="row">{row.label}</th>
-                      <td>{row.full || "Not in the summary"}</td>
-                      <td>{row.entry || "Not in the summary"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </FiguresTable>
-            {savingDelta !== null && (
-              <details className="milburn-details" data-entry-run-comparison="">
-                <summary>
-                  <TitleIcon name="alert" bare size={14} />
-                  {ENTRY_RUN_HEADING}
-                </summary>
-                <ul className="milburn-points">
-                  <Point icon="landmark">
-                    <strong>
-                      The move into work {savingDelta >= 0 ? "adds" : "takes"} {formatBn(Math.abs(savingDelta))}{" "}
-                      {savingDelta >= 0 ? "to" : "from"} the Exchequer.
-                    </strong>
-                  </Point>
-                  {entryRunPoints(movers).map((point, index) => (
-                    <Point key={point} icon={["usersRound", "briefcase", "wallet", "scale"][index]}>
-                      {point}
-                    </Point>
-                  ))}
-                  <Point icon="layers" data-entry-runs="">
-                    {entryRunsNote(fullName)}
-                  </Point>
-                </ul>
-              </details>
-            )}
-          </>
-        }
-      >
-        <div className="milburn-chart-grid cols-3">
-          {rows.map((row) => (
-            <ChartPanel key={row.key} icon={row.icon} title={row.short} chip={row.delta} chipTone={row.tone}>
-              <HorizontalBars
-                ariaLabel={`${row.label}: static ${row.full}, with 25% moving into work ${row.entry}`}
-                format={row.format}
-                labelWidth={132}
-                rows={SERIES.map((series, index) => ({
-                  name: series.name,
-                  value: row.values[index],
-                  label: row.barLabels?.[index] ?? (index === 0 ? row.full : row.entry),
-                  color: series.color,
-                }))}
-              />
-            </ChartPanel>
-          ))}
-        </div>
-      </MilburnChartCard>
-    </section>
   );
 }
 
@@ -312,7 +101,7 @@ function SourceLink({ href, children }) {
 export const REVIEW_COMPARISON_TITLE = "Beside the review's own estimate";
 
 /** The two exercises' names, on their cards and over the full table's columns. */
-export const OUR_SCENARIO_TITLE = `PolicyEngine: assumed move into work (${ENTRY_ASSUMPTION.share})`;
+export const OUR_SCENARIO_TITLE = "PolicyEngine: assumed phased move into work";
 export const REVIEW_MODELLING_TITLE = "The review’s modelling";
 
 /** Said wherever the two figures meet: they are not the same exercise. */
@@ -320,7 +109,7 @@ export const DIFFERENT_EXERCISES_SENTENCE =
   "The two are different exercises, for different years, groups and measures: neither figure is a check on the other.";
 
 /** Why our figure is not drawn beside the review's: it is an assumption, not an estimate. */
-export const ASSUMED_NOT_ESTIMATED_SENTENCE = `Our figure follows from an assumed ${ENTRY_ASSUMPTION.share} moving into work, not an estimate of how many would, so the two are not drawn on one scale.`;
+export const ASSUMED_NOT_ESTIMATED_SENTENCE = "Our figure follows from an assumed share moving into work, not an estimate of how many would, so the two are not drawn on one scale.";
 
 const onePlace = (value) => `${value.toFixed(1)}%`;
 
@@ -339,12 +128,13 @@ function neetRateText(rate) {
  * (milburn_review_figures.json): two exercises, each with its year, group,
  * measures and method, and the report cited. Neither is said to be right.
  */
-export function ReviewComparison({ summary, review, catalogue }) {
-  const entry = summaryRun(summary, ENTRY_RUN);
-  const movers = entryMovers(entry);
-  const yearLabel = fiscalYearTick(summary.year);
-  const fullMeasure = catalogue?.byId?.get(DEFAULT_SUMMARY_RUN);
-  const fullName = fullMeasure ? shortNameOf(fullMeasure) : DEFAULT_SUMMARY_RUN;
+export function ReviewComparison({ entry, year, review, catalogue }) {
+  const central = pathYear(entry, "central", year);
+  const movers = central?.movers ? central.movers : null;
+  const share = shareText(central?.share);
+  const yearLabel = fiscalYearTick(year);
+  const fullMeasure = catalogue?.byId?.get(HEADLINE_RUN);
+  const fullName = fullMeasure ? shortNameOf(fullMeasure) : HEADLINE_RUN;
   const { employment, report, neetRate } = review;
   const ours = { column: OUR_SCENARIO_TITLE };
   const theirs = { name: `The review (published), by ${employment.byYear}`, column: REVIEW_MODELLING_TITLE };
@@ -357,7 +147,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
       key: "who",
       icon: "usersRound",
       label: "Who",
-      ours: `${ENTRY_ASSUMPTION.share} of non-working 18–24s with PIP or the health element`,
+      ours: `${share} of non-working 18–24s losing the health element`,
       theirs: employment.who && "16–24s who would otherwise be NEET",
     },
     { key: "measures", icon: "layers", label: "Measures", ours: fullName, theirs: employment.measures && "The review’s whole package" },
@@ -373,7 +163,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
       icon: "briefcase",
       label: "Work assumed",
       // "16 hours a week at the minimum wage": the assumption's own words, shortened
-      ours: ENTRY_ASSUMPTION.work.replace("’ work", "").replace("' work", "").replace(" for their age", ""),
+      ours: "16 hours a week at the minimum wage",
       theirs: employment.hours && "Full-time and part-time mix; hours not published",
     },
     {
@@ -394,7 +184,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
       title: OUR_SCENARIO_TITLE,
       chip: null,
       figure: movers !== null ? `About ${formatPeople(movers)}` : notRun,
-      caption: `people assumed to move into work: an assumed ${ENTRY_ASSUMPTION.share}, not an estimate`,
+      caption: `people assumed to move into work in ${yearLabel}: an assumed ${share}, not an estimate`,
       side: "ours",
     },
     {
@@ -410,11 +200,11 @@ export function ReviewComparison({ summary, review, catalogue }) {
     {
       key: "people",
       label: "People moving into work",
-      ours: movers !== null ? `About ${formatPeople(movers)}, assumed (${ENTRY_ASSUMPTION.share} of the group), not estimated` : notRun,
+      ours: movers !== null ? `About ${formatPeople(movers)}, assumed (${share} of the group), not estimated` : notRun,
       theirs: `About ${formatPeople(employment.people)}`,
     },
     { key: "when", label: "When", ours: yearLabel, theirs: `By ${employment.byYear}` },
-    { key: "who", label: "Who", ours: `${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group}, chosen at random`, theirs: employment.who },
+    { key: "who", label: "Who", ours: `${share} of ${ENTRY_GROUP}`, theirs: employment.who },
     { key: "measures", label: "Measures covered", ours: `${fullName}, as this dashboard models it`, theirs: employment.measures },
     {
       key: "method",
@@ -422,7 +212,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
       ours: "Microsimulation with an assumed move into work; the entry rate is assumed for illustration, not estimated",
       theirs: employment.method,
     },
-    { key: "work", label: "Work assumed", ours: `${ENTRY_ASSUMPTION.work[0].toUpperCase()}${ENTRY_ASSUMPTION.work.slice(1)}`, theirs: employment.hours },
+    { key: "work", label: "Work assumed", ours: `${ENTRY_WORK[0].toUpperCase()}${ENTRY_WORK.slice(1)}`, theirs: employment.hours },
     { key: "neet", label: "NEET rate, 16 to 24-year-olds", ours: "Not modelled", theirs: neetRateText(neetRate) },
   ].filter((row) => row.theirs);
   const csv = () =>
@@ -444,7 +234,7 @@ export function ReviewComparison({ summary, review, catalogue }) {
         id="milburn-review-heading"
         icon="scale"
         title={REVIEW_COMPARISON_TITLE}
-        description={`Different exercises, not a check on each other: ours assumes ${ENTRY_ASSUMPTION.share} move into work.`}
+        description={`Different exercises, not a check on each other: ours assumes ${share} move into work in ${yearLabel}.`}
         name="beside-the-reviews-own-estimate"
         csv={csv}
         after={
@@ -708,9 +498,9 @@ export function BreakEven({ runId, catalogue }) {
  * from, said on the card where known, as it can differ from the saving's.
  */
 function BreakEvenSection({ runId, catalogue, summaryState, review = null, gainYear = null }) {
-  const id = runId || DEFAULT_SUMMARY_RUN;
+  const id = runId || HEADLINE_RUN;
   // The review's estimate is for its whole package: drawn only beside the package runs
-  const reviewLine = review && (id === DEFAULT_SUMMARY_RUN || id === ENTRY_RUN) ? review.employment : null;
+  const reviewLine = review && id === HEADLINE_RUN ? review.employment : null;
   const { status, summary } = summaryState;
   const measure = catalogue?.byId?.get(id);
   const name = measure ? shortNameOf(measure) : id;
@@ -878,37 +668,45 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null, gainY
 }
 
 /**
- * Impact's Moves into work (illustrative) sub-tab (?sub=scenarios): the full abolition
- * package beside the same package with a quarter of non-working 18 to
- * 24-year-olds with PIP or the health element moving into work,
- * microsimulated (milburn_summary.json); that run beside the review's own
- * employment estimate (milburn_review_figures.json);
- * then the household entry cases (milburn_scenarios.json) and the
- * break-even arithmetic for the selected run. Anything missing shows an
- * unavailable state, never zeros.
+ * Impact's Moves into work (illustrative) sub-tab (?sub=scenarios): the
+ * share of non-working young people losing the health element assumed in
+ * work by year, and the selected year's figures static and on each path
+ * (milburn_entry_path.json, arithmetic on two runs); our movers beside the
+ * review's own employment estimate (milburn_review_figures.json); then the
+ * household entry cases (milburn_scenarios.json) and the break-even
+ * arithmetic for the selected run. Anything missing shows an unavailable
+ * state, never zeros. `year`: the header's year.
  */
-export default function BehaviouralScenarios({ selectedRun } = {}) {
+export default function BehaviouralScenarios({ selectedRun, year = 2029 } = {}) {
   const catalogue = useMeasureCatalogue();
   const file = useScenariosFile();
   const summaryState = useMilburnSummary(catalogue?.manifest?.snapshotSha256 ?? null);
+  const entryState = useEntryPath();
   const reviewState = useReviewFigures();
   const review = reviewState.status === "ready" ? reviewState.review : null;
+  const entry = entryState.status === "ready" ? entryState.data : null;
+  const shownYear = entry && entry.years.includes(Number(year)) ? Number(year) : entry ? entry.years.find((y) => y >= (entry.startYear ?? y)) : Number(year);
 
   let lead;
-  if (summaryState.status === "loading") {
+  if (entryState.status === "loading") {
     lead = (
       <p className="view-status" role="status">
-        Loading the comparison…
+        Loading the scenario…
       </p>
     );
-  } else if (summaryState.status !== "ready") {
+  } else if (!entry) {
     lead = (
       <div className="milburn-unavailable" role="status">
-        <p>The comparison is not available: the summary file has not been written yet.</p>
+        <p>The scenario is not available: its data file has not been published.</p>
       </div>
     );
   } else {
-    lead = <EntryComparison summary={summaryState.summary} catalogue={catalogue} />;
+    lead = (
+      <>
+        <EntryShares data={entry} />
+        <EntryYear data={entry} year={shownYear} />
+      </>
+    );
   }
 
   let cases;
@@ -933,28 +731,20 @@ export default function BehaviouralScenarios({ selectedRun } = {}) {
       <SectionHeading
         icon="sliders"
         title="Moves into work (illustrative)"
-        subtitle="What changes if some non-working young people with PIP or the health element move into work."
+        subtitle="The report's benefit changes from April 2029, with an assumed move into work for young Universal Credit health claimants. The assumption is ours; it combines two figures the review publishes."
       />
-      {/* The assumption, the year it covers and the link to how it was chosen, in one line */}
+      {/* The assumption and the link to how it was chosen, in one line */}
       <p className="milburn-assumption" role="note">
         <TitleIcon name="info" bare size={16} className="milburn-assumption-icon" />
         <span className="milburn-assumption-text">
           <span>{SCENARIOS_LABEL}</span>
-          {summaryState.status === "ready" && Number.isInteger(summaryState.summary.year) && (
-            <>
-              {" · "}
-              <span data-year-only="" title={yearOnlyText(summaryState.summary.year, "this tab")}>
-                {fiscalYearTick(summaryState.summary.year)} only
-              </span>
-            </>
-          )}
           {" · "}
-          <MethodLink anchor={ENTRY_METHOD_ANCHOR}>Why 25%</MethodLink>
+          <MethodLink anchor={ENTRY_METHOD_ANCHOR}>Why this path</MethodLink>
         </span>
       </p>
       {lead}
-      {summaryState.status === "ready" && review && <ReviewComparison summary={summaryState.summary} review={review} catalogue={catalogue} />}
-      {summaryState.status === "ready" && reviewState.status === "unavailable" && (
+      {entry && review && <ReviewComparison entry={entry} year={shownYear} review={review} catalogue={catalogue} />}
+      {entry && reviewState.status === "unavailable" && (
         <div className="milburn-unavailable" role="status">
           <p>The review&rsquo;s own figures are not available: their data file has not been published.</p>
         </div>

@@ -58,24 +58,11 @@ export const DEFAULT_SUMMARY_RUN = "milburn_package";
 /** The run the headline cards show when no single policy is chosen: the report's package. */
 export const HEADLINE_RUN = "milburn_report_package";
 
-/** The run with an illustrative move into work, microsimulated. */
-export const ENTRY_RUN = "milburn_package_entry_25pct";
-
 /** The hours cases of the break-even arithmetic. */
 export const BREAK_EVEN_HOURS = Object.freeze([
   { id: "h16", hours: 16 },
   { id: "h25", hours: 25 },
 ]);
-
-/** What the entry run assumes, in words: who moves, and into what work (milburn_variants.py). */
-export const ENTRY_ASSUMPTION = Object.freeze({
-  share: "25%",
-  group: "non-working 18 to 24-year-olds with PIP or the health element",
-  work: "16 hours' work a week at the minimum wage for their age",
-});
-
-/** The entry run's assumption as one phrase. */
-export const ENTRY_ASSUMPTION_TEXT = `${ENTRY_ASSUMPTION.share} of ${ENTRY_ASSUMPTION.group} move into ${ENTRY_ASSUMPTION.work}`;
 
 /** What the break-even share is. */
 export const BREAK_EVEN_SHARE_DEFINITION =

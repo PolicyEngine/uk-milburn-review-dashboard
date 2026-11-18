@@ -200,11 +200,31 @@ def test_a_failed_linearity_check_withholds_the_figure(staged):
         path(data, "central")["years"]["2029"]["exchequer_bn"]["scenario"]
         is None
     )
-    # The rollout path is on the phased package, not checked
+    # A figure that fails is withheld on every path, the rollout's too
     assert (
         path(data, "rollout")["years"]["2029"]["exchequer_bn"]["scenario"]
+        is None
+    )
+    # and only that figure: the others stand
+    assert (
+        path(data, "central")["years"]["2029"]["young_losing_pct"]["scenario"]
         is not None
     )
+
+
+def test_one_poverty_measure_failing_leaves_the_other(staged):
+    tmp_path, static, phased, runs = staged
+    metrics = runs / script.CHECK / "metrics.csv"
+    rows = list(csv.DictReader(open(metrics)))
+    for row in rows:
+        if int(row["year"]) >= 2029:
+            row["poverty_rel_ahc_change_pp"] = "0.95"
+    write(metrics, rows)
+    data = run_script(staged)
+    assert data["linearity_check"]["failed"] == ["poverty_pp_rel_ahc"]
+    central = path(data, "central")["years"]["2029"]
+    assert central["poverty_pp_rel_ahc"]["scenario"] is None
+    assert central["poverty_pp_abs_bhc"]["scenario"] is not None
 
 
 def test_it_refuses_runs_on_different_builds(staged):

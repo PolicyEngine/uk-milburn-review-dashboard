@@ -12,7 +12,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   BREAK_EVEN_ENTRANTS_DEFINITION,
   BREAK_EVEN_SHARE_DEFINITION,
-  ENTRY_ASSUMPTION_TEXT,
   MORE_ENTRANTS_THAN_GROUP,
   breakEvenText,
   entryMovers,
@@ -49,14 +48,7 @@ import { FinancesHeadline, PovertyHeadline, barShare, financesHeadlineCsv, pover
 import { OPEN_POPULATION_SUB } from "../populationSub";
 import { downloadMenus, STANDARD_FORMATS } from "../../test/downloadMenus";
 import { reportCopy } from "./reportStatus";
-import {
-  BreakEven,
-  ENTRY_RUN_HEADING,
-  EntryComparison,
-  SAME_GAIN_SENTENCE,
-  SCENARIOS_LABEL,
-  entryRunPoints,
-} from "../../components/milburn/BehaviouralScenarios";
+import { BreakEven, SAME_GAIN_SENTENCE, SCENARIOS_LABEL } from "../../components/milburn/BehaviouralScenarios";
 
 const FIXTURES = join(__dirname, "..", "..", "test", "fixtures", "milburn");
 const SUMMARY_TEXT = readFileSync(join(FIXTURES, "summary", "milburn_summary.json"), "utf8");
@@ -525,30 +517,12 @@ describe("the published summary", () => {
     const full = summaryRun(published, "milburn_package");
     // The 2029-30 entry case (milburn_scenarios.json) against the 2029-30 saving
     expect(full.breakEvenSharePct).toEqual({ h16: 97.4, h25: 76.7 });
-    // Above 100% still occurs, so its wording is still shown
-    expect(summaryRun(published, "milburn_package_entry_25pct").breakEvenSharePct.h16).toBeGreaterThan(100);
+    // The pre-report 25% run's files stay, but the summary no longer reads it
+    expect(summaryRun(published, "milburn_package_entry_25pct")).toBeNull();
   });
 
-  it("counts the entry run's movers from its own results, and none in a static run", () => {
-    expect(formatPeople(entryMovers(summaryRun(published, "milburn_package_entry_25pct")))).toBe("83,000");
+  it("counts no movers in a static run", () => {
     expect(entryMovers(summaryRun(published, "milburn_package"))).toBeNull();
-    render(<EntryComparison summary={published} catalogue={null} />);
-    const section = screen.getByRole("region", { name: "With a quarter moving into work" });
-    expect(section.textContent).toContain("2029-30: the report’s two benefit removals, static and with about 83,000 young people assumed to move into work (an assumed 25%).");
-    // The detail is in the folded notes
-    expect(section.querySelector("details [data-entry-runs]").textContent).toMatch(/^Both runs: .+, the same two removals as the report’s benefit changes, applied from April 2027\.$/);
-    expect(section.textContent).toContain("Who moves: about 83,000 people, an assumed 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
-  });
-
-  it("leads Moves into work (illustrative) with the 25% entry run against the static package", () => {
-    render(<EntryComparison summary={published} catalogue={null} />);
-    const rows = within(screen.getByRole("table")).getAllByRole("row");
-    expect(rows[1].textContent).toContain("£4.67bn");
-    expect(rows[1].textContent).toContain("£4.80bn");
-    expect(rows[2].textContent).toContain("+0.49pp (about 342,000 people)");
-    expect(rows[2].textContent).toContain("+0.25pp (about 176,000 people)");
-    expect(rows[3].textContent).toContain("£12,962");
-    expect(rows[3].textContent).toContain("£11,694");
   });
 });
 
@@ -556,26 +530,18 @@ describe("a run without an average loss", () => {
   const raw = JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8"));
   const withNull = {
     ...raw,
-    runs: raw.runs.map((run) => (run.id === "milburn_package_entry_25pct" ? { ...run, average_loss_young_person_in_losing_household: null } : run)),
+    runs: raw.runs.map((run) => (run.id === "milburn_package" ? { ...run, average_loss_young_person_in_losing_household: null } : run)),
   };
   const summary = parseSummary(withNull);
 
   it("reads null, not zero, and keeps the run's direction", () => {
-    const entry = summaryRun(summary, "milburn_package_entry_25pct");
+    const entry = summaryRun(summary, "milburn_package");
     expect(entry.averageLossYoung).toBeNull();
     expect(entry.direction).toBe("loss");
   });
 
-  it("says the figure is not available in the comparison, draws no bar for it and no difference", () => {
-    render(<EntryComparison summary={summary} catalogue={null} />);
-    const rows = within(screen.getByRole("table")).getAllByRole("row");
-    expect(rows[3].textContent).toContain("Not available");
-    expect(rows[3].textContent).not.toContain("£0");
-    expect(rows[3].textContent).not.toContain("Not in the summary");
-  });
-
   it("leaves the average loss out of the key figures", () => {
-    const tiles = keyFigureTiles(summaryRun(summary, "milburn_package_entry_25pct"), summary.year);
+    const tiles = keyFigureTiles(summaryRun(summary, "milburn_package"), summary.year);
     expect(tiles.map((tile) => tile.key)).not.toContain("loss");
     expect(tiles.map((tile) => tile.key)).toContain("young");
   });
@@ -607,40 +573,13 @@ describe("the poverty card's direct count", () => {
   });
 });
 
-describe("EntryComparison", () => {
-  it("leads with the 25% entry run beside the static package, from the summary", async () => {
-    const catalogue = await localCatalogue();
-    render(<EntryComparison summary={summary} catalogue={catalogue} />);
-    const section = screen.getByRole("region", { name: "With a quarter moving into work" });
-    const rows = within(within(section).getByRole("table")).getAllByRole("row");
-    expect(rows[1].textContent).toContain("£4.00bn");
-    expect(rows[1].textContent).toContain("£3.00bn");
-    // The entry run carries no absolute poverty figure: said, never zero
-    expect(rows[2].textContent).toContain("+0.40pp (about 280,000 people)");
-    expect(rows[2].textContent).toContain("Not in the summary");
-    expect(rows[3].textContent).toContain("£12,000");
-    expect(rows[3].textContent).toContain("£9,000");
-    expect(section.textContent).toContain("The move into work takes £1.00bn from the Exchequer.");
-    // What the run does, with the movers from the file; no claim about why or how large
-    expect(section.textContent).toContain(ENTRY_RUN_HEADING);
-    for (const point of entryRunPoints(70400)) expect(section.textContent).toContain(point);
-    expect(entryRunPoints(70400)[0]).toContain("about 70,000 people");
-    expect(entryRunPoints(null)[0]).toBe("Who moves: an assumed 25% of non-working 18 to 24-year-olds with PIP or the health element, chosen at random.");
-    expect(section.textContent).not.toMatch(/Why the effect is small|worse off|young people who lose/);
-  });
-
+describe("Moves into work wording", () => {
   it("names the group that moves, never the young people who lose", () => {
-    expect(ENTRY_ASSUMPTION_TEXT).toBe(
-      "25% of non-working 18 to 24-year-olds with PIP or the health element move into 16 hours' work a week at the minimum wage for their age",
+    expect(SCENARIOS_LABEL).toBe(
+      "Assumes a share of non-working 18 to 24-year-olds whose Universal Credit health element the package removes take 16 hours a week at the minimum wage for their age: none before April 2029, then a phased share rising to 4.4% by 2031-32, or 9% with no ramp",
     );
-    expect(SCENARIOS_LABEL).toBe("Assumes 25% of non-working 18 to 24-year-olds with PIP or the health element take 16 hours’ work at their minimum wage");
+    expect(SCENARIOS_LABEL).not.toMatch(/young people who lose|worse off/);
     expect(SAME_GAIN_SENTENCE).not.toMatch(/incentive/);
-  });
-
-  it("says when either run has not yet run", () => {
-    const partial = parseSummary({ year: 2027, runs: [{ id: "milburn_package", saving_bn: { 2027: 4 } }] });
-    render(<EntryComparison summary={partial} catalogue={null} />);
-    expect(screen.getByText(/Not yet run: the comparison/)).toBeTruthy();
   });
 });
 

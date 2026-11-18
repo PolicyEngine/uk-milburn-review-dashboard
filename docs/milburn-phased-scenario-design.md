@@ -477,3 +477,37 @@ Folded in:
   "expects"; "sustained" and "stays in work" reworded; pre-2029 note added;
   a caching test added; the age edge, `share / (1 − e)`, self-employment
   income, the stale doc line and the extra design checks taken up.
+
+## 11. Results (runs of 18 November, commit 22748260)
+
+Five runs on Modal from a clean checkout of 22748260 (build fcfac709,
+policyengine 6.20.2), staged in `~/milburn-runs/2026-11-18-phased/`; the
+static runs from `~/milburn-runs/2026-11-18-floor/`. Written to
+`public/data/milburn_entry_path.json` by `scripts/milburn_entry_path.py`.
+
+Linearity check (25% plus its complement against everyone moving, with
+PIP): residual 0% of the increment for the Exchequer, absolute poverty
+before housing costs and the 16 to 24s in losing households in every year;
+relative poverty after housing costs 2%, 7% and 9% in 2029-30 to 2031-32,
+so it fails the 5% tolerance and is withheld on every path.
+
+| Path | Year | Share | Movers | Exchequer saving £bn (static → scenario) | Absolute poverty BHC, pp (static → scenario) | 16–24s in losing households % |
+|---|---|---|---|---|---|---|
+| Phased (central) | 2029-30 | 1.26% | 2,000 | 4.67 → 4.67 | 0.490 → 0.487 | 7.75 → 7.75 |
+| Phased (central) | 2030-31 | 2.84% | 5,000 | 4.78 → 4.79 | 0.491 → 0.484 | 7.75 → 7.74 |
+| Phased (central) | 2031-32 | 4.42% | 8,000 | 4.89 → 4.90 | 0.491 → 0.481 | 7.75 → 7.73 |
+| Flat 9% | 2029-30 | 9% | 17,000 | 4.67 → 4.69 | 0.490 → 0.470 | 7.75 → 7.70 |
+| Flat 9% | 2030-31 | 9% | 17,000 | 4.78 → 4.81 | 0.491 → 0.471 | 7.75 → 7.70 |
+| Flat 9% | 2031-32 | 9% | 17,000 | 4.89 → 4.92 | 0.491 → 0.470 | 7.75 → 7.70 |
+| With PIP | 2029-30 | 1.26% | 4,000 | 4.67 → 4.67 | 0.490 → 0.484 | 7.75 → 7.74 |
+| With PIP | 2030-31 | 2.84% | 8,000 | 4.78 → 4.80 | 0.491 → 0.478 | 7.75 → 7.72 |
+| With PIP | 2031-32 | 4.42% | 13,000 | 4.89 → 4.91 | 0.491 → 0.470 | 7.75 → 7.70 |
+| Rollout (phased package) | 2029-30 | 9% of reached | 9,000 | 2.77 → 2.78 | 0.223 → 0.212 | 4.56 → 4.53 |
+| Rollout (phased package) | 2030-31 | 9% of reached | 14,000 | 4.01 → 4.03 | 0.339 → 0.326 | 6.40 → 6.35 |
+| Rollout (phased package) | 2031-32 | 9% of reached | 15,000 | 4.56 → 4.59 | 0.408 → withheld | 7.18 → 7.13 |
+| Unrebased (Methodology only) | 2029-30 to 2031-32 | 2.32%, 3.68%, 5.05% | 4,000, 7,000, 9,000 | 4.67 → 4.67, 4.78 → 4.80, 4.89 → 4.90 | 0.490 → 0.485, 0.491 → 0.482, 0.491 → 0.479 | 7.75 → 7.74, 7.73, 7.72 |
+
+Withheld: relative poverty after housing costs on every path and year
+(linearity check); the rollout path's 2031-32 absolute poverty (its
+difference from the health element run rests on fewer than 3 survey
+households). Nothing before April 2029 (no change).

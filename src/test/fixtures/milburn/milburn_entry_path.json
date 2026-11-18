@@ -1,0 +1,649 @@
+{
+  "status": "ok",
+  "method": "static + share \u00d7 (everyone moves \u2212 static), the expected value over who moves; relative poverty first-order only",
+  "years": [
+    2027,
+    2028,
+    2029,
+    2030,
+    2031
+  ],
+  "start_year": 2029,
+  "effect": 0.09,
+  "neet_gap_pp": {
+    "2026": 0.0,
+    "2027": 0.3,
+    "2028": 0.9,
+    "2029": 1.7,
+    "2030": 2.7,
+    "2031": 3.7,
+    "2036": 6.6
+  },
+  "rebase_year": 2028,
+  "hours": 16,
+  "people_basis": "age_impact.csv, row all, people (the summary's)",
+  "model_build": {
+    "label": "build x",
+    "build": "x",
+    "dataset_sha256": "abc",
+    "engine": {
+      "policyengine-uk": "1"
+    },
+    "certified": true,
+    "policyengine": "1"
+  },
+  "paths": [
+    {
+      "id": "central",
+      "share_path": "table3",
+      "base": "full",
+      "on_tab": true,
+      "years": {
+        "2027": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2028": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2029": {
+          "share": 0.012632,
+          "movers": 1000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.012632
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": 0.994947
+          },
+          "poverty_people_abs_bhc": {
+            "static": 700000,
+            "scenario": 696000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": 0.994947
+          },
+          "poverty_people_rel_ahc": {
+            "static": 700000,
+            "scenario": 696000
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.974737
+          }
+        },
+        "2030": {
+          "share": 0.028421,
+          "movers": 3000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.028421
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": 0.988632
+          },
+          "poverty_people_abs_bhc": {
+            "static": 700000,
+            "scenario": 692000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": 0.988632
+          },
+          "poverty_people_rel_ahc": {
+            "static": 700000,
+            "scenario": 692000
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.943158
+          }
+        },
+        "2031": {
+          "share": 0.044211,
+          "movers": 4000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.044211
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": 0.982316
+          },
+          "poverty_people_abs_bhc": {
+            "static": 700000,
+            "scenario": 688000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": 0.982316
+          },
+          "poverty_people_rel_ahc": {
+            "static": 700000,
+            "scenario": 688000
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.911579
+          }
+        }
+      }
+    },
+    {
+      "id": "flat",
+      "share_path": "flat",
+      "base": "full",
+      "on_tab": true,
+      "years": {
+        "2027": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2028": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2029": {
+          "share": 0.09,
+          "movers": 9000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.09
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": 0.964
+          },
+          "poverty_people_abs_bhc": {
+            "static": 700000,
+            "scenario": 675000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": 0.964
+          },
+          "poverty_people_rel_ahc": {
+            "static": 700000,
+            "scenario": 675000
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.82
+          }
+        },
+        "2030": {
+          "share": 0.09,
+          "movers": 9000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.09
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": 0.964
+          },
+          "poverty_people_abs_bhc": {
+            "static": 700000,
+            "scenario": 675000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": 0.964
+          },
+          "poverty_people_rel_ahc": {
+            "static": 700000,
+            "scenario": 675000
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.82
+          }
+        },
+        "2031": {
+          "share": 0.09,
+          "movers": 9000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.09
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": 0.964
+          },
+          "poverty_people_abs_bhc": {
+            "static": 700000,
+            "scenario": 675000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": 0.964
+          },
+          "poverty_people_rel_ahc": {
+            "static": 700000,
+            "scenario": 675000
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.82
+          }
+        }
+      }
+    },
+    {
+      "id": "with_pip",
+      "share_path": "table3",
+      "base": "full",
+      "on_tab": true,
+      "years": {
+        "2027": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2028": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2029": {
+          "share": 0.012632,
+          "movers": 4000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.018947
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": null
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": null
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.962105
+          }
+        },
+        "2030": {
+          "share": 0.028421,
+          "movers": 9000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.042632
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": null
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": null
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.914737
+          }
+        },
+        "2031": {
+          "share": 0.044211,
+          "movers": 13000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.066316
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": null
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": null
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.867368
+          }
+        }
+      }
+    },
+    {
+      "id": "rollout",
+      "share_path": "flat",
+      "base": "phased",
+      "on_tab": true,
+      "years": {
+        "2027": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2028": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2029": {
+          "share": 0.09,
+          "movers": 4000,
+          "exchequer_bn": {
+            "static": 2.0,
+            "scenario": 2.045
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 0.5,
+            "scenario": 0.482
+          },
+          "poverty_people_abs_bhc": {
+            "static": 350000,
+            "scenario": 337000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 0.5,
+            "scenario": 0.482
+          },
+          "poverty_people_rel_ahc": {
+            "static": 350000,
+            "scenario": 337000
+          },
+          "young_losing_pct": {
+            "static": 6.0,
+            "scenario": 5.91
+          }
+        },
+        "2030": {
+          "share": 0.09,
+          "movers": 4000,
+          "exchequer_bn": {
+            "static": 2.0,
+            "scenario": 2.045
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 0.5,
+            "scenario": 0.482
+          },
+          "poverty_people_abs_bhc": {
+            "static": 350000,
+            "scenario": 337000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 0.5,
+            "scenario": 0.482
+          },
+          "poverty_people_rel_ahc": {
+            "static": 350000,
+            "scenario": 337000
+          },
+          "young_losing_pct": {
+            "static": 6.0,
+            "scenario": 5.91
+          }
+        },
+        "2031": {
+          "share": 0.09,
+          "movers": 4000,
+          "exchequer_bn": {
+            "static": 2.0,
+            "scenario": 2.045
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 0.5,
+            "scenario": 0.482
+          },
+          "poverty_people_abs_bhc": {
+            "static": 350000,
+            "scenario": 337000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 0.5,
+            "scenario": 0.482
+          },
+          "poverty_people_rel_ahc": {
+            "static": 350000,
+            "scenario": 337000
+          },
+          "young_losing_pct": {
+            "static": 6.0,
+            "scenario": 5.91
+          }
+        }
+      }
+    },
+    {
+      "id": "unrebased",
+      "share_path": "table3_unrebased",
+      "base": "full",
+      "on_tab": false,
+      "years": {
+        "2027": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2028": {
+          "share": 0.0,
+          "movers": 0,
+          "no_change": true
+        },
+        "2029": {
+          "share": 0.023182,
+          "movers": 2000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.023182
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": 0.990727
+          },
+          "poverty_people_abs_bhc": {
+            "static": 700000,
+            "scenario": 694000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": 0.990727
+          },
+          "poverty_people_rel_ahc": {
+            "static": 700000,
+            "scenario": 694000
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.953636
+          }
+        },
+        "2030": {
+          "share": 0.036818,
+          "movers": 4000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.036818
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": 0.985273
+          },
+          "poverty_people_abs_bhc": {
+            "static": 700000,
+            "scenario": 690000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": 0.985273
+          },
+          "poverty_people_rel_ahc": {
+            "static": 700000,
+            "scenario": 690000
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.926364
+          }
+        },
+        "2031": {
+          "share": 0.050455,
+          "movers": 5000,
+          "exchequer_bn": {
+            "static": 4.0,
+            "scenario": 4.050455
+          },
+          "poverty_pp_abs_bhc": {
+            "static": 1.0,
+            "scenario": 0.979818
+          },
+          "poverty_people_abs_bhc": {
+            "static": 700000,
+            "scenario": 686000
+          },
+          "poverty_pp_rel_ahc": {
+            "static": 1.0,
+            "scenario": 0.979818
+          },
+          "poverty_people_rel_ahc": {
+            "static": 700000,
+            "scenario": 686000
+          },
+          "young_losing_pct": {
+            "static": 10.0,
+            "scenario": 9.899091
+          }
+        }
+      }
+    }
+  ],
+  "linearity_check": {
+    "runs": [
+      "milburn_report_package_entry_check_with_pip",
+      "milburn_report_package_entry_check_complement_with_pip"
+    ],
+    "share": 0.25,
+    "tolerance": {
+      "exchequer_bn": 0.02,
+      "poverty_pp": 0.05,
+      "young_losing_pct": 0.05
+    },
+    "covers": "the full package with PIP recipients; the rollout path is not checked",
+    "results": [
+      {
+        "year": 2029,
+        "figure": "exchequer_bn",
+        "residual_share_of_increment": 0.0,
+        "pass": true
+      },
+      {
+        "year": 2029,
+        "figure": "poverty_pp_abs_bhc",
+        "residual_share_of_increment": -0.0,
+        "pass": true
+      },
+      {
+        "year": 2029,
+        "figure": "poverty_pp_rel_ahc",
+        "residual_share_of_increment": -0.0,
+        "pass": true
+      },
+      {
+        "year": 2029,
+        "figure": "young_losing_pct",
+        "residual_share_of_increment": -0.0,
+        "pass": true
+      },
+      {
+        "year": 2030,
+        "figure": "exchequer_bn",
+        "residual_share_of_increment": 0.0,
+        "pass": true
+      },
+      {
+        "year": 2030,
+        "figure": "poverty_pp_abs_bhc",
+        "residual_share_of_increment": -0.0,
+        "pass": true
+      },
+      {
+        "year": 2030,
+        "figure": "poverty_pp_rel_ahc",
+        "residual_share_of_increment": -0.0,
+        "pass": true
+      },
+      {
+        "year": 2030,
+        "figure": "young_losing_pct",
+        "residual_share_of_increment": -0.0,
+        "pass": true
+      },
+      {
+        "year": 2031,
+        "figure": "exchequer_bn",
+        "residual_share_of_increment": 0.0,
+        "pass": true
+      },
+      {
+        "year": 2031,
+        "figure": "poverty_pp_abs_bhc",
+        "residual_share_of_increment": -0.0,
+        "pass": true
+      },
+      {
+        "year": 2031,
+        "figure": "poverty_pp_rel_ahc",
+        "residual_share_of_increment": -0.0,
+        "pass": true
+      },
+      {
+        "year": 2031,
+        "figure": "young_losing_pct",
+        "residual_share_of_increment": -0.0,
+        "pass": true
+      }
+    ],
+    "failed": []
+  },
+  "withheld": [
+    {
+      "path": "with_pip",
+      "year": 2029,
+      "figure": "poverty_pp_abs_bhc",
+      "reason": "would give back a thin difference between paths"
+    },
+    {
+      "path": "with_pip",
+      "year": 2029,
+      "figure": "poverty_pp_rel_ahc",
+      "reason": "would give back a thin difference between paths"
+    },
+    {
+      "path": "with_pip",
+      "year": 2030,
+      "figure": "poverty_pp_abs_bhc",
+      "reason": "would give back a thin difference between paths"
+    },
+    {
+      "path": "with_pip",
+      "year": 2030,
+      "figure": "poverty_pp_rel_ahc",
+      "reason": "would give back a thin difference between paths"
+    },
+    {
+      "path": "with_pip",
+      "year": 2031,
+      "figure": "poverty_pp_abs_bhc",
+      "reason": "would give back a thin difference between paths"
+    },
+    {
+      "path": "with_pip",
+      "year": 2031,
+      "figure": "poverty_pp_rel_ahc",
+      "reason": "would give back a thin difference between paths"
+    }
+  ]
+}

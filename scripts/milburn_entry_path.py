@@ -232,7 +232,7 @@ def derive(all_move, static, share_of, year, against=None, dropped=()):
             reason = "an input is withheld under the floor"
         elif thin_movers:
             reason = "movers rest on too few survey households"
-        elif base in dropped:
+        elif key in dropped:
             reason = "failed the linearity check"
         elif key != "exchequer_bn" and not wide_enough(
             counts_a[key], counts_s[key], a[key], s[key]
@@ -283,7 +283,7 @@ def linearity(all_move, static, part, complement):
                 results.append(
                     {"year": year, "figure": key, "result": "withheld input"}
                 )
-                failed.add(base)
+                failed.add(key)
                 continue
             increment = a[key] - s[key]
             residual = (p[key] - s[key]) + (c[key] - s[key]) - increment
@@ -291,7 +291,7 @@ def linearity(all_move, static, part, complement):
                 CHECK_ABSOLUTE[base], CHECK_TOLERANCE[base] * abs(increment)
             )
             if not ok:
-                failed.add(base)
+                failed.add(key)
             results.append(
                 {
                     "year": year,
@@ -334,7 +334,7 @@ def main(argv=None):
     parser.add_argument("--runs", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=OUTPUT)
     args = parser.parse_args(argv)
-    design.check_report_design()
+    design.check_entry_design()
     runs = {
         "static": Run(args.static.expanduser()),
         "static_phased": Run(args.static_phased.expanduser()),
@@ -366,7 +366,7 @@ def main(argv=None):
                 lambda y, p=share_path: design.report_entry_share(y, p),
                 year,
                 against=runs[against] if against else None,
-                dropped=failed if full else (),
+                dropped=failed,
             )
             by_year[str(year)] = figures
             withheld_all += [

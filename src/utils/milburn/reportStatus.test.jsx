@@ -196,14 +196,14 @@ describe("Methodology", () => {
   it("after, states the report's own employment assumption beside ours, with its sources; before, does not", () => {
     renderMethodology(true);
     const scenarios = () => document.getElementById("method-behavioural-scenarios");
-    expect(scenarios().textContent).toContain("Why 25%");
+    expect(scenarios().textContent).toContain("Why this path");
     expect(scenarios().textContent).toContain("Who moves");
-    expect(scenarios().textContent).toContain("around 440,000 young people into sustained work by 2036");
+    expect(scenarios().textContent).toContain("around 440,000 more young people in sustained work by 2036");
     expect(scenarios().querySelector(`a[href="${FINAL_REPORT.annexUrl}"]`)).not.toBeNull();
     expect(scenarios().querySelector(`a[href="${FINAL_REPORT.reportUrl}"]`)).not.toBeNull();
     cleanup();
     renderMethodology(false);
-    expect(scenarios().textContent).toContain("Why 25%");
+    expect(scenarios().textContent).toContain("Why this path");
     expect(scenarios().textContent).not.toContain("440,000");
     expect(document.getElementById("method-about-review").querySelector("[data-report-proposals]")).toBeNull();
   });

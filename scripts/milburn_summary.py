@@ -19,6 +19,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RUNS = ROOT / "public" / "data" / "milburn"
 YEAR = 2029
+# Runs whose files stay (loadable by link) but which no summary figure
+# reads: the pre-report 25% move into work, replaced on the tab by the
+# phased scenario (scripts/milburn_entry_path.py)
+OFF_SUMMARY = {"milburn_package_entry_25pct"}
 
 
 def num(value):
@@ -230,7 +234,9 @@ def main():
     sp = ROOT / "public" / "data" / "milburn_scenarios.json"
     scenarios = json.loads(sp.read_text()) if sp.exists() else {}
     folders = [
-        d for d in sorted(RUNS.iterdir()) if (d / "model_build.json").exists()
+        d
+        for d in sorted(RUNS.iterdir())
+        if (d / "model_build.json").exists() and d.name not in OFF_SUMMARY
     ]
     results = [summarise(d, scenarios) for d in folders]
     # Every year the runs cover, under the same floor (the cells each run's

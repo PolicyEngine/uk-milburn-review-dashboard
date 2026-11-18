@@ -108,7 +108,7 @@ describe("MethodologyTab", () => {
 
   it("describes the move into work by the group that moves", () => {
     const { container } = renderTab();
-    expect(container).toHaveTextContent("25% of non-working 18 to 24-year-olds with PIP or the health element move into 16 hours' work a week");
+    expect(container).toHaveTextContent("Non-working 18 to 24-year-olds whose Universal Credit health element the package removes");
     expect(container.textContent).not.toMatch(/young people it leaves worse off/);
   });
 

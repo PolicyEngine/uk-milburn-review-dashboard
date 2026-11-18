@@ -17,7 +17,6 @@ import { scrollBelowBars, smoothUnlessReduced } from "../utils/pageScroll";
 import { POVERTY_FIGURES_SHOWN, WITHHELD_SENTENCE } from "../utils/povertyFigures";
 import { MICROCOSM_BUILD, POLICYENGINE_UK_VERSION, POLICYENGINE_VERSION, REPLICATION_LINE } from "./ReplicationLine";
 import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
-import { ENTRY_ASSUMPTION_TEXT } from "../utils/milburn/summary";
 import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
 import { FINAL_REPORT, REPORT_PUBLISHED, reportCopy } from "../utils/milburn/reportStatus";
 
@@ -446,34 +445,44 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
         <MethodSection
           id={METHOD_SECTIONS.scenarios}
           title="Moves into work and benchmarks"
-          summary="The package with a move into work, microsimulated, and published figures to set the results beside."
+          summary="The package with an assumed phased move into work, and published figures to set the results beside."
         >
-          <Topic id="method-behavioural-scenarios" title="Moves into work (illustrative)" preview="Microsimulated move into work · Entry cases · Break-even">
+          <Topic id="method-behavioural-scenarios" title="Moves into work (illustrative)" preview="A phased share moving into work · Entry cases · Break-even">
             <FactList
               items={[
                 [
-                  "Microsimulated",
-                  `The full abolition package (the same two removals as the report’s benefit changes, applied from April 2027) is run again on the assumption that ${ENTRY_ASSUMPTION_TEXT}, chosen at random, and set beside the static package: the saving, poverty and average loss.`,
-                ],
-                [
-                  "Why 25%",
-                  "An assumption, not an estimate: no published study gives the share of young PIP or health element claimants who would move into work if these benefits were removed, so the 25% is chosen for illustration and says nothing about how large the effect would be. The figures show how the results change if that many moved; the break-even chart shows the share that would be needed to match the Exchequer saving.",
+                  "How the figures are made",
+                  "The report's two benefit changes from April 2029 (the static package), and the same package with everyone in the group moving into work, are run once each. Each path's figures are the static figure plus the year's share times the difference between the two runs: the expected value over who moves, not a simulation of particular people. That holds for totals and counts (the Exchequer, absolute poverty, people in losing households). A check, a random 25% of the with-PIP group and the other 75% run separately, tests that the parts add up to the whole: they do, to rounding, for the Exchequer, absolute poverty and the losing households. Relative poverty after housing costs missed by up to 9% of the change, as its line moves with the median, so it is not shown. The rollout path, on the phased package, is not checked itself.",
                 ],
                 [
                   "Who moves",
-                  "Only people aged 18 to 24 with no earnings who themselves receive PIP or the health element, picked at random with a fixed seed; each moves into 16 hours a week at the minimum wage for their age for the whole year. Nobody else changes behaviour.",
+                  "Non-working 18 to 24-year-olds whose Universal Credit health element the package removes: the assessed claimant with limited capability for work and work-related activity, in a claim where no claimant keeps the element, with no employment or self-employment income. Each moves into 16 hours a week at the minimum wage for their age, our assumption: the review assumes a mix of full-time and part-time work and publishes no hours or wage. 16 and 17-year-olds lose the element too but do not move. The with-PIP path adds non-working 18 to 24-year-olds who lose PIP. Nobody else changes behaviour.",
+                ],
+                [
+                  "Why this path",
+                  <>
+                    An assumption, not an estimate of how people respond. Its level is the 9% employment effect the <AnnexLink />{" "}
+                    assumes for Universal Credit
+                    health claimants (section 1), read here as 9 percentage points; the annex does not say whether it is points or per cent, and the figures scale
+                    with it. The annex gives the 9% no time path. The phased path takes its timing from the review&apos;s NEET path (data tables, table 3), counted
+                    from 2028-29, the year before the benefit changes start: none before April 2029, then 1.3% in 2029-30, 2.8% in 2030-31 and 4.4% in 2031-32,
+                    about half way to the 9% it reaches in 2036-37. That pairing is ours: the NEET path reflects the review&apos;s whole package, and the review
+                    phases its welfare savings by when claimants are reassessed. Table 3 is rounded to one decimal place, so the 2029-30 share could be between
+                    about 0.9% and 1.6%. Not counted from 2028-29, the same timing gives 2.3%, 3.7% and 5.1%. The flat path applies 9% from 2029-30; the rollout
+                    path applies 9% to those the phased package has reached (new 18-year-olds at once, existing claimants at an assumed 45% a year). The
+                    review&apos;s 9% sits in a scenario with replacement awards, which the package here does not model.
+                  </>,
                 ],
                 ...(published
                   ? [
                       [
-                        "The report’s assumption",
+                        "The review’s own figure",
                         <>
-                          The review&apos;s own modelling expects its reforms together to help around 440,000 young
-                          people into sustained work by 2036 (<ReportLink />, paragraph 111). Its{" "}
+                          The review&apos;s modelling puts around 440,000 more young people in sustained work by 2036 (<ReportLink />, paragraph 111). In its{" "}
                           <AnnexLink />{" "}
-                          assumes 440,000 more young people in work, in a mix of full-time and part-time jobs, and a 9% employment effect for Universal Credit health claimants (sections 1 and 8).
-                          That figure covers the whole package, including employment support and job guarantees, so it
-                          is not comparable with our 25% of affected claimants.
+                          that is the employment effect of the whole package of recommendations, including the benefit changes, employment support,
+                          the guarantees and education measures, and it counts effects beyond age 24 (section 8); section 2 gives around 400,000 more 16 to
+                          24-year-olds in work in 2036. The review gives no figure for the benefit changes on their own, so this scenario does not use it.
                         </>,
                       ],
                     ]

@@ -96,8 +96,8 @@ const LOADED = {
   // Impact opens on Young people, which reads the age table (below)
   dashboard: (panel) => within(panel).findAllByText(/Results by age are not available/),
   // Impact's other sub-tabs, by ?sub=
-  // Moves into work (illustrative): led by the microsimulated run from milburn_summary.json
-  scenarios: (panel) => within(panel).findAllByRole("heading", { name: "With a quarter moving into work" }),
+  // Moves into work (illustrative): led by the share assumed in work, from milburn_entry_path.json
+  scenarios: (panel) => within(panel).findAllByRole("heading", { name: "Share assumed in work, by year" }),
   benchmarks: (panel) => within(panel).findAllByRole("listitem"),
   // Population impact's Poverty while its figures are shown; while they are
   // withheld (povertyFigures.js), ?sub=poverty opens Public finances
