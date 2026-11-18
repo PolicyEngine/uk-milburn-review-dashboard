@@ -64,7 +64,7 @@ export const NO_CHANGE_SENTENCE =
 
 /** The tab's subtitle, said on the tab and on its loading skeleton alike. */
 export const SCENARIOS_SUBTITLE =
-  "The report's benefit changes from April 2029, with an assumed move into work for young Universal Credit health claimants. The assumption is ours; it combines two figures the review publishes.";
+  "The report's changes from April 2029, plus our assumed move into work for young UC health claimants, built from two review figures.";
 
 /** Said in place of a count of movers before the changes start. */
 export const NONE_BEFORE_START = "None: the changes start in April 2029";

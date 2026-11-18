@@ -182,9 +182,10 @@ export function metricSentence(metric, yearText, value, count = null, who = sele
   const start = `In ${yearText} ${who.text}`;
   const v = (verb) => verbFor(who, verb);
   if (metric.line && count) {
-    const move = `${start} ${v("move")} ${count} ${value < 0 ? "out of" : "into"} ${metric.line}`;
+    // Short: the header names the policy
+    const move = `In ${yearText}, ${count} ${value < 0 ? "leave" : "enter"} ${metric.line}`;
     return amount
-      ? `${move}, ${value < 0 ? "lowering" : "raising"} the rate by about ${amount}.`
+      ? `${move} (${value < 0 ? "−" : "+"}${amount.replace(/ percentage points$/, "pp")}).`
       : `${move}, almost no change in the rate.`;
   }
   if (!amount) return `${start} ${v("make")} almost no change to ${subject}.`;

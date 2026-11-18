@@ -152,7 +152,7 @@ describe("the Poverty sub-tab's measures pair", () => {
       expect(within(c).getByRole("button", { name: /^Options:/ })).toHaveAccessibleName("Options: Absolute · Before housing costs · All people");
     }
     // The change in people, from the outlook's population
-    await waitFor(() => expect(change.querySelector(".chart-description")).toHaveTextContent(/^In 2027-28 the selected policies move about [\d,]+ people out of absolute poverty before housing costs, lowering the rate by about 0\.0075 percentage points\.$/), { timeout: 5000 });
+    await waitFor(() => expect(change.querySelector(".chart-description")).toHaveTextContent(/^In 2027-28, about [\d,]+ people leave absolute poverty before housing costs \(−0\.0075pp\)\.$/), { timeout: 5000 });
     // A waterfall in people: short names, the package last; every selected
     // policy a row, the ones that move no one after the steps with "No
     // change" and why, and no bar

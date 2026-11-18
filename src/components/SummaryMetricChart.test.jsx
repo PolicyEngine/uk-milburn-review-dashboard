@@ -304,7 +304,7 @@ describe("the card's sentence", () => {
       "In 2029-30 the selected policies raise income inequality (the Gini coefficient) by about 0.16%.",
     );
     expect(metricSentence(povertyMetric(parsePovertyChoice("absolute-bhc-all")), "2029-30", -0.012, "about 4,200 people")).toBe(
-      "In 2029-30 the selected policies move about 4,200 people out of absolute poverty before housing costs, lowering the rate by about 0.012 percentage points.",
+      "In 2029-30, about 4,200 people leave absolute poverty before housing costs (−0.012pp).",
     );
   });
   it("says almost no change only when the change rounds to 0.00", () => {
@@ -314,7 +314,7 @@ describe("the card's sentence", () => {
   it("names the one selected policy, with a singular verb (María, #6 item 5)", () => {
     const one = selectionSubject(["PIP removed for 18 to 24-year-olds"]);
     expect(metricSentence(povertyMetric(parsePovertyChoice("absolute-bhc-all")), "2029-30", 0.012, "about 4,200 people", one)).toBe(
-      "In 2029-30 “PIP removed for 18 to 24-year-olds” moves about 4,200 people into absolute poverty before housing costs, raising the rate by about 0.012 percentage points.",
+      "In 2029-30, about 4,200 people enter absolute poverty before housing costs (+0.012pp).",
     );
     expect(metricSentence(top10, "2029-30", 0.004, null, one)).toBe("In 2029-30 “PIP removed for 18 to 24-year-olds” makes almost no change to the top 10% income share.");
     expect(noChangeFor(SUMMARY_METRICS.poverty.noChange, one)).toBe(
