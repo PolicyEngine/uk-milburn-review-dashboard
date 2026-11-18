@@ -3,8 +3,9 @@
 > **Historical.** This note was written before the final report, on the
 > uncertified Microcosm build 6f918b81, with the pre-report packages, 2027-28
 > start dates and the netted average loss. None of its figures is current.
-> The dashboard now runs on build fcfac709 (policyengine 6.20.1 and 6.20.2,
-> same engine and data; see docs/milburn-local-run.md) with the report's
+> The dashboard now runs on build fcfac709 (pre-report runs first made on
+> policyengine 6.20.1, report runs on 6.20.2, same engine and data; every run
+> now records 6.20.2; see docs/milburn-local-run.md) with the report's
 > measures from April 2029; current figures are in
 > `public/data/milburn_summary.json` and `public/data/milburn/<run>/`, and the
 > design choices in `src/uk_budget_data/budget_measures/milburn_design.py`.

@@ -11,8 +11,9 @@ data build the review uses.
 > 6.20.1 (policyengine.py PR 759) first certified Microcosm build `fcfac709`
 > with policyengine-uk 2.177.7 and core 3.34.10; the project now depends on
 > `policyengine[uk]>=6.20.2`, which certifies the same build, engine and
-> data. The pre-report runs' `model_build.json` files still record 6.20.1
-> and the report runs 6.20.2: the figures are on the same engine and data.
+> data. Version labels: the pre-report runs were first made on 6.20.1 and
+> the report runs on 6.20.2, on the same engine and data; since the floored
+> reruns of 18 November every run's `model_build.json` records 6.20.2.
 > There is no engine override, and
 > `local_build.bundle_certifies()` checks the file against the installed
 > bundle. Sections below that describe the uncertified build `6f918b81`
@@ -27,11 +28,16 @@ data build the review uses.
 | Label carried into outputs | `build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2` |
 
 Version labels: runs made before the final report was published
-record `certified in policyengine 6.20.1` in their `model_build.json`, and
-later runs `6.20.2`. Both bundles pin the same engine (policyengine-uk
-2.177.7, policyengine-core 3.34.10) and certify the same build fcfac709
-(same SHA-256), so the figures are comparable; only the bundle's release
-number differs.
+first recorded `certified in policyengine 6.20.1` in their
+`model_build.json`, and the report runs `6.20.2`. Both bundles pin the same
+engine (policyengine-uk 2.177.7, policyengine-core 3.34.10) and certify the
+same build fcfac709 (same SHA-256), so the figures are comparable; only the
+bundle's release number differs, and the pre-report runs were not rerun to
+change it. The floored reruns of 18 November (the 3-survey-household floor)
+ran every run on 6.20.2, so every published `model_build.json` now records
+6.20.2; the page still merges a 6.20.1 and a 6.20.2 label into one
+(`combinedLabel` in `src/utils/milburn/localBuild.js`) should an older
+output return.
 
 Fetch the file once (it reads the Hugging Face CLI token; nothing is printed):
 

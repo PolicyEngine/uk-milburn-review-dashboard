@@ -61,6 +61,7 @@ Definitions are in [`src/uk_budget_data/reforms.py`](src/uk_budget_data/reforms.
 - **policyengine 6.20.2** (`pyproject.toml`, `uv.lock`), whose bundle certifies **Microcosm UK build `fcfac709`** with policyengine-uk 2.177.7 and policyengine-core 3.34.10. Upgrade the bundle, never policyengine-uk alone.
 - Runs load the certified file from the location the bundle pins, checked by SHA-256 and `local_build.bundle_certifies()` ([`src/uk_budget_data/local_build.py`](src/uk_budget_data/local_build.py)). Fetch it once with the command in [`docs/milburn-local-run.md`](docs/milburn-local-run.md).
 - Every run writes `model_build.json` (build, dataset SHA-256, engine, `certified`, policyengine version) beside its tables in `public/data/milburn/<id>/`.
+- Version labels: the pre-report runs were first made on policyengine 6.20.1 and the report runs on 6.20.2, which pin the same engine and certify the same data, so the figures are comparable. They were not rerun for the label; since the floored reruns of 18 November every run records 6.20.2 ("Version labels" in [`docs/milburn-local-run.md`](docs/milburn-local-run.md)).
 
 ## Running
 
