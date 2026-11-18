@@ -28,8 +28,7 @@ at most ``MAX_CONTAINERS`` at once, and the app is ephemeral, so it stops
 when the command ends.
 
 Needs ``modal`` (not a dependency of the package): run the command with
-``uv run --with modal==1.6.2``. See docs/budget-day-runbook.md, "Results by
-constituency on Modal".
+``uv run --with modal==1.6.2``.
 """
 
 import os

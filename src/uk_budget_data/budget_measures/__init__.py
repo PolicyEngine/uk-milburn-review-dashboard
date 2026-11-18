@@ -3,9 +3,8 @@ module per modifier.
 
 A receipt binds a modifier only from a module of a fixed shape: imports,
 literal constants and undecorated functions, each name bound once, and
-nothing that changes module state at run time (policyengine.py#571;
-``docs/budget-day-publication.md``, "What the receipt asks of measure
-code"). ``reforms.py`` fills caches at run time, so its modifiers cannot be
+nothing that changes module state at run time (policyengine.py#571).
+``reforms.py`` fills caches at run time, so its modifiers cannot be
 receipted; every modifier lives here instead, with its numbers as literal
 default arguments, and ``reforms.py`` imports them.
 

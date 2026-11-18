@@ -1,5 +1,5 @@
 # Reconciliation thresholds. PROPOSAL: these numbers await the team's
-# decision (see docs/budget-day-publication.md, decision 3).
+# decision.
 
 # A year passes when |ours - Treasury| <= max(relative_tolerance * |Treasury|,
 # absolute_floor_bn).

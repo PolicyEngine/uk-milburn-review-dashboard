@@ -6,7 +6,7 @@ PolicyEngine's dashboard for the UK Autumn Budget 2026 (Wednesday 28 October 202
 |---|---|
 | Live dashboard | <https://uk-autumn-budget-2026.vercel.app/uk/autumn-budget-2026> |
 | Household API | <https://uk-budget-api-2026-qevs5bboca-ew.a.run.app/api/household-impact> (`POST`; see [Architecture](#architecture)) |
-| Budget-day runbook | [`docs/budget-day-runbook.md`](docs/budget-day-runbook.md) |
+| Budget-day runbook | [`docs/budget-day-runbook.md`](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md) |
 | Decision log | [Issue #119](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/issues/119) |
 | Drill reruns (the four mock Budgets on today's engine) | <https://uk-ab2026-drill-reruns.vercel.app> |
 
@@ -52,7 +52,7 @@ List them from the command line with `uv run uk-budget-data generate --list-refo
 
 - **Web app** (`src/app/`, `src/App.jsx`, `src/components/`): Next.js 16 and React 19, built and run with Bun, served under the base path `/uk/autumn-budget-2026` (`next.config.ts`). Tailwind CSS 4 on `@policyengine/ui-kit`'s theme; charts in Recharts. Population impact and Pre-measures forecast read precomputed files from `public/data/`; Household impact calls the household API.
 - **Data package** (`src/uk_budget_data/`, CLI `uk-budget-data`): Python 3.13. Runs the measures through [policyengine.py](https://github.com/PolicyEngine/policyengine.py) and writes `public/data/`.
-- **Household API** (`uk-budget-api`, `src/uk_budget_data/api.py`): FastAPI on Cloud Run (`uk-budget-api-2026`, `europe-west1`). Its `POST /api/household-impact` route is documented in [`docs/budget-day-publication.md`](docs/budget-day-publication.md#household-route-post-apihousehold-impact).
+- **Household API** (`uk-budget-api`, `src/uk_budget_data/api.py`): FastAPI on Cloud Run (`uk-budget-api-2026`, `europe-west1`). Its `POST /api/household-impact` route is documented in [`docs/budget-day-publication.md`](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-publication.md#household-route-post-apihousehold-impact).
 
 **Engine.** The project depends on `policyengine[uk]` 6.11.1 or later (`pyproject.toml`), locked at 6.11.1 (`uv.lock`), which pins policyengine-uk 2.151.0 and the certified Microcosm national dataset that goes with it. Population results are built with `pe.uk.managed_microsimulation()`, which downloads that dataset from a private Hugging Face repository and so needs `HUGGING_FACE_TOKEN`. Household calculations need no dataset. Upgrade the bundle, never policyengine-uk alone (see [`.claude/CLAUDE.md`](.claude/CLAUDE.md)).
 
@@ -137,23 +137,23 @@ The same pipeline is importable: `from uk_budget_data import generate_all_data, 
 
 ## Budget day
 
-The full sequence, roles and timings are in the [runbook](docs/budget-day-runbook.md); the design behind it is in [`docs/budget-day-publication.md`](docs/budget-day-publication.md). In order:
+The full sequence, roles and timings are in the [runbook](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md); the design behind it is in [`docs/budget-day-publication.md`](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-publication.md). In order:
 
 | Step | What happens | Runbook |
 |---|---|---|
-| Start | Pull `main`, sync, run the certified-data tests and the household route check | [G0](docs/budget-day-runbook.md#g0-start-receipt-by-1130) |
-| OBR tables | Download the OBR workbooks **in a browser** (obr.uk refuses scripts) and import them | [Documents arrive](docs/budget-day-runbook.md#documents-arrive-1340), [OBR forecast](docs/budget-day-runbook.md#budget-day-obr-forecast-living-standards-tab-from-1340) |
-| Generate | `generate --artifacts`, one receipted artifact per measure, locally or on Modal | [G2](docs/budget-day-runbook.md#g2-provisional-numbers-1315) |
-| Stage | `publish reconcile` and `publish stage`; each measure needs a signed expected-effects row (in #140, after #104) | [G2](docs/budget-day-runbook.md#g2-provisional-numbers-1315), [G3](docs/budget-day-runbook.md#g3-rebase-and-reconcile-1340-to-1410) |
-| Attest | Only while sign-off is on (it is off; see [Review and sign-off](#review-and-sign-off)): hand-written modifiers (`plan_2_threshold_unfreeze`, `state_pension_income_tax_protection`) and any package holding them are held until **two different people** sign an attestation for that exact receipt | [How a measure must be written](docs/budget-day-runbook.md#how-a-measure-must-be-written) |
-| Approve | `publish approve --by <name>`; `publish review-rows` writes the review rows sign-off needs, and deletes the artifacts no entry names | [G3](docs/budget-day-runbook.md#g3-rebase-and-reconcile-1340-to-1410) |
-| Combined | `generate --combined` over the approved measures, staged and approved | [G4](docs/budget-day-runbook.md#g4-combined-run-and-publish-1450) |
-| Results by area | `geography` over the approved ids locally, or `constituencies --backend modal` for seats on Microcosm's local-area cut; both write `area_provenance.json` for `publish index` | [G4](docs/budget-day-runbook.md#g4-combined-run-and-publish-1450) |
-| Publish | `publish index`, `publish check`, then the pull request whose merge deploys | [G4](docs/budget-day-runbook.md#g4-combined-run-and-publish-1450) |
+| Start | Pull `main`, sync, run the certified-data tests and the household route check | [G0](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#g0-start-receipt-by-1130) |
+| OBR tables | Download the OBR workbooks **in a browser** (obr.uk refuses scripts) and import them | [Documents arrive](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#documents-arrive-1340), [OBR forecast](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#budget-day-obr-forecast-living-standards-tab-from-1340) |
+| Generate | `generate --artifacts`, one receipted artifact per measure, locally or on Modal | [G2](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#g2-provisional-numbers-1315) |
+| Stage | `publish reconcile` and `publish stage`; each measure needs a signed expected-effects row (in #140, after #104) | [G2](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#g2-provisional-numbers-1315), [G3](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#g3-rebase-and-reconcile-1340-to-1410) |
+| Attest | Only while sign-off is on (it is off; see [Review and sign-off](#review-and-sign-off)): hand-written modifiers (`plan_2_threshold_unfreeze`, `state_pension_income_tax_protection`) and any package holding them are held until **two different people** sign an attestation for that exact receipt | [How a measure must be written](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#how-a-measure-must-be-written) |
+| Approve | `publish approve --by <name>`; `publish review-rows` writes the review rows sign-off needs, and deletes the artifacts no entry names | [G3](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#g3-rebase-and-reconcile-1340-to-1410) |
+| Combined | `generate --combined` over the approved measures, staged and approved | [G4](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#g4-combined-run-and-publish-1450) |
+| Results by area | `geography` over the approved ids locally, or `constituencies --backend modal` for seats on Microcosm's local-area cut; both write `area_provenance.json` for `publish index` | [G4](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#g4-combined-run-and-publish-1450) |
+| Publish | `publish index`, `publish check`, then the pull request whose merge deploys | [G4](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#g4-combined-run-and-publish-1450) |
 | Sources | Point the page's OBR and Budget-document links at the day's publications (config keys `obr_efo_current` and `budget_documents`, in #128 and #127) | — |
-| Corrections | Withdraw, fix, regenerate | [G5](docs/budget-day-runbook.md#g5-corrections-whenever-one-arrives), [Rollback](docs/budget-day-runbook.md#rollback) |
+| Corrections | Withdraw, fix, regenerate | [G5](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#g5-corrections-whenever-one-arrives), [Rollback](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#rollback) |
 
-**Who signs what.** Nobody, from Budget day evening (28 October 2026): sign-off is off, and a pull request merges once `main`'s required checks pass, with no review rows, no attestations and no second signer; the ruleset requires no approving review (see [Review and sign-off](#review-and-sign-off)). The expected-effects rows (`data_inputs/treasury/expected_effects.csv`, in #140) still name whoever declared them, and the manifest records who approved each entry. With sign-off on, each attestation needs two distinct people, and approval and review rows are the Reconciler's. See [Roles](docs/budget-day-runbook.md#roles).
+**Who signs what.** Nobody, from Budget day evening (28 October 2026): sign-off is off, and a pull request merges once `main`'s required checks pass, with no review rows, no attestations and no second signer; the ruleset requires no approving review (see [Review and sign-off](#review-and-sign-off)). The expected-effects rows (`data_inputs/treasury/expected_effects.csv`, in #140) still name whoever declared them, and the manifest records who approved each entry. With sign-off on, each attestation needs two distinct people, and approval and review rows are the Reconciler's. See [Roles](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-runbook.md#roles).
 
 ### Running it
 
@@ -187,7 +187,7 @@ The figures derive from UKDS-licensed survey microdata, and this repository and 
 - **Web app:** the Vercel project `uk-autumn-budget-2026` builds `main` with `bun run build` (`vercel.json`); a merge to `main` publishes. Set `NEXT_PUBLIC_HOUSEHOLD_API_URL` for Production and Preview.
 - **Household API:** the "Deploy the household API" workflow ([`.github/workflows/deploy-api.yml`](.github/workflows/deploy-api.yml)) submits [`cloudbuild.yaml`](cloudbuild.yaml), which deploys only a commit on `main`, smoke-tests the new revision before moving traffic, and rolls back through [`cloudbuild-rollback.yaml`](cloudbuild-rollback.yaml). Deploys on push stay off until the repository variable `API_DEPLOY_ON_PUSH` is `true`; until then, run the workflow by hand.
 
-Settings, service limits and fallbacks are under "Production setup" in [`docs/budget-day-publication.md`](docs/budget-day-publication.md#production-setup-as-created).
+Settings, service limits and fallbacks are under "Production setup" in [`docs/budget-day-publication.md`](https://github.com/PolicyEngine/uk-autumn-budget-dashboard-2026/blob/main/docs/budget-day-publication.md#production-setup-as-created).
 
 ## Contributing
 

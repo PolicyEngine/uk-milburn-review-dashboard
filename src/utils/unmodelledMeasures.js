@@ -2,7 +2,7 @@
  * The Autumn Budget 2026 measures this dashboard does not model, shown
  * collapsed at the foot of the Policies tab
  * (components/policies/UnmodelledMeasures.jsx). They are the coverage
- * ledger's `ledger` calls (G1 in docs/budget-day-runbook.md): a measure the
+ * ledger's `ledger` calls (G1, the coverage step): a measure the
  * dashboard comes to model leaves this list, and one moved to the ledger
  * joins it, so a change at G1 is an edit here only.
  *

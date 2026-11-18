@@ -439,8 +439,7 @@ def add_jobs_arguments(parser, modal: bool = False) -> None:
             help=(
                 "Where measures run: local (default) or modal, one Modal "
                 "container per measure (flat CSVs and --only only; needs "
-                "Modal credentials and the HF token secret, see "
-                "docs/budget-day-runbook.md)"
+                "Modal credentials and the HF token secret)"
             ),
         )
 

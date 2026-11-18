@@ -36,8 +36,7 @@ from the image's files. So the image is defined only where the repository
 is (``modal.is_local()``).
 
 Needs ``modal`` (not a dependency of the package): run the command with
-``uv run --with modal==1.6.2``. See docs/budget-day-runbook.md, "Budget day
-on Modal".
+``uv run --with modal==1.6.2``.
 """
 
 import io
