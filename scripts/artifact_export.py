@@ -162,14 +162,18 @@ def relativise():
 # (src/utils/milburn/localBuild.js) never requests, by path under the
 # export, "/"-separated: checked against the browser's network log on every
 # tab (17 November 2026). Not listed, because the page reads them:
-# data/living_standards_outlook.json (Poverty), data/policy_parameters.json
-# (Measures), data/milburn_*.json and six files in each run's folder.
+# data/living_standards_outlook.json (Poverty), data/milburn_*.json and
+# six files in each run's folder.
 SKIP_PUBLISHED = (
     # Written for every run, drawn nowhere on this route; no longer copied
     # into public/ (scripts/milburn_rerun_all.sh), skipped if they are
     "data/milburn/*/income_curve.csv",
     "data/milburn/*/obr_comparison.csv",
     "data/milburn/*/household_scatter_binned.csv",
+    # The Budget measures' parameter tables: the Measures tab no longer
+    # fetches them on this route (PolicyCards, 18 November 2026). Kept in
+    # public/ this release for the tests and preset scripts that read it.
+    "data/policy_parameters.json",
 )
 
 

@@ -11,7 +11,7 @@ export const GLOSSARY = {
   netIncome: {
     term: "Household net income",
     meaning:
-      "Earnings, pensions, other income and benefits, less direct taxes, Council Tax, fuel and other duties, student loan repayments and pension contributions; a change in VAT counts too.",
+      "Earnings, pensions, other income and benefits, less direct taxes, Council Tax, student loan repayments and pension contributions.",
   },
   housingCosts: {
     term: "Before and after housing costs (BHC, AHC)",
@@ -31,8 +31,8 @@ export const GLOSSARY = {
     meaning: "The middle income in a ranking of people by income; the mean is the average.",
   },
   incomeGroups: {
-    term: "Deciles, quintiles and vigintiles",
-    meaning: "Tenths, fifths and twentieths of people, by equivalised household income.",
+    term: "Deciles",
+    meaning: "Tenths of people, by equivalised household income.",
   },
   real: {
     term: "Real terms and cash terms",
@@ -69,11 +69,6 @@ export const GLOSSARY = {
   benefitUnit: {
     term: "Benefit unit",
     meaning: "A single adult or a couple, with any dependent children: the family that claims benefits together.",
-  },
-  statePensionAge: {
-    term: "State Pension age",
-    meaning:
-      "Rises from 66 to 67 between May 2026 and March 2028, by date of birth. Pensioners here are people aged 66 or over in 2026-27 and 67 or over from 2027-28.",
   },
 };
 

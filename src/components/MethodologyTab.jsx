@@ -228,6 +228,8 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
     group.measures.map((measure) => ({ id: measure.id, name: measure.name })),
   );
   useRevealLinkedAnchor();
+  // No manifest yet: the catalogue is still loading, so no count ("0 published")
+  const catalogueLoading = !catalogue.manifest;
 
   return (
     <div className="methodology-tab">
@@ -359,8 +361,12 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
               ]}
             />
           </Topic>
-          <Topic title="Measures modelled" preview={`${modelled.length} published`}>
-            {modelled.length ? (
+          <Topic title="Measures modelled" preview={catalogueLoading ? "Loading…" : `${modelled.length} published`}>
+            {catalogueLoading ? (
+              <p className="method-more" role="status">
+                Loading the measures…
+              </p>
+            ) : modelled.length ? (
               <ul className="method-list">
                 {modelled.map((measure) => (
                   <li key={measure.id}>{measure.name}</li>

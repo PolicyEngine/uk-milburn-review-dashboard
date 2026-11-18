@@ -687,7 +687,9 @@ export default function MilburnHouseholdTab({ runId = null, presets: given = und
     </button>
   );
 
-  if (presets === undefined) {
+  // Until the header's policy is known (the catalogue still loading), a
+  // loading line, never "Not covered" on every card
+  if (presets === undefined || !runId) {
     return (
       <p className="milburn-loading" role="status">
         Loading the examples…
@@ -712,7 +714,7 @@ export default function MilburnHouseholdTab({ runId = null, presets: given = und
           yoursChange={yoursChange}
           yearBars={false}
           positions={false}
-          subtitle={`Young people in ${FISCAL_YEAR} under current law and the policy chosen in the header: ${name}. Enter your own household, or start from an example below.`}
+          subtitle={`Young people in ${FISCAL_YEAR} under current law and the policy chosen in the header: ${name}. Enter your own household, or start from an example below.${!run.covered && run.reason ? ` Not covered: ${run.reason}` : ""}`}
           yoursLead="See how the policy chosen in the header changes your income. A calculation usually takes 15–30 seconds; after a quiet spell or when many people use it at once it can take longer, up to a minute or two."
           figureTip={() => `Change in net income in ${FISCAL_YEAR} from ${name}, against current law`}
           noFigureText={run.covered ? undefined : "Not covered"}

@@ -205,7 +205,7 @@ export function PolicyStrip({ rows, id, year, band, partsShown }) {
       hardest.row.mean_change < 0 && {
         key: "hardest",
         icon: "usersRound",
-        label: "Largest average loss",
+        label: "Largest average change, per person",
         value: `${hardest.label}: ${money(hardest.row.mean_change)}`,
       },
     Number.isFinite(groupRow?.pct_worse_off) && {
