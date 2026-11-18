@@ -157,7 +157,7 @@ describe("Methodology", () => {
     expect([...topic().querySelectorAll("[data-report-modelled] li")].map((item) => item.textContent)).toEqual(REPORT_MODELLED);
     const proposals = REPORT_PROPOSALS.join("\n");
     for (const name of ["Youth Allowance", "Additional Cost Allowance", "Health and Disability Fund", "Severe and Complex Needs Insurance", "21 to 24-year-olds in retail and hospitality"]) expect(proposals, name).toContain(name);
-    expect(REPORT_MODELLED.map((line) => line.split(":")[0])).toEqual(["Modelled", "Modelled with stated assumptions", "Comparators, from April 2027", "Not modelled"]);
+    expect(REPORT_MODELLED.map((line) => line.split(":")[0])).toEqual(["Modelled", "Modelled with stated assumptions", "Illustrative runs", "Comparators, from April 2027", "Not modelled"]);
     // The runs offered now: no pre-report package or variant is named
     expect(REPORT_MODELLED.join("\n")).not.toMatch(/full abolition|central variant|upper bound/i);
     expect(topic().textContent).toContain("Proposals we do not model are listed with the reason under “Measures we cannot compute”.");

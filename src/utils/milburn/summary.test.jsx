@@ -238,7 +238,7 @@ describe("key figure tiles", () => {
     expect(lines.slice(2)).toEqual([
       "Figure,Value,Unit,Also shown,Its unit,As shown,Note",
       '16–24s in households that lose,500400,people,7.5,% of 16–24s,"500,000 7.50% of 16–24s","Includes siblings, partners."',
-      'Their average household loss,12000,"£ a year, per household",,,"£12,000 a year","Per household, not per person."',
+      'Their average household loss,12000,"£ a year, per household",,,"£12,000 a year","Annual change in household income, averaged over 16–24s in households that lose."',
     ]);
   });
 });
