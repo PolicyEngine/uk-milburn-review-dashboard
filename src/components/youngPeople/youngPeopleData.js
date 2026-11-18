@@ -13,6 +13,7 @@ import {
   ALL_BAND,
   MIN_SAMPLE_SIZE,
   YOUNG_BAND,
+  sharesPublished,
   singleAgeKey,
   wholeSelectionRun,
 } from "../../utils/ageImpact";
@@ -283,7 +284,7 @@ export function sharesBySingleAge(rows, policies, selected, year, combinedId = n
   const byAge = new Map(yearRows.map((candidate) => [candidate.age_band, candidate]));
   for (let age = ages[0]; age <= ages[1]; age += 1) {
     const row = byAge.get(singleAgeKey(age)) ?? null;
-    const usable = row && row.sample_size >= MIN_SAMPLE_SIZE ? row : null;
+    const usable = row && row.sample_size >= MIN_SAMPLE_SIZE && sharesPublished(row) ? row : null;
     groups.push({ key: String(age), label: singleAgeKey(age), age, row: usable, suppressed: !usable });
   }
   return { run, groups };

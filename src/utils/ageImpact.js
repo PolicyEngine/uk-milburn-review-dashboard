@@ -61,6 +61,14 @@ export function packageRunFor(rows, packageRun, year) {
   return (rows ?? []).some((row) => row.reform_id === packageRun && row.year === Number(year)) ? packageRun : null;
 }
 
+/**
+ * Whether a row's three shares are all published: a share resting on fewer
+ * than 3 survey households is withheld (null) with pct_unchanged
+ * (disclosure_floor.apply_flat_floor), so the group shows as withheld.
+ */
+export const sharesPublished = (row) =>
+  !["pct_better_off", "pct_unchanged", "pct_worse_off"].some((key) => row?.[key] === null);
+
 const usableRow = (row) => Boolean(row) && row.sample_size >= MIN_SAMPLE_SIZE && Number.isFinite(row.mean_change);
 
 const seriesKeyOf = (policy) => policy.seriesKey ?? `measure:${policy.id}`;
@@ -220,7 +228,7 @@ export function sharesByGroup(rows, policies, selected, year, combinedId = null)
   if (!yearRows.length) return null;
   const groups = AGE_GROUPS.map((group) => {
     const row = yearRows.find((candidate) => candidate.age_band === group.key) ?? null;
-    const usable = row && row.sample_size >= MIN_SAMPLE_SIZE ? row : null;
+    const usable = row && row.sample_size >= MIN_SAMPLE_SIZE && sharesPublished(row) ? row : null;
     return { key: group.key, label: group.label, short: group.short, row: usable, suppressed: !usable };
   });
   return { run, groups };

@@ -38,3 +38,16 @@ describe("Gains and losses by single year of age (Pavel's review, AGE5 and AGE10
     expect(shares.run).toBe("package");
   });
 });
+
+describe("withheld shares (3-survey-household floor)", () => {
+  it("shows an age whose shares are withheld as suppressed, not zero", async () => {
+    const { sharesBySingleAge } = await import("./youngPeopleData");
+    const rows = [
+      { reform_id: "a", year: 2029, age_band: "20", sample_size: 500, pct_better_off: null, pct_unchanged: null, pct_worse_off: 4 },
+      { reform_id: "a", year: 2029, age_band: "21", sample_size: 500, pct_better_off: 1, pct_unchanged: 95, pct_worse_off: 4 },
+    ];
+    const policies = [{ id: "a", name: "A" }];
+    const result = sharesBySingleAge(rows, policies, ["a"], 2029, null, [20, 21]);
+    expect(result.groups.map((group) => group.suppressed)).toEqual([true, false]);
+  });
+});
