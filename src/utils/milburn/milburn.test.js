@@ -125,8 +125,9 @@ describe("the benchmarks file", () => {
     }
     // The figures from build fcfac709 (issue #1), as given
     const fixed = (id) => parsed.rows.find((row) => row.id === id).estimate.fixed;
-    expect(fixed("uc_health_element_16_24")).toBe("233,407");
-    expect(fixed("young_pip_recipients")).toBe("406,919");
+    // Our counts to the nearest thousand; the tolerance is tested unrounded (benchmarks.js)
+    expect(fixed("uc_health_element_16_24")).toBe("233,000");
+    expect(fixed("young_pip_recipients")).toBe("407,000");
     expect(fixed("young_benefits_spend")).toBe("£4.44bn a year");
     expect(fixed("pip_spend_16_24")).toBe("£3.27bn a year");
     expect(fixed("uc_health_spend_16_24")).toBe("£1.18bn a year");
@@ -192,10 +193,10 @@ describe("the benchmark charts", () => {
       "uc_health_spend_16_24",
       "employer_nics_under_25",
     ]);
-    // The gaps issue #1 gives, like for like: +33%, -6%, -14%, +28%, +15%
+    // The gaps issue #1 gives, like for like: +33% (+32% on our count to the nearest thousand), -6%, -14%, +28%, +15%
     const gap = (id) => Math.round(comparisonFor(row(id)).gapPct);
-    expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 233407 });
-    expect(gap("uc_health_element_16_24")).toBe(33);
+    expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 233000 });
+    expect(gap("uc_health_element_16_24")).toBe(32);
     // The PIP overlap: shares, so the gap is in percentage points (Max, 18 Nov; issue #4's table)
     expect(comparisonFor(row("uc_health_pip_overlap"))).toMatchObject({ unit: "pct", published: 62.5, estimate: 90.6 });
     expect(comparisonFor(row("uc_health_pip_overlap")).gapPp).toBeCloseTo(28.1, 6);
@@ -207,7 +208,7 @@ describe("the benchmark charts", () => {
     expect(gap("employer_nics_under_25")).toBe(15);
     // The RF's £5.1bn is its Take a chance on me (Figure 10, as corrected on 2 September), not the 11 November comment
     expect(row("employer_nics_under_25")).toMatchObject({ url: "https://www.resolutionfoundation.org/publications/take-a-chance-on-me/", date: "29 June 2026" });
-    expect(comparisonFor(row("young_pip_recipients"))).toMatchObject({ unit: "count", published: 450000, estimate: 406919 });
+    expect(comparisonFor(row("young_pip_recipients"))).toMatchObject({ unit: "count", published: 450000, estimate: 407000 });
     // Like-for-like pairs print their gap; the PIP caseload still differs in date and area, and says so
     expect(Object.keys(DIFFERENT_BASIS)).toEqual(["young_pip_recipients"]);
     expect(differentBasis("young_pip_recipients")).toMatch(/England and Wales in 2025/);

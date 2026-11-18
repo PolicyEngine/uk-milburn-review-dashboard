@@ -156,7 +156,7 @@ describe("Benchmarks cards", () => {
       "employer_nics_under_25",
     ]);
     for (const [id, gap] of [
-      ["uc_health_element_16_24", "Ours 33% higher"],
+      ["uc_health_element_16_24", "Ours 32% higher"],
       // A share differs in percentage points, never as a % of a %
       ["uc_health_pip_overlap", "Ours 28.1pp higher"],
       ["pip_spend_16_24", "Ours 14% lower"],
@@ -177,7 +177,8 @@ describe("Benchmarks cards", () => {
     expect(pip.textContent).not.toMatch(/Ours \d+% (higher|lower)/);
     // The 15% tolerance: tested only against a matched figure (DWP's count), else marked untested
     expect(pip.querySelector("[data-tolerance]").dataset.tolerance).toBe("within");
-    expect(pip.querySelector("[data-tolerance]").textContent).toBe("Within 15% of DWP's 2025 count");
+    // The tested figure is named, so the badge is not read against the published 450,000
+    expect(pip.querySelector("[data-tolerance]").textContent).toBe("0.1% below DWP's 2025 count (407,505), within 15%");
     for (const id of ["uc_health_element_16_24", "uc_health_pip_overlap", "pip_spend_16_24", "uc_health_spend_16_24", "young_benefits_spend", "employer_nics_under_25"]) {
       expect(card(id).querySelector("[data-tolerance]").dataset.tolerance, id).toBe("untested");
     }

@@ -46,7 +46,7 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "233,407",
+        "value": "233,000",
         "basis": "People aged 16 to 24 receiving the Universal Credit health element, Great Britain, 2025 (2025-26 rules), at the build's calibrated weights",
         "label": "PolicyEngine, build fcfac709, 2025",
         "note": "Why ours is higher: the data's UC take-up draw adds claimants who carry the element where they receive PIP, so the build counts about a third more young recipients than published"
@@ -89,7 +89,7 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "406,919",
+        "value": "407,000",
         "basis": "People aged 16 to 24 receiving PIP, England and Wales, 2025, at the build's calibrated weights. DWP's 2025 count for the same group is 407,505 (England 384,150, Wales 23,355)",
         "label": "PolicyEngine, build fcfac709, 2025",
         "note": "DWP's 2025 count for the same ages and area: 407,505. The published 450,000 is current (November 2026), so it includes the caseload's growth since 2025"

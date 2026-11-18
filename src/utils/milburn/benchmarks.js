@@ -142,9 +142,9 @@ export const BENCHMARK_SHORT = {
     estimateBasis: "16–24s in households the package makes worse off",
   },
   young_benefits_spend: {
-    label: "PIP and UC LCWRA spending",
+    label: "PIP and UC health element spending",
     icon: "banknote",
-    basis: "2025-26, ages 16 to 24: PIP £3.8bn, UC LCWRA £0.92bn",
+    basis: "2025-26, ages 16 to 24: PIP £3.8bn, UC health element £0.92bn",
     estimateBasis: "Spending in 2025, cash terms: PIP in England and Wales, the health element in Great Britain",
   },
   pip_spend_16_24: {
@@ -154,7 +154,7 @@ export const BENCHMARK_SHORT = {
     estimateBasis: "Spending in 2025, England and Wales, cash terms",
   },
   uc_health_spend_16_24: {
-    label: "UC LCWRA spending, 16–24s",
+    label: "UC health element spending, 16–24s",
     icon: "piggy",
     basis: "Spending in 2025-26",
     estimateBasis: "Spending in 2025, Great Britain, cash terms",
@@ -286,16 +286,27 @@ export function toleranceFor(row) {
   const rule = TOLERANCE[row?.id];
   if (!rule) return null;
   if (rule.untested) return { tested: false, reason: rule.untested };
+  // On the unrounded figures: the page shows ours to the nearest thousand
   const { published, estimate, label } = rule.against;
   const gapPct = ((estimate - published) / published) * 100;
-  return { tested: true, within: Math.abs(gapPct) <= TOLERANCE_PCT, gapPct, against: label };
+  return { tested: true, within: Math.abs(gapPct) <= TOLERANCE_PCT, gapPct, against: label, published };
 }
 
-/** A verdict in a few words, for a badge: "Within 15% of DWP's 2025 count…", "No 15% test". */
+/**
+ * A verdict in a few words, for a badge, naming the figure tested against
+ * so it is not read as the card's published one: "0.1% below DWP's 2025
+ * count (407,505), within 15%"; "No 15% test".
+ */
 export function toleranceWords(verdict) {
   if (!verdict) return "";
   if (!verdict.tested) return `No ${TOLERANCE_PCT}% test`;
-  return `${verdict.within ? "Within" : "Outside"} ${TOLERANCE_PCT}% of ${verdict.against}`;
+  const verdictWords = `${verdict.within ? "within" : "outside"} ${TOLERANCE_PCT}%`;
+  if (!Number.isFinite(verdict.gapPct) || !Number.isFinite(verdict.published)) {
+    return `${verdict.within ? "Within" : "Outside"} ${TOLERANCE_PCT}% of ${verdict.against}`;
+  }
+  const size = Math.abs(verdict.gapPct).toFixed(1);
+  const side = size === "0.0" ? "level with" : verdict.gapPct < 0 ? `${size}% below` : `${size}% above`;
+  return `${side[0].toUpperCase()}${side.slice(1)} ${verdict.against} (${verdict.published.toLocaleString("en-GB")}), ${verdictWords}`;
 }
 
 /**
