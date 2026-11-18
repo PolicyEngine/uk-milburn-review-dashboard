@@ -573,7 +573,7 @@
       "young_people_in_losing_households": 421780,
       "share_of_16_24_in_losing_households_pct": 5.64,
       "average_loss_young_person_in_losing_household": -1693,
-      "average_loss_basis": "netted mean over all 16-24s divided by the share affected (file without the conditional mean; under 0.05% on the other side)",
+      "average_loss_basis": "mean change among 16-24s in gaining households",
       "everyone_in_losing_households_pct": 0.0,
       "poverty_change_pp": {
         "rel_bhc": -0.002,
@@ -583,7 +583,7 @@
       },
       "people_into_poverty_abs_ahc": -11877,
       "people_into_poverty_rel_ahc": -20436,
-      "child_poverty_change_pp_rel_ahc": -0.009,
+      "child_poverty_change_pp_rel_ahc": null,
       "people_into_poverty_abs_bhc": -14543,
       "people_into_poverty_rel_bhc": -1526,
       "child_poverty_change_pp_rel_bhc": 0.003,
@@ -1417,7 +1417,7 @@
         "young_people_in_losing_households": 0,
         "share_of_16_24_in_losing_households_pct": 0.0,
         "average_loss_young_person_in_losing_household": null,
-        "average_loss_basis": "not available: no 16-24s affected",
+        "average_loss_basis": "not available: too few survey records in losing households",
         "everyone_in_losing_households_pct": 0.0,
         "poverty_change_pp": {
           "rel_bhc": 0.0,
@@ -2169,7 +2169,7 @@
         "young_people_in_losing_households": 0,
         "share_of_16_24_in_losing_households_pct": 0.0,
         "average_loss_young_person_in_losing_household": null,
-        "average_loss_basis": "not available: no 16-24s affected",
+        "average_loss_basis": "not available: too few survey records in losing households",
         "everyone_in_losing_households_pct": 0.0,
         "poverty_change_pp": {
           "rel_bhc": 0.0,
@@ -3029,7 +3029,7 @@
         "young_people_in_losing_households": 421780,
         "share_of_16_24_in_losing_households_pct": 5.64,
         "average_loss_young_person_in_losing_household": -1693,
-        "average_loss_basis": "netted mean over all 16-24s divided by the share affected (file without the conditional mean; under 0.05% on the other side)",
+        "average_loss_basis": "mean change among 16-24s in gaining households",
         "everyone_in_losing_households_pct": 0.0,
         "poverty_change_pp": {
           "rel_bhc": -0.002,
@@ -3039,7 +3039,7 @@
         },
         "people_into_poverty_abs_ahc": -11877,
         "people_into_poverty_rel_ahc": -20436,
-        "child_poverty_change_pp_rel_ahc": -0.009,
+        "child_poverty_change_pp_rel_ahc": null,
         "people_into_poverty_abs_bhc": -14543,
         "people_into_poverty_rel_bhc": -1526,
         "child_poverty_change_pp_rel_bhc": 0.003,
@@ -3865,7 +3865,7 @@
         "young_people_in_losing_households": 422835,
         "share_of_16_24_in_losing_households_pct": 5.64,
         "average_loss_young_person_in_losing_household": -1722,
-        "average_loss_basis": "netted mean over all 16-24s divided by the share affected (file without the conditional mean; under 0.05% on the other side)",
+        "average_loss_basis": "mean change among 16-24s in gaining households",
         "everyone_in_losing_households_pct": 0.0,
         "poverty_change_pp": {
           "rel_bhc": 0.016,
@@ -3878,7 +3878,7 @@
         "child_poverty_change_pp_rel_ahc": -0.027,
         "people_into_poverty_abs_bhc": -14580,
         "people_into_poverty_rel_bhc": 11536,
-        "child_poverty_change_pp_rel_bhc": 0.04,
+        "child_poverty_change_pp_rel_bhc": null,
         "people_directly_affected": 0
       },
       {
@@ -4617,7 +4617,7 @@
         "young_people_in_losing_households": 399462,
         "share_of_16_24_in_losing_households_pct": 5.31,
         "average_loss_young_person_in_losing_household": -1803,
-        "average_loss_basis": "netted mean over all 16-24s divided by the share affected (file without the conditional mean; under 0.05% on the other side)",
+        "average_loss_basis": "mean change among 16-24s in gaining households",
         "everyone_in_losing_households_pct": 0.0,
         "poverty_change_pp": {
           "rel_bhc": 0.005,
@@ -4630,7 +4630,7 @@
         "child_poverty_change_pp_rel_ahc": -0.045,
         "people_into_poverty_abs_bhc": -14228,
         "people_into_poverty_rel_bhc": 3326,
-        "child_poverty_change_pp_rel_bhc": 0.009,
+        "child_poverty_change_pp_rel_bhc": null,
         "people_directly_affected": 0
       },
       {
