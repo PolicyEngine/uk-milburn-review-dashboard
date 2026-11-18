@@ -188,7 +188,7 @@ def _report_entry_group(include_pip=False, phased=False):
 
 
 def _report_entry(sim, share, include_pip=False, phased=False, below=True):
-    design.check_report_design()
+    design.check_entry_design()
     return employment_response_in_group(
         sim,
         _report_entry_group(include_pip, phased),

@@ -151,8 +151,24 @@ def test_the_report_design_is_the_published_runs():
         "REPORT_YOUTH_ALLOWANCE_MONTHLY": None,
         "REPORT_EMPLOYER_NICS_UNDER_25_RATE": None,
         "REPORT_EMPLOYER_NICS_AGE_LIMIT": 25,
+        # The phased move into work (docs/milburn-phased-scenario-design.md)
+        "REPORT_ENTRY_EFFECT": 0.09,
+        "REPORT_NEET_GAP_PP": {
+            2026: 0.0,
+            2027: 0.3,
+            2028: 0.9,
+            2029: 1.7,
+            2030: 2.7,
+            2031: 3.7,
+            2036: 6.6,
+        },
+        "REPORT_NEET_GAP_END_YEAR": 2036,
+        "REPORT_ENTRY_REBASE_YEAR": 2028,
+        "REPORT_ENTRY_CHECK_SHARE": 0.25,
+        "REPORT_ENTRY_PATHS": ("table3", "table3_unrebased", "flat"),
     }
     design.check_report_design()
+    design.check_entry_design()
 
 
 def defaults(function):

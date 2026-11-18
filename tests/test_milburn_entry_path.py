@@ -48,7 +48,9 @@ def test_the_shares_follow_table_3_and_start_in_april_2029():
 def test_the_design_refuses_a_rebase_year_out_of_step(monkeypatch):
     monkeypatch.setattr(design, "REPORT_ENTRY_REBASE_YEAR", 2027)
     with pytest.raises(ValueError, match="REBASE"):
-        design.check_report_design()
+        design.check_entry_design()
+    # A start year changed for another run is not refused for this
+    design.check_report_design()
 
 
 def test_the_entry_runs_are_reserved_and_never_listed():

@@ -147,7 +147,7 @@ REPORT_NEET_GAP_END_YEAR = 2036
 REPORT_ENTRY_REBASE_YEAR = 2028
 # The seeded share of the linearity check's direct runs
 REPORT_ENTRY_CHECK_SHARE = 0.25
-ENTRY_PATHS = ("table3", "table3_unrebased", "flat")
+REPORT_ENTRY_PATHS = ("table3", "table3_unrebased", "flat")
 
 
 def report_entry_share(year, path="table3"):
@@ -156,7 +156,7 @@ def report_entry_share(year, path="table3"):
     Table 3's gap as a share of its end-year gap (rebased to
     REPORT_ENTRY_REBASE_YEAR for "table3", not for "table3_unrebased"), or
     REPORT_ENTRY_EFFECT flat ("flat")."""
-    if path not in ENTRY_PATHS:
+    if path not in REPORT_ENTRY_PATHS:
         raise ValueError(f"Unknown entry path {path!r}.")
     if year < REPORT_START_YEAR:
         return 0.0
@@ -295,12 +295,15 @@ def check_report_design():
                 "REPORT_YOUTH_ALLOWANCE_MONTHLY must give every year "
                 f"{min(wanted)} to {max(wanted)} and no other."
             )
-    problems += _entry_path_problems()
     if problems:
         raise ValueError("Milburn report design: " + " ".join(problems))
 
 
-def _entry_path_problems():
+def check_entry_design():
+    """Refuse a phased move into work the entry runs and their arithmetic
+    cannot use as written (kept apart from check_report_design, so a
+    REPORT_START_YEAR changed for another run is not refused here)."""
+    check_report_design()
     problems = []
     if not 0 <= REPORT_ENTRY_EFFECT <= 1:
         problems.append("REPORT_ENTRY_EFFECT must be in [0, 1].")
@@ -334,4 +337,5 @@ def _entry_path_problems():
             problems.append("Table 3's end gap must exceed the rebase gap.")
     if not 0 < REPORT_ENTRY_CHECK_SHARE < 1:
         problems.append("REPORT_ENTRY_CHECK_SHARE must be in (0, 1).")
-    return problems
+    if problems:
+        raise ValueError("Milburn entry design: " + " ".join(problems))
