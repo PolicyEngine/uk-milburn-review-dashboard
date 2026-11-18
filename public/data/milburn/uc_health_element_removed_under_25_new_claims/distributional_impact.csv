@@ -1,13 +1,13 @@
 reform_id,reform_name,year,decile,value
-uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,1st,-0.006742427521090166
+uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,1st,
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,2nd,-0.006630220442261011
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,3rd,-0.017631838572990752
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,4th,-0.001458060408689924
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,5th,-0.003647474758434955
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,6th,-0.00498620028794182
-uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,7th,-0.0003747881644379555
+uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,7th,
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,8th,-0.0038565152065122995
-uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,9th,-0.00046566487757135057
+uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,9th,
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2027,10th,-0.00032690957485638034
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2028,1st,-0.0077014626877000905
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2028,2nd,-0.006562607257895204
@@ -17,7 +17,7 @@ uc_health_element_removed_under_25_new_claims,UC health element removed for unde
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2028,6th,-0.005126516745466599
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2028,7th,-0.00036919886081821597
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2028,8th,-0.0037906572379920985
-uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2028,9th,-0.00045687590617024987
+uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2028,9th,
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2028,10th,-0.00032930498353888466
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2029,1st,-0.008338444172730268
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2029,2nd,-0.006657079732655971
@@ -27,7 +27,7 @@ uc_health_element_removed_under_25_new_claims,UC health element removed for unde
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2029,6th,-0.01278191999262411
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2029,7th,-0.008310700714640941
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2029,8th,-0.005304996814755961
-uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2029,9th,-0.0004503567891653453
+uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2029,9th,
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2029,10th,-0.0003582725790048508
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2030,1st,-0.008972744403138333
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2030,2nd,-0.006709346580019785
@@ -37,7 +37,7 @@ uc_health_element_removed_under_25_new_claims,UC health element removed for unde
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2030,6th,-0.012840340463865006
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2030,7th,-0.008262411076406344
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2030,8th,-0.005413022770482691
-uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2030,9th,-0.0004510696490030222
+uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2030,9th,
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2030,10th,-0.00035771289679740245
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2031,1st,-0.009566776475647264
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2031,2nd,-0.00672917903249747
@@ -47,5 +47,5 @@ uc_health_element_removed_under_25_new_claims,UC health element removed for unde
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2031,6th,-0.01414697285315665
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2031,7th,-0.008163239438918706
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2031,8th,-0.005359976039393026
-uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2031,9th,-0.00045036115006715237
+uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2031,9th,
 uc_health_element_removed_under_25_new_claims,UC health element removed for under-25 new claims,2031,10th,-0.00035564702581058653
