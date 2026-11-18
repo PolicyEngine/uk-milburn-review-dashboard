@@ -23,7 +23,7 @@ import {
 } from "../../utils/chartTheme";
 import { DISPLAY_YEARS, NOT_YET_PUBLISHED, useDisplayYears } from "../../utils/displayYears";
 import { X_AXIS_HEIGHT, plotMargin } from "./chartRows";
-import { AGE_GROUPS, ALL_BAND, YOUNG_BAND } from "../../utils/ageImpact";
+import { AGE_GROUPS, ALL_BAND, YOUNG_BAND, isShownGroup } from "../../utils/ageImpact";
 import {
   GROUP_STYLES,
   changeByYear,
@@ -44,10 +44,13 @@ import { nounOf, shortNameOf } from "../../utils/policyDetails";
 import TitleIcon from "../TitleIcon";
 import ChartMoreInfo from "../ChartMoreInfo";
 import { BY_YEAR_METHOD } from "../methodology/anchors";
-import { AgeHouseholdNote } from "../milburn/SourceChip";
 
-/** Every age group's line, 16 to 24 first. */
-export const SERIES = AGE_GROUPS.map((group) => ({
+/**
+ * The lines: 16 to 24 and all ages only (Vahid, 18 Nov). Other age groups
+ * move only because each person carries their household's change, so they
+ * are not drawn, listed or exported.
+ */
+export const SERIES = AGE_GROUPS.filter((group) => isShownGroup(group.key)).map((group) => ({
   key: group.key,
   label: group.label,
   short: group.short,
@@ -71,10 +74,6 @@ const HIT_WIDTH = 12;
 const SELECTED_FILL = CHART_COLOURS.highlightBand;
 
 
-const compareOptions = (label) => [
-  { value: "focus", label: `${label} and all ages`, summary: "With all ages" },
-  { value: "groups", label: "Every age group", summary: "Every group" },
-];
 const viewOptions = (label) => [
   { value: "lines", label: "Lines", summary: "Lines" },
   { value: "measures", label: `Policies, ${label}`, summary: "By policy" },
@@ -440,7 +439,7 @@ export function stepSentence(notes, headline, nameIn) {
 
 /**
  * How the change for 16 to 24-year-olds moves year by year, against all
- * ages, with the other age groups as faint context, the measures behind
+ * ages (no other age group is drawn), the measures behind
  * the biggest steps named on the line, and a breakdown by measure. Straight
  * segments between the annual points: there is nothing between them.
  */
@@ -456,11 +455,10 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
   const catalogue = useMeasureCatalogue();
   // On a phone the step labels do not fit the plot: the sentence names them
   const phone = useViewportMatch(PHONE_QUERY);
-  // Compare, Breakdown and Years hold when the shared Age group changes
-  // (the card is not remounted); only the line chips start again
-  const [chosenCompare, setCompare] = useState("focus");
-  // All ages has nothing to compare with all ages: every group's lines
-  const compare = group === ALL_BAND ? "groups" : chosenCompare;
+  // The group against all ages; no Compare choice, as no other age group
+  // is drawn. All ages as the group has nothing to compare with: its line
+  // alone, with 16 to 24's
+  const compare = group === ALL_BAND ? "groups" : "focus";
   const [view, setView] = useState("lines");
   const [years, setYears] = useState("each");
   const [hovered, setHovered] = useState(null);
@@ -728,7 +726,6 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
                 when there is no headline */}
             {headline ? <span className="trend-headline">{headline}</span> : description}
             {stepsLine ? ` ${stepsLine}` : null}
-            <AgeHouseholdNote />
           </p>
         </div>
         <ChartDownloadMenu download={download} chartTitle={title} />
@@ -738,7 +735,6 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
           name={title}
           options={[
             ...extraOptions,
-            group !== ALL_BAND && { label: "Compare", value: compare, onChange: setCompare, options: compareOptions(FOCUS_LABEL) },
             { label: "Breakdown", value: view, onChange: setView, options: viewOptions(FOCUS_LABEL) },
             { label: "Years", value: years, onChange: setYears, options: YEARS_OPTIONS },
           ]}
@@ -922,11 +918,11 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
           members={members}
           year={Number(selectedYear)}
           info={{
-            shows: "Average change in household income per person in each age group, each year, with all ages for comparison.",
+            shows: `Average change in household income per person for ${SUBJECT.toLowerCase()}, each year, with all ages for comparison.`,
             how: [
               "Running total adds up the years from the first one we show.",
               // Averages do not nest (María, #6 item 3)
-              "All ages averages over everyone, most of whom the policy does not reach, so its line is smaller than the targeted group's.",
+              "All ages averages over everyone, most of whom no measure reaches.",
             ],
             caveats: [
               unpublished.length > 0 &&

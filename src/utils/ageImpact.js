@@ -33,6 +33,15 @@ export const AGE_GROUPS = [
   ...AGE_BANDS,
   { key: ALL_BAND, label: "All ages", short: "All" },
 ];
+/**
+ * The groups the Young people charts show (Vahid, 18 Nov): 16 to 24, whom
+ * the policies target, and all ages as the overall reference. Other bands
+ * move only because each person carries their household's change, so they
+ * are not shown; the published files still hold them.
+ */
+export const SHOWN_GROUP_KEYS = [YOUNG_BAND, ALL_BAND];
+/** Whether a group (an age band or all ages) is one the charts show. */
+export const isShownGroup = (key) => SHOWN_GROUP_KEYS.includes(key);
 /** The top single year of age: its row is everyone that age or older. */
 export const SINGLE_AGE_TOP = 90;
 /** The single-year row label of an age ("17", or "90+" at the top). */

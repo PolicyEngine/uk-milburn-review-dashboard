@@ -42,12 +42,12 @@ import {
   singleAgeSelection,
   sharesByGroup,
   SINGLE_AGE_TOP,
+  isShownGroup,
 } from "../utils/ageImpact";
 import { groupAges } from "../utils/ageGroups";
 import { SINGLE_AGE_FIRST, SINGLE_AGE_LAST, fitRange, sharesBySingleAge, singleAgeBars } from "./youngPeople/youngPeopleData";
 import { X_AXIS_HEIGHT, plotMargin } from "./youngPeople/chartRows";
 import "./YoungPeopleSection.css";
-import { AGE_SHARES_NOTE, AgeHouseholdNote } from "./milburn/SourceChip";
 import { chartMotion, netDotTitled } from "../utils/chartMotion";
 import TitleIcon from "./TitleIcon";
 import ChartMoreInfo from "./ChartMoreInfo";
@@ -59,6 +59,14 @@ import {
   exportLegendItems,
   drawnNames,
 } from "../utils/legendMembership";
+
+/** The age-group points the charts show: 16 to 24 and, where a chart has it, all ages (SHOWN_GROUP_KEYS). */
+export const shownBands = (points) => points.filter((point) => isShownGroup(point.band));
+/** A shares result with only the groups the charts show (16 to 24 and all ages), or null. */
+export function shownSharesByGroup(...args) {
+  const shares = sharesByGroup(...args);
+  return shares ? { ...shares, groups: shares.groups.filter((group) => isShownGroup(group.key)) } : null;
+}
 
 /** The section's anchor: link to it as #young-people (utils/viewAnchors). */
 import { YOUNG_PEOPLE_ANCHOR } from "../utils/viewAnchors";
@@ -84,11 +92,11 @@ const OUTCOMES = [
 const SHARE_BAR_SHAPE = barShape(OUTCOMES.map((outcome) => outcome.key), { layout: "vertical", roundBase: true });
 
 const MEAN_DESCRIPTION =
-  "Average change in household income per person, £ a year, by age group; bars add each policy's own effect.";
+  "Average change in household income per person, £ a year, for 16 to 24-year-olds; bars add each policy's own effect.";
 const SINGLE_AGE_DESCRIPTION =
   `Average change in household income per person, £ a year, by single year of age (${SINGLE_AGE_FIRST} to ${SINGLE_AGE_LAST}); bars add each policy's own effect.`;
 const SHARES_DESCRIPTION =
-  "Share of people who gain or lose (over 0.01%), by age group.";
+  "Share of people who gain or lose (over 0.01%), aged 16 to 24 and across all ages.";
 /** The single-age view's description, for the chosen group's own ages. */
 const sharesSingleDescription = ([first, last]) =>
   `Share of people who gain or lose (a change over 0.01%), at each age from ${first} to ${last >= SINGLE_AGE_TOP ? "90 and over" : last}.`;
@@ -385,7 +393,8 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
   // reads its own net; each policy's own published part is kept wherever no
   // published net would sit beside a missing part (meanChangeByBand)
   const packageRun = selectionPackageKey(catalogue.manifest, selectedPolicies);
-  const bandData = meanChangeByBand(rows, policies, selectedPolicies, selectedYear, packageRun);
+  // 16 to 24 only: other bands move only through their households (Vahid, 18 Nov)
+  const bandData = shownBands(meanChangeByBand(rows, policies, selectedPolicies, selectedYear, packageRun));
   const fromPackage = bandData.some((point) => point.fromPackage);
   // Each policy's part is offered when some band keeps the parts
   const partsAvailable = fromPackage && bandData.some((point) => point.partsShown);
@@ -433,7 +442,7 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
   // no effect at any age this year is greyed out, and the note under the
   // chart says why (legendMembership)
   const members = useMemo(() => {
-    const points = meanChangeByBand(rows, policies, selectedPolicies, selectedYear, selectionPackageKey(catalogue.manifest, selectedPolicies));
+    const points = shownBands(meanChangeByBand(rows, policies, selectedPolicies, selectedYear, selectionPackageKey(catalogue.manifest, selectedPolicies)));
     const keyOf = (id) => catalogue.byId.get(id)?.seriesKey;
     // No parts drawn anywhere, no policy key: the net is the package's own run
     const partsDrawn = (point) => !point.fromPackage || (point.partsShown && (single || packageView === "policy"));
@@ -754,25 +763,20 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
 
 export function SharesCard({ rows, policies, selectedPolicies, selectedYear, narrow, height, combinedId, group = YOUNG_BAND, extraOptions = [] }) {
   const chartRef = useRef(null);
-  // By age group or by single year of age. Opens on the age groups, with
-  // the chosen group marked (as main did); single years of the chosen
-  // group are in Options. The reader's choice holds when the age group
-  // changes, as on the other age cards (Pavel's review, AGE11; round 3:
-  // a nine-row single-age chart left the card half empty by default)
+  // 16 to 24 and all ages, or 16 to 24 by single year of age (Options).
+  // Opens on the two groups (Pavel's review, AGE11; round 3: a nine-row
+  // single-age chart left the card half empty by default). No other age
+  // group is shown (Vahid, 18 Nov)
   const [chosenView, setView] = useState("band");
-  // With no run for the whole selection: one row per measure, for one age
-  // group (16 to 24 first)
-  const [groupKey, setGroupKey] = useState(group);
-  // By age's Age group drives it; the card's own choice holds until that changes
-  useEffect(() => {
-    setGroupKey(group);
-  }, [group]);
+  // With no run for the whole selection: one row per measure, for the
+  // group (16 to 24)
+  const groupKey = group;
   const [hide, setHide] = useState("show");
   const [order, setOrder] = useState("size");
   const [direction, setDirection] = useState("both");
   const yearLabel = fiscalYearTick(selectedYear);
   const published = isPublished(rows, selectedYear);
-  const perMeasure = sharesByMeasure(sharesByGroup, rows, policies, selectedPolicies, selectedYear, combinedId, groupKey);
+  const perMeasure = sharesByMeasure(shownSharesByGroup, rows, policies, selectedPolicies, selectedYear, combinedId, groupKey);
   const groupLabel = perMeasure?.groups.find((group) => group.key === groupKey)?.label ?? "";
   const singleAges = groupAges(group, selectedYear);
   // Every single age withheld while the age groups are published: the
@@ -783,7 +787,7 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
     !perMeasure &&
     published &&
     !publishedShareRows(sharesBySingleAge(rows, policies, selectedPolicies, selectedYear, combinedId, singleAges)) &&
-    publishedShareRows(sharesByGroup(rows, policies, selectedPolicies, selectedYear, combinedId));
+    publishedShareRows(shownSharesByGroup(rows, policies, selectedPolicies, selectedYear, combinedId));
   const view = fallback ? "band" : chosenView;
   const single = !perMeasure && view === "single";
   const description = perMeasure
@@ -797,7 +801,7 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
     ? null
     : single
       ? sharesBySingleAge(rows, policies, selectedPolicies, selectedYear, combinedId, singleAges)
-      : sharesByGroup(rows, policies, selectedPolicies, selectedYear, combinedId);
+      : shownSharesByGroup(rows, policies, selectedPolicies, selectedYear, combinedId);
   const filtered = perMeasure ? filterShareRows(perMeasure.rows, { hide, order, direction }) : null;
   const data = perMeasure
     ? filtered.rows.map((row) => visibleSegments({ group: row.name, key: row.id, ...pick(row.row) }, OUTCOME_KEYS))
@@ -859,11 +863,7 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
               <NoBreakYear text={title} />
             </span>
           </h3>
-          <p className="chart-description">
-            {description}
-            {/* Why groups the policy does not target move (María, #6 item 4) */}
-            {!perMeasure && <AgeHouseholdNote text={AGE_SHARES_NOTE} />}
-          </p>
+          <p className="chart-description">{description}</p>
         </div>
         <ChartDownloadMenu
           download={download}
@@ -876,13 +876,6 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
             name={title}
             options={[
               ...extraOptions,
-              // By age's group control stands in for the card's own
-              !extraOptions.length && {
-                label: "Age group",
-                value: groupKey,
-                onChange: setGroupKey,
-                options: perMeasure.groups.map((group) => ({ value: group.key, label: group.label })),
-              },
               { label: "Policies with no effect", value: hide, onChange: setHide, options: SHARE_FILTER_OPTIONS.hide, omitAtDefault: "show" },
               { label: "Order", value: order, onChange: setOrder, options: SHARE_FILTER_OPTIONS.order },
               { label: "Show", value: direction, onChange: setDirection, options: SHARE_FILTER_OPTIONS.direction },

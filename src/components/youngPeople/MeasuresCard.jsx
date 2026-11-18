@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { groupSubject } from "../../utils/ageGroups";
 import MeasureRowLabel, { measureCategory } from "../MeasureRowLabel";
 import { CHART_LOGO } from "../../utils/chartLogo";
@@ -190,25 +190,16 @@ const percent = (value) => `${value.toFixed(2)}%`;
 
 /**
  * Under the dumbbell on the local build, for the one policy chosen: the
- * age group that loses (or gains) most on average, and the share worse off
- * in the card's group and across all ages, from the policy's own run.
+ * share worse off in the card's group and across all ages, from the
+ * policy's own run (no other age group is named: Vahid, 18 Nov).
  */
 export function PolicyStrip({ rows, id, year, band, partsShown }) {
   // A thin group's figures are withheld here as in the chart (MIN_SAMPLE_SIZE)
   const rowFor = (key) =>
     (rows ?? []).find((row) => row.reform_id === id && row.year === Number(year) && row.age_band === key && row.sample_size >= MIN_SAMPLE_SIZE);
-  const bands = AGE_BANDS.map((item) => ({ ...item, row: rowFor(item.key) })).filter((item) => Number.isFinite(item.row?.mean_change));
-  const hardest = bands.reduce((worst, item) => (worst === null || item.row.mean_change < worst.row.mean_change ? item : worst), null);
   const groupRow = band === ALL_BAND ? null : rowFor(band);
   const allRow = rowFor(ALL_BAND);
   const items = [
-    hardest &&
-      hardest.row.mean_change < 0 && {
-        key: "hardest",
-        icon: "usersRound",
-        label: "Largest average change, per person",
-        value: `${hardest.label}: ${money(hardest.row.mean_change)}`,
-      },
     Number.isFinite(groupRow?.pct_worse_off) && {
       key: "group",
       icon: "user",
@@ -259,11 +250,6 @@ export function measuresSubject(selectedPolicies, partsShown) {
   return { title: "Effect of each policy", from: "each policy" };
 }
 
-const BAND_OPTIONS = [
-  ...AGE_BANDS.map((band) => ({ value: band.key, label: band.label })),
-  { value: "pensioners", label: "Pensioners" },
-];
-
 const UNIT = "Average change in household income, per person (£ a year)";
 
 /**
@@ -271,7 +257,7 @@ const UNIT = "Average change in household income, per person (£ a year)";
  * chosen age group (16 to 24 at first) beside its all-ages figure, in the
  * selected year. Every bar is one policy's own run, so nothing is added up.
  */
-function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, height, group = YOUNG_BAND, extraOptions = [], defaultCompare = ALL_BAND }) {
+function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, height, group = YOUNG_BAND, extraOptions = [] }) {
   const { byId, localBuild, manifest } = useMeasureCatalogue();
   // On the local build, one package chosen: its parts' own runs as rows under it
   const lead = localBuild && selectedPolicies.length === 1 ? selectedPolicies[0] : null;
@@ -281,19 +267,13 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
   const parts = lead ? PACKAGE_PARTS[lead] ?? [] : [];
   const drawnPolicies = parts.length ? [lead, ...parts] : selectedPolicies;
   const chartRef = useRef(null);
-  // The section's age group (By age), which the card's Compare can override
-  // until the section's group changes again
-  const [band, setBand] = useState(group);
-  useEffect(() => {
-    setBand(group);
-  }, [group]);
-  // What the group is compared with: all ages, or another age band (By age
-  // opens on 25 to 34, defaultCompare; all ages when that is the group)
-  const [compareWith, setCompareWith] = useState(defaultCompare);
-  const compareKey = compareWith === band ? ALL_BAND : compareWith;
-  // All ages chosen as the group: nothing to compare it with
+  // The section's group (16 to 24), against all ages: no other age group
+  // is offered (Vahid, 18 Nov)
+  const band = group;
+  const compareKey = ALL_BAND;
+  // All ages as the group: nothing to compare it with
   const single = band === compareKey;
-  const compareName = compareKey === ALL_BAND ? "All ages" : AGE_BANDS.find((b) => b.key === compareKey)?.label ?? compareKey;
+  const compareName = "All ages";
   const GROUPS = groupsFor(band).map((item) => (item.key === "all" ? { ...item, label: compareName } : item));
   const subject = measuresSubject(selectedPolicies, parts.length > 0);
   const description = single
@@ -369,28 +349,8 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
         <ChartDownloadMenu download={download} chartTitle={title} />
       </div>
       <div className="chart-controls young-people-controls">
-        <ControlBar
-          name={title}
-          options={
-            extraOptions.length
-              ? // By age: its age group, then what to compare it with
-                [
-                  ...extraOptions,
-                  {
-                    label: "Compare with",
-                    value: compareKey,
-                    onChange: setCompareWith,
-                    // All ages against all ages: the pill reads "All ages" once
-                    ...(single ? { omitAtDefault: ALL_BAND } : {}),
-                    options: [
-                      { value: ALL_BAND, label: "All ages" },
-                      ...AGE_BANDS.filter((b) => b.key !== band).map((b) => ({ value: b.key, label: b.label })),
-                    ],
-                  },
-                ]
-              : [{ label: "Compare", value: band, onChange: setBand, options: BAND_OPTIONS }]
-          }
-        />
+        {/* No Compare choice: the group is always set against all ages */}
+        <ControlBar name={title} options={extraOptions} />
       </div>
       <div ref={chartRef} className="chart-plot young-people-plot">
         {!published ? (

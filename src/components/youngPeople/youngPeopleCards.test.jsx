@@ -4,7 +4,7 @@ import fc from "fast-check";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import MeasuresCard from "./MeasuresCard";
 import { expectStandardDownloads } from "../../test/downloadMenus";
-import TrendCard, { yearList } from "./TrendCard";
+import TrendCard, { SERIES, yearList } from "./TrendCard";
 import {
   SINGLE_AGE_FIRST,
   SINGLE_AGE_LAST,
@@ -227,19 +227,14 @@ describe("young people cards", () => {
     expect(document.querySelector(".no-effect")).toHaveTextContent(/^No effect in 2028-29: Salary sacrifice cap$/);
   });
 
-  it("lets the reader choose the age group compared", () => {
+  it("sets 16 to 24 against all ages, with no Compare choice (Vahid, 18 Nov)", () => {
     render(<MeasuresCard {...props} selectedYear={2028} />);
-    // The age group is the card's one Options pill
-    fireEvent.click(screen.getByRole("button", { name: /^Options: 16 to 24/ }));
-    fireEvent.click(within(screen.getByRole("radiogroup", { name: "Compare" })).getByRole("radio", { name: /65 and over/ }));
-    expect(screen.getByText("Average change in household income from each policy, for people aged 65 and over and people of all ages.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Options:/ })).toBeNull();
+    expect(screen.getByText("Average change in household income from each policy, for 16 to 24-year-olds and people of all ages.")).toBeInTheDocument();
   });
 
-  it("keeps each policy's all ages figure when the chosen group has no rows", () => {
-    render(<MeasuresCard {...props} rows={ROWS} selectedYear={2028} />);
-    // The age group is the card's one Options pill
-    fireEvent.click(screen.getByRole("button", { name: /^Options: 16 to 24/ }));
-    fireEvent.click(within(screen.getByRole("radiogroup", { name: "Compare" })).getByRole("radio", { name: /65 and over/ }));
+  it("keeps each policy's all ages figure when the group has no rows", () => {
+    render(<MeasuresCard {...props} rows={ROWS} selectedYear={2028} group="65+" />);
     // The all ages figures are drawn alone (the ring), with no gap or note
     const rowNode = screen.getByRole("row", { name: /^Threshold freeze extension:/ });
     expect(rowNode.getAttribute("aria-label")).toBe("Threshold freeze extension: all ages -£150 a year");
@@ -263,12 +258,18 @@ describe("young people cards", () => {
     expect(screen.getByText("We have not yet published results for 2031-32.")).toBeInTheDocument();
   });
 
-  it("takes its focus from By age's group: the compare option and the dumbbell follow it", () => {
-    const { unmount } = render(<TrendCard {...props} selectedYear={2029} group="25-34" />);
-    expect(screen.getByRole("button", { name: /^Options: With all ages/ })).toBeInTheDocument();
+  it("offers no other age group: no Compare in Change by year, none in Effect of each policy", () => {
+    const { unmount } = render(<TrendCard {...props} selectedYear={2029} />);
+    const trend = document.querySelector(".young-people-trend");
+    fireEvent.click(within(trend).getByRole("button", { name: /^Options:/ }));
+    expect(within(trend).queryByRole("radio", { name: /Every age group|and all ages/ })).toBeNull();
+    expect(within(trend).queryByText("Compare")).toBeNull();
+    // The line chips: 16 to 24 and all ages only
+    expect(trend.querySelector(".chart-legend").textContent).not.toMatch(/Under 16|25 to 34|35 to 49|50 to 64|65 and over/);
+    expect(SERIES.map((series) => series.key)).toEqual(["16-24", "all"]);
     unmount();
-    render(<MeasuresCard {...props} selectedYear={2028} group="pensioners" />);
-    expect(screen.getByRole("button", { name: /^Options: Pensioners/ })).toBeInTheDocument();
+    render(<MeasuresCard {...props} selectedYear={2028} />);
+    expect(screen.queryByRole("radio", { name: /65 and over|Pensioners|25 to 34/ })).toBeNull();
   });
 
   it("says a change of about £0 as almost no change, not a gain of £0", () => {
@@ -285,10 +286,9 @@ describe("young people cards", () => {
     expect(description.querySelector(".trend-headline")).toHaveTextContent(
       /^16 to 24-year-olds gain about £30 a person in 2028-29( and lose about £230 from 2029-30, when the [\w ]+ applies)?\.$/,
     );
-    // Why other ages change, on this card too (María, #6 item 3)
-    expect(description.querySelector("[data-age-household-note]")).toHaveTextContent(
-      "Other ages change only because they share a household with someone in the targeted ages.",
-    );
+    // No line on why other ages change: none is drawn (Vahid, 18 Nov)
+    expect(description.querySelector("[data-age-household-note]")).toBeNull();
+    expect(description).not.toHaveTextContent(/Other ages|share a household/);
     expect(description).not.toHaveTextContent(/£ a year/);
   });
 
@@ -319,15 +319,16 @@ describe("young people cards", () => {
     const card = () => document.querySelector(".young-people-trend");
     fireEvent.click(within(card()).getByRole("button", { name: /^Options:/ }));
     fireEvent.click(within(card()).getByRole("radio", { name: "Running total" }));
-    rerender(<TrendCard {...props} selectedYear={2029} group="25-34" />);
-    expect(within(card()).getByRole("button", { name: /^Options: With all ages.*Running total/ })).toBeInTheDocument();
+    rerender(<TrendCard {...props} selectedYear={2029} group="all" />);
+    expect(within(card()).getByRole("button", { name: /^Options:.*Running total/ })).toBeInTheDocument();
   });
 
   it("says what the chart shows in About this chart (AGE7)", () => {
     render(<TrendCard {...props} selectedYear={2029} />);
     const card = document.querySelector(".young-people-trend");
     fireEvent.click(within(card).getByRole("button", { name: /About this chart/ }));
-    expect(card).toHaveTextContent("Average change in household income per person in each age group, each year, with all ages for comparison.");
+    expect(card).toHaveTextContent("Average change in household income per person for 16 to 24-year-olds, each year, with all ages for comparison.");
+    expect(card).toHaveTextContent("All ages averages over everyone, most of whom no measure reaches.");
   });
 
   it("keys the lines by its chips alone, with no names at the lines' ends, on a wide screen and a phone", () => {

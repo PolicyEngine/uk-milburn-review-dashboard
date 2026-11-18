@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState } from "react";
-import { AgeHouseholdNote } from "../milburn/SourceChip";
 import { Bar, CartesianGrid, Cell, ComposedChart, Customized, Line, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Tooltip } from "../ViewportTooltip";
 import { CHART_LOGO } from "../../utils/chartLogo";
@@ -74,9 +73,10 @@ export const agesText = ([first, last]) => `${first} to ${last >= SINGLE_AGE_TOP
  * Whether the chosen group's single ages are all withheld in the year (too
  * few survey records at every one, under the selection rule) while the year
  * is published and the combination is: By age then shows the age bands
- * instead (AgeChangeCard).
+ * instead (AgeChangeCard). With `noParts`, only when no policy's own part
+ * is published at any of those ages either (By policy has nothing to draw).
  */
-export function everySingleAgeWithheld({ catalogue, rows, policies, selectedPolicies, selectedYear, group = PENSIONERS }) {
+export function everySingleAgeWithheld({ catalogue, rows, policies, selectedPolicies, selectedYear, group = PENSIONERS, noParts = false }) {
   const year = Number(selectedYear);
   if (!isPublished(rows, year)) return false;
   const [first, last] = ageWindow(group, year);
@@ -87,7 +87,7 @@ export function everySingleAgeWithheld({ catalogue, rows, policies, selectedPoli
     year,
     packageRun: selectionPackageKey(catalogue?.manifest, selectedPolicies),
   });
-  return points.length > 0 && points.every((point) => point.netChange === null);
+  return points.length > 0 && points.every((point) => point.netChange === null && !(noParts && point.parts.length > 0));
 }
 
 /** An age tick, the group's ends in bold teal. */
@@ -287,10 +287,7 @@ export default function SingleAgeCard({ catalogue, rows, policies, selectedPolic
               <NoBreakYear text={title} />
             </span>
           </h3>
-          <p className="chart-description">
-            {description}
-            <AgeHouseholdNote />
-          </p>
+          <p className="chart-description">{description}</p>
         </div>
         <ChartDownloadMenu download={download} chartTitle={title} />
       </div>

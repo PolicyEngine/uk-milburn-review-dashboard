@@ -1,16 +1,13 @@
 import TitleIcon from "../TitleIcon";
 import "./milburn.css";
 
-/** Why the age charts move for ages no measure targets (HBAI convention). */
+/**
+ * Why ages no measure targets change (HBAI convention), for Methodology.
+ * The Young people charts show 16 to 24 and all ages only (Vahid, 18 Nov),
+ * so they no longer carry it.
+ */
 export const AGE_HOUSEHOLD_NOTE =
   "Other ages change only because they share a household with someone in the targeted ages.";
-
-/**
- * Why Gains and losses shows gains and losses in age groups the selected
- * policy does not target (María, #6 item 4).
- */
-export const AGE_SHARES_NOTE =
-  "Everyone shares their household's change, so ages the policy does not target move too.";
 
 /**
  * A publisher's name as a chip or a list says it: the review's report, annex
@@ -84,17 +81,6 @@ export default function SourceChip({ kind = "estimate", source, className = "" }
   return (
     <span className={`source-chip ${published ? "is-published" : "is-estimate"} ${className}`.trim()} data-source-kind={published ? "published" : "estimate"}>
       <TitleIcon name={published ? "fileText" : "calculator"} bare size={12} />
-      {text}
-    </span>
-  );
-}
-
-/** The age charts' one line on why other ages change, on its own line at the end of a card's description. */
-export function AgeHouseholdNote({ text = AGE_HOUSEHOLD_NOTE }) {
-  return (
-    // Read as part of the card's description, one paragraph (Vahid, 17 Nov)
-    <span className="age-household-note age-household-note--inline" data-age-household-note="">
-      {" "}
       {text}
     </span>
   );

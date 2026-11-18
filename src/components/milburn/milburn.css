@@ -1020,22 +1020,6 @@
   outline-offset: 2px;
 }
 
-/* The age charts' line on why other ages change */
-.age-household-note {
-  display: flex;
-  color: var(--c-axis-title);
-  align-items: flex-start;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.age-household-note > span[aria-hidden] {
-  display: inline-flex;
-  flex: none;
-  margin-top: 3px;
-  color: var(--c-gain-text);
-}
-
 /* Moves into work (illustrative): the two exercises as cards side by side, stacked on a phone (ReviewComparison) */
 .milburn-versus {
   display: grid;
@@ -1114,17 +1098,6 @@
 .milburn-versus-rows strong {
   font-weight: 600;
   color: var(--c-axis-title);
-}
-
-/* The age note as the end of a card's description: plain inline text */
-.age-household-note.age-household-note--inline {
-  display: inline;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
 }
 
 /* Measures: the proposals we cannot compute, folded at first */

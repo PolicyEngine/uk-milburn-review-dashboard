@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import SourceChip, { AGE_HOUSEHOLD_NOTE, AgeHouseholdNote, SourceLinkChip, chipSource, distinctSources, shortDate, shortSource } from "./SourceChip";
+import SourceChip, { AGE_HOUSEHOLD_NOTE, SourceLinkChip, chipSource, distinctSources, shortDate, shortSource } from "./SourceChip";
 
 describe("SourceChip", () => {
   it("marks a PolicyEngine estimate with an icon", () => {
@@ -52,9 +52,7 @@ describe("SourceChip", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("says why ages no measure targets change", () => {
-    const { container } = render(<AgeHouseholdNote />);
-    expect(container.textContent.trim()).toBe(AGE_HOUSEHOLD_NOTE);
+  it("says why ages no measure targets change (for Methodology)", () => {
     expect(AGE_HOUSEHOLD_NOTE).toBe("Other ages change only because they share a household with someone in the targeted ages.");
   });
 });

@@ -36,7 +36,7 @@ describe("By age's age groups", () => {
   });
 });
 
-describe("By age's cards share one age group", async () => {
+describe("Young people has no age group choice (Vahid, 18 Nov)", async () => {
   const { vi } = await import("vitest");
   const { fireEvent, render, screen, within } = await import("@testing-library/react");
   vi.mock("./YoungPeopleSection", async (original) => ({
@@ -48,49 +48,19 @@ describe("By age's cards share one age group", async () => {
     return { ...actual, ResponsiveContainer: ({ children }) => <div style={{ width: 800, height: 400 }}>{children}</div> };
   });
 
-  it("chosen in any card's Options, it changes all four and the address", async () => {
+  it("offers no age group in any card's Options, and leaves an old ?age= unread", async () => {
     const { default: AgeSection } = await import("./AgeSection");
-    const { POVERTY_FIGURES_SHOWN } = await import("../utils/povertyFigures");
-    window.history.replaceState({}, "", "/?sub=age&age=16-24");
+    window.history.replaceState({}, "", "/?sub=age&age=25-34");
     render(<AgeSection selectedPolicies={[]} selectedYear={2027} policies={[]} />);
-    const pills = () => screen.getAllByRole("button", { name: /^Options:/ });
-    // Three while the gains and losses shares are withheld (povertyFigures.js)
-    expect(pills()).toHaveLength(POVERTY_FIGURES_SHOWN ? 4 : 3);
-    for (const pill of pills()) expect(pill.getAttribute("aria-label")).toMatch(/^Options: 16 to 24/);
-    // Choose 25 to 34 in the second card (Change by year)
-    fireEvent.click(pills()[1]);
-    const dialog = screen.getByRole("dialog");
-    const group = within(dialog).getAllByRole("radiogroup")[0];
-    expect(within(group).queryByRole("radio", { name: /50 to 64|Pensioners/ })).toBeNull();
-    fireEvent.click(within(group).getByRole("radio", { name: /25 to 34/ }));
-    for (const pill of pills()) expect(pill.getAttribute("aria-label")).toMatch(/^Options: 25 to 34/);
+    expect(screen.getByRole("heading", { name: "How 16 to 24-year-olds' incomes change" })).toBeInTheDocument();
+    for (const pill of screen.queryAllByRole("button", { name: /^Options:/ })) {
+      expect(pill.getAttribute("aria-label")).not.toMatch(/16 to 24|25 to 34|All ages/);
+      fireEvent.click(pill);
+      const dialog = screen.getByRole("dialog");
+      expect(within(dialog).queryByRole("radio", { name: /^(16 to 24|25 to 34|50 to 64|All ages|Pensioners|Every age group|Age groups)$/ })).toBeNull();
+      fireEvent.keyDown(dialog, { key: "Escape" });
+    }
+    expect(document.body.textContent).not.toMatch(/25 to 34/);
     expect(new URLSearchParams(window.location.search).get("age")).toBe("25-34");
-  });
-
-  it("with All ages against All ages, Effect of each policy's pill reads All ages once", async () => {
-    const { default: AgeSection } = await import("./AgeSection");
-    window.history.replaceState({}, "", "/?sub=age&age=all");
-    render(<AgeSection selectedPolicies={[]} selectedYear={2027} policies={[]} />);
-    const pills = screen.getAllByRole("button", { name: /^Options:/ });
-    // Average change by age, Change by year, Effect of each policy, Gains and losses
-    // By age opens Compare with on 25 to 34; with All ages chosen there too,
-    // the pill reads All ages once
-    expect(pills[2].getAttribute("aria-label")).toMatch(/25 to 34/);
-    fireEvent.click(pills[2]);
-    const compare = within(screen.getByRole("dialog")).getAllByRole("radiogroup")[1];
-    fireEvent.click(within(compare).getByRole("radio", { name: "All ages" }));
-    expect(screen.getAllByRole("button", { name: /^Options:/ })[2].getAttribute("aria-label")).toBe("Options: All ages");
-  });
-
-  it("opens Effect of each policy on 16 to 24 compared with 25 to 34", async () => {
-    const { default: AgeSection } = await import("./AgeSection");
-    window.history.replaceState({}, "", "/?sub=age");
-    render(<AgeSection selectedPolicies={[]} selectedYear={2027} policies={[]} />);
-    const pill = screen.getAllByRole("button", { name: /^Options:/ })[2];
-    expect(pill.getAttribute("aria-label")).toBe("Options: 16 to 24 · 25 to 34");
-    fireEvent.click(pill);
-    const [group, compare] = within(screen.getByRole("dialog")).getAllByRole("radiogroup");
-    expect(within(group).getByRole("radio", { name: "16 to 24" })).toHaveAttribute("aria-checked", "true");
-    expect(within(compare).getByRole("radio", { name: "25 to 34" })).toHaveAttribute("aria-checked", "true");
   });
 });

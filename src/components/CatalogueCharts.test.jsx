@@ -351,7 +351,8 @@ describe("measure chart keys", () => {
     expect(rows[2][0][measure.seriesKey]).toBe(100);
     expect(rows[2][0].netChange).toBe(100);
     expect(rows[3][0][measure.seriesKey]).toBe(100);
-    expect(rows[3][0].band).toBe("0-15");
+    // The age chart draws 16 to 24 only (Vahid, 18 Nov)
+    expect(rows[3].map((point) => point.band)).toEqual(["16-24"]);
   });
 
   it("preserves all age-chart metadata and individual values for arbitrary labels", () => {
