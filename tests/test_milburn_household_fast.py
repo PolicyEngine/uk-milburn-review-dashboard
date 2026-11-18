@@ -11,10 +11,11 @@ from policyengine_core.errors import ParameterNotFoundError
 from policyengine_core.parameters import ParameterNode
 
 from uk_budget_data import household_impact as hi
-from uk_budget_data import lazy_parameters
+from uk_budget_data import household_runs, lazy_parameters
 from uk_budget_data import milburn_household as mh
 from uk_budget_data.household_runs import (
     OtherBuildError,
+    balanced_groups,
     fan_out_grouped_answers,
     job_groups,
     run_answer,
@@ -139,7 +140,33 @@ def test_job_groups(count, groups, expected):
     assert job_groups(count, groups) == expected
 
 
-def test_grouped_fan_out_answers_in_the_jobs_order():
+def side_job(name):
+    return ([], {}, {}, 2029, {"parameter_changes": {}, "modifiers": [name]})
+
+
+def test_batches_balance_on_each_sides_last_time(monkeypatch):
+    """Longest first, each to the batch with least time so far; the batch
+    with least time last (the Web's)."""
+    monkeypatch.setattr(household_runs, "_SIDE_SECONDS", {})
+    jobs = [side_job(name) for name in "abcdefg"]
+    # No side timed yet: round-robin
+    assert balanced_groups(jobs, 3) == job_groups(7, 3)
+    seconds = dict(zip("abcdefg", (5, 14, 11, 2.5, 7, 5, 2.5)))
+    household_runs.note_seconds(
+        jobs,
+        [run_answer(None, seconds[name], "c", "x") for name in "abcdefg"],
+    )
+    batches = balanced_groups(jobs, 3)
+    assert sorted(i for batch in batches for i in batch) == list(range(7))
+    totals = [sum(seconds["abcdefg"[i]] for i in batch) for batch in batches]
+    assert totals == sorted(totals, reverse=True)
+    assert max(totals) <= 16.5
+    # A side not timed counts as the mean of the request's timed ones (9.5)
+    assert balanced_groups([side_job("new"), *jobs[:2]], 2) == [[0, 1], [2]]
+
+
+def test_grouped_fan_out_answers_in_the_jobs_order(monkeypatch):
+    monkeypatch.setattr(household_runs, "_SIDE_SECONDS", {})
     batches = []
 
     def batch_map(groups):
@@ -156,7 +183,9 @@ def test_grouped_fan_out_answers_in_the_jobs_order():
     assert batches == [[0, 3, 6], [1, 4], [2, 5]]
 
 
-def test_grouped_fan_out_refuses_another_builds_runs():
+def test_grouped_fan_out_refuses_another_builds_runs(monkeypatch):
+    monkeypatch.setattr(household_runs, "_SIDE_SECONDS", {})
+
     def batch_map(groups):
         return [
             [run_answer(job, 0.5, "c", "old") for job in group]

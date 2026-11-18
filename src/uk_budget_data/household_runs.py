@@ -111,6 +111,57 @@ def job_groups(count: int, groups: int) -> list[list[int]]:
     return [list(range(start, count, groups)) for start in range(groups)]
 
 
+# Seconds each side's run last took in a batch, by side (``side_key``): a
+# side's cost is much the same for every household (a measure's modifier
+# can cost several runs' worth), so batches are balanced on it
+_SIDE_SECONDS: dict = {}
+
+
+def side_key(job) -> str:
+    """A ``run_scenario`` job's side (its fifth item) and whether it has
+    the sweep's axes, as text; the whole job for anything else."""
+    import json
+
+    if isinstance(job, (list, tuple)) and len(job) > 4:
+        axes = job[5] if len(job) > 5 else None
+        return json.dumps(
+            [job[4], axes is not None], sort_keys=True, default=str
+        )
+    return json.dumps(job, sort_keys=True, default=str)
+
+
+def note_seconds(jobs: list, answers: list) -> None:
+    """Keep each job's side's time from its run's answer."""
+    for job, answer in zip(jobs, answers):
+        if isinstance(answer, dict) and "seconds" in answer:
+            _SIDE_SECONDS[side_key(job)] = float(answer["seconds"])
+
+
+def balanced_groups(jobs: list, groups: int) -> list[list[int]]:
+    """The jobs' indices in at most ``groups`` batches with about equal
+    total time: longest first, each to the batch with least so far, by
+    each side's last time (``_SIDE_SECONDS``; a side not yet timed counts
+    as the mean of these jobs' timed ones). With no side timed, ``job_groups``.
+    """
+    known = [
+        _SIDE_SECONDS[k] for k in map(side_key, jobs) if k in _SIDE_SECONDS
+    ]
+    if not known:
+        return job_groups(len(jobs), groups)
+    default = sum(known) / len(known)
+    cost = [_SIDE_SECONDS.get(side_key(job), default) for job in jobs]
+    groups = max(1, min(groups, len(jobs)))
+    batches: list = [[] for _ in range(groups)]
+    totals = [0.0] * groups
+    for index in sorted(range(len(jobs)), key=lambda i: (-cost[i], i)):
+        target = min(range(groups), key=lambda b: (totals[b], b))
+        batches[target].append(index)
+        totals[target] += cost[index]
+    # The batch with least time last: the Web runs it (WEB_BATCH)
+    order = sorted(range(groups), key=lambda b: -totals[b])
+    return [sorted(batches[b]) for b in order]
+
+
 def fan_out_grouped_answers(
     batch_map: Callable[[list], Iterable],
     jobs: list,
@@ -130,7 +181,7 @@ def fan_out_grouped_answers(
         OtherBuildError: as ``fan_out_answers``.
     """
     started = time.perf_counter()
-    batches = job_groups(len(jobs), groups)
+    batches = balanced_groups(jobs, groups)
     answers: list = [None] * len(jobs)
     for indices, batch in zip(
         batches, batch_map([[jobs[i] for i in group] for group in batches])
@@ -143,8 +194,9 @@ def fan_out_grouped_answers(
     except OtherBuildError as error:
         print(f"household fan-out refused: {error}")
         raise
+    note_seconds(jobs, answers)
     print(
-        f"household fan-out: {len(jobs)} runs in {len(batches)} batches in "
-        f"{time.perf_counter() - started:.1f} s {detail}"
+        f"household fan-out: {len(jobs)} runs in {len(batches)} batches "
+        f"{batches} in {time.perf_counter() - started:.1f} s {detail}"
     )
     return results

@@ -158,6 +158,7 @@ from uk_budget_data.household_runs import (  # noqa: E402
     container_build,
     fan_out_answers,
     fan_out_grouped_answers,
+    note_seconds,
     run_answer,
 )
 from uk_budget_data.household_warm import warm_target  # noqa: E402
@@ -195,6 +196,8 @@ def build_image() -> modal.Image:
             {
                 "NUMEXPR_MAX_THREADS": "1",
                 "OMP_NUM_THREADS": "1",
+                "OPENBLAS_NUM_THREADS": "1",
+                "MKL_NUM_THREADS": "1",
                 "HOUSEHOLD_RUNNER": "modal",
                 "HOUSEHOLD_WORKERS": "1",
                 # The Web container's household requests at once
@@ -444,7 +447,9 @@ class Web:
                 for run in mh_runs():
                     hi.measure_sides(run["policies"])
                 if WEB_BATCH == "1":
-                    hi.run_batch(warm_jobs())
+                    # Timed, so the first request's batches are balanced
+                    jobs = warm_jobs()
+                    note_seconds(jobs, timed_batch(jobs))
             except Exception:
                 print(f"Web warm-up failed:\n{traceback.format_exc()}")
 
