@@ -706,7 +706,7 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
           yearBars={false}
           positions={false}
           subtitle={`Young people in ${FISCAL_YEAR} under current law and the report's runs. Enter your own household, or start from an example below.`}
-          yoursLead="See how the report's runs change your income. A calculation usually takes about 10–15 seconds; after a quiet spell or a busy moment it can take a minute or two."
+          yoursLead="See how the report's runs change your income. A calculation usually takes 10–20 seconds; after a quiet spell or when many people use it at once it can take longer, up to a minute or two."
           figureTip={() => `Change in net income in ${FISCAL_YEAR} from the health element and PIP removal (no replacement awards)`}
           cardExtra={(example) => {
             const summary = summarise(example.results);

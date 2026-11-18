@@ -307,18 +307,20 @@ export const COLD_START_RETRY = Object.freeze({ budgetMs: 240_000, maxRetries: 6
 
 /**
  * What the waiting panel says (ProcessingPanel's `times`): a custom
- * household's four runs, measured on the Modal app with a container warm
- * (see uk_budget_data/modal_household.py), and when to say it is taking
- * longer: past `stillWorking` seconds a new container may be starting.
+ * household's four runs on the Modal app (uk_budget_data/modal_household.py),
+ * measured on 18 November 2026 at 9.5–18 s for one household with the
+ * containers warm, 16.6 s after a quiet spell of three minutes and 20–23 s
+ * for two households at once; past `stillWorking` seconds new containers
+ * may be starting.
  */
 export const CALCULATION_TIMES = Object.freeze({
   typical: 15,
   slow: 90,
-  text: "Usually about 10–15 seconds",
+  text: "Usually 10–20 seconds",
   stillWorking: 25,
-  stillWorkingText: "Still working: after a quiet spell or a busy moment this can take a minute or two",
+  stillWorkingText: "Still working: when many people use it at once this can take a minute or two",
 });
-export const STARTING_UP_TEXT = "After a quiet spell or a busy moment this can take a minute or two. Your result will appear here.";
+export const STARTING_UP_TEXT = "After a quiet spell or when many people use it at once this can take a minute or two. Your result will appear here.";
 
 /** Whether custom households can be calculated on this build. */
 export const customAvailable = () => Boolean(householdApiUrl());
