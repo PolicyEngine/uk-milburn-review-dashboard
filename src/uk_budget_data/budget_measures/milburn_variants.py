@@ -239,8 +239,10 @@ def entry_group(
         (age >= uc_upper_age) | (age < uc_lower_age) | ~reached_now
     )
     element = np.array(sim.calculate("uc_LCWRA_element", year))
-    loses_element = (
-        lcwra & (element > 0) & ~benunit.project(benunit.any(keeps))
+    # The element is the benefit unit's: it goes where the unit has one and
+    # no claimant in it keeps it
+    loses_element = lcwra & benunit.project(
+        (element > 0) & ~benunit.any(keeps)
     )
     loses = loses_element
     if include_pip:

@@ -161,3 +161,52 @@ def test_a_new_entrant_is_reached_and_moves_in_the_phased_run():
         PHASED, single(18, lcwra=True, year=YEAR), "employment_income", YEAR
     )
     assert before == 0 and after > 0
+
+
+def couple(older_has_lcwra, year=YEAR):
+    """A married couple on UC, 22 with LCWRA and 30 with or without it."""
+    return {
+        "people": {
+            "young": {
+                "age": {year: 22},
+                "employment_income": {year: 0},
+                "uc_limited_capability_for_WRA": {year: True},
+            },
+            "older": {
+                "age": {year: 30},
+                "employment_income": {year: 0},
+                "uc_limited_capability_for_WRA": {year: older_has_lcwra},
+            },
+        },
+        "benunits": {
+            "b": {"members": ["young", "older"], "is_married": {year: True}}
+        },
+        "households": {
+            "h": {
+                "members": ["young", "older"],
+                "rent": {year: 6_000},
+                "tenure_type": {year: "RENT_PRIVATELY"},
+                "region": {year: "NORTH_WEST"},
+            }
+        },
+    }
+
+
+@engine
+@pytest.mark.parametrize("older_has_lcwra", [False, True])
+def test_a_young_partner_moves_only_where_the_unit_loses_the_element(
+    older_has_lcwra,
+):
+    """The element is the benefit unit's: a 22-year-old with LCWRA whose
+    30-year-old partner also has it keeps the element, so does not move;
+    the 30-year-old never moves. (Two people, one benefit unit: person and
+    benefit unit arrays are combined correctly.)"""
+    for reform_id in (UC_ONLY, WITH_PIP, PHASED):
+        before, after = change(
+            reform_id, couple(older_has_lcwra), "employment_income", YEAR
+        )
+        assert before == 0
+        if older_has_lcwra:
+            assert after == 0, reform_id
+        elif reform_id != PHASED:
+            assert 0 < after < 16 * 52 * 20, reform_id  # one person's hours
