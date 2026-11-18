@@ -20,6 +20,7 @@ export const BENCHMARKS_FILE = "milburn_benchmarks.json";
 export const BENCHMARK_SECTIONS = [
   {
     key: "caseloads",
+    chip: "Caseloads",
     title: "How do our caseloads compare?",
     intro: "Published counts of young people on the UC health element or PIP, beside ours for the same ages, for 2025.",
     icon: "usersRound",
@@ -27,13 +28,15 @@ export const BENCHMARK_SECTIONS = [
   },
   {
     key: "spending",
+    chip: "Spending",
     title: "How does our spending compare?",
-    intro: "Published spending and costs for 2025-26, beside ours for the same year in cash terms; our savings from the measures are shown apart on each card.",
+    intro: "Published spending and costs for 2025-26, beside ours for the same year in cash terms; our savings from the measures are in each card's More info, apart from the pair.",
     icon: "landmark",
     ids: ["pip_spend_16_24", "uc_health_spend_16_24", "young_benefits_spend", "employer_nics_under_25"],
   },
   {
     key: "jobs",
+    chip: "Work",
     title: "Where do young people work?",
     intro: "The review's share of young people's jobs in retail and hospitality, the sectors its employer NI threshold starts with, beside ours for the same industries.",
     icon: "briefcase",
@@ -41,6 +44,7 @@ export const BENCHMARK_SECTIONS = [
   },
   {
     key: "review",
+    chip: "The review's estimates",
     title: "The review's own estimates",
     intro: "These include replacement awards, a Youth Allowance, a work allowance and more young people in work, in 2026-27 prices; our static runs include none of them, so no PolicyEngine figure is set beside them.",
     icon: "scale",
@@ -48,6 +52,7 @@ export const BENCHMARK_SECTIONS = [
   },
   {
     key: "poverty",
+    chip: "Poverty",
     title: "Poverty",
     intro: "What the benefits do for young people today, as published.",
     icon: "percent",
@@ -55,6 +60,7 @@ export const BENCHMARK_SECTIONS = [
   },
   {
     key: "context",
+    chip: "Context",
     title: "Context from the review",
     intro: "Published figures on young people, work and costs that we do not estimate.",
     icon: "book",
@@ -104,6 +110,7 @@ export const BENCHMARK_SHORT = {
     basis: "Basis not published: no age range, date or source given",
   },
   uc_health_element_16_24: {
+    hero: "UC health element, 16–24s",
     label: "16–24s receiving the UC health element",
     icon: "activity",
     estimateBasis: "Ages 16 to 24, Great Britain, 2025",
@@ -114,6 +121,7 @@ export const BENCHMARK_SHORT = {
     basis: "More than double the number in 2012",
   },
   young_pip_recipients: {
+    hero: "PIP recipients, 16–24s",
     label: "Young people receiving PIP",
     icon: "clipboard",
     estimateBasis: "Ages 16 to 24, England and Wales, 2025",
@@ -130,18 +138,21 @@ export const BENCHMARK_SHORT = {
     estimateBasis: "16–24s in households the package makes worse off",
   },
   young_benefits_spend: {
+    hero: "PIP and UC LCWRA combined",
     label: "PIP and UC health spending on young people",
     icon: "banknote",
     basis: "2025-26, ages 16 to 24: PIP £3.8bn, UC LCWRA £0.92bn",
     estimateBasis: "Spending in 2025, cash terms: PIP in England and Wales, the health element in Great Britain",
   },
   pip_spend_16_24: {
+    hero: "PIP spending, 16–24s",
     label: "PIP spending, ages 16 to 24",
     icon: "wallet",
     basis: "Spending in 2025-26",
     estimateBasis: "Spending in 2025, England and Wales, cash terms",
   },
   uc_health_spend_16_24: {
+    hero: "UC LCWRA spending, 16–24s",
     label: "UC LCWRA element spending, ages 16 to 24",
     icon: "piggy",
     basis: "Spending in 2025-26",
@@ -169,6 +180,7 @@ export const BENCHMARK_SHORT = {
     basis: "Youth Jobs Grant and apprenticeships; no separate employer NI cost",
   },
   employer_nics_under_25: {
+    hero: "Zero employer NI for under-25s",
     label: "Cost of zero employer NI for under-25s",
     icon: "building",
     basis: "Gross cost in 2025-26; not a recommendation of the review",
@@ -376,4 +388,156 @@ export function estimateFor(row, { ageRows, packageRows, packageKey, year }) {
   if (row.estimate.metric !== "young_people_worse_off") return null;
   if (row.estimate.package) return youngPeopleWorseOff(packageRows, packageKey, year);
   return youngPeopleWorseOff(ageRows, row.estimate.reformId, year);
+}
+
+/**
+ * The hero chart's band: a gap within this % of the published figure, either
+ * way, sits inside the shaded band. A reading aid, not a test of either figure.
+ */
+export const HERO_BAND_PCT = 15;
+
+/** The pair whose two figures are the sum of two other pairs (PIP and the UC LCWRA element). */
+export const COMBINED_PAIR = "young_benefits_spend";
+
+/**
+ * Every comparable pair, in the order given, as one row of the hero chart:
+ * its short label, both figures as worded, and its gap (the estimate less
+ * the published figure, as a % of the published figure). A pair that
+ * counts different things has no gap (`gapPct` null), never counts as
+ * inside the band and goes last.
+ */
+export function heroRows(rows) {
+  const all = rows
+    .map((row) => {
+      const comparison = comparisonFor(row);
+      if (!comparison) return null;
+      const basis = differentBasis(row.id);
+      const short = BENCHMARK_SHORT[row.id] ?? {};
+      return {
+        id: row.id,
+        label: short.hero ?? short.label ?? row.figure,
+        unit: comparison.unit,
+        published: comparison.publishedText,
+        estimate: comparison.estimateText,
+        gapPct: basis ? null : comparison.gapPct,
+        likeForLike: !basis,
+        differentBasis: basis,
+        within: !basis && Math.abs(comparison.gapPct) <= HERO_BAND_PCT,
+        combined: row.id === COMBINED_PAIR,
+      };
+    })
+    .filter(Boolean);
+  return [...all.filter((row) => row.likeForLike), ...all.filter((row) => !row.likeForLike)];
+}
+
+/** The hero's headline counts: like-for-like pairs, how many sit inside the band, and the largest gap either way. */
+export function heroSummary(rows) {
+  const like = rows.filter((row) => row.likeForLike);
+  const largest = like.reduce((best, row) => (!best || Math.abs(row.gapPct) > Math.abs(best.gapPct) ? row : best), null);
+  return { pairs: rows.length, like: like.length, within: like.filter((row) => row.within).length, notLike: rows.length - like.length, largest };
+}
+
+/** A gap as a short signed label, to the nearest whole per cent: "+33%", "−14%", "0%". */
+export function signedGap(gapPct) {
+  const whole = Math.round(Math.abs(gapPct));
+  if (whole === 0) return "0%";
+  return `${gapPct < 0 ? "−" : "+"}${whole}%`;
+}
+
+/** The gap in words, to the nearest whole per cent: "14% lower", "33% higher", "within 1%". */
+export const gapWords = (gapPct) =>
+  Math.round(Math.abs(gapPct)) === 0 ? "within 1%" : `${Math.round(Math.abs(gapPct))}% ${gapPct < 0 ? "lower" : "higher"}`;
+
+/**
+ * Small graphics for figures whose wording holds a series or a split, by
+ * row id: each point's `text` is worded exactly as in the row's value or
+ * basis (a test holds it so), its `number` the same figure to draw.
+ * `kind` "bars" draws one bar a point, from zero; "stack" one bar split
+ * into its parts; "meter" one share of a whole. `tone` "latest" marks the
+ * figure the tile leads with, "projected" a projection.
+ */
+export const BENCHMARK_GRAPHICS = Object.freeze({
+  neet_rate_projection_2036: {
+    kind: "bars",
+    points: [
+      { label: "2026-27", text: "13.1%", number: 13.1 },
+      { label: "2036-37, without", text: "13.4%", number: 13.4, tone: "projected" },
+      { label: "2036-37, with", text: "6.8%", number: 6.8, tone: "latest" },
+    ],
+  },
+  pip_spend_trend_16_24: {
+    kind: "bars",
+    points: [
+      { label: "2019-20", text: "£1.3bn", number: 1.3 },
+      { label: "2024-25", text: "£3.2bn", number: 3.2, tone: "latest" },
+      { label: "In five years", text: "£6.5bn", number: 6.5, tone: "projected" },
+    ],
+  },
+  disabled_neet_16_24: {
+    kind: "bars",
+    points: [
+      { label: "Disabled", text: "30.2%", number: 30.2, tone: "latest" },
+      { label: "Not disabled", text: "8.6%", number: 8.6 },
+    ],
+  },
+  review_investment_2036: {
+    kind: "stack",
+    points: [
+      { label: "Education", text: "£2.1bn", number: 2.1 },
+      { label: "Opportunity and Support Guarantees", text: "£1.9bn", number: 1.9 },
+      { label: "Youth hiring incentives", text: "£1.1bn", number: 1.1 },
+      { label: "Health", text: "£0.7bn", number: 0.7 },
+    ],
+  },
+  child_dla_recipients: {
+    kind: "meter",
+    points: [{ label: "Move to PIP by 17", text: "77%", number: 77 }],
+  },
+});
+
+/** A row's graphic: its own (BENCHMARK_GRAPHICS), else bars for a dated range, a share as people, or null. */
+export function graphicFor(row) {
+  if (BENCHMARK_GRAPHICS[row.id]) return BENCHMARK_GRAPHICS[row.id];
+  const { value } = splitValue(row.value);
+  const range = figureRange(value);
+  if (range) return { kind: "bars", points: range.map((point, index) => ({ ...point, tone: index === range.length - 1 ? "latest" : undefined })) };
+  const share = figureShare(value);
+  if (share) return { kind: "share", share };
+  return null;
+}
+
+/** The topics of the filter: every section, after "All". */
+export const BENCHMARK_TOPICS = [{ key: "all", chip: "All" }, ...BENCHMARK_SECTIONS.map(({ key, chip }) => ({ key, chip }))];
+
+/** The address's topic (?bm=), or "all" for none or one we do not know. */
+export function topicFromSearch(search) {
+  const asked = new URLSearchParams(search).get("bm");
+  return BENCHMARK_TOPICS.some((topic) => topic.key === asked) ? asked : "all";
+}
+
+const sentence = (text) => {
+  const words = String(text || "").trim();
+  return !words ? "" : /[.!?]$/.test(words) ? words : `${words}.`;
+};
+
+/**
+ * What a card's "More info" holds, as InfoSections parts: why the two
+ * differ (a pair's own note, after its different basis), the published
+ * figure as worded with its basis, ours with its build, year, area and
+ * price basis (and our saving, apart), and the source with its date.
+ * `estimate` is a worked-out estimate's text, where the row has no fixed one.
+ */
+export function moreInfo(row, { estimate = null, runLabel = "" } = {}) {
+  const basis = differentBasis(row.id);
+  const why = [basis && `Not like for like: ${basis}.`, sentence(row.estimate?.note)].filter(Boolean).join(" ");
+  const how = [];
+  if (row.estimate?.fixed) how.push(`${row.estimate.label || "PolicyEngine"}: ${row.estimate.fixed}. ${sentence(row.estimate.basis)}`.trim());
+  else if (row.estimate && estimate) how.push(`${row.estimate.label || "PolicyEngine"}: ${estimate}${runLabel ? ` (${runLabel})` : ""}.`);
+  if (row.saving) how.push(`${row.saving.label}: ${row.saving.value}. ${sentence(row.saving.basis)}`.trim());
+  return {
+    lead: why ? { title: "Why they differ", body: why } : undefined,
+    shows: row.value ? `Published: ${row.value}. ${sentence(row.basis)}`.trim() : sentence(row.basis) || null,
+    how,
+    sources: row.source ? [{ label: row.source, href: row.url ?? undefined, date: row.date }] : [],
+  };
 }

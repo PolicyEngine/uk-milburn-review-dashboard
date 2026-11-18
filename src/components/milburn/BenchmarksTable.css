@@ -1,17 +1,415 @@
-/* Benchmarks (BenchmarksTable.jsx): sections named for the question each
-   answers, each a grid of comparison panels and stat tiles. Rhythm: 24px
-   between sections, 16px card padding, 12px inside a card, 8px between a
-   card's lines. Colours are tokens only. */
+/* Benchmarks (BenchmarksTable.jsx, BenchmarksHero.jsx, BenchmarkCards.jsx):
+   the hero chart, the topic filter, then sections of compact cards.
+   Published figures wear the reference grey (a ring), PolicyEngine's the
+   brand teal (a dot), everywhere on the tab. Rhythm: 24px between
+   sections, 16px card padding, 12px inside a card. Colours are tokens only. */
 .bm {
   display: grid;
   gap: 24px;
   color: var(--c-axis-title);
 }
 
+/* The two marks, as in the hero's legend: published a grey ring, ours a teal dot */
+.bm-key-ring,
+.bm-key-dot {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.bm-key-ring {
+  border: 2px solid var(--c-reference);
+  background: var(--c-surface);
+}
+
+.bm-key-dot {
+  background: var(--c-gain);
+}
+
+.bm-key-band {
+  display: inline-block;
+  width: 18px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--c-highlight-band);
+  outline: 1px dashed var(--c-gain-light);
+}
+
+/* ---------- Hero ---------- */
+.bm-hero {
+  --bm-label-w: 236px;
+  --bm-col-gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--c-grid);
+  border-radius: 12px;
+  background: var(--c-surface);
+}
+
+.bm-hero .chart-description {
+  max-width: 68ch;
+}
+
+.bm-hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.bm-chip {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--c-highlight-band);
+  color: var(--c-text);
+  font-size: var(--fs-small);
+  line-height: 1.35;
+}
+
+.bm-chip strong {
+  color: var(--c-highlight);
+  font-variant-numeric: tabular-nums;
+}
+
+.bm-chip.is-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--c-muted-fill);
+}
+
+.bm-chip.is-flag strong,
+.bm-chip.is-flag > span[aria-hidden] {
+  color: var(--c-text);
+}
+
+.bm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-caption);
+  color: var(--c-axis-title);
+}
+
+.bm-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bm-hero-plot {
+  position: relative;
+}
+
+/* The band and gridlines behind every row, over the track column only */
+.bm-hero-guides {
+  position: absolute;
+  top: 0;
+  bottom: 44px;
+  left: calc(var(--bm-label-w) + var(--bm-col-gap));
+  right: 0;
+  pointer-events: none;
+}
+
+.bm-hero-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--bm-band-left);
+  width: var(--bm-band-width);
+  background: var(--c-highlight-band);
+  border-left: 1px dashed var(--c-gain-light);
+  border-right: 1px dashed var(--c-gain-light);
+}
+
+.bm-hero-grid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px solid var(--c-grid);
+}
+
+.bm-hero-grid.is-zero {
+  border-left: 1px solid var(--c-zero-line);
+}
+
+.bm-hero-rows {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bm-hero-row {
+  display: grid;
+  grid-template-columns: var(--bm-label-w) minmax(0, 1fr);
+  column-gap: var(--bm-col-gap);
+  align-items: center;
+  min-height: 48px;
+}
+
+.bm-hero-row + .bm-hero-row {
+  border-top: 1px solid var(--c-row-band);
+}
+
+.bm-hero-name {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  padding: 6px 8px;
+  margin-left: -8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.bm-hero-name:hover,
+.bm-hero-name:focus-visible {
+  background: var(--c-hover);
+}
+
+.bm-hero-name:focus-visible {
+  outline: 2px solid var(--c-gain);
+  outline-offset: 1px;
+}
+
+.bm-hero-label {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--c-ink);
+}
+
+.bm-hero-figures {
+  font-size: var(--fs-caption);
+  color: var(--c-axis-title);
+  font-variant-numeric: tabular-nums;
+}
+
+.bm-hero-sum {
+  font-weight: 400;
+  color: var(--c-axis-title);
+}
+
+.bm-hero-track {
+  position: relative;
+  height: 32px;
+}
+
+.bm-hero-line {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--c-axis);
+}
+
+.bm-hero-ring,
+.bm-hero-dot {
+  position: absolute;
+  top: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.bm-hero-ring {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--c-reference);
+  background: var(--c-surface);
+}
+
+.bm-hero-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--c-gain);
+  box-shadow: 0 0 0 2px var(--c-surface);
+}
+
+.bm-hero-value {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--c-gain-text);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  padding: 0 3px;
+  border-radius: 4px;
+  background: var(--c-surface);
+}
+
+.bm-hero-value.is-right {
+  margin-left: 12px;
+}
+
+.bm-hero-value.is-left {
+  transform: translate(calc(-100% - 12px), -50%);
+}
+
+.bm-hero-row.is-flagged .bm-hero-ring {
+  border-style: dashed;
+}
+
+.bm-hero-flag {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 16px);
+  transform: translateY(-50%);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-muted-fill);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  color: var(--c-text);
+  white-space: nowrap;
+}
+
+.bm-hero-axis {
+  display: grid;
+  grid-template-columns: var(--bm-label-w) minmax(0, 1fr);
+  column-gap: var(--bm-col-gap);
+  height: 22px;
+  margin-top: 4px;
+}
+
+.bm-hero-axis-ticks {
+  position: relative;
+}
+
+.bm-hero-axis-ticks > span {
+  position: absolute;
+  top: 2px;
+  transform: translateX(-50%);
+  font-size: var(--fs-micro);
+  color: var(--c-tick);
+  font-variant-numeric: tabular-nums;
+}
+
+.bm-hero-axis-title {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 0 calc(var(--bm-label-w) + var(--bm-col-gap));
+  height: 18px;
+  font-size: var(--fs-micro);
+  color: var(--c-axis-title);
+}
+
+.bm-hero-note {
+  margin: 12px 0 0;
+  font-size: var(--fs-caption);
+  color: var(--c-axis-title);
+}
+
+/* ---------- Toolbar: topic filter and the all-figures download ---------- */
+.bm-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 0 -4px;
+  padding: 10px 4px;
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-grid);
+}
+
+.bm-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.bm-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 4px 12px;
+  border: 1px solid var(--c-axis);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.bm-filter-chip:hover {
+  border-color: var(--c-gain);
+  background: var(--c-hover);
+}
+
+.bm-filter-chip:focus-visible {
+  outline: 2px solid var(--c-gain);
+  outline-offset: 2px;
+}
+
+.bm-filter-chip[aria-pressed="true"] {
+  border-color: var(--c-highlight);
+  background: var(--c-highlight);
+  color: var(--c-surface);
+}
+
+.bm-filter-count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--c-muted-fill);
+  color: var(--c-axis-title);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.bm-filter-chip[aria-pressed="true"] .bm-filter-count {
+  background: var(--c-surface);
+  color: var(--c-highlight);
+}
+
+.bm-toolbar-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.bm-toolbar-label {
+  font-size: var(--fs-caption);
+  color: var(--c-axis-title);
+}
+
+/* ---------- Sections ---------- */
+.bm-sections {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+
 .bm-group {
   display: grid;
   gap: 12px;
   min-width: 0;
+  scroll-margin-top: 72px;
 }
 
 .bm-group-head {
@@ -29,25 +427,31 @@
 }
 
 .bm-group-head p {
+  max-width: 80ch;
   margin: 0;
   font-size: var(--fs-small);
   line-height: 1.5;
   color: var(--c-axis-title);
 }
 
-.bm-compare-grid,
-.bm-tiles {
+/* Cards keep their own height, so opening one's More info leaves its neighbours as they are */
+.bm-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  align-items: start;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 16px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* A card: equal heights along a row, the source line at the bottom */
-.bm-compare,
-.bm-tile {
+.bm-cards.is-dense {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+}
+
+/* ---------- Cards ---------- */
+.bm-card {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -56,15 +460,27 @@
   border: 1px solid var(--c-grid);
   border-radius: 8px;
   background: var(--c-surface);
+  scroll-margin-top: 96px;
+  transition: border-color 220ms ease, box-shadow 220ms ease;
 }
 
-.bm-compare p,
-.bm-tile p {
+.bm-card:focus {
+  outline: none;
+}
+
+.bm-card.is-focused {
+  border-color: var(--c-gain);
+  box-shadow: 0 0 0 3px var(--c-highlight-band);
+}
+
+.bm-card p {
   margin: 0;
 }
 
-.bm-compare h4,
-.bm-tile h4 {
+.bm-card h4 {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
   margin: 0;
   font-size: var(--fs-body);
   font-weight: 600;
@@ -72,160 +488,40 @@
   color: var(--c-ink);
 }
 
-/* Titles: two lines at most */
-.bm-compare h4 .title-text,
-.bm-tile h4 {
+.bm-card h4 .title-text {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
 
-.bm-compare h4 {
-  display: flex;
-  align-items: flex-start;
-  min-width: 0;
-  /* Two lines' room, so the verdicts along a row line up */
-  min-height: 2.7em;
-}
-
-/* The verdict: one line of plain words that wraps inside the card */
-.bm-verdict {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: var(--c-highlight-band);
-  color: var(--c-text);
-  font-size: var(--fs-small);
-  line-height: 1.4;
-}
-
-.bm-verdict > span[aria-hidden],
-.bm-kicker > span[aria-hidden],
-.bm-press > span[aria-hidden] {
-  display: inline-flex;
-  flex: none;
-}
-
-.bm-verdict > span[aria-hidden] {
-  margin-top: 2px;
-  color: var(--c-highlight);
-}
-
-.bm-verdict > span:last-child {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.bm-compare-plot {
-  min-width: 0;
-}
-
-/* One muted note */
-.bm-note {
-  font-size: var(--fs-caption);
-  line-height: 1.45;
-  color: var(--c-axis-title);
-  overflow-wrap: anywhere;
-}
-
-/* Why a pair differs, and our saving from a measure, apart from the pair */
-.bm-why,
-.bm-separate {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  font-size: var(--fs-caption);
-  line-height: 1.45;
-  color: var(--c-text);
-}
-
-.bm-why > span[aria-hidden],
-.bm-separate > span[aria-hidden] {
-  display: inline-flex;
-  flex: none;
-  margin-top: 2px;
-  color: var(--c-axis-title);
-}
-
-.bm-why > span:last-child,
-.bm-separate > span:last-child {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.bm-separate {
-  padding-top: 6px;
-  border-top: 1px dashed var(--c-grid);
-}
-
-/* Last line: the source chip, then what our own figure is */
-.bm-foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin-top: auto !important;
-  font-size: var(--fs-caption);
-  line-height: 1.45;
-}
-
-.bm-ours {
-  min-width: 0;
-  color: var(--c-subtab-muted);
-  overflow-wrap: anywhere;
-}
-
-.bm-press {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 2px 9px;
-  border: 1px solid var(--c-loss-border);
-  border-radius: 999px;
-  background: var(--c-loss-soft);
-  color: var(--c-loss-text);
-  font-weight: 600;
-}
-
-/* Stat tiles: the icon beside the figure, then the title */
-.bm-tile-head {
-  display: flex;
-  align-items: center;
+/* Both figures side by side, large */
+.bm-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
-  min-width: 0;
-}
-
-.bm-tile-icon {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: var(--c-highlight-band);
-  color: var(--c-gain-text);
 }
 
 .bm-figure {
   display: grid;
+  align-content: start;
   gap: 2px;
   min-width: 0;
-  padding: 8px 12px;
-  border-radius: 6px;
-  background: var(--c-highlight-band);
 }
 
 .bm-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: var(--fs-micro);
   font-weight: 600;
   color: var(--c-axis-title);
+}
+
+.bm-kicker .bm-key-ring,
+.bm-kicker .bm-key-dot {
+  width: 9px;
+  height: 9px;
 }
 
 .bm-figure.is-estimate .bm-kicker,
@@ -240,67 +536,220 @@
 }
 
 .bm-value-main {
-  font-size: var(--fs-section);
+  font-size: var(--fs-xl);
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--c-ink);
   font-variant-numeric: tabular-nums;
 }
 
-.bm-figure.is-second .bm-value-main {
+/* In a pair, "a year" under each figure, so the two line up */
+.bm-pair .bm-qualifier {
+  display: block;
+}
+
+.bm-tile .bm-value-main {
   font-size: var(--fs-section);
 }
 
 .bm-qualifier {
-  font-size: var(--fs-small);
+  font-size: var(--fs-caption);
   font-weight: 500;
   color: var(--c-axis-title);
   white-space: nowrap;
 }
 
-/* Two dated points as bars from zero */
-.bm-range {
-  display: grid;
-  gap: 10px;
-  padding: 4px 0;
+/* The gap as a badge: neutral, it carries no judgement */
+.bm-gap {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--c-highlight-band);
+  color: var(--c-highlight);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-.bm-range-row {
+.bm-gap > span[aria-hidden] {
+  display: inline-flex;
+}
+
+.bm-gap.is-flag {
+  background: var(--c-muted-fill);
+  color: var(--c-text);
+  font-weight: 500;
+}
+
+/* Two thin bars from zero: published grey, ours teal */
+.bm-bars {
   display: grid;
-  grid-template-columns: 84px minmax(0, 1fr) auto;
+  gap: 4px;
+  padding-left: 0;
+  border-left: 1px solid var(--c-axis);
+}
+
+.bm-bar {
+  display: block;
+  height: 8px;
+  border-radius: 0 4px 4px 0;
+}
+
+.bm-bar.is-published {
+  background: var(--c-reference);
+}
+
+.bm-bar.is-estimate {
+  background: var(--c-gain);
+}
+
+/* Foot: the source chip, then More info under the card's one rule */
+.bm-foot {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.bm-foot-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bm-more {
+  min-height: 0;
+  padding-top: 4px;
+  border-top: 1px solid var(--c-grid);
+}
+
+.bm-more .disclosure-compact > .disclosure-toggle {
+  width: 100%;
+  justify-content: space-between;
+  font-size: var(--fs-small);
+}
+
+.bm-more .disclosure-preview {
+  white-space: normal;
+}
+
+.bm-more .info-sections {
+  font-size: var(--fs-caption);
+}
+
+/* ---------- Tile graphics ---------- */
+.bm-mini {
+  display: grid;
+  gap: 6px;
+}
+
+.bm-mini-row {
+  display: grid;
+  grid-template-columns: minmax(64px, 40%) minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
-  font-size: var(--fs-caption);
+  font-size: var(--fs-micro);
   color: var(--c-axis-title);
   font-variant-numeric: tabular-nums;
 }
 
-.bm-range-label {
-  text-align: right;
+.bm-mini-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.bm-range-track {
-  height: 24px;
-  border-left: 1px solid var(--c-grid);
+.bm-mini-track {
+  height: 10px;
+  border-left: 1px solid var(--c-axis);
 }
 
-.bm-range-fill {
+.bm-mini-fill {
   display: block;
   height: 100%;
   border-radius: 0 4px 4px 0;
   background: var(--c-before);
 }
 
-.bm-range-fill.is-latest {
+.bm-mini-row.is-latest .bm-mini-fill {
   background: var(--c-reference);
 }
 
-.bm-range-value {
+.bm-mini-row.is-projected .bm-mini-fill {
+  background: repeating-linear-gradient(135deg, var(--c-before) 0 3px, var(--c-surface) 3px 6px);
+  box-shadow: inset 0 0 0 1px var(--c-before);
+}
+
+.bm-mini-value {
   font-weight: 600;
   color: var(--c-text);
   text-align: right;
 }
 
-/* A share as people: the counted ones filled in */
+.bm-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.bm-stack-bar {
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.bm-stack-part,
+.bm-stack-swatch {
+  background: var(--c-reference);
+}
+
+.bm-stack-part.is-0,
+.bm-stack-swatch.is-0 {
+  background: var(--c-zero-line);
+}
+
+.bm-stack-part.is-2,
+.bm-stack-swatch.is-2 {
+  background: var(--c-before);
+}
+
+.bm-stack-part.is-3,
+.bm-stack-swatch.is-3 {
+  background: var(--c-axis);
+}
+
+.bm-stack-key {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-micro);
+  color: var(--c-axis-title);
+}
+
+.bm-stack-key li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bm-stack-key strong {
+  margin-left: auto;
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.bm-stack-swatch {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
 .bm-share {
   display: flex;
   gap: 4px;
@@ -319,6 +768,31 @@
   fill: currentColor;
 }
 
+.bm-show-all {
+  display: inline-flex;
+  align-items: center;
+  justify-self: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--c-axis);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-gain-text);
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bm-show-all:hover {
+  background: var(--c-hover);
+}
+
+.bm-show-all:focus-visible {
+  outline: 2px solid var(--c-gain);
+  outline-offset: 2px;
+}
+
 /* About these figures: the page's notes, folded away */
 .bm-about {
   margin-top: 0;
@@ -328,12 +802,56 @@
   margin-top: 12px;
 }
 
-@media (max-width: 480px) {
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  .bm-hero {
+    --bm-label-w: 0px;
+    --bm-col-gap: 0px;
+    padding: 16px;
+  }
+
+  .bm-hero-row {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 6px 0;
+  }
+
+  /* The label on its own line, over the gridlines */
+  .bm-hero-name {
+    position: relative;
+    z-index: 1;
+    margin-left: 0;
+    padding: 4px 0;
+    background: var(--c-surface);
+  }
+
+  .bm-hero-axis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bm-hero-axis-spacer {
+    display: none;
+  }
+
+  .bm-hero-flag {
+    left: calc(50% + 12px);
+  }
+
+  .bm-hero-flag-more {
+    display: none;
+  }
+
+  .bm-toolbar {
+    position: static;
+  }
+
   .bm-value-main {
     font-size: var(--fs-section);
   }
+}
 
-  .bm-compare h4 {
-    min-height: 0;
+@media (prefers-reduced-motion: reduce) {
+  .bm-card,
+  .bm-filter-chip {
+    transition: none;
   }
 }

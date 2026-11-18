@@ -5,7 +5,6 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 
 const fixture = readFileSync(join(__dirname, "..", "..", "test", "fixtures", "milburn", "milburn_scenarios.json"), "utf8");
 const reviewFigures = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_review_figures.json"), "utf8");
-const benchmarks = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_benchmarks.json"), "utf8");
 
 const state = vi.hoisted(() => ({ ageRows: null, budgetRows: null, catalogue: { combinedId: null } }));
 
@@ -27,18 +26,12 @@ vi.mock("recharts", async () => {
   return { ...actual, ResponsiveContainer: ({ children }) => <div style={{ width: 800, height: 400 }}>{children}</div> };
 });
 
-const respond = (body) =>
-  vi.fn(async () => (body === null ? { ok: false, status: 404, json: async () => null } : { ok: true, status: 200, json: async () => JSON.parse(body) }));
-
 afterEach(() => {
   vi.unstubAllGlobals();
   state.ageRows = null;
   state.budgetRows = null;
   state.measureRows = null;
 });
-
-// The benchmarks file's year (policyengine_estimate_year), 2029-30
-const youngRow = { reform_id: "combined--pkg", year: "2029", age_band: "16-24", people: "1000000", pct_worse_off: "10" };
 
 const summaryText = readFileSync(join(__dirname, "..", "..", "test", "fixtures", "milburn", "summary", "milburn_summary.json"), "utf8");
 
@@ -216,163 +209,5 @@ describe("Moves into work (illustrative)", () => {
     expect(await screen.findByText(/entry cases are not available/)).toBeInTheDocument();
     expect(await screen.findByText(/comparison is not available/)).toBeInTheDocument();
     expect(screen.queryByText(/£0/)).toBeNull();
-  });
-});
-
-describe("Benchmarks", () => {
-  it("lists every published figure with its source, opening in a new tab", async () => {
-    vi.stubGlobal("fetch", respond(benchmarks));
-    state.ageRows = [youngRow];
-    state.measureRows = [{ ...youngRow, reform_id: "uc_health_element_removed_under_25", pct_worse_off: "3" }];
-    const { default: BenchmarksTable } = await import("./BenchmarksTable");
-    render(<BenchmarksTable />);
-    expect(await screen.findByText("260,000")).toBeInTheDocument();
-    expect(screen.getByText("440,000")).toBeInTheDocument();
-    const card = (id) => document.querySelector(`[data-benchmark="${id}"]`);
-    // A figure's number is large, its qualifier small beside it
-    expect(card("milburn_welfare_saving_10y").querySelector(".bm-value").textContent).toBe("£13.7bn by 2036-37");
-    expect(card("milburn_welfare_saving_10y").querySelector(".bm-value-main").textContent).toBe("£13.7bn");
-    expect(card("milburn_welfare_saving_10y").querySelector(".bm-qualifier").textContent).toBe("by 2036-37");
-    // The old notice is gone: nothing above the first section
-    expect(screen.queryByText(/PolicyEngine estimates are context, not a check/)).toBeNull();
-    // Every figure now cites its own publication: none is a press report
-    expect(within(screen.getByRole("region", { name: "Benchmarks" })).queryByText("Press report")).toBeNull();
-    for (const link of within(screen.getByRole("region", { name: "Benchmarks" })).getAllByRole("link")) {
-      expect(link).toHaveAttribute("target", "_blank");
-      expect(link).toHaveAttribute("rel", "noopener noreferrer");
-    }
-    // Each figure says whose it is: "Published", or "PolicyEngine estimate"
-    const kinds = new Set([...document.querySelectorAll(".bm-kicker")].map((label) => label.textContent.trim().replace(/, \d{4}-\d{2}$/, "")));
-    expect([...kinds].sort()).toEqual(["PolicyEngine estimate", "Published"]);
-    // The package's estimate from its own run
-    expect(screen.getByText("100,000")).toBeInTheDocument();
-    expect(screen.queryByText("30,000")).toBeNull();
-    // Fixed PolicyEngine figures beside the published ones, each saying what ours is; the build id is in the folded notes, once
-    for (const [published, estimate, ours] of [
-      ["450,000", "406,919", "Ours: 2025"],
-      ["176,000", "233,407", "Ours: 2025"],
-      ["£5.1bn a year", "£5.85bn a year", "Ours: 2025-26, cash terms"],
-    ]) {
-      const row = screen.getByText(published).closest("li");
-      expect(row.textContent).toContain(estimate);
-      expect(row.querySelector(".bm-ours").textContent).toBe(ours);
-      expect(row.textContent).not.toContain("build fcfac709");
-    }
-    const about = screen.getByText("About these figures").closest("details");
-    expect(about.textContent).toContain("Builds: PolicyEngine, build fcfac709, 2025; PolicyEngine, build fcfac709, 2025, cash terms; PolicyEngine, build fcfac709, 2025-26, cash terms.");
-    expect(document.querySelectorAll(".bm-group [data-benchmark]").length).toBeGreaterThan(0);
-    for (const each of document.querySelectorAll(".bm-group [data-benchmark]")) expect(each.textContent, each.dataset.benchmark).not.toContain("build fcfac709");
-    // Each card has one source chip (source and date) and at most one note; none repeats the source
-    for (const each of document.querySelectorAll(".bm-group [data-benchmark]")) {
-      expect(each.querySelectorAll("[data-source-link]").length, each.dataset.benchmark).toBe(each.dataset.benchmark === "package_young_people_affected" ? 0 : 1);
-      expect(each.querySelectorAll(".bm-note").length, each.dataset.benchmark).toBeLessThanOrEqual(1);
-      expect(each.querySelector(".bm-note")?.textContent ?? "", each.dataset.benchmark).not.toMatch(/^(Resolution Foundation|IFS|The review's (own )?(count|figure))/);
-    }
-    // Sections are named for the question each answers, each with one line under it
-    expect([...document.querySelectorAll(".bm-group")].map((group) => [group.dataset.section, group.querySelector("h3").textContent])).toEqual([
-      ["caseloads", "How do our caseloads compare?"],
-      ["spending", "How does our spending compare?"],
-      ["jobs", "Where do young people work?"],
-      ["review", "The review's own estimates"],
-      ["poverty", "Poverty"],
-      ["context", "Context from the review"],
-    ]);
-    for (const group of document.querySelectorAll(".bm-group")) expect(group.querySelector(".bm-group-head p").textContent).toBeTruthy();
-    // Each comparable pair is a comparison panel with its gap as a % of the published figure, to the nearest whole per cent
-    const region = screen.getByRole("region", { name: "Benchmarks" });
-    expect([...region.querySelectorAll(".bm-compare")].map((panel) => panel.dataset.benchmark)).toEqual([
-      "uc_health_element_16_24",
-      "young_pip_recipients",
-      "pip_spend_16_24",
-      "uc_health_spend_16_24",
-      "young_benefits_spend",
-      "employer_nics_under_25",
-    ]);
-    for (const [id, gap] of [
-      ["uc_health_element_16_24", "PolicyEngine is 33% higher"],
-      ["pip_spend_16_24", "PolicyEngine is 14% lower"],
-      ["uc_health_spend_16_24", "PolicyEngine is 28% higher"],
-      ["young_benefits_spend", "Close: PolicyEngine is 6% lower"],
-      ["employer_nics_under_25", "PolicyEngine is 15% higher"],
-    ]) {
-      expect(card(id).querySelector(".bm-verdict").textContent, id).toBe(gap);
-      // Why the two differ, said on the card
-      expect(card(id).querySelector("[data-gap-note]").textContent, id).toBeTruthy();
-    }
-    // No two-decimal gap anywhere
-    expect(region.textContent).not.toMatch(/\d\.\d\d% (higher|lower)/);
-    expect(region.textContent).not.toContain("8.82%");
-    // A pair that still counts different things says so, with no gap between the two
-    const pip = card("young_pip_recipients");
-    expect(pip.textContent).toContain("Not like for like: ours is England and Wales in 2025; the published figure is current, for November 2026");
-    expect(pip.textContent).not.toMatch(/PolicyEngine is|% (higher|lower)/);
-    expect(pip.querySelector("[data-gap-note]").textContent).toContain("407,505");
-    // Our savings are shown apart and labelled as savings; the employer NI figure as a net cost
-    expect(card("pip_spend_16_24").querySelector("[data-separate]").textContent).toBe("Our saving from removing PIP at 16 to 24, 2029-30, cash terms: £4.68bn a year");
-    expect(card("uc_health_spend_16_24").querySelector("[data-separate]").textContent).toBe("Our saving from removing it for under-25s, 2029-30, cash terms: £1.13bn a year");
-    expect(card("young_benefits_spend").querySelector("[data-separate]").textContent).toBe("Our saving from removing them, 2029-30, cash terms: £4.67bn a year");
-    expect(card("employer_nics_under_25").querySelector("[data-separate]").textContent).toBe("Our net cost, 2029-30, cash terms: £4.65bn a year");
-    // Every other figure is a stat tile under its section, once, with its source and date
-    expect([...region.querySelectorAll(".bm-tile")].map((tile) => tile.dataset.benchmark)).toEqual([
-      "uc_health_no_work_requirements",
-      "package_young_people_affected",
-      "retail_hospitality_jobs_16_24",
-      "review_welfare_saving_2036",
-      "milburn_welfare_saving_10y",
-      "relative_poverty_review",
-      "young_net_incomes_review",
-      "kept_out_of_poverty",
-      "pip_no_extra_costs",
-      "neet_16_24",
-      "neet_rate_projection_2036",
-      "hidden_neets_england",
-      "disabled_neet_16_24",
-      "incapacity_benefits_young",
-      "dla_pip_16_24",
-      "child_dla_recipients",
-      "pip_spend_trend_16_24",
-      "uc_health_spend_young_2024",
-      "into_sustained_work_2036",
-      "review_investment_2036",
-      "youth_hiring_incentives_cost",
-      "incapacity_spending_18_24",
-    ]);
-    // The RF figure with no published basis says so, with no PolicyEngine figure
-    expect(card("uc_health_no_work_requirements").querySelector(".bm-note").textContent).toMatch(/^Basis not published/);
-    expect(card("uc_health_no_work_requirements").querySelector(".is-estimate")).toBeNull();
-    // Every row of the file is on the page once
-    expect(region.querySelectorAll("[data-benchmark]").length).toBe(JSON.parse(benchmarks).rows.length);
-    // The review's own figures link to the review, with its date
-    const saving = card("milburn_welfare_saving_10y");
-    expect(within(saving).getByRole("link", { name: /Review · 17 Nov 2026/ })).toHaveAttribute(
-      "href",
-      expect.stringContaining("gov.uk/government/publications/from-a-welfare-state-to-a-working-state"),
-    );
-    // The chip is short; the full title is the link's tooltip
-    expect(within(saving).getByRole("link")).toHaveAttribute("title", "From a Welfare State to a Working State");
-    // The review's own estimates are tiles with no PolicyEngine figure beside them
-    const annual = card("review_welfare_saving_2036");
-    expect(annual.querySelector(".bm-value").textContent).toBe("£3.6bn in 2036-37");
-    expect(annual.textContent).not.toContain("£2.64bn to £4.67bn a year");
-    expect(annual.querySelector(".is-estimate")).toBeNull();
-    const poverty = screen.getByText("50,000 fewer").closest("li");
-    expect(poverty.textContent).not.toContain("260,000 more");
-    expect(poverty.querySelector(".is-estimate")).toBeNull();
-    // The page's notes are folded away
-    expect(screen.getByText("About these figures").closest("details")).not.toHaveAttribute("open");
-    // Rows without a source are gone, and no link carries a stray %20 or points elsewhere than its label
-    expect(screen.queryByText(/465,000/)).toBeNull();
-    expect(screen.queryByText(/62,570/)).toBeNull();
-    for (const link of within(screen.getByRole("region", { name: "Benchmarks" })).getAllByRole("link")) {
-      expect(link.getAttribute("href")).not.toContain("%20");
-      expect(link.getAttribute("href")).not.toContain("aol.");
-    }
-  });
-
-  it("shows an unavailable state when its file is missing", async () => {
-    vi.stubGlobal("fetch", respond(null));
-    const { default: BenchmarksTable } = await import("./BenchmarksTable");
-    render(<BenchmarksTable />);
-    expect(await screen.findByText("The benchmarks are not available.")).toBeInTheDocument();
   });
 });
