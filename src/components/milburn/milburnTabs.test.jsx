@@ -50,6 +50,42 @@ const serve = ({ scenarios = fixture, summary = summaryText, review = reviewFigu
     return body === null ? { ok: false, status: 404, json: async () => null } : { ok: true, status: 200, json: async () => JSON.parse(body) };
   });
 
+const publishedEntry = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_entry_path.json"), "utf8");
+const publishedScenarios = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_scenarios.json"), "utf8");
+
+// The published files, not the fixture: a crash on real data (c48f71da) is caught here
+describe("Moves into work on the published files", () => {
+  it.each([2027, 2029, 2031])("renders the tab and its entry-path cards in %i", async (year) => {
+    vi.stubGlobal("fetch", serve({ entry: publishedEntry, scenarios: publishedScenarios }));
+    const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");
+    const { EntryShares, EntryYear } = await import("./EntryPathCards");
+    const { parseEntryPath } = await import("../../utils/milburn/entryPath");
+    const label = `${year}-${String((year + 1) % 100).padStart(2, "0")}`;
+    render(<BehaviouralScenarios year={year} />);
+    expect(await screen.findByRole("region", { name: "Share assumed in work, by year" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: `Static and with the assumed move into work, ${label}` })).toBeInTheDocument();
+    const review = await screen.findByRole("region", { name: "Beside the review's own estimate" });
+    const ours = review.querySelector('[data-side="ours"] .milburn-versus-figure').textContent;
+    if (year < 2029) expect(ours).toBe("None: the changes start in April 2029");
+    else expect(ours).toMatch(/^About \d/);
+    expect(review.textContent).not.toContain("Not yet run");
+    // The cards alone, on the parsed file
+    const data = parseEntryPath(JSON.parse(publishedEntry));
+    const { container } = render(
+      <>
+        <EntryShares data={data} />
+        <EntryYear data={data} year={year} />
+      </>,
+    );
+    expect(container.querySelector("[data-entry-shares]")).not.toBeNull();
+    if (year >= 2029) {
+      const change = [...container.querySelector('tr[data-row="change_exchequer"]').children].map((cell) => cell.textContent);
+      // The flat path's change, in £m: visible where £bn to two places is not
+      expect(change[3]).toMatch(/^\+£\d+\.\dm$/);
+    }
+  });
+});
+
 describe("Moves into work (illustrative)", () => {
   it("leads with the share assumed in work by year and the selected year's figures, then the entry cases and the break-even arithmetic", async () => {
     vi.stubGlobal("fetch", serve());
@@ -69,7 +105,8 @@ describe("Moves into work (illustrative)", () => {
     expect(screen.getByRole("link", { name: "Why this path" })).toHaveAttribute("href", "?tab=methodology#method-behavioural-scenarios");
     // Shares and people by year, with the review's NEET gap beside them
     const row2029 = [...shares.querySelector('[data-entry-shares] tr[data-year="2029"]').children].map((cell) => cell.textContent);
-    expect(row2029).toEqual(["2029-30", "1.3% (about 1,000)", "9.0% (about 9,000)", "1.3% (about 4,000)", "9.0% (about 4,000)", "1.7pp"]);
+    // The rollout path: its movers over the whole group, then its 9% of those reached
+    expect(row2029).toEqual(["2029-30", "1.3% (about 1,000)", "9.0% (about 9,000)", "1.3% (about 4,000)", "4.0% (about 4,000); 9.0% of those reached", "1.7pp"]);
     expect(shares.querySelector('[data-entry-shares] tr[data-year="2028"]').textContent).toBe("2028-290%0%0%0%0.9pp");
     // The 9%'s reading, the pairing and the review's 440,000 are said, as ours and theirs
     const notes = shares.querySelector("[data-entry-path-notes]").textContent;

@@ -7,9 +7,12 @@ Arithmetic on runs, not a run of the scenario
     static + s × (all_move − static)
 
 from the static package and the run in which everyone in the group moves.
-That is the expected value over who moves; no particular people are
-simulated. Relative poverty is first-order only: the line moves with the
-median.
+That is the expected value over who moves, if movers are a random draw
+from the group; no particular people are simulated. Relative poverty is
+first-order only (the line moves with the median), and is withheld when it
+fails the linearity check. A path on the phased package also carries
+``share_of_group``: its movers over the whole group the full package's run
+holds, as its ``share`` is of those reached.
 
 Reads the runs from staging (each with its private counts, which never
 reach public/):
@@ -368,6 +371,19 @@ def main(argv=None):
                 against=runs[against] if against else None,
                 dropped=failed,
             )
+            # The rollout path's share is of those the phased package has
+            # reached; its movers over the whole group (everyone the full
+            # package's group holds) is what the share chart plots
+            if not full and figures.get("movers") is not None:
+                reached = runs[rid].values(year)["movers_all"]
+                group = runs[UC_ONLY].values(year)["movers_all"]
+                figures["share_of_group"] = (
+                    0.0
+                    if figures["share"] == 0
+                    else figures["share"] * reached / group
+                    if reached is not None and group
+                    else None
+                )
             by_year[str(year)] = figures
             withheld_all += [
                 {"path": path_id, "year": year, "figure": k, "reason": r}
@@ -387,7 +403,14 @@ def main(argv=None):
             "status": "ok",
             "method": (
                 "static + share × (everyone moves − static), the expected "
-                "value over who moves; relative poverty first-order only"
+                "value over who moves, if movers are a random draw from the "
+                "group"
+                + (
+                    "; relative poverty is withheld (it failed the linearity "
+                    "check)"
+                    if "poverty_pp_rel_ahc" in failed
+                    else "; relative poverty first-order only"
+                )
             ),
             "years": list(YEARS),
             "start_year": design.REPORT_START_YEAR,

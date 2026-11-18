@@ -9,13 +9,17 @@
  *   { years: [2027, …], start_year, effect, neet_gap_pp: { "2026": … },
  *     rebase_year, hours,
  *     paths: [{ id, share_path, base: "full"|"phased", on_tab,
- *       years: { "2029": { share, movers, no_change?,
+ *       years: { "2029": { share, movers, no_change?, share_of_group?,
  *         exchequer_bn: { static, scenario },
  *         poverty_pp_abs_bhc, poverty_pp_rel_ahc,
  *         poverty_people_abs_bhc, poverty_people_rel_ahc,
  *         young_losing_pct } } }],
  *     linearity_check: { failed: [], … },
  *     withheld: [{ path, year, figure, reason }] }
+ *
+ * `share_of_group` is on paths on the phased package (rollout) only: their
+ * `share` is of those the package has reached, `share_of_group` their
+ * movers over the whole group.
  *
  * A figure withheld under the disclosure floor, or failing the linearity
  * check, is null, never zero.
@@ -44,7 +48,7 @@ export const ENTRY_WORK = "16 hours a week at the minimum wage for their age";
 
 /** The method, said wherever the figures are. */
 export const ENTRY_METHOD_SENTENCE =
-  "Figures are arithmetic on two runs (the package alone, and the package with everyone in the group moving into work), scaled by the share: the expected value over who moves, not a simulation of particular people.";
+  "Figures are arithmetic on two runs (the package alone, and the package with everyone in the group moving into work), scaled by the share: the expected value over who moves, if movers are a random draw from the group, not a simulation of particular people.";
 
 /** The 9%'s reading, said wherever it is used. */
 export const NINE_PER_CENT_SENTENCE =
@@ -52,11 +56,32 @@ export const NINE_PER_CENT_SENTENCE =
 
 /** The pairing of the 9% with the NEET path's timing is ours. */
 export const PAIRING_SENTENCE =
-  "The annex gives the 9% no time path. The phased path takes its timing from the review's NEET path (data tables, table 3), counted from 2028-29, the year before the benefit changes, reaching 9% in 2036-37. That pairing is ours: the NEET path reflects the review's whole package, and the review phases its welfare savings by when claimants are reassessed.";
+  "The annex gives the 9% no time path. The phased path takes its timing from the review's NEET path (data tables, table 3), counted from 2028-29, the year before the benefit changes, reaching 9% in 2036-37. That pairing is ours: the NEET path reflects the review's whole package, and the report moves existing claimants at their scheduled reassessment (paragraphs 733 and 770); the annex does not publish its savings by year.";
 
 /** Before April 2029. */
 export const NO_CHANGE_SENTENCE =
   "No change before April 2029: the report's benefit changes start then. The review's own NEET path falls before then, from measures this scenario does not model.";
+
+/** The tab's subtitle, said on the tab and on its loading skeleton alike. */
+export const SCENARIOS_SUBTITLE =
+  "The report's benefit changes from April 2029, with an assumed move into work for young Universal Credit health claimants. The assumption is ours; it combines two figures the review publishes.";
+
+/** Said in place of a count of movers before the changes start. */
+export const NONE_BEFORE_START = "None: the changes start in April 2029";
+
+/** Whether a path's year is before the changes start (no change, not a withheld figure). */
+export const beforeStart = (data, figure, year) => Boolean(figure?.noChange) || (data?.startYear != null && Number(year) < data.startYear);
+
+/**
+ * A path's share of the whole group in a year: its own share, or, on the
+ * phased package (rollout), its movers over the whole group.
+ */
+export function groupShare(data, pathId, year) {
+  const figure = pathYear(data, pathId, year);
+  if (!figure) return null;
+  if (data?.paths?.get(pathId)?.base === "phased") return figure.shareOfGroup;
+  return figure.share;
+}
 
 /** The review's 440,000, and why it is not used. */
 export const REVIEW_FIGURE_CAVEAT =
@@ -83,6 +108,7 @@ export function parseEntryPath(json) {
     for (const [year, figures] of Object.entries(path.years)) {
       years.set(Number(year), {
         share: finite(figures.share),
+        shareOfGroup: finite(figures.share_of_group),
         movers: finite(figures.movers),
         noChange: Boolean(figures.no_change),
         exchequer: pair(figures.exchequer_bn),

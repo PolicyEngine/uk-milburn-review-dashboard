@@ -169,6 +169,16 @@ def test_figures_are_static_plus_share_times_the_increment(staged):
     assert rollout["exchequer_bn"]["scenario"] == pytest.approx(
         2.0 + 0.09 * 0.5
     )
+    # The rollout path's movers over the whole group (its share is of those
+    # reached); the full-package paths carry no such field
+    _, _, _, runs = staged
+    reached = script.Run(runs / script.PHASED).values(2031)["movers_all"]
+    group = script.Run(runs / script.UC_ONLY).values(2031)["movers_all"]
+    assert rollout["share_of_group"] == pytest.approx(
+        0.09 * reached / group, abs=1e-6
+    )
+    assert "share_of_group" not in central["2029"]
+    assert "random draw" in data["method"]
     assert data["linearity_check"]["failed"] == []
 
 

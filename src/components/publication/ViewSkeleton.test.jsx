@@ -1,3 +1,4 @@
+import { SCENARIOS_SUBTITLE } from "../../utils/milburn/entryPath";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render, screen } from "@testing-library/react";
@@ -43,9 +44,15 @@ describe("a view's loading placeholder", () => {
   it("draws the new sub-tabs' placeholders without a number", () => {
     for (const view of ["dashboard:scenarios", "dashboard:benchmarks"]) {
       const { container, unmount } = render(<ViewSkeleton view={view} />);
-      expect(container.textContent).not.toMatch(/£|\d/);
+      // The start date in the scenarios subtitle is a date, not a result
+      expect(container.textContent.replace(/April 2029/g, "")).not.toMatch(/£|\d/);
       unmount();
     }
+  });
+
+  it("gives Moves into work the live tab's own subtitle", () => {
+    const { container } = render(<ViewSkeleton view="dashboard:scenarios" />);
+    expect(container.textContent).toContain(SCENARIOS_SUBTITLE);
   });
 
   it("puts every view's placeholder in the server's HTML, one per address", () => {

@@ -42,7 +42,17 @@ import {
   useReviewFigures,
 } from "../../utils/milburn/summary";
 import { shortNameOf } from "../../utils/policyDetails";
-import { ENTRY_GROUP, ENTRY_WORK, pathYear, shareText, useEntryPath } from "../../utils/milburn/entryPath";
+import {
+  ENTRY_GROUP,
+  ENTRY_WORK,
+  NONE_BEFORE_START,
+  SCENARIOS_SUBTITLE,
+  beforeStart,
+  pathYear,
+  shareText,
+  useEntryPath,
+} from "../../utils/milburn/entryPath";
+import { FIGURE_WITHHELD } from "./EntryPathCards";
 import "./milburn.css";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -130,7 +140,9 @@ function neetRateText(rate) {
  */
 export function ReviewComparison({ entry, year, review, catalogue }) {
   const central = pathYear(entry, "central", year);
-  const movers = central?.movers ? central.movers : null;
+  // Before April 2029 no one moves: said so, not "withheld"; null after it is a withheld count
+  const before = beforeStart(entry, central, year);
+  const movers = !before && typeof central?.movers === "number" ? central.movers : null;
   const share = shareText(central?.share);
   const yearLabel = fiscalYearTick(year);
   const fullMeasure = catalogue?.byId?.get(HEADLINE_RUN);
@@ -138,7 +150,7 @@ export function ReviewComparison({ entry, year, review, catalogue }) {
   const { employment, report, neetRate } = review;
   const ours = { column: OUR_SCENARIO_TITLE };
   const theirs = { name: `The review (published), by ${employment.byYear}`, column: REVIEW_MODELLING_TITLE };
-  const notRun = "Not yet run";
+  const noMovers = before ? NONE_BEFORE_START : FIGURE_WITHHELD;
   // The cards' one-line versions; the full wording is in the table under "Full comparison"
   const last = neetRate ? neetRate.years.length - 1 : -1;
   const cardRows = [
@@ -183,8 +195,8 @@ export function ReviewComparison({ entry, year, review, catalogue }) {
       key: "ours",
       title: OUR_SCENARIO_TITLE,
       chip: null,
-      figure: movers !== null ? `About ${formatPeople(movers)}` : notRun,
-      caption: `people assumed to move into work in ${yearLabel}: an assumed ${share}, not an estimate`,
+      figure: movers !== null ? `About ${formatPeople(movers)}` : noMovers,
+      caption: before ? `people assumed to move into work in ${yearLabel}` : `people assumed to move into work in ${yearLabel}: an assumed ${share}, not an estimate`,
       side: "ours",
     },
     {
@@ -200,7 +212,7 @@ export function ReviewComparison({ entry, year, review, catalogue }) {
     {
       key: "people",
       label: "People moving into work",
-      ours: movers !== null ? `About ${formatPeople(movers)}, assumed (${share} of the group), not estimated` : notRun,
+      ours: movers !== null ? `About ${formatPeople(movers)}, assumed (${share} of the group), not estimated` : noMovers,
       theirs: `About ${formatPeople(employment.people)}`,
     },
     { key: "when", label: "When", ours: yearLabel, theirs: `By ${employment.byYear}` },
@@ -342,8 +354,31 @@ export function ReviewComparison({ entry, year, review, catalogue }) {
   );
 }
 
+/**
+ * The entry case beside the national average per mover: the flat path's
+ * Exchequer change over static, over its movers, in the entry cases' year.
+ * Null unless both figures are there. `cases`: the entry cases; the
+ * 16-hour one is the one set beside the national path (16 hours too).
+ */
+export function perMoverNote(entry, cases, year) {
+  const flat = pathYear(entry, "flat", year);
+  const one = cases?.find((item) => item.hours === 16);
+  const change = flat?.exchequer;
+  if (!one || !change || change.static === null || change.scenario === null || !flat.movers) return null;
+  const millions = (change.scenario - change.static) * 1000;
+  const perMover = Math.round((millions * 1e6) / flat.movers / 100) * 100;
+  return (
+    `These two figures are not like for like. The entry case's ${pounds.format(one.exchequer_gain_package)} a year is one household: a single ${AGE_IN_CASE}-year-old private renter moving into 16 hours a week at the National Living Wage. ` +
+    `Across the whole group, the flat path in ${fiscalYearTick(year)} gives the Exchequer about ${pounds.format(perMover)} a year per mover on average (£${millions.toFixed(1)}m over about ${formatPeople(flat.movers)} movers). ` +
+    "Both count income tax, employee and employer National Insurance and benefits. The movers in the national figure are aged 18 to 24, are paid the minimum wage for their age (lower for 18 to 20-year-olds), and live in all household types and tenures, many with parents or in larger benefit units."
+  );
+}
+
+/** The age of the person in the household entry cases (milburn_scenarios.py, AGE). */
+const AGE_IN_CASE = 22;
+
 /** The household entry cases from milburn_scenarios.json, one row per hours case. */
-function EntryCases({ data }) {
+function EntryCases({ data, entry = null }) {
   const cases = HOURS_CASES.map((option) => data.entryCases.find((entry) => entry.id === option.id)).filter(Boolean);
   // The same gains with and without the package: one column each, and a
   // line saying so; both figures side by side only where they differ
@@ -354,6 +389,7 @@ function EntryCases({ data }) {
   );
   // The file's own sentences, too long for one-line bullets: prose, folded away
   const paragraphs = [data.basis, data.notes.join(" ")].filter(Boolean);
+  const nationalNote = entry ? perMoverNote(entry, cases, data.year) : null;
   const narrow = useNarrowViewport();
   // One bar per gain, and per law where the two differ
   const series = same
@@ -427,6 +463,11 @@ function EntryCases({ data }) {
                 </tbody>
               </table>
             </FiguresTable>
+            {nationalNote && (
+              <p className="milburn-note" data-per-mover="">
+                {nationalNote}
+              </p>
+            )}
             {(same || paragraphs.length > 0) && (
               <details className="milburn-details" data-case-more="">
                 <summary>
@@ -723,7 +764,7 @@ export default function BehaviouralScenarios({ selectedRun, year = 2029 } = {}) 
       </div>
     );
   } else {
-    cases = <EntryCases data={file.data} />;
+    cases = <EntryCases data={file.data} entry={entry} />;
   }
 
   return (
@@ -731,7 +772,7 @@ export default function BehaviouralScenarios({ selectedRun, year = 2029 } = {}) 
       <SectionHeading
         icon="sliders"
         title="Moves into work (illustrative)"
-        subtitle="The report's benefit changes from April 2029, with an assumed move into work for young Universal Credit health claimants. The assumption is ours; it combines two figures the review publishes."
+        subtitle={SCENARIOS_SUBTITLE}
       />
       {/* The assumption and the link to how it was chosen, in one line */}
       <p className="milburn-assumption" role="note">

@@ -1,6 +1,6 @@
 {
   "status": "ok",
-  "method": "static + share \u00d7 (everyone moves \u2212 static), the expected value over who moves; relative poverty first-order only",
+  "method": "static + share \u00d7 (everyone moves \u2212 static), the expected value over who moves, if movers are a random draw from the group; relative poverty is withheld (it failed the linearity check)",
   "years": [
     2027,
     2028,
@@ -313,12 +313,14 @@
         "2027": {
           "share": 0.0,
           "movers": 0,
-          "no_change": true
+          "no_change": true,
+          "share_of_group": 0.0
         },
         "2028": {
           "share": 0.0,
           "movers": 0,
-          "no_change": true
+          "no_change": true,
+          "share_of_group": 0.0
         },
         "2029": {
           "share": 0.09,
@@ -342,7 +344,8 @@
           "young_losing_pct": {
             "static": 4.556282,
             "scenario": 4.527837
-          }
+          },
+          "share_of_group": 0.048683
         },
         "2030": {
           "share": 0.09,
@@ -366,7 +369,8 @@
           "young_losing_pct": {
             "static": 6.396946,
             "scenario": 6.351526
-          }
+          },
+          "share_of_group": 0.075395
         },
         "2031": {
           "share": 0.09,
@@ -386,7 +390,8 @@
           "young_losing_pct": {
             "static": 7.178771,
             "scenario": 7.131846
-          }
+          },
+          "share_of_group": 0.08273
         }
       }
     },

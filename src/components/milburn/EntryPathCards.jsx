@@ -27,6 +27,7 @@ import {
   RELATIVE_APPROXIMATE_SENTENCE,
   REPLACEMENTS_SENTENCE,
   REVIEW_FIGURE_CAVEAT,
+  groupShare,
   pathYear,
   shareText,
 } from "../../utils/milburn/entryPath";
@@ -70,6 +71,31 @@ const bnText = (value) => (missing(value) ? FIGURE_WITHHELD : formatBn(value));
 const ppText = (value) => (missing(value) ? FIGURE_WITHHELD : formatSignedPp(value));
 const pctText = (value) => (missing(value) ? FIGURE_WITHHELD : `${value.toFixed(2)}%`);
 const peopleText = (value) => (missing(value) ? "" : ` (${value < 0 ? "−" : "+"}${formatPeople(Math.abs(value))})`);
+const signOf = (value) => (value > 0 ? "+" : value < 0 ? "−" : "");
+
+/** The label over the change rows: each path's figure minus its static package's. */
+export const CHANGE_FROM_STATIC = "Change from static";
+
+/**
+ * A path's change from its static package, to the precision that shows it:
+ * £m for the Exchequer, three decimals of a point (and people) for poverty
+ * and the losing share. At two decimals the paths read the same as static.
+ */
+function changeText(figure, key) {
+  const pairOf = figure?.[key];
+  if (missing(pairOf?.static) || missing(pairOf?.scenario)) return FIGURE_WITHHELD;
+  const change = pairOf.scenario - pairOf.static;
+  if (key === "exchequer") {
+    const millions = change * 1000;
+    return `${signOf(Math.round(millions * 10))}£${Math.abs(millions).toFixed(1)}m`;
+  }
+  const points = `${signOf(Math.round(change * 1000))}${Math.abs(change).toFixed(3)}pp`;
+  if (key !== "povertyAbs") return points;
+  const people = figure?.peopleAbs;
+  if (missing(people?.static) || missing(people?.scenario)) return points;
+  const moved = people.scenario - people.static;
+  return `${points} (${signOf(moved)}${formatPeople(Math.abs(moved))} people)`;
+}
 
 /** The year's table: each figure, for the static package and on each path. */
 export function entryPathRows(data, year) {
@@ -87,12 +113,26 @@ export function entryPathRows(data, year) {
     phasedStatic: text(rollout, key, "static", format, people),
     paths: figures.map((figure) => text(figure, key, "scenario", format, people)),
   });
+  const change = (key, label) => ({
+    key: `change_${key}`,
+    label: `${CHANGE_FROM_STATIC}: ${label}`,
+    change: true,
+    static: "",
+    phasedStatic: "",
+    paths: figures.map((figure) => changeText(figure, key)),
+  });
   return [
     row("exchequer", "Exchequer saving", bnText),
     row("povertyAbs", "Absolute poverty before housing costs, all ages (pp)", ppText, "peopleAbs"),
     row("youngLosing", "16–24s in losing households (%)", pctText),
+    change("exchequer", "Exchequer saving (£m)"),
+    change("povertyAbs", "absolute poverty before housing costs (pp)"),
+    change("youngLosing", "16–24s in losing households (pp)"),
   ];
 }
+
+/** Whether a path is on the phased package, its share of those reached (the rollout path). */
+const isPhased = (data, pathId) => data?.paths?.get(pathId)?.base === "phased";
 
 const COLOURS = { central: CHART_COLOURS.after, flat: CHART_COLOURS.before, rollout: CHART_COLOURS.highlight };
 
@@ -106,7 +146,8 @@ export function EntryShares({ data }) {
   const chartData = years.map((year) => {
     const point = { year: fiscalYearTick(year) };
     for (const path of charted) {
-      const share = pathYear(data, path.id, year)?.share;
+      // Each path's share of the whole group: the rollout path's movers over it, not its share of those reached
+      const share = groupShare(data, path.id, year);
       point[path.id] = missing(share) ? null : Math.round(share * 1000) / 10;
     }
     return point;
@@ -119,7 +160,8 @@ export function EntryShares({ data }) {
       columns: [
         { key: "year", label: "Year" },
         ...ENTRY_PATHS.flatMap((path) => [
-          { key: `${path.id}_share`, label: `${path.label}: share (%)`, decimals: 2 },
+          { key: `${path.id}_share`, label: `${path.label}: share of the whole group (%)`, decimals: 2 },
+          ...(isPhased(data, path.id) ? [{ key: `${path.id}_reached`, label: `${path.label}: share of those reached (%)`, decimals: 2 }] : []),
           { key: `${path.id}_movers`, label: `${path.label}: people` },
         ]),
         { key: "gap", label: "Review's NEET gap, whole package (pp)", decimals: 1 },
@@ -129,8 +171,10 @@ export function EntryShares({ data }) {
         ...Object.fromEntries(
           ENTRY_PATHS.flatMap((path) => {
             const figure = pathYear(data, path.id, year);
+            const share = groupShare(data, path.id, year);
             return [
-              [`${path.id}_share`, missing(figure?.share) ? null : figure.share * 100],
+              [`${path.id}_share`, missing(share) ? null : share * 100],
+              ...(isPhased(data, path.id) ? [[`${path.id}_reached`, missing(figure?.share) ? null : figure.share * 100]] : []),
               [`${path.id}_movers`, figure?.movers ?? null],
             ];
           }),
@@ -171,10 +215,15 @@ export function EntryShares({ data }) {
                         const figure = pathYear(data, path.id, year);
                         const movers = figure?.movers;
                         const people = movers ? ` (about ${formatPeople(movers)})` : missing(movers) && figure?.share ? ` (people ${FIGURE_WITHHELD.toLowerCase()})` : "";
+                        // The rollout path: its share of the whole group first, then of those reached
+                        const phased = isPhased(data, path.id);
+                        const ofGroup = phased ? groupShare(data, path.id, year) : figure?.share;
+                        const reached = phased && figure?.share ? `; ${shareText(figure.share)} of those reached` : "";
                         return (
                           <td key={path.id}>
-                            {shareText(figure?.share)}
+                            {missing(ofGroup) ? (phased && figure?.share ? FIGURE_WITHHELD : shareText(figure?.share)) : shareText(ofGroup)}
                             {people}
+                            {reached}
                           </td>
                         );
                       })}
@@ -199,7 +248,8 @@ export function EntryShares({ data }) {
                 </Point>
                 <Point icon="layers">
                   The rollout path applies 9% to the group once the new rules reach them, on the phased package: new 18-year-olds at once, existing claimants
-                  at an assumed 45% a year (our assumption), drawn at random, so its figures rest on that draw. Its share of the whole group is lower.
+                  at an assumed 45% a year (our assumption), drawn at random, so its figures rest on that draw. The chart and the table give its movers as a share
+                  of the whole group, lower than the 9% of those reached.
                 </Point>
                 <Point icon="info" data-review-caveat="">
                   {REVIEW_FIGURE_CAVEAT}
@@ -209,7 +259,7 @@ export function EntryShares({ data }) {
           </>
         }
       >
-        <div role="img" aria-label={`${title}: ${chartData.map((point) => `${point.year}: phased ${point.central}%, flat ${point.flat}%`).join("; ")}`}>
+        <div role="img" aria-label={`${title}: ${chartData.map((point) => `${point.year}: phased ${point.central}%, flat ${point.flat}%, rollout ${point.rollout}%`).join("; ")}`}>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={chartData} margin={chartMargin()}>
               <CartesianGrid {...GRID_PROPS} />
@@ -308,9 +358,9 @@ export function EntryYear({ data, year }) {
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.key} data-row={row.key}>
+                <tr key={row.key} data-row={row.key} data-change={row.change ? "" : undefined}>
                   <th scope="row">{row.label}</th>
-                  <td>{row.static}</td>
+                  <td>{row.change ? "" : row.static}</td>
                   {row.paths.map((value, index) => (
                     <td key={ENTRY_PATHS[index].id}>{value}</td>
                   ))}
@@ -320,7 +370,8 @@ export function EntryYear({ data, year }) {
           </table>
         </div>
         <p className="milburn-note" data-phased-static="">
-          The rollout path is set against the phased package, static: {rows.map((row) => `${row.label} ${row.phasedStatic}`).join("; ")}.
+          The rollout path is set against the phased package, static: {rows.filter((row) => !row.change).map((row) => `${row.label} ${row.phasedStatic}`).join("; ")}. Each
+          change row is a path&rsquo;s figure minus its own static package&rsquo;s.
         </p>
       </MilburnChartCard>
     </section>
