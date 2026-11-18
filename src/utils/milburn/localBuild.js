@@ -284,8 +284,9 @@ export function localTableRows(catalogue, table, isShown) {
 
 /**
  * The runs' build labels as one. Labels that differ only in the
- * policyengine release that certified them (the pre-report runs say 6.20.1,
- * the report's 6.20.2, on the same engine and data) are one label naming
+ * policyengine release that certified them (the pre-report runs first said
+ * 6.20.1, the report's 6.20.2, on the same engine and data; every run now
+ * says 6.20.2) are one label naming
  * both releases and saying so; any other mix is listed in full.
  */
 export function combinedLabel(labels) {
