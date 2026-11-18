@@ -20,6 +20,7 @@ import { groupMilburnMeasures } from "../utils/milburn/measureGroups";
 import { NOT_COMPUTABLE_MEASURES } from "../utils/milburn/notComputable";
 import { FINAL_REPORT, REPORT_PUBLISHED, reportCopy } from "../utils/milburn/reportStatus";
 import { WITHHELD_LABEL, WITHHELD_METHOD } from "../utils/withheld";
+import { INDICATIVE_GAP_NOTE, TOLERANCE_RULE } from "../utils/milburn/benchmarks";
 
 /** The policyengine-core version this build runs, beside policyengine-uk. */
 export const POLICYENGINE_CORE_VERSION = "3.34.10";
@@ -115,9 +116,9 @@ export const milburnLimitations = (published = REPORT_PUBLISHED) => [
   ["PIP in Scotland", "Adult Disability Payment records in Scotland are held as PIP in the data, so PIP figures for Scotland use ADP records."],
   ["New-claimant health element rate", "Which Universal Credit health element rate a new claimant receives is assigned by a random draw that does not depend on age. New claimants since April 2026 receive the lower health element (£217.26 a month, £2,607 a year) rather than £442.10 a month, so removing it takes less from them."],
   ["Few young claimant households", "The results rest on about 130 to 170 survey households with young claimants (the health element and PIP removal changes 658 households in the data, drawn from 171 survey households; the health element removal alone 468 from 127, and the PIP removal alone 629 from 156), so the pattern across individual income deciles and single years of age is noisy; national totals are steadier than any one decile or age."],
-  ["Overlapping losses", "About nine in ten young claimants with limited capability for work and work-related activity (LCWRA) in the data also get PIP, so removing both payments concentrates the losses on the same young people. A different overlap would change how many people lose income and how much they lose."],
+  ["Overlapping losses", "In the data 90.6% of 16 to 24-year-olds with limited capability for work and work-related activity (LCWRA) also get PIP, against 62.5% in the Resolution Foundation's figures, so removing both payments concentrates the losses on the same young people. A different overlap would change how many people lose income and how much they lose."],
   ["Carer's Allowance and PIP", "Removing PIP changes, besides PIP itself, chiefly Universal Credit amounts that depend on it in the model, such as the disabled child element, entitlement while in education and the exemption from the shared accommodation rate. For 18 to 24-year-olds in 2029-30 that is about £3.09bn of PIP and about £0.56bn of these knock-on effects. Carer's Allowance and the Universal Credit carer element do not change: in policyengine-uk 2.177.7 a carer's entitlement is not linked to the PIP of the person cared for, whom the model takes to qualify. In reality a carer whose entitlement rests on that person's PIP daily living award could lose it, so carers' losses are not shown and the saving may be understated."],
-  ["Caseloads against published counts", "On build fcfac709 the number of Universal Credit households with the LCWRA element, all ages, is a calibration target and sits 1.5% above DWP's figure, but LCWRA by age is not: the data hold about a third more people aged 16 to 24 receiving the health element than the Resolution Foundation counts (233,000 in Great Britain in 2025, against 176,000), as claimants added by the take-up draw carry LCWRA where they receive PIP. PIP at ages 16 to 24 in England and Wales matches DWP's 2025 count (407,000). Within England the model counts too many recipients aged 16 to 19 and too few aged 20 to 24. The proposal starts at 18. Across ages 16 to 24 the young average award is lower than the published figures (about £8,000 a year, against £8,400), so young PIP spending is about 14% below the review's. The data also hold about 10% fewer payroll employees aged 18 to 24 than HMRC's count. Caseloads in later years grow with population only."],
+  ["Caseloads against published counts", "On build fcfac709 the number of Universal Credit households with the LCWRA element, all ages, is a calibration target and sits 1.5% above DWP's figure, but LCWRA by age is not: the data hold about a third more people aged 16 to 24 receiving the health element than the Resolution Foundation counts (233,000 in Great Britain in 2025, against 176,000), as claimants added by the take-up draw carry LCWRA where they receive PIP. PIP at ages 16 to 24 in England and Wales matches DWP's 2025 count (407,000). Within England the model counts too many recipients aged 16 to 19 (17.6% above DWP's count) and too few aged 20 to 24 (15.9% below). The proposal starts at 18. On an uncertified build that corrects this split, the 18 to 24 PIP caseload is about 3.4% higher and the package saving about 2.5% higher (a sensitivity, not our figures). Across ages 16 to 24 the young average award is lower than the published figures (about £8,000 a year, against £8,400), so young PIP spending is about 14% below the review's. The data also hold about 10% fewer payroll employees aged 18 to 24 than HMRC's count. Caseloads in later years grow with population only."],
   ...(published
     ? REPORT_DESIGN_LIMITATIONS
     : [["No replacement in the upper bound", "The full abolition package (upper bound) includes no replacement fund, cost allowance or insurance payment. The central variant stands in for a smaller allowance with PIP at half rate."]]),
@@ -502,10 +503,11 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
           </Topic>
           <Topic id="method-benchmarks" title="Benchmarks" preview="Published figures · Sources · PolicyEngine estimates beside them">
             <p className="method-more">
-              Published figures from the review, the ONS, the Resolution Foundation and the IFS, each with its basis, source
-              and date. Where PolicyEngine has a figure for the same ages, area, year and measure (build fcfac709 for
-              2025, money in cash terms), it sits beside it with the gap to the nearest whole per cent and a line on why
-              the two differ; a pair that still differs in date or area says so and gives no gap. Our savings from the
+              Published figures from the review, the ONS, DWP, HMRC, the Resolution Foundation and the IFS, each with its
+              basis, source and date. Where PolicyEngine has a figure for the same ages, area, year and measure (build
+              fcfac709 for 2025, money in cash terms), it sits beside it with the gap to the nearest whole per cent and a
+              line on why the two differ; a pair that still differs in date or area says so and gives no gap.{" "}
+              {INDICATIVE_GAP_NOTE} {TOLERANCE_RULE} Our savings from the
               measures are shown apart, never against published spending, and the review&rsquo;s own estimates, which
               include replacement awards and employment effects, have no PolicyEngine figure beside them.
             </p>

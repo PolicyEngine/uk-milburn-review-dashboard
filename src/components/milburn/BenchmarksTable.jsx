@@ -22,7 +22,9 @@ import {
   toleranceWords,
   differentBasis,
   estimateFor,
+  INDICATIVE_GAP_NOTE,
   parseBenchmarks,
+  TOLERANCE_RULE,
   topicFromSearch,
 } from "../../utils/milburn/benchmarks";
 import { usePackageTable } from "../../utils/milburn/packageRun";
@@ -240,12 +242,8 @@ export default function BenchmarksTable() {
     );
   } else {
     const yearLabel = ready.year === null ? "" : fiscalYearTick(ready.year);
-    const runLabel = [
-      yearLabel,
-      `${catalogue.localBuild ? "local build" : "verified"} run`,
-    ]
-      .filter(Boolean)
-      .join(", ");
+    // The estimate's year only: which route built the run is no reader's concern
+    const runLabel = yearLabel;
     const counts = Object.fromEntries([
       ["all", ready.rows.length],
       [OURS_TOPIC, ready.rows.filter((row) => row.estimate).length],
@@ -367,8 +365,13 @@ export default function BenchmarksTable() {
               <span>
                 Gap: the PolicyEngine estimate less the published figure, as a %
                 of the published figure, to the nearest whole per cent; given
-                only where the two count the same ages, area, year and measure.
+                only where the two count the same ages, area, year and measure.{" "}
+                {INDICATIVE_GAP_NOTE}
               </span>
+            </li>
+            <li data-tolerance-rule="">
+              <TitleIcon name="scale" bare size={14} />
+              <span>{TOLERANCE_RULE}</span>
             </li>
             <li>
               <TitleIcon name="scale" bare size={14} />
@@ -395,7 +398,7 @@ export default function BenchmarksTable() {
               <TitleIcon name="usersRound" bare size={14} />
               <span>
                 Package figure: people aged 16 to 24 in households whose income
-                falls ({catalogue.localBuild ? "local build" : "verified"} run).
+                falls.
               </span>
             </li>
           </ul>

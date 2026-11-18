@@ -38,7 +38,7 @@ export const BENCHMARK_SECTIONS = [
     key: "jobs",
     chip: "Work",
     title: "Where do young people work?",
-    intro: "The review's share of young people's jobs in retail and hospitality, beside ours.",
+    intro: "The review's share of young people's jobs in retail and hospitality.",
     icon: "briefcase",
     ids: ["retail_hospitality_jobs_16_24"],
   },
@@ -62,7 +62,7 @@ export const BENCHMARK_SECTIONS = [
     key: "context",
     chip: "Context",
     title: "Context from the review",
-    intro: "Published figures on young people, work and costs that we do not estimate.",
+    intro: "Published figures on young people, work and costs, not set beside a PolicyEngine figure.",
     icon: "book",
     ids: [
       "neet_16_24",
@@ -248,19 +248,24 @@ export function differentBasis(id) {
 
 /**
  * The 15% tolerance: a pair is tested against it only where the published
- * figure states its ages, area and period and ours matches all three. Each
- * like-for-like row says which: `against` (the matched figure, its wording,
- * and ours) for a tested row, or `untested` (why not, in a few words).
- * The gap is tested unrounded, so 14.7% is within.
+ * figure is an official count (a department's or the ONS's, not another
+ * model's estimate or a think tank's count) with the same ages, area and
+ * period as ours (TOLERANCE_RULE). Each like-for-like row says which:
+ * `against` (the matched official figure, its wording, and ours) for a
+ * tested row, or `untested` (which part of the rule fails, in a few
+ * words). The gap is tested unrounded, so 14.7% is within.
  */
 export const TOLERANCE_PCT = 15;
+export const TOLERANCE_RULE = `We test a gap against the ${TOLERANCE_PCT}% tolerance only where the published figure is an official count with the same ages, area and period as ours.`;
+/** Said beside the gaps: where the published figure does not state its basis, its gap is indicative. */
+export const INDICATIVE_GAP_NOTE = "Where the published figure does not state its ages, area or period, the gap is indicative only.";
 export const TOLERANCE = Object.freeze({
-  uc_health_element_16_24: { untested: "the published count gives no source, date or area" },
-  uc_health_pip_overlap: { untested: "the published counts give no source, date or area" },
+  uc_health_element_16_24: { untested: "not an official count, and it gives no source, date or area" },
+  uc_health_pip_overlap: { untested: "not official counts, and they give no source, date or area" },
   young_pip_recipients: {
     against: { label: "DWP's 2025 count", published: 407505, estimate: 406919 },
   },
-  young_benefits_spend: { untested: "a sum of two figures whose gaps offset" },
+  young_benefits_spend: { untested: "the review's figures give no area" },
   pip_spend_16_24: { untested: "the review's figure gives no area" },
   uc_health_spend_16_24: { untested: "the review's figure gives no area" },
   employer_nics_under_25: { untested: "another model's estimate, not an official count" },
@@ -292,6 +297,16 @@ export function toleranceWords(verdict) {
   if (!verdict.tested) return `No ${TOLERANCE_PCT}% test`;
   return `${verdict.within ? "Within" : "Outside"} ${TOLERANCE_PCT}% of ${verdict.against}`;
 }
+
+/**
+ * Why a published figure has no PolicyEngine figure beside it, by row id,
+ * where we do estimate something like it elsewhere: said in its card's
+ * More info.
+ */
+export const UNPAIRED_REASONS = Object.freeze({
+  neet_16_24:
+    "Our NEET count on the Young people tab is income-based (no earnings, not in full-time education), not the Labour Force Survey measure, and ONS publishes NEET estimates by quarter only, so there is no figure on the same basis to set beside this one.",
+});
 
 /** The icon of a figure with none of its own. */
 export const BENCHMARK_ICON = "fileText";
@@ -554,12 +569,13 @@ export function moreInfo(row, { estimate = null, runLabel = "" } = {}) {
       ? `${toleranceWords(verdict)}: ours ${Math.round(Math.abs(verdict.gapPct) * 10) / 10}% ${verdict.gapPct < 0 ? "lower" : "higher"}.`
       : `Not tested against the ${TOLERANCE_PCT}% tolerance: ${verdict.reason}.`;
   const why = [basis && `Not like for like: ${basis}.`, sentence(row.estimate?.note), test].filter(Boolean).join(" ");
+  const unpaired = !row.estimate && Object.hasOwn(UNPAIRED_REASONS, row.id) ? UNPAIRED_REASONS[row.id] : "";
   const how = [];
   if (row.estimate?.fixed) how.push(`${row.estimate.label || "PolicyEngine"}: ${row.estimate.fixed}. ${sentence(row.estimate.basis)}`.trim());
   else if (row.estimate && estimate) how.push(`${row.estimate.label || "PolicyEngine"}: ${estimate}${runLabel ? ` (${runLabel})` : ""}.`);
   if (row.saving) how.push(`${row.saving.label}: ${row.saving.value}. ${sentence(row.saving.basis)}`.trim());
   return {
-    lead: why ? { title: "Why they differ", body: why } : undefined,
+    lead: why ? { title: "Why they differ", body: why } : unpaired ? { title: "Why no PolicyEngine figure", body: unpaired } : undefined,
     shows: row.value ? `Published: ${row.value}. ${sentence(row.basis)}`.trim() : sentence(row.basis) || null,
     how,
     // The card's foot carries the source chip; More info does not repeat it

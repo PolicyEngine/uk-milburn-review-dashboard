@@ -54,7 +54,7 @@ export const MILBURN_SELECTOR_SUMMARIES = Object.freeze({
   milburn_report_employer_nics_threshold_glide_path: "Assumed steps: £6,000 in 2027-28, rising £1,000 a year to £10,000",
   milburn_report_youth_allowance_work_allowance: "Under-25 UC claims get the work allowance claims with a child or health condition get today; the amount is our assumption, from April 2029",
   milburn_report_youth_allowance_work_allowance_15h: "15 hours a week at the minimum wage, about £900 a month in 2029-30 (our assumption)",
-  milburn_report_employer_nics_threshold_all_sectors: "The £10,000 end state in every sector, an upper bound (para 270 says to extend it to sectors with the most potential), from April 2027 (assumed)",
+  milburn_report_employer_nics_threshold_all_sectors: "The £10,000 end state in every sector, an upper bound (para 270 says to consider extending it), from April 2027 (assumed)",
   milburn_report_youth_allowance_combined: "The higher rate and the work allowance run together, our design, from April 2029",
   milburn_report_package_with_youth_allowance: "Health element and PIP removal plus both Youth Allowance changes, our design, from April 2029",
   pip_halved_under_25: "Half of PIP kept at 18 to 24, a stand-in for the new allowance",
