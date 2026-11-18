@@ -47,7 +47,7 @@ describe("with the final report published", () => {
 
   it("labels the comparators by their start, and keeps the other groups as they were", () => {
     const labels = MILBURN_GROUPS.filter((group) => !group.hidden).map((group) => group.label);
-    expect(labels).toEqual(["The report's measures", "Comparators (from April 2027)"]);
+    expect(labels).toEqual(["Measures from the report, and our variants", "Comparators (from April 2027)"]);
     expect(MILBURN_GROUPS.find((group) => group.id === COMPARATORS_GROUP).label).toBe(REPORT_COPY.after.comparatorsLabel);
   });
 

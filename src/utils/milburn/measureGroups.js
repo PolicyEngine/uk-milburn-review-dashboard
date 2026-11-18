@@ -79,7 +79,7 @@ export const MILBURN_GROUPS = Object.freeze([
   // savings start (annex section 1); first, so the page opens on them
   {
     id: REPORT_GROUP,
-    label: "The report's measures",
+    label: "Measures from the report, and our variants",
     ids: [
       "milburn_report_package",
       "milburn_report_package_phased",

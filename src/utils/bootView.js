@@ -21,12 +21,14 @@ export const BOOT_SUBS = Object.freeze({
 });
 // Old sub-tab names that now open another (App.jsx oldAgeSubGroup)
 const SUB_ALIASES = Object.freeze({ young: "age", pensioners: "age" });
+// ?tab=measures, the Measures tab's label, is the policies tab (App.jsx VIEW_ALIASES)
+const TAB_ALIASES = Object.freeze({ measures: "policies" });
 
 /** "tab:sub" (or "tab" for a view without sub-tabs) for an address. */
 export function bootView({ search, hash }) {
   const params = new URLSearchParams(search);
   if (hash === "#young-people") return "dashboard:age";
-  const asked = params.get("tab");
+  const asked = TAB_ALIASES[params.get("tab")] ?? params.get("tab");
   const tab = BOOT_TABS.includes(asked) ? asked : "dashboard";
   const subs = BOOT_SUBS[tab];
   if (!subs) return tab;
@@ -38,10 +40,10 @@ export function bootView({ search, hash }) {
 /** The inline script: marks <html data-boot-view> from the address. */
 export const BOOT_VIEW_SCRIPT =
   "(function(){try{" +
-  `var T=${JSON.stringify(BOOT_TABS)},S=${JSON.stringify(BOOT_SUBS)},A=${JSON.stringify(SUB_ALIASES)};` +
+  `var T=${JSON.stringify(BOOT_TABS)},S=${JSON.stringify(BOOT_SUBS)},A=${JSON.stringify(SUB_ALIASES)},B=${JSON.stringify(TAB_ALIASES)};` +
   "var l=window.location,p=new URLSearchParams(l.search),v;" +
   'if(l.hash==="#young-people")v="dashboard:age";else{' +
-  'var t=T.indexOf(p.get("tab"))>=0?p.get("tab"):"dashboard",s=S[t];' +
+  'var q=B[p.get("tab")]||p.get("tab"),t=T.indexOf(q)>=0?q:"dashboard",s=S[t];' +
   'if(!s)v=t;else{var r=p.get("sub"),u=A[r]||r;v=t+":"+(s.indexOf(u)>=0?u:s[0]);}}' +
   'document.documentElement.setAttribute("data-boot-view",v);' +
   "}catch(e){}})();";

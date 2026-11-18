@@ -99,12 +99,11 @@ export const signed = (value) => {
   if (rounded === 0) return "£0";
   return `${rounded > 0 ? "+" : "−"}£${Math.abs(rounded).toLocaleString("en-GB")}`;
 };
-/** "about £120": to the nearest £10 above £50, else to the pound. */
-export const about = (value) => {
-  const size = Math.abs(value);
-  const rounded = size >= 50 ? Math.round(size / 10) * 10 : Math.round(size);
-  return `about £${rounded.toLocaleString("en-GB")}`;
-};
+/**
+ * "about £1,005": to the pound, as the other cards give the same average
+ * (NEET young people's −£1,005), so one figure never reads two ways.
+ */
+export const about = (value) => `about £${Math.round(Math.abs(value)).toLocaleString("en-GB")}`;
 
 /**
  * The selected year's shading, and each unpublished year's grey band with

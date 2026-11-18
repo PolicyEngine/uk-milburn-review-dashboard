@@ -246,8 +246,8 @@ EXAMPLES = (
         "description": (
             "Renting alone; 15 hours a week at the minimum wage in retail "
             "(the report's example, para 270); on Universal Credit. In "
-            "2029-30 that pays £10,786, above the £10,000 threshold, so "
-            "employer NI is reduced, not removed."
+            "2029-30 that pays about £10,800 (£13.85 an hour), above the "
+            "£10,000 threshold, so employer NI is reduced, not removed."
         ),
         "icon": "briefcase",
         "household": {

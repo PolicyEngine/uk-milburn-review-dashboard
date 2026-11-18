@@ -93,6 +93,32 @@ const SHARES_DESCRIPTION =
 const sharesSingleDescription = ([first, last]) =>
   `Share of people who gain or lose (a change over 0.01%), at each age from ${first} to ${last >= SINGLE_AGE_TOP ? "90 and over" : last}.`;
 
+/** Said on an age group whose average the file withholds: never drawn as zero or left blank. */
+export const WITHHELD_BAND_TEXT = "Withheld";
+
+/** The mark on a withheld age group: the word, at zero, where its bar would be. */
+function WithheldMark({ cx, cy }) {
+  if (!Number.isFinite(cx) || !Number.isFinite(cy)) return null;
+  return (
+    <text x={cx} y={cy - 6} textAnchor="middle" style={{ ...TICK_STYLE, fill: CHART_COLOURS.text }} data-withheld-band="">
+      {WITHHELD_BAND_TEXT}
+    </text>
+  );
+}
+
+/**
+ * Whether an age group's point is withheld: nothing drawn (no net, no
+ * part) while a selected run, or the package's own, has a row for it whose
+ * average the file withholds (null under the disclosure floor).
+ */
+export function withheldBand(point, rows, runIds, year, seriesKeys) {
+  if (point.netChange !== null && point.netChange !== undefined) return false;
+  if (seriesKeys.some((key) => Number.isFinite(point[key]) && point[key] !== 0)) return false;
+  return (rows ?? []).some(
+    (row) => runIds.includes(row.reform_id) && row.year === Number(year) && row.age_band === point.band && !Number.isFinite(row.mean_change),
+  );
+}
+
 /** The two views of "Average change by age" (and Pensioners' Gains and losses). */
 export const AGE_VIEWS = [
   { value: "band", label: "By age group" },
@@ -364,7 +390,12 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
   // Each policy's part is offered when some band keeps the parts
   const partsAvailable = fromPackage && bandData.some((point) => point.partsShown);
   const byPolicy = partsAvailable && packageView === "policy";
-  const data = fromPackage && !byPolicy ? bandData.map((point) => packageOnly(point, policies)) : bandData;
+  const unmarked = fromPackage && !byPolicy ? bandData.map((point) => packageOnly(point, policies)) : bandData;
+  // A withheld age group carries a mark at zero, labelled "Withheld"
+  const withheldRuns = [...selectedPolicies, ...(packageRun ? [packageRun] : [])];
+  const data = unmarked.map((point) =>
+    withheldBand(point, rows, withheldRuns, selectedYear, ALL_POLICY_NAMES) ? { ...point, withheldMark: 0, withheld: true } : point,
+  );
   const singleData = singleAgeSelection(singleAgeBars(rows, policies, selectedPolicies, selectedYear), {
     rows,
     policies,
@@ -675,6 +706,8 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
                 {...chartMotion()}
                 hide={activeNames.length <= 1 && !netOnly}
               />
+              {/* A withheld age group: the word at zero, not an empty slot */}
+              <Scatter dataKey="withheldMark" shape={<WithheldMark />} legendType="none" tooltipType="none" isAnimationActive={false} />
               <Customized component={<ChartUnitLabel text={UNIT} />} />
             </ComposedChart>
           </ResponsiveContainer>
@@ -914,6 +947,7 @@ export function SharesCard({ rows, policies, selectedPolicies, selectedYear, nar
           // The one run's groups, as the per-measure view: names, a 100% bar
           // and the ▲/▼ shares in two fixed columns
           <MeasureSharesChart
+            byGroup
             rows={shares.groups
               .filter((group) => !group.suppressed || group.withheld)
               .map((group) => ({ id: group.key, name: group.label, row: group.row ?? {}, withheld: group.withheld }))}

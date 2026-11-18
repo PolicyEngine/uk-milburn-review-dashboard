@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render as renderReact, screen, waitFor, within } from "@testing-library/react";
-import YoungPeopleSection, { SharesCard, YOUNG_PEOPLE_ANCHOR, bandAxis } from "./YoungPeopleSection";
+import YoungPeopleSection, { SharesCard, YOUNG_PEOPLE_ANCHOR, bandAxis, withheldBand } from "./YoungPeopleSection";
 import {
   meanChangeByBand,
   meanChangeBySingleAge,
@@ -100,6 +100,23 @@ beforeEach(() => {
   );
 });
 afterEach(() => vi.unstubAllGlobals());
+
+describe("a withheld age group on Average change by age", () => {
+  // As milburn_report_youth_allowance_independent in 2029-30: 65+ and all ages withheld, 50-64 a true zero
+  const rows = [
+    { reform_id: "ya", year: 2029, age_band: "65+", mean_change: null, sample_size: 44376 },
+    { reform_id: "ya", year: 2029, age_band: "50-64", mean_change: 0, sample_size: 39985 },
+  ];
+  it("is marked where the file withholds its average, never where it is a true zero", () => {
+    expect(withheldBand({ band: "65+", netChange: null, "measure:ya": null }, rows, ["ya"], 2029, ["measure:ya"])).toBe(true);
+    expect(withheldBand({ band: "50-64", netChange: 0, "measure:ya": 0 }, rows, ["ya"], 2029, ["measure:ya"])).toBe(false);
+    // Another run's withheld row, or another year's, does not mark it
+    expect(withheldBand({ band: "65+", netChange: null }, rows, ["other"], 2029, [])).toBe(false);
+    expect(withheldBand({ band: "65+", netChange: null }, rows, ["ya"], 2030, [])).toBe(false);
+    // A part still drawn: no mark over it
+    expect(withheldBand({ band: "65+", netChange: null, "measure:b": 12 }, rows, ["ya"], 2029, ["measure:b"])).toBe(false);
+  });
+});
 
 describe("Average change by age's axis", () => {
   const policies = [{ id: "a" }, { id: "b" }];

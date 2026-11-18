@@ -143,6 +143,7 @@ describe("the view tabs", () => {
       ["/?tab=outlook", "Impact"],
       ["/?tab=living", "Impact"],
       ["/?tab=policies", "Measures"],
+      ["/?tab=measures", "Measures"],
       ["/?tab=dashboard", "Impact"],
       ["/?tab=methodology", "Methodology"],
       ["/?tab=nonsense", "Impact"],
@@ -153,6 +154,7 @@ describe("the view tabs", () => {
       unmount();
     }
     expect(viewFromLocation({ search: "?tab=personal", hash: "" })).toBe("dashboard");
+    expect(viewFromLocation({ search: "?tab=measures", hash: "" })).toBe("policies");
     expect(viewFromLocation({ search: "?tab=household", hash: "" })).toBe("household");
     expect(viewFromLocation({ search: "?tab=living", hash: "#young-people" })).toBe("dashboard");
     expect(viewFromLocation({ search: "?tab=young", hash: "" })).toBe("dashboard");

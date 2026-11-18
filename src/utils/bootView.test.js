@@ -17,6 +17,7 @@ const CASES = [
   ["?sub=young", "", "dashboard:age"],
   ["?tab=dashboard&sub=pensioners", "", "dashboard:age"],
   ["?tab=household", "", "household"],
+  ["?tab=measures", "", "policies"],
   ["?tab=outlook&sub=forecast", "", "dashboard:age"],
   ["?tab=nonsense", "", "dashboard:age"],
   ["?policies=alpha", "#young-people", "dashboard:age"],

@@ -10,7 +10,7 @@ export const AGE_HOUSEHOLD_NOTE =
  * policy does not target (María, #6 item 4).
  */
 export const AGE_SHARES_NOTE =
-  "Each person carries their household's change, so groups the policy does not target move too: a parent living with a 20-year-old who loses PIP counts as worse off.";
+  "Each person carries their household's change, so groups the policy does not target move too: a parent living with a young person whose benefit changes counts as affected.";
 
 /**
  * A publisher's name as a chip or a list says it: the review's report, annex

@@ -130,8 +130,8 @@ export const POLICIES_INACTIVE = "Policy choices don't change this tab";
 // Old ?tab= values still opened by shared links, and the view each is now;
 // the address is rewritten to the new value. The Household calculator tab
 // was removed: its links open Impact. ?tab=household is now the Milburn
-// Household impact tab.
-const VIEW_ALIASES = { personal: "dashboard" };
+// Household impact tab. ?tab=measures, the tab's label, opens Measures.
+const VIEW_ALIASES = { personal: "dashboard", measures: "policies" };
 const viewKey = (tab) => VIEW_ALIASES[tab] ?? tab;
 
 // The view under the landing page, and the one an address with no ?tab=

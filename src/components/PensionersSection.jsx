@@ -743,6 +743,7 @@ export function PensionerSharesCard({ catalogue, rows, policies, selectedPolicie
           // The one run's groups, as the per-measure view: names, a 100% bar
           // and the ▲/▼ shares in two fixed columns
           <MeasureSharesChart
+            byGroup
             rows={shares.groups.filter((group) => !group.suppressed).map((group) => ({ id: group.key, name: group.label, row: group.row }))}
             groupLabel=""
             yearLabel={yearLabel}
