@@ -19,6 +19,7 @@ external API, which the artifact's frame blocks).
 """
 
 import fnmatch
+import json
 import os
 import re
 import shutil
@@ -49,6 +50,61 @@ def build():
     subprocess.run(["bunx", "next", "build"], cwd=ROOT, env=env, check=True)
 
 
+
+def rewrite_paths(text):
+    """The path rewrites for HTML and JS, as relativise applies them."""
+    text = re.sub(r"([\"'`(])/_next/", r"\1./_next/", text)
+    text = re.sub(r"([\"'`])/data/", r"\1./data/", text)
+    text = re.sub(r"([\"'`])/assets/", r"\1./assets/", text)
+    text = re.sub(r"([\"'`])/icon\.svg", r"\1./icon.svg", text)
+    text = text.replace("/_next/", "/nx/")
+    text = text.replace('indexOf("./nx/")', 'indexOf("/nx/")')
+    text = text.replace("contain './nx/'", "contain '/nx/'")
+    return text
+
+
+FLIGHT_PUSH = re.compile(r'<script>self\.__next_f\.push\(\[1,("(?:[^"\\]|\\.)*")\]\)</script>')
+
+
+def rewrite_flight(html):
+    """Rewrite paths inside Next's embedded page data, keeping every text
+    row's declared byte length true. Without this the rewrite shortens a
+    row (an inline script naming /_next/ paths, say), the reader runs past
+    its end and the page shows "This page couldn't load"."""
+    pushes = list(FLIGHT_PUSH.finditer(html))
+    if not pushes:
+        return html
+    data = "".join(json.loads(m.group(1)) for m in pushes)
+    raw = data.encode("utf-8")
+    out = []
+    i = 0
+    row = re.compile(rb"([0-9a-zA-Z]+):T([0-9a-f]+),")
+    while i < len(raw):
+        m = row.match(raw, i)
+        if m:
+            n = int(m.group(2), 16)
+            body = raw[m.end():m.end() + n].decode("utf-8")
+            new = rewrite_paths(body).encode("utf-8")
+            out.append(m.group(1) + b":T" + format(len(new), "x").encode() + b"," + new)
+            i = m.end() + n
+            continue
+        j = raw.find(b"\n", i)
+        j = len(raw) if j < 0 else j + 1
+        out.append(rewrite_paths(raw[i:j].decode("utf-8")).encode("utf-8"))
+        i = j
+    merged = b"".join(out).decode("utf-8")
+    first = pushes[0]
+    one = "<script>self.__next_f.push([1," + json.dumps(merged).replace("<", "\\u003c") + "])</script>"
+    parts = []
+    last = 0
+    for k, m in enumerate(pushes):
+        parts.append(html[last:m.start()])
+        if k == 0:
+            parts.append(one)
+        last = m.end()
+    parts.append(html[last:])
+    return "".join(parts)
+
 def relativise():
     """Every absolute path the export writes, made relative to its file."""
     for root, _, files in os.walk(OUT):
@@ -68,6 +124,11 @@ def relativise():
             path = os.path.join(root, name)
             with open(path, encoding="utf-8", errors="surrogateescape") as fh:
                 text = original = fh.read()
+            if name.endswith(".html"):
+                # Next embeds its page data as rows; a text row ("id:T<hex>,")
+                # declares its length in bytes, so rewrite those rows here,
+                # recomputing each length, before the plain rewrite below
+                text = rewrite_flight(text)
             if name.endswith(".css"):
                 # CSS sits in _next/static/chunks/; its fonts and images in _next/static/media/
                 text = text.replace("/_next/static/media/", "../media/")
