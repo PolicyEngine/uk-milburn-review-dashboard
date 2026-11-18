@@ -365,8 +365,8 @@ export default function BenchmarksTable() {
               <span>
                 Gap: the PolicyEngine estimate less the published figure, as a %
                 of the published figure, to the nearest whole per cent; given
-                only where the two count the same ages, area, year and measure.{" "}
-                {INDICATIVE_GAP_NOTE}
+                only where the two count the same ages, area, year and measure,
+                as far as the published figure states them. {INDICATIVE_GAP_NOTE}
               </span>
             </li>
             <li data-tolerance-rule="">

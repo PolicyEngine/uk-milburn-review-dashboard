@@ -510,8 +510,8 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
           <Topic id="method-benchmarks" title="Benchmarks" preview="Published figures · Sources · PolicyEngine estimates beside them">
             <p className="method-more">
               Published figures from the review, the ONS, DWP, HMRC, the Resolution Foundation and the IFS, each with its
-              basis, source and date. Where PolicyEngine has a figure for the same ages, area, year and measure (build
-              fcfac709 for 2025, money in cash terms), it sits beside it with the gap to the nearest whole per cent and a
+              basis, source and date. Where PolicyEngine has a figure for the same ages, area, year and measure, as far
+              as the published figure states them (build fcfac709 for 2025, money in cash terms), it sits beside it with the gap to the nearest whole per cent and a
               line on why the two differ; a pair that still differs in date or area says so and gives no gap.{" "}
               {INDICATIVE_GAP_NOTE} {TOLERANCE_RULE} Our savings from the
               measures are shown apart, never against published spending, and the review&rsquo;s own estimates, which

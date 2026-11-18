@@ -278,14 +278,16 @@ export function pipKnockOn(view) {
 
 /** What the sector does under the run chosen in the header. */
 export function sectorHint(runId) {
+  // By the shape of the run's id, not a list of runs (which runs exist
+  // comes from milburn_measures.json)
   const id = String(runId ?? "");
-  if (id === "milburn_report_employer_nics_threshold_all_sectors") {
+  if (/employer_nics_threshold_all_sectors$/.test(id)) {
     return "This run raises the employer threshold for 21 to 24-year-olds in every sector, so the sector does not change it.";
   }
-  if (id.startsWith("milburn_report_employer_nics_threshold")) {
+  if (/employer_nics_threshold/.test(id)) {
     return "This run raises the employer threshold for 21 to 24-year-olds in retail and hospitality only.";
   }
-  if (id === "employer_nics_zero_under_25") return "This run removes employer National Insurance for every under-25, in any sector.";
+  if (/employer_nics_zero/.test(id)) return "This run removes employer National Insurance for every under-25, in any sector.";
   return "Only the employer National Insurance runs use the sector; the policy chosen does not.";
 }
 

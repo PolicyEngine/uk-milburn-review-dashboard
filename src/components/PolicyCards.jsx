@@ -676,10 +676,11 @@ export function PolicyCard({ policy, onShowEffect, parameters: given }) {
  * their own, as cards of this kind (policies/UnmodelledMeasures.jsx).
  */
 function PolicyCards({ policies, selectedPolicies, onShowEffect, parameterTables }) {
-  const { localBuild } = useMeasureCatalogue();
+  const { localBuild, manifest } = useMeasureCatalogue();
   // policy_parameters.json holds the Budget measures' tables only: on the
-  // Milburn route (local build) nothing is shown from it, so it is not fetched
-  const tables = usePolicyParameters(parameterTables === undefined && localBuild ? null : parameterTables);
+  // Milburn route (local build) nothing is shown from it, so it is not
+  // fetched, nor while the catalogue (and so the route) is still loading
+  const tables = usePolicyParameters(parameterTables === undefined && (localBuild || !manifest) ? null : parameterTables);
   const shown = policies.filter((policy) => policy.displayable === true && selectedPolicies.includes(policy.id));
   // The Budget's Table 6.1 order; a measure with no row after, raises
   // first, then costs, then the rest, each in the catalogue's order

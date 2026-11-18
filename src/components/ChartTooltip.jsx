@@ -73,8 +73,8 @@ function ChartTooltip({
   const sections =
     grouped && rows.some((row) => bySeriesKey.has(row.key))
       ? [
-          ["Raise revenue", rows.filter((row) => row.direction === "revenue")],
-          ["Cost revenue", rows.filter((row) => row.direction === "cost")],
+          ["Saves the Exchequer", rows.filter((row) => row.direction === "revenue")],
+          ["Costs the Exchequer", rows.filter((row) => row.direction === "cost")],
           ["Other policies", rows.filter((row) => row.direction !== "revenue" && row.direction !== "cost")],
         ].filter(([, sectionRows]) => sectionRows.length > 0)
       : [[null, rows]];

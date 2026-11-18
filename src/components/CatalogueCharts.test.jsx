@@ -269,8 +269,8 @@ describe("published measure catalogue in population views", () => {
       const tile = row.querySelector(".mrl-icon");
       expect(tile.style.getPropertyValue("--mrl-colour")).toBe(measure.color);
     }
-    expect(screen.getAllByText("Raise revenue")).toHaveLength(2);
-    expect(screen.getAllByText("Cost revenue")).toHaveLength(2);
+    expect(screen.getAllByText("Saves the Exchequer")).toHaveLength(2);
+    expect(screen.getAllByText("Costs the Exchequer")).toHaveLength(2);
   });
 
   it("holds the age package shares when the combined run is withdrawn", async () => {
@@ -388,9 +388,9 @@ describe("measure chart keys", () => {
     const catalogue = catalogueFor(fixture);
     const { container } = render(withCatalogue(catalogue, <ChartTooltip active payload={catalogue.displayable.map((measure) => ({ dataKey: measure.seriesKey, name: "untrusted display label", value: 1 }))} format={String} />));
     const headings = [...container.querySelectorAll(".chart-tooltip-heading")].map((node) => node.textContent);
-    expect(headings).toEqual(["Raise revenue", "Other policies"]);
+    expect(headings).toEqual(["Saves the Exchequer", "Other policies"]);
     expect(screen.getByText(catalogue.byId.get(ALPHA).label)).toBeInTheDocument();
-    expect(screen.queryByText("Cost revenue")).not.toBeInTheDocument();
+    expect(screen.queryByText("Costs the Exchequer")).not.toBeInTheDocument();
   });
 });
 

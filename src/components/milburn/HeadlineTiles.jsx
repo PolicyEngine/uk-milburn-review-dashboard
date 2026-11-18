@@ -264,7 +264,8 @@ export function PovertyHeadline({ runId, selectedYear }) {
                       key={line.key}
                       icon={line.icon}
                       label={line.label}
-                      value={run.povertyPp[line.key] === null ? WITHHELD_LABEL : formatSignedPp(run.povertyPp[line.key])}
+                      // The narrow value column says "Withheld"; the notes give the label
+                      value={run.povertyPp[line.key] === null ? "Withheld" : formatSignedPp(run.povertyPp[line.key])}
                       width={barShare(run.povertyPp[line.key], values)}
                       tone={run.povertyPp[line.key] > 0 ? "is-loss" : "is-gain"}
                     />
@@ -292,6 +293,12 @@ export function PovertyHeadline({ runId, selectedYear }) {
           <TitleIcon name="calculator" bare size={14} />
           <span>{ROUNDING_NOTE}</span>
         </li>
+        {[...(run.withheld ?? [])].some((field) => /poverty/.test(field)) && (
+          <li data-withheld-note="">
+            <TitleIcon name="shield" bare size={14} />
+            <span>{WITHHELD_LABEL}: {WITHHELD_DETAIL.replace(/^Withheld: t/, "T")}</span>
+          </li>
+        )}
         {showRange && (
           <li data-range-note="">
             <TitleIcon name="layers" bare size={14} />

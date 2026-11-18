@@ -621,8 +621,8 @@ export function createGroupedLegend(items, areaWidth) {
   // A pixel of slack, as on screen
   const measureLabel = (text) => measureTextWidth(text, font) + 1;
   const groups = [
-    ["Raise revenue", items.filter((item) => item.group === "raise")],
-    ["Cost revenue", items.filter((item) => item.group === "cost")],
+    ["Saves the Exchequer", items.filter((item) => item.group === "raise")],
+    ["Costs the Exchequer", items.filter((item) => item.group === "cost")],
     ["Other policies", items.filter((item) => item.group === "other")],
   ].filter(([, groupItems]) => groupItems.length > 0);
   const rest = items.filter((item) => !item.group);

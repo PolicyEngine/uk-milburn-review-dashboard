@@ -17,8 +17,8 @@ export function legendGroups(items) {
     return [[null, items]];
   }
   return [
-    ["Raise revenue", items.filter((item) => item.direction !== "neutral" && item.raises)],
-    ["Cost revenue", items.filter((item) => item.direction !== "neutral" && !item.raises)],
+    ["Saves the Exchequer", items.filter((item) => item.direction !== "neutral" && item.raises)],
+    ["Costs the Exchequer", items.filter((item) => item.direction !== "neutral" && !item.raises)],
     ["Other policies", items.filter((item) => item.direction === "neutral")],
   ].filter(([, groupItems]) => groupItems.length > 0);
 }
