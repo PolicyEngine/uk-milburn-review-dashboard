@@ -7,11 +7,14 @@ arithmetic on the engine's 2027-28 parameters (policyengine-uk 2.177.7,
 OBR October 2026 forecast), whose values are written out here.
 """
 
+import json
 import warnings
+from pathlib import Path
 
 import pytest
 
 from uk_budget_data import local_build
+from uk_budget_data.budget_measures import milburn_design as design
 from uk_budget_data.forecast import forecast_parameters
 from uk_budget_data.models import DataConfig
 from uk_budget_data.personal_impact import household_simulations
@@ -55,19 +58,20 @@ def single(
     region="NORTH_WEST",
     new_claimant=None,
     pip=False,
+    year=YEAR,
 ):
     person = {
-        "age": {YEAR: age},
-        "employment_income": {YEAR: employment_income},
-        "uc_limited_capability_for_WRA": {YEAR: lcwra},
+        "age": {year: age},
+        "employment_income": {year: employment_income},
+        "uc_limited_capability_for_WRA": {year: lcwra},
     }
     if pip:
-        person["pip_dl_category"] = {YEAR: "STANDARD"}
-        person["pip_m_category"] = {YEAR: "ENHANCED"}
+        person["pip_dl_category"] = {year: "STANDARD"}
+        person["pip_m_category"] = {year: "ENHANCED"}
     benunit = {"members": ["p"]}
     if new_claimant is not None:
         benunit["uc_receives_new_claimant_health_element"] = {
-            YEAR: new_claimant
+            year: new_claimant
         }
     return {
         "people": {"p": person},
@@ -75,24 +79,25 @@ def single(
         "households": {
             "h": {
                 "members": ["p"],
-                "rent": {YEAR: rent},
-                "tenure_type": {YEAR: "RENT_PRIVATELY"},
-                "region": {YEAR: region},
+                "rent": {year: rent},
+                "tenure_type": {year: "RENT_PRIVATELY"},
+                "region": {year: region},
             }
         },
     }
 
 
-def change(reform_id, situation, variable="household_net_income"):
-    """(current law, measure) annual values of ``variable`` in 2027-28."""
+def change(reform_id, situation, variable="household_net_income", year=YEAR):
+    """(current law, measure) annual values of ``variable`` in ``year``
+    (2027-28 unless given)."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         baseline, reformed = household_simulations(
             situation, get_reform(reform_id), DataConfig()
         )
         return (
-            float(baseline.calculate(variable, YEAR).sum()),
-            float(reformed.calculate(variable, YEAR).sum()),
+            float(baseline.calculate(variable, year).sum()),
+            float(reformed.calculate(variable, year).sum()),
         )
 
 
@@ -322,13 +327,23 @@ def test_the_entry_to_work_scenarios():
     from uk_budget_data.milburn_scenarios import milburn_scenarios
 
     result = milburn_scenarios()
-    assert result["year"] == 2027
+    # 2029-30, the first year of the report's benefit changes
+    assert result["year"] == design.REPORT_START_YEAR == 2029
     assert [c["id"] for c in result["entry_cases"]] == ["h16", "h25"]
+    # The committed file is what the code writes
+    committed = json.loads(
+        (
+            Path(__file__).resolve().parents[1]
+            / "public/data/milburn_scenarios.json"
+        ).read_text()
+    )
+    assert committed["entry_cases"] == pytest.approx(result["entry_cases"])
     for case in result["entry_cases"]:
-        # The National Living Wage for 2027-28 (from age 21): £13.21.
-        assert case["hourly_wage"] == 13.21
+        # The National Living Wage for 2029-30 (from age 21), from the
+        # engine: above 2027-28's £13.21.
+        assert case["hourly_wage"] > 13.21
         assert case["annual_earnings"] == pytest.approx(
-            13.21 * case["hours"] * 52
+            case["hourly_wage"] * case["hours"] * 52
         )
         assert case["net_income_gain_current_law"] > 0
         assert case["exchequer_gain_current_law"] > 0
@@ -397,9 +412,9 @@ def test_under_22_removes_the_element_at_21_but_not_at_23():
     assert lost_23[0] == pytest.approx(lost_23[1], abs=0.01)
 
 
-def _with_dl(situation, category):
-    situation["people"]["p"]["pip_dl_category"] = {YEAR: category}
-    situation["people"]["p"]["pip_m_category"] = {YEAR: "NONE"}
+def _with_dl(situation, category, year=YEAR):
+    situation["people"]["p"]["pip_dl_category"] = {year: category}
+    situation["people"]["p"]["pip_m_category"] = {year: "NONE"}
     return situation
 
 

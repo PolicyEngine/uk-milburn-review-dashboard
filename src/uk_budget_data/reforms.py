@@ -2632,9 +2632,12 @@ def _get_reserved() -> dict[str, Reform]:
 def reset_reserved_reforms() -> None:
     """Forget the reserved measures, so the next lookup rebuilds their
     names and descriptions from the design constants (tests; a long-lived
-    process after a constant changed)."""
-    global _RESERVED_CACHE
+    process after a constant changed). Promoted ids are in the listed
+    registry too, so its caches go as well."""
+    global _RESERVED_CACHE, _REFORMS_CACHE, _REFORM_LOOKUP_CACHE
     _RESERVED_CACHE = None
+    _REFORMS_CACHE = None
+    _REFORM_LOOKUP_CACHE = None
 
 
 def get_reserved_reforms() -> list[Reform]:
