@@ -50,18 +50,40 @@ export function decileSentence(data, kind, later = null) {
   return later ? `${first}; ${later}.` : `${first}.`;
 }
 
+/**
+ * Who a card's sentence is about. The header picks one policy at a time and
+ * runs are never added up (María, #6 item 5), so one selected policy is
+ * named, in quotes, with a singular verb; with no name, or several
+ * selected, "the selected policies" as before.
+ *
+ * @param {Array<string>} [names] - The selected policies' names, as the selector shows them
+ * @returns {{text: string, plural: boolean, pronoun: string}}
+ */
+export function selectionSubject(names) {
+  const named = (names ?? []).filter(Boolean);
+  if (named.length === 1) return { text: `“${named[0]}”`, plural: false, pronoun: "it" };
+  return { text: "the selected policies", plural: true, pronoun: "they" };
+}
+
+/** A verb in the subject's number: "raise" for "the selected policies", "raises" for one. */
+export const verbFor = (subject, verb) => (subject.plural ? verb : `${verb}s`);
+
 /** The revenue chart's line for the selected year; null without a figure. */
-export function revenueSentence(net, yearLabel) {
+export function revenueSentence(net, yearLabel, subject = selectionSubject()) {
   if (net == null || !Number.isFinite(net)) return null;
   // The chart's own rounding (moneyFormat: £m to the nearest £5m under
   // £1bn, £bn to one decimal), in words, so text and tooltip agree
   const bn = formatBnOrM(Math.abs(net)).replace(/m$/, " million").replace(/bn$/, " billion");
+  const who = subject.text;
+  const v = (verb) => verbFor(subject, verb);
   // Exactly nothing (a measure not in force that year) is not "roughly balance"
-  if (Math.abs(net) < 0.0005) return `In ${yearLabel}, the selected policies change no revenue.`;
-  if (Math.abs(net) < 0.05) return `In ${yearLabel}, the selected policies roughly balance: they neither raise nor cost much revenue.`;
+  if (Math.abs(net) < 0.0005) return `In ${yearLabel}, ${who} ${v("change")} no revenue.`;
+  if (Math.abs(net) < 0.05) {
+    return `In ${yearLabel}, ${who} roughly ${v("balance")}: ${subject.pronoun} neither ${subject.plural ? "raise" : "raises"} nor ${subject.plural ? "cost" : "costs"} much revenue.`;
+  }
   return net > 0
-    ? `In ${yearLabel}, the selected policies raise ${bn} for the government.`
-    : `In ${yearLabel}, the selected policies cost the government ${bn}.`;
+    ? `In ${yearLabel}, ${who} ${v("raise")} ${bn} for the government.`
+    : `In ${yearLabel}, ${who} ${v("cost")} the government ${bn}.`;
 }
 
 // "Later years differ" (ideas issue, 27 October): a short pointer when a
@@ -202,9 +224,13 @@ const revenueRounded = (net) => (Math.abs(net) < 0.05 ? 0 : net);
  * @param {Array<{yearLabel: string, net: number|null}>} later - Later years, in order
  * @returns {string|null}
  */
-export function laterRevenueNote(net, later) {
+export function laterRevenueNote(net, later, subject = selectionSubject()) {
   if (net == null || !Number.isFinite(net)) return null;
   const points = (later ?? []).filter((point) => point.net != null && Number.isFinite(point.net));
   const turn = firstShownTurn({ net: revenueRounded(net) }, points, revenueRounded, CLEAR_REVENUE_CHANGE);
-  return turn ? `Later years differ: in ${turn.point.yearLabel}, the selected policies ${REVENUE_WORDS[turn.turns.net]}.` : null;
+  if (!turn) return null;
+  // One policy, named in the sentence before: "it raises revenue"
+  const [verb, rest] = REVENUE_WORDS[turn.turns.net].split(" ");
+  const who = subject.plural ? subject.text : subject.pronoun;
+  return `Later years differ: in ${turn.point.yearLabel}, ${who} ${verbFor(subject, verb)} ${rest}.`;
 }

@@ -818,8 +818,11 @@ export function fixedNoNegativeZero(value, decimals) {
  * in the year shown (an employer cost alone): "None of the selected
  * policies changes household incomes in 2027-28."
  */
-export const noHouseholdChange = (yearText) =>
-  `None of the selected policies changes household incomes in ${yearText}.`;
+// One policy selected (the Milburn page always): said of that one
+export const noHouseholdChange = (yearText, count = 2) =>
+  count === 1
+    ? `The selected policy changes no household's income in ${yearText}.`
+    : `None of the selected policies changes household incomes in ${yearText}.`;
 
 /** In place of a plot whose every cell is withheld: no wording on why. */
 export const noFigures = (yearText) => `No figures for this selection in ${yearText}.`;
@@ -832,7 +835,8 @@ export const noFigures = (yearText) => `No figures for this selection in ${yearT
  * this chart), is unavailable, never "no change".
  */
 export function emptyMeasuresNote({ noEffect, selectedPolicies, yearLabel }) {
+  const one = selectedPolicies.length === 1;
   return selectedPolicies.length > 0 && noEffect.length === selectedPolicies.length
-    ? noHouseholdChange(yearLabel)
-    : `Results are unavailable for the selected policies in ${yearLabel}.`;
+    ? noHouseholdChange(yearLabel, selectedPolicies.length)
+    : `Results are unavailable for the selected ${one ? "policy" : "policies"} in ${yearLabel}.`;
 }

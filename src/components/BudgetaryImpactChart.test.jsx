@@ -53,7 +53,7 @@ describe("BudgetaryImpactChart", () => {
     const { container } = render(
       <MeasureCatalogueProvider catalogue={catalogue}><BudgetaryImpactChart data={zero} selectedYear={YEAR} selectedPolicies={[ALPHA]} /></MeasureCatalogueProvider>,
     );
-    expect(screen.getByRole("status")).toHaveTextContent("None of the selected policies changes revenue in");
+    expect(screen.getByRole("status")).toHaveTextContent("The selected policy changes no revenue in");
     // Only the selection's reasons: an unselected measure is never named
     expect(screen.getByRole("status")).not.toHaveTextContent(catalogue.byId.get(BETA).name);
     expect(screen.queryByTestId("recharts-responsive-container")).not.toBeInTheDocument();
@@ -121,7 +121,8 @@ describe("BudgetaryImpactChart", () => {
       // (critic W1, round 3)
       expect(container).toHaveTextContent(/leaves out interactions between them\./);
       expect(container).not.toHaveTextContent(/difference between the baselines/);
-      expect(screen.getByRole("link", { name: "Policies added up" })).toHaveAttribute("href", "?tab=methodology#method-limitations");
+      // No link: Limitations says nothing of adding policies up (María, #6 item 5)
+      expect(screen.queryByRole("link", { name: "Policies added up" })).toBeNull();
     });
 
     it("is absent when the data starts at 2027-28", () => {
@@ -174,5 +175,12 @@ describe("what the revenue chart's About says of its net line", () => {
     expect(revenueInfo([{ year: 2027, netImpact: 0.7 }]).how[0]).toBe(
       "Each bar is one policy on its own against current law; the net line adds up the bars.",
     );
+  });
+
+  it("with one policy selected, says each year's one bar is its own run and nothing is added up (María, #6 item 5)", () => {
+    const info = revenueInfo([{ year: 2027, netImpact: 0.7 }], 1);
+    expect(info.how).toEqual([
+      "Each year's bar is the selected policy's own run against current law. Policies are run one at a time and never added together.",
+    ]);
   });
 });

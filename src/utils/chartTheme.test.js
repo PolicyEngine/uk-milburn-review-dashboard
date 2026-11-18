@@ -279,14 +279,18 @@ describe("barShape: one bar style", () => {
 describe("emptyMeasuresNote", () => {
   const yearLabel = "2031-32";
   it("says no policy changes incomes only when every selected policy has no effect", () => {
+    // One policy selected: said of that one, not "none of the selected policies"
     expect(emptyMeasuresNote({ noEffect: [{ id: "a" }], selectedPolicies: ["a"], yearLabel })).toBe(
+      "The selected policy changes no household's income in 2031-32.",
+    );
+    expect(emptyMeasuresNote({ noEffect: [{ id: "a" }, { id: "b" }], selectedPolicies: ["a", "b"], yearLabel })).toBe(
       "None of the selected policies changes household incomes in 2031-32.",
     );
   });
 
   it("says results are unavailable, never 'no change', when a selected policy is held back or has no row (an empty list is not no effect)", () => {
     expect(emptyMeasuresNote({ noEffect: [], selectedPolicies: ["a"], yearLabel })).toBe(
-      "Results are unavailable for the selected policies in 2031-32.",
+      "Results are unavailable for the selected policy in 2031-32.",
     );
     expect(emptyMeasuresNote({ noEffect: [{ id: "a" }], selectedPolicies: ["a", "b"], yearLabel })).toBe(
       "Results are unavailable for the selected policies in 2031-32.",

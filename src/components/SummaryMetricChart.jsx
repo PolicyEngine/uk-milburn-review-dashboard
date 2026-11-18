@@ -37,6 +37,7 @@ import { POVERTY_FIGURES_SHOWN } from "../utils/povertyFigures";
 import ChartMoreInfo from "./ChartMoreInfo";
 import { METHOD_ANCHORS } from "./methodology/anchors";
 import { shortNameOf } from "../utils/policyDetails";
+import { selectionSubject, verbFor } from "../utils/plainSentences";
 import MeasureEffectsView, { EFFECT_VIEWS, yearEffects } from "./MeasureEffectsView";
 
 // The dashboard's bar style: each bar rounds its end away from zero (chartTheme)
@@ -132,7 +133,7 @@ const POVERTY_LINES = {
   // policyengine-uk's in_relative_poverty_*: 60% of the median in the same
   // simulation, so under the policies the line is their own median's
   relative:
-    "relative poverty (below 60% of median income in the same year; the line moves with the policies' effect on the median)",
+    "relative poverty (below 60% of median income in the same year; the line moves with the policy's effect on the median)",
 };
 
 const HOUSING = { bhc: "before housing costs", ahc: "after housing costs" };
@@ -173,18 +174,25 @@ export function plainAmount(metric, value) {
  * people out of absolute poverty before housing costs, lowering the rate by
  * about 0.012 percentage points." Almost no change when it rounds to 0.00.
  */
-export function metricSentence(metric, yearText, value, count = null) {
+export function metricSentence(metric, yearText, value, count = null, who = selectionSubject()) {
   const amount = plainAmount(metric, value);
   const subject = subjectOf(metric);
-  const start = `In ${yearText} the selected policies`;
+  // One selected policy is named, with a singular verb (María, #6 item 5)
+  const start = `In ${yearText} ${who.text}`;
+  const v = (verb) => verbFor(who, verb);
   if (metric.line && count) {
-    const move = `${start} move ${count} ${value < 0 ? "out of" : "into"} ${metric.line}`;
+    const move = `${start} ${v("move")} ${count} ${value < 0 ? "out of" : "into"} ${metric.line}`;
     return amount
       ? `${move}, ${value < 0 ? "lowering" : "raising"} the rate by about ${amount}.`
       : `${move}, almost no change in the rate.`;
   }
-  if (!amount) return `${start} make almost no change to ${subject}.`;
-  return `${start} ${value < 0 ? "lower" : "raise"} ${subject} by about ${amount}.`;
+  if (!amount) return `${start} ${v("make")} almost no change to ${subject}.`;
+  return `${start} ${v(value < 0 ? "lower" : "raise")} ${subject} by about ${amount}.`;
+}
+
+/** "The selected policies do not change …" in the subject's number: "“X” does not change …". */
+export function noChangeFor(text, who = selectionSubject()) {
+  return who.plural ? text : String(text).replace(/^The selected policies do not/, `${who.text} does not`);
 }
 
 /** What the sentence names: "income inequality (the Gini coefficient)", "the poverty rate". */
@@ -209,7 +217,7 @@ export function povertyMetric({ basis, housing, group }) {
     description:
       `Change in the share of ${people} in ${basis === "absolute" ? "absolute poverty" : "relative poverty"} ` +
       `${HOUSING[housing]}, each year, in percentage points.` +
-      (basis === "relative" ? " The line is 60% of median income in the same year, so it moves with the policies' effect on the median." : "") +
+      (basis === "relative" ? " The line is 60% of median income in the same year, so it moves with the policy's effect on the median." : "") +
       (children ? " Children are dependent children as DWP counts them: under 16, or 16 to 19 in full-time non-advanced education." : ""),
     csvUnits: `percentage points; ${people} in households below ${POVERTY_LINES[basis]}, ${HOUSING[housing]}`,
     file: `${children ? "child-" : ""}poverty-rate-change-${basis}-${housing}`,
@@ -218,7 +226,7 @@ export function povertyMetric({ basis, housing, group }) {
     short: `Change in ${basis} ${children ? "child " : ""}poverty (${housing.toUpperCase()}), pp`,
     // What the long description adds, for About this chart
     detail:
-      (basis === "relative" ? "The relative line is 60% of median income in the same year, so it moves with the policies' effect on the median. " : "") +
+      (basis === "relative" ? "The relative line is 60% of median income in the same year, so it moves with the policy's effect on the median. " : "") +
       (children ? "Children are dependent children as DWP counts them: under 16, or 16 to 19 in full-time non-advanced education." : ""),
     // "the share of children in relative poverty after housing costs"
     phrase: `the share of ${people} in ${basis === "absolute" ? "absolute poverty" : "relative poverty"} ${HOUSING[housing]}`,
@@ -464,6 +472,10 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
   const { combinedId } = catalogue;
   const run = wholeSelectionRun(policies, selectedPolicies, combinedId);
   const { metric, controls } = useMeasureChoice(family, choiceRows(rows, run, selectedPolicies));
+  // The sentences name the one selected policy, as the selector does
+  const who = selectionSubject(
+    selectedPolicies.length === 1 ? [shortNameOf(catalogue.byId?.get(selectedPolicies[0]) ?? { id: selectedPolicies[0] })] : [],
+  );
   // Each measure on its own: the selected year (default) or year by year
   const [effectView, setEffectView] = useState("year");
   // People behind a poverty change (pp × the population), where the
@@ -574,9 +586,9 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
           <p className="chart-description">
             {selected?.value != null ? (
               Math.round(selected.value * 1e6) === 0 ? (
-                `In ${fiscalYearTick(selectedYear)} the selected policies do not change ${subjectOf(metric)}.`
+                `In ${fiscalYearTick(selectedYear)} ${who.text} ${who.plural ? "do" : "does"} not change ${subjectOf(metric)}.`
               ) : (
-                metricSentence(metric, fiscalYearTick(selectedYear), selected.value, selectedCount)
+                metricSentence(metric, fiscalYearTick(selectedYear), selected.value, selectedCount, who)
               )
             ) : byMeasure ? (
               (() => {
@@ -618,7 +630,7 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
           <MeasureEffectsView byMeasure={byMeasure} metric={metric} selectedYear={selectedYear} view={effectView} narrow={narrow} years={years} />
         ) : !run && !byMeasure ? (
           <div className="plot-empty" style={{ minHeight: height }} role="status">
-            <p>This chart covers none of the selected policies</p>
+            <p>{selectedPolicies.length === 1 ? "This chart does not cover the selected policy" : "This chart covers none of the selected policies"}</p>
           </div>
         ) : shown.length === 0 ? (
           // On Budget day a run (the combined one last) can be named
@@ -628,7 +640,7 @@ function SummaryMetricChart({ metric: family, rows, policies, selectedPolicies, 
           </div>
         ) : allZero ? (
           <div className="plot-empty" style={{ minHeight: height }} role="status">
-            <p>{metric.noChange}</p>
+            <p>{noChangeFor(metric.noChange, who)}</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={height}>

@@ -111,7 +111,7 @@ describe("the page's verified publication catalogue", () => {
     window.history.replaceState({}, "", `/?sub=finances&policies=${id}`);
     vi.stubGlobal("fetch", dashboardFixtureFetch());
     render(<App />);
-    expect(await screen.findByText("Some selected policies are unavailable")).toBeInTheDocument();
+    expect(await screen.findByText("The selected policy is unavailable")).toBeInTheDocument();
     expect(new URLSearchParams(window.location.search).get("policies")).toBe(id);
     expect(screen.queryByTestId("budget-figures")).toBeNull();
     expect(document.body).not.toHaveTextContent("£0");

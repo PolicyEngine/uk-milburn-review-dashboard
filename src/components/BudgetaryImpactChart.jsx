@@ -29,12 +29,12 @@ import {
 import { chartMotion, chartTransition } from "../utils/chartMotion";
 import TitleIcon from "./TitleIcon";
 import SelectedYearShade from "./SelectedYearShade";
-import { laterRevenueNote, revenueSentence } from "../utils/plainSentences";
+import { laterRevenueNote, revenueSentence, selectionSubject } from "../utils/plainSentences";
 import { formatBnOrM } from "../utils/moneyFormat";
 import { zeroReason } from "../utils/legendMembership";
 import ChartMoreInfo from "./ChartMoreInfo";
 import { METHOD_ANCHORS } from "./methodology/anchors";
-import { MethodLink } from "../utils/methodLink";
+import { shortNameOf } from "../utils/policyDetails";
 
 // A year not yet published gets a small grey tag just above the zero line,
 // so its empty band is never read as zero. The years' nets are not printed
@@ -135,14 +135,18 @@ const CHART_DESCRIPTION =
 // The net line is the selected policies' combined run when one is
 // published (budgetChartData's netFromPackage), else the bars' sum; with
 // the run, how far the two are apart in the years shown
-export function revenueInfo(data) {
+// One policy selected (the Milburn page always): one run, one bar a year,
+// nothing added up (María, #6 item 5)
+export function revenueInfo(data, selectedCount = 2) {
   const fromPackage = data.some((point) => point.netFromPackage);
   const gaps = data
     .filter((point) => point.netFromPackage && Number.isFinite(point.barsSum))
     .map((point) => Math.abs(point.netImpact - point.barsSum));
   const gapM = gaps.length ? Math.max(...gaps) * 1000 : null;
   return {
-    how: fromPackage
+    how: selectedCount <= 1
+      ? ["Each year's bar is the selected policy's own run against current law. Policies are run one at a time and never added together."]
+      : fromPackage
       ? [
           "Each bar is one policy on its own against current law; the net line is all the policies run together, so it captures the interactions between them.",
           gapM !== null &&
@@ -152,10 +156,7 @@ export function revenueInfo(data) {
         ].filter(Boolean)
       : [
           "Each bar is one policy on its own against current law; the net line adds up the bars.",
-          <>
-            So it leaves out interactions between them.{" "}
-            <MethodLink anchor={METHOD_ANCHORS.limitations}>Policies added up</MethodLink>{" "}explains this.
-          </>,
+          "So it leaves out interactions between them.",
         ],
     method: { anchor: METHOD_ANCHORS.publicFinances, label: "How we cost the policies" },
   };
@@ -175,6 +176,10 @@ function BudgetaryImpactChart({ data, selectedYear, selectedPolicies = [] }) {
     policyColors: POLICY_COLORS,
     bySeriesKey,
   } = catalogue;
+  // The sentence names the one selected policy, as the selector does
+  const subject = selectionSubject(
+    selectedPolicies.length === 1 ? [shortNameOf(catalogue.byId?.get(selectedPolicies[0]) ?? { id: selectedPolicies[0] })] : [],
+  );
 
   if (!data || data.length === 0) return null;
   if (!displayable.length) return <UnavailableNotice reason="Revenue figures are unavailable until approved results verify." />;
@@ -258,6 +263,7 @@ function BudgetaryImpactChart({ data, selectedYear, selectedPolicies = [] }) {
     data
       .filter((point) => point.year > selectedYear && !point.unpublished)
       .map((point) => ({ yearLabel: fiscalYearTick(point.year), net: point.netImpact })),
+    subject,
   );
   // One menu: the chart's data as CSV, and the chart as PNG or SVG.
   const download = {
@@ -278,7 +284,7 @@ function BudgetaryImpactChart({ data, selectedYear, selectedPolicies = [] }) {
           {/* One plain sentence for the selected year; what the chart
               measures is in About this chart */}
           <p className="chart-description">
-            {(noRevenue ? null : revenueSentence(data.find((point) => point.year === selectedYear)?.netImpact, fiscalYearTick(selectedYear))) ?? CHART_DESCRIPTION}
+            {(noRevenue ? null : revenueSentence(data.find((point) => point.year === selectedYear)?.netImpact, fiscalYearTick(selectedYear), subject)) ?? CHART_DESCRIPTION}
             {laterRevenue && <span className="later-years-note"> {laterRevenue}</span>}
           </p>
         </div>
@@ -289,7 +295,7 @@ function BudgetaryImpactChart({ data, selectedYear, selectedPolicies = [] }) {
         {noRevenue ? (
           <div className="plot-empty" style={{ minHeight: 240 }} role="status">
             <p>
-              None of the selected policies changes revenue in {yearSpan}.
+              {selectedPolicies.length === 1 ? "The selected policy changes no revenue" : "None of the selected policies changes revenue"} in {yearSpan}.
               {outOfYears.length > 0 && ` ${outOfYears.join("; ")}.`}
             </p>
           </div>
@@ -414,7 +420,7 @@ function BudgetaryImpactChart({ data, selectedYear, selectedPolicies = [] }) {
       <div className="chart-footer">
         <ChartMoreInfo
           year={selectedYear}
-          info={revenueInfo(data)}
+          info={revenueInfo(data, selectedPolicies.length)}
         />
       </div>
     </div>

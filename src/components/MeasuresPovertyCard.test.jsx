@@ -201,7 +201,8 @@ describe("the Poverty sub-tab's measures pair", () => {
     fireEvent.click(within(measures).getByRole("button", { name: "About this chart" }));
     expect(within(measures).getByText(/so the bars need not add up to it/)).toBeInTheDocument();
     // Why, linked to Limitations (critic W2, round 3)
-    expect(within(measures).getByRole("link", { name: "Policies added up" })).toHaveAttribute("href", "?tab=methodology#method-limitations");
+    // No link: Limitations says nothing of adding policies up (María, #6 item 5)
+    expect(within(measures).queryByRole("link", { name: "Policies added up" })).toBeNull();
     // The policy's own effect is said once, in the sentence, not again here
     expect(within(measures).queryByText("Each bar is one policy on its own.")).toBeNull();
     const about = measures.querySelector(".chart-more-info");

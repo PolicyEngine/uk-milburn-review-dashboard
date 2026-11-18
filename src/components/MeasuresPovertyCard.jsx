@@ -24,7 +24,6 @@ import ControlBar from "./ControlBar";
 import ChartMoreInfo from "./ChartMoreInfo";
 import NoBreakYear from "./NoBreakYear";
 import { METHOD_ANCHORS } from "./methodology/anchors";
-import { MethodLink } from "../utils/methodLink";
 import { FloatingTooltip, TooltipRows, useFloatingTooltip } from "./FloatingTooltip";
 import SummaryMetricChart, { SUMMARY_METRICS, hasColumn, metricValue, povertyMetric, usePovertyChoice } from "./SummaryMetricChart";
 import { useOutlook } from "./livingStandards/useOutlook";
@@ -319,12 +318,9 @@ export default function MeasuresPovertyCard({ rows, policies, selectedPolicies, 
               // (round 3); why the bars need not add up, linked (critic W2).
               // Only when the last bar is drawn: every offered policy
               // selected, with the combined run published (W6 G1)
-              totalStep && (
-                <>
-                  The last bar is all the selected policies modelled together, so the bars need not add up to it.{" "}
-                  <MethodLink anchor={METHOD_ANCHORS.limitations}>Policies added up</MethodLink> explains why.
-                </>
-              ),
+              // (the Limitations link is gone: that section says nothing
+              // of adding policies up, María #6 item 5)
+              totalStep && "The last bar is all the selected policies modelled together, so the bars need not add up to it.",
             ],
             caveats: [
               read.fellBack && (

@@ -10,12 +10,14 @@ import SummaryMetricChart, {
   metricByYear,
   metricSentence,
   metricValue,
+  noChangeFor,
   parsePovertyChoice,
   povertyMetric,
   sigFigs,
   tightAxis,
 } from "./SummaryMetricChart";
 import { CHART_COLOURS } from "../utils/chartTheme";
+import { selectionSubject } from "../utils/plainSentences";
 import { buildMeasureCatalogue, MeasureCatalogueProvider } from "../utils/measureCatalogue";
 
 // #185 on #104: the measures come from the catalogue, and its combined run
@@ -130,7 +132,7 @@ describe("SummaryMetricChart", () => {
         selectedYear={2027}
       />,
     );
-    expect(screen.getByRole("status")).toHaveTextContent("do not change the poverty rate");
+    expect(screen.getByRole("status")).toHaveTextContent("does not change the poverty rate");
   });
 });
 
@@ -270,6 +272,16 @@ describe("the card's sentence", () => {
     expect(metricSentence(top10, "2029-30", 0.004)).toBe("In 2029-30 the selected policies make almost no change to the top 10% income share.");
     expect(metricSentence(top10, "2029-30", 0.005)).toMatch(/raise the top 10% income share by about 0.005 percentage points/);
   });
+  it("names the one selected policy, with a singular verb (María, #6 item 5)", () => {
+    const one = selectionSubject(["PIP removed for 18 to 24-year-olds"]);
+    expect(metricSentence(povertyMetric(parsePovertyChoice("absolute-bhc-all")), "2029-30", 0.012, "about 4,200 people", one)).toBe(
+      "In 2029-30 “PIP removed for 18 to 24-year-olds” moves about 4,200 people into absolute poverty before housing costs, raising the rate by about 0.012 percentage points.",
+    );
+    expect(metricSentence(top10, "2029-30", 0.004, null, one)).toBe("In 2029-30 “PIP removed for 18 to 24-year-olds” makes almost no change to the top 10% income share.");
+    expect(noChangeFor(SUMMARY_METRICS.poverty.noChange, one)).toBe(
+      "“PIP removed for 18 to 24-year-olds” does not change the poverty rate in any year we show.",
+    );
+  });
 });
 
 describe("the inequality chart", () => {
@@ -289,7 +301,8 @@ describe("the inequality chart", () => {
       />,
     );
     expect(container.querySelector(".chart-description")).toHaveTextContent(
-      "In 2027-28 the selected policies lower income inequality (the Gini coefficient) by about 0.04%.",
+      // One policy selected: named, with a singular verb (María, #6 item 5)
+      /^In 2027-28 “[^”]+” lowers income inequality \(the Gini coefficient\) by about 0\.04%\.$/,
     );
     expect(container.querySelector(".chart-description strong")).toBeNull();
   });

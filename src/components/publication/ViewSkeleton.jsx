@@ -36,7 +36,7 @@ const SUB_TABS = SKELETON_SUB_TABS;
 // "map", "example" (Household calculator's example households) or "text"
 const LAYOUTS = {
   "dashboard:finances": [
-    { icon: "banknote", title: "Public finances", subtitle: "Net effect of the selected policies on government revenue and spending, by year.", cards: [["bars", "wide"], ["bars"], ["bars"]] },
+    { icon: "banknote", title: "Public finances", subtitle: "Net effect on revenue and spending, by year.", cards: [["bars", "wide"], ["bars"], ["bars"]] },
   ],
   "dashboard:age": [
     { icon: "usersRound", title: "How each age group's income changes", cards: [["lines", "wide"], ["bars"], ["bars"]] },
@@ -48,7 +48,7 @@ const LAYOUTS = {
     { icon: "scale", title: "Benchmarks", subtitle: "Published figures on young people, work and health-related benefits.", cards: [["text", "wide"]] },
   ],
   "dashboard:poverty": [
-    { icon: "lifebuoy", title: "How the policies change poverty", subtitle: "With the selected policies.", cards: [["bars"], ["bars"]] },
+    { icon: "lifebuoy", title: "How the selected policy changes poverty", subtitle: "With the selected policy.", cards: [["bars"], ["bars"]] },
   ],
   household: [
     { icon: "users", title: "Household impact", subtitle: "Young people in 2029-30 under current law and under the report's runs, by exact household calculation.", cards: [["text"], ["text"], ["text"]] },

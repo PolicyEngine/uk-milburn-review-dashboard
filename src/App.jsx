@@ -910,7 +910,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   // open one only.
   const unavailableIds = selectedPolicies.filter((id) => !catalogue.byId.get(id)?.displayable);
   const selectionUnavailable = unavailableIds.length ? {
-    reason: "Some selected policies are unavailable",
+    reason: selectedPolicies.length === 1 ? "The selected policy is unavailable" : "Some selected policies are unavailable",
     // One line inside the view: each selected measure and why it is out
     // (a withdrawn one never reaches here; it drops from the selection)
     detail: unavailableIds.map((id) => {
@@ -967,7 +967,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     <p className="milburn-header-hint" data-header-hint="">
       <TitleIcon name="layers" bare size={14} />
       <span>
-        Choose the <strong>policies</strong> and the <strong>year</strong> in the header above; the charts below follow your choice.
+        Choose the <strong>policy</strong> and the <strong>year</strong> in the header above; the charts below follow your choice.
       </span>
     </p>
   );
@@ -1027,8 +1027,8 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         <div className="results-container">
           <SectionHeading
             icon="lifebuoy"
-            title="How the policies change poverty"
-            subtitle="Change in poverty rates with the selected policies."
+            title="How the selected policy changes poverty"
+            subtitle="Change in poverty rates with the selected policy."
           />
           <PovertyHeadline runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} />
           {/* The change by year beside which measures move it */}

@@ -82,7 +82,7 @@ describe("the local build route's page", () => {
       expect(found).not.toBeNull();
       return found;
     });
-    expect(hint.textContent).toBe("Choose the policies and the year in the header above; the charts below follow your choice.");
+    expect(hint.textContent).toBe("Choose the policy and the year in the header above; the charts below follow your choice.");
     const line = document.querySelector("[data-static-line]");
     expect(line.textContent).toBe(`${STATIC_CAVEAT_LINE}: see Methodology`);
     expect(line.textContent).toBe("Static estimates with no replacement payments modelled: see Methodology");

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
-import { decileSentence, laterDecileNote, laterRevenueNote, revenueSentence } from "./plainSentences";
+import { decileSentence, laterDecileNote, laterRevenueNote, revenueSentence, selectionSubject } from "./plainSentences";
+import { MILBURN_DISPLAY_NAMES } from "./milburn/measureGroups";
 
 describe("plain card sentences", () => {
   const rows = (low, high) => [{ netChange: low }, { netChange: 0 }, { netChange: high }];
@@ -336,5 +337,37 @@ describe("the revenue sentence's rounding", () => {
     expect(revenueSentence(-0.6172, "2027-28")).toBe("In 2027-28, the selected policies cost the government £615 million.");
     expect(formatBnOrM(-0.6172)).toBe("−£615m");
     expect(revenueSentence(2.36, "2028-29")).toBe("In 2028-29, the selected policies raise £2.4 billion for the government.");
+  });
+});
+
+// One policy at a time, never stacked (María, #6 item 5): the sentence
+// names the selected policy, with a singular verb
+describe("the revenue sentence with one policy selected", () => {
+  const one = selectionSubject(["Work allowance for under-25s in work (illustrative)"]);
+
+  it("names it, in quotes, with a singular verb", () => {
+    expect(revenueSentence(-0.88, "2029-30", one)).toBe(
+      "In 2029-30, “Work allowance for under-25s in work (illustrative)” costs the government £880 million.",
+    );
+    expect(revenueSentence(3.1, "2029-30", one)).toBe(
+      "In 2029-30, “Work allowance for under-25s in work (illustrative)” raises £3.1 billion for the government.",
+    );
+    expect(revenueSentence(0, "2029-30", one)).toBe("In 2029-30, “Work allowance for under-25s in work (illustrative)” changes no revenue.");
+    expect(revenueSentence(0.02, "2029-30", one)).toBe(
+      "In 2029-30, “Work allowance for under-25s in work (illustrative)” roughly balances: it neither raises nor costs much revenue.",
+    );
+    expect(laterRevenueNote(-2, [{ yearLabel: "2031-32", net: 1.2 }], one)).toBe("Later years differ: in 2031-32, it raises revenue.");
+  });
+
+  it("never says 'the selected policies' for any run the selector offers", () => {
+    for (const name of Object.values(MILBURN_DISPLAY_NAMES)) {
+      const subject = selectionSubject([name]);
+      for (const net of [-1, 0, 0.02, 1]) expect(revenueSentence(net, "2029-30", subject)).not.toMatch(/selected policies|” (raise|cost|change) /);
+    }
+  });
+
+  it("keeps the plural for several policies, or none named", () => {
+    expect(selectionSubject(["a", "b"]).text).toBe("the selected policies");
+    expect(selectionSubject().plural).toBe(true);
   });
 });
