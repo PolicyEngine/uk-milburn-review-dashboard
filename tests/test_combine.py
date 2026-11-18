@@ -159,14 +159,18 @@ def test_members_without_their_own_baseline_use_the_configured_one():
 
 
 def test_the_registered_package_is_the_generic_combination_of_its_members():
-    """Differential: the combined candidate package carries exactly the
-    generic combiner's parameter changes and modifiers, in member order."""
+    """Differential: the combined package (milburn_package) carries exactly
+    the generic combiner's parameter changes and modifiers, in member
+    order."""
     members = [
         get_reform(key) for key in AUTUMN_BUDGET_2026_COMBINED_COMPONENTS
     ]
     sides = merged_changes(members, DataConfig())
     package = get_reform(AUTUMN_BUDGET_2026_COMBINED_ID)
-    assert package.parameter_changes == sides["reform"]["parameter_changes"]
+    assert package.id == "milburn_package"
+    assert (package.parameter_changes or {}) == sides["reform"][
+        "parameter_changes"
+    ]
     assert (package.baseline_parameter_changes or {}) == sides["baseline"][
         "parameter_changes"
     ]
@@ -174,12 +178,8 @@ def test_the_registered_package_is_the_generic_combination_of_its_members():
     # shows.
     assert [m.__name__ for m in sides["baseline"]["modifiers"]] == []
     assert [m.__name__ for m in sides["reform"]["modifiers"]] == [
-        "bus_fare_cap_2027",
-        "carers_allowance_earnings_taper",
-        "zero_vat_on_domestic_electricity",
-        "pump_vat_on_fuel_duty_deferral",
-        "household_energy_payment_2026",
-        "pension_tax_allowance",
+        "pip_removed_ages_18_to_24",
+        "uc_health_element_removed_under_25",
     ]
 
 

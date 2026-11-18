@@ -34,6 +34,15 @@ except ImportError:
     ci_shards = None
 
 CERTIFIED_DATA = "certified_data"
+# Whether the session was given the token, read before anything imports
+# uk_budget_data: on the Milburn engine that import removes the token from
+# the environment (local_build.drop_hugging_face_token), so reading it
+# later would treat a session that has it as one that does not. The main
+# process notes it in TOKEN_GIVEN_ENV, which pytest-xdist workers inherit.
+TOKEN_GIVEN_ENV = "CERTIFIED_DATA_TOKEN_GIVEN"
+if os.environ.get("HUGGING_FACE_TOKEN"):
+    os.environ[TOKEN_GIVEN_ENV] = "1"
+TOKEN_GIVEN = os.environ.get(TOKEN_GIVEN_ENV) == "1"
 SLOW = "slow"
 # Where the warnings the tests can let through are defined. Under
 # pytest-xdist the main process imports a worker's warning's module to
@@ -177,7 +186,7 @@ def pytest_collection_modifyitems(config, items):
 def pytest_runtest_setup(item):
     if CERTIFIED_DATA not in item.keywords:
         return
-    if os.environ.get("HUGGING_FACE_TOKEN"):
+    if TOKEN_GIVEN or os.environ.get("HUGGING_FACE_TOKEN"):
         return
     message = "HUGGING_FACE_TOKEN is not set; the certified dataset is needed"
     if certified_data_required():

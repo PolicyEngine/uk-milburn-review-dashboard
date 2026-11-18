@@ -319,8 +319,10 @@ class TestLegacyGeography:
         }
 
         DataPipeline(config=DataConfig(output_dir=output_dir))._save_all(data)
+        # The flat files carry the build record (local_build) beside them
         assert sorted(p.name for p in output_dir.iterdir()) == [
-            "budgetary_impact.csv"
+            "budgetary_impact.csv",
+            "model_build.json",
         ]
 
         private_dir = tmp_path / "private"
@@ -328,8 +330,10 @@ class TestLegacyGeography:
             output_dir=output_dir, legacy_geography_dir=private_dir
         )
         DataPipeline(config=config)._save_all(data)
+        # The flat files carry the build record (local_build) beside them
         assert sorted(p.name for p in output_dir.iterdir()) == [
-            "budgetary_impact.csv"
+            "budgetary_impact.csv",
+            "model_build.json",
         ]
         assert sorted(p.name for p in private_dir.iterdir()) == [
             "legacy_constituency.csv",

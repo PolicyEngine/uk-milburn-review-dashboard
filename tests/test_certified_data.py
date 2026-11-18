@@ -595,6 +595,8 @@ def run_isolated(pytester, monkeypatch, body, token, required, workers):
     pytester.makepyfile(body)
     for name, value in (
         ("HUGGING_FACE_TOKEN", token),
+        # The outer session's note that it had a token (tests/conftest.py)
+        ("CERTIFIED_DATA_TOKEN_GIVEN", None),
         ("REQUIRE_CERTIFIED_DATA", "1" if required else None),
     ):
         if value is None:
