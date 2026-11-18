@@ -33,7 +33,7 @@
     },
     {
       "id": "milburn_package",
-      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
       "saving_bn": {
         "2027": 4.486,
         "2028": 4.632,
@@ -45,7 +45,7 @@
       "young_people_in_losing_households": 580365,
       "share_of_16_24_in_losing_households_pct": 7.75,
       "average_loss_young_person_in_losing_household": 12962,
-      "average_loss_basis": "netted mean over all 16-24s divided by the share affected (file without the conditional mean; under 0.05% on the other side)",
+      "average_loss_basis": "mean change among 16-24s in losing households",
       "everyone_in_losing_households_pct": 2.02,
       "poverty_change_pp": {
         "rel_bhc": 0.366,
@@ -159,7 +159,7 @@
     },
     {
       "id": "milburn_package_phased",
-      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
       "saving_bn": {
         "2027": 2.009,
         "2028": 3.338,
@@ -171,7 +171,7 @@
       "young_people_in_losing_households": 468612,
       "share_of_16_24_in_losing_households_pct": 6.26,
       "average_loss_young_person_in_losing_household": 12834,
-      "average_loss_basis": "netted mean over all 16-24s divided by the share affected (file without the conditional mean; under 0.05% on the other side)",
+      "average_loss_basis": "mean change among 16-24s in losing households",
       "everyone_in_losing_households_pct": 1.71,
       "poverty_change_pp": {
         "rel_bhc": 0.228,
@@ -242,9 +242,9 @@
       "direction": "gain",
       "young_people_in_losing_households": 2856944,
       "share_of_16_24_in_losing_households_pct": 38.17,
-      "average_loss_young_person_in_losing_household": -555,
-      "average_loss_basis": "mean change among 16-24s in gaining households",
-      "everyone_in_losing_households_pct": 0.0,
+      "average_loss_young_person_in_losing_household": null,
+      "average_loss_basis": "not available: too few survey records in gaining households",
+      "everyone_in_losing_households_pct": null,
       "poverty_change_pp": {
         "rel_bhc": 0.067,
         "rel_ahc": 0.02,
@@ -470,8 +470,8 @@
       "direction": "loss",
       "young_people_in_losing_households": 403968,
       "share_of_16_24_in_losing_households_pct": 5.4,
-      "average_loss_young_person_in_losing_household": 4793,
-      "average_loss_basis": "netted mean over all 16-24s divided by the share affected (file without the conditional mean; under 0.05% on the other side)",
+      "average_loss_young_person_in_losing_household": null,
+      "average_loss_basis": "not available: too few survey records in losing households",
       "everyone_in_losing_households_pct": 1.26,
       "poverty_change_pp": {
         "rel_bhc": 0.058,
@@ -546,16 +546,16 @@
       "average_loss_basis": "mean change among 16-24s in gaining households",
       "everyone_in_losing_households_pct": 0.01,
       "poverty_change_pp": {
-        "rel_bhc": -0.001,
+        "rel_bhc": null,
         "rel_ahc": -0.008,
-        "abs_bhc": -0.001,
+        "abs_bhc": null,
         "abs_ahc": -0.01
       },
       "people_into_poverty_abs_ahc": -7164,
       "people_into_poverty_rel_ahc": -5442,
       "child_poverty_change_pp_rel_ahc": -0.015,
-      "people_into_poverty_abs_bhc": -598,
-      "people_into_poverty_rel_bhc": -350,
+      "people_into_poverty_abs_bhc": null,
+      "people_into_poverty_rel_bhc": null,
       "child_poverty_change_pp_rel_bhc": 0.0,
       "people_directly_affected": 0
     },
@@ -663,7 +663,7 @@
     },
     {
       "id": "pip_removed_16_to_24",
-      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.1",
+      "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
       "saving_bn": {
         "2027": 4.424,
         "2028": 4.582,
@@ -675,7 +675,7 @@
       "young_people_in_losing_households": 649235,
       "share_of_16_24_in_losing_households_pct": 8.67,
       "average_loss_young_person_in_losing_household": 11314,
-      "average_loss_basis": "netted mean over all 16-24s divided by the share affected (file without the conditional mean; under 0.05% on the other side)",
+      "average_loss_basis": "mean change among 16-24s in losing households",
       "everyone_in_losing_households_pct": 2.37,
       "poverty_change_pp": {
         "rel_bhc": 0.337,

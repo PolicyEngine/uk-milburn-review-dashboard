@@ -49,7 +49,23 @@
         "value": "233,407",
         "basis": "People aged 16 to 24 receiving the Universal Credit health element, Great Britain, 2025 (2025-26 rules), at the build's calibrated weights",
         "label": "PolicyEngine, build fcfac709, 2025",
-        "note": "Why ours is higher: claimants the data's UC take-up draw adds carry the element where they receive PIP, so 91% of young recipients in the build also get PIP, against 63% (110,000 of 176,000) in the Resolution Foundation's figures"
+        "note": "Why ours is higher: the data's UC take-up draw adds claimants who carry the element where they receive PIP, so the build counts about a third more young recipients than published"
+      }
+    },
+    {
+      "id": "uc_health_pip_overlap",
+      "figure": "Share of 16 to 24-year-olds receiving the Universal Credit health element who also receive PIP",
+      "value": "62.5%; 110,000 of 176,000",
+      "basis": "Resolution Foundation response to the review: 110,000 of the 176,000 people aged 16 to 24 receiving the health element of Universal Credit also receive PIP. It gives no source, date or area for the counts",
+      "source": "Resolution Foundation",
+      "url": "https://www.resolutionfoundation.org/press-releases/government-must-match-milburns-ambition-to-properly-invest-in-young-people/",
+      "date": "17 November 2026",
+      "press_report": false,
+      "policyengine_estimate": {
+        "value": "90.6%",
+        "basis": "People aged 16 to 24 receiving the Universal Credit health element who also receive PIP, Great Britain, 2025 (2025-26 rules), at the build's calibrated weights",
+        "label": "PolicyEngine, build fcfac709, 2025",
+        "note": "The overlap affects how many young people would lose both payments under the package. Our data's UC take-up draw adds health element claimants among PIP recipients, which raises the overlap"
       }
     },
     {
@@ -113,7 +129,8 @@
       "policyengine_estimate": {
         "run": "package",
         "metric": "young_people_worse_off",
-        "label": "People aged 16 to 24 in households made worse off by the combined package"
+        "label": "People aged 16 to 24 in households made worse off by the combined package",
+        "note": "Our data put 90.6% of 16 to 24-year-olds receiving the UC health element on PIP too, against 62.5% in the Resolution Foundation's figures, so more of these young people lose both payments in our data than the published counts imply"
       }
     },
     {
