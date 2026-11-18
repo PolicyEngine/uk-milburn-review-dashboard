@@ -100,8 +100,14 @@ from uk_budget_data.reforms import (
     MACHINE_GAMES_DUTY_ID,
     MILBURN_CENTRAL_COMPONENTS,
     MILBURN_CENTRAL_ID,
+    MILBURN_PACKAGE_COMPONENTS,
+    MILBURN_PACKAGE_ID,
     MILBURN_REPORT_PACKAGE_COMPONENTS,
     MILBURN_REPORT_PACKAGE_ID,
+    MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_COMPONENTS,
+    MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_ID,
+    MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_COMPONENTS,
+    MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_ID,
     TRADING_ALLOWANCE_FROM,
     UC_HEALTH_UNDER_25_NEW_CLAIMS_ID,
     WARM_HOME_DISCOUNT_ID,
@@ -826,10 +832,20 @@ NET_INCOME_PARTS = (
 
 
 # The combined packages the household calculation runs as their members
-# (measure_sides): the report's package is its two removals together.
+# (measure_sides): a package's own modifier is a closure
+# (publication.combine) no worker process can find, so it runs as its
+# members, merged as the publication merges them. The report's package is
+# its two removals together.
 PACKAGE_MEMBERS = {
     MILBURN_REPORT_PACKAGE_ID: MILBURN_REPORT_PACKAGE_COMPONENTS,
     MILBURN_CENTRAL_ID: MILBURN_CENTRAL_COMPONENTS,
+    MILBURN_PACKAGE_ID: MILBURN_PACKAGE_COMPONENTS,
+    MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_ID: (
+        MILBURN_REPORT_YOUTH_ALLOWANCE_COMBINED_COMPONENTS
+    ),
+    MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_ID: (
+        MILBURN_REPORT_PACKAGE_WITH_YOUTH_ALLOWANCE_COMPONENTS
+    ),
 }
 
 
@@ -841,6 +857,15 @@ def measure_ids() -> list[str]:
         for reform in get_autumn_budget_2026_reforms()
         if reform.id != AUTUMN_BUDGET_2026_COMBINED_ID
     ]
+
+
+def accepted_measure_ids() -> set[str]:
+    """The measures a request may name: every single measure
+    (``measure_ids``) and the packages run as their members
+    (``PACKAGE_MEMBERS``). Not ``measure_ids`` itself, which is "every
+    measure" to its callers, and a package with its members would count
+    them twice."""
+    return set(measure_ids()) | set(PACKAGE_MEMBERS)
 
 
 # The average UK household's domestic electricity spending, £ a year
@@ -1650,8 +1675,7 @@ def measure_sides(
     """
     if not reform_ids:
         raise ValueError("Choose at least one measure.")
-    known = set(measure_ids())
-    unknown = sorted(set(reform_ids) - known)
+    unknown = sorted(set(reform_ids) - accepted_measure_ids())
     if unknown:
         raise ValueError(
             f"Not a measure the calculation knows: {', '.join(unknown)}"

@@ -1,20 +1,22 @@
 """The Milburn review dashboard's household calculator (the Household
-impact tab): its four report runs, its eight stored examples, and how one
-household is run through them.
+impact tab): which of the published runs it covers, its eight stored
+examples, and how one household is run through a run.
 
+The tab follows the one run chosen in the header, like the other tabs.
 Each run is one request to the household API (``/api/household-impact``),
 through ``household_impact.calculate_household_impact`` as the API runs it,
-against current law for the same household:
+against current law for the same household, with the run's id as its
+policies: a combined run runs as its members together
+(``household_impact.PACKAGE_MEMBERS``), its parts each member on its own.
+Runs are never added to each other.
 
-- ``package``: the health element and PIP removals run together (our
-  design of the report's changes, with no replacement awards) (their own changes are its split by measure);
-- ``youth_allowance``, ``work_allowance`` and ``employer_ni``: separate
-  runs, never added to the package's figure or to each other.
-
-The page sends the same groups (src/utils/milburn/householdCalculator.js),
-the stored examples are precomputed from here
-(scripts/precompute_milburn_household_presets.py), and the Milburn Modal app
-warms them (modal_household.milburn_warm_jobs).
+A published run is covered unless ``NOT_COVERED`` gives the reason one
+household cannot show it. The page reads the coverage and the stored
+examples from the presets file
+(scripts/precompute_milburn_household_presets.py); a custom household asks
+the API's Milburn route for the chosen run (``/api/milburn-household``),
+and the Milburn Modal app warms every covered run
+(modal_household.milburn_warm_jobs).
 """
 
 from uk_budget_data import household_impact as hi
@@ -22,56 +24,125 @@ from uk_budget_data import household_impact as hi
 YEAR = 2029
 FISCAL_YEAR = hi.fiscal_year(YEAR)
 
-# (key, policies, name, kind): ``package`` is both removals together; the
-# others are separate runs. The illustrative work allowance's amount is our
-# assumption (the report gives none).
-RUNS = (
-    {
-        "key": "package",
-        "policies": ["milburn_report_uc_health", "milburn_report_pip"],
-        "name": "Health element and PIP removal (no replacement awards)",
-        "kind": "package",
-        "description": (
-            "The Universal Credit health element and PIP removed for "
-            "under-25s, run together. Its two parts are each removal on "
-            "its own."
-        ),
-    },
+# Who a run reaches by a random draw across the population: one
+# household's result would be that draw, not the policy
+_DRAW = (
+    "Who is reassessed each year is a random draw across the population, "
+    "so one household's result would be that draw, not the policy."
+)
+_SEVERE = (
+    "It keeps the health element for claimants with 24 or more PIP daily "
+    "living points, which the calculator does not ask for."
+)
+# The published runs one household cannot show, with the reason the page
+# gives (every other published run is covered)
+NOT_COVERED = {
+    "milburn_report_package_phased": _DRAW,
+    "milburn_package_phased": _DRAW,
+    "milburn_package_entry_25pct": (
+        "An illustrative move into work for a random quarter of affected "
+        "young people: one household's result would be that draw, not the "
+        "policy."
+    ),
+    "uc_health_element_removed_under_25_severe_kept": _SEVERE,
+    "milburn_package_central": _SEVERE,
+}
+
+# What a covered run's household figure needs said beside it
+NOTES = {
+    "milburn_report_employer_nics_threshold_glide_path": (
+        f"In {FISCAL_YEAR} the glide path's threshold is £8,000, its third "
+        "step (the end state, £10,000, is reached in 2031-32)."
+    ),
+    "milburn_report_employer_nics_threshold": (
+        "The threshold applies to 21 to 24-year-olds in retail and "
+        "hospitality; the model passes the employer's saving to pay."
+    ),
+    "milburn_report_employer_nics_threshold_all_sectors": (
+        "The threshold applies to 21 to 24-year-olds in every sector; the "
+        "model passes the employer's saving to pay."
+    ),
+    "employer_nics_zero_under_25": (
+        "The model passes the employer's saving to pay."
+    ),
+}
+
+# The four runs the tab showed before it followed the header, by their old
+# keys: a request that names no runs (a page built before) still gets them
+LEGACY_RUNS = (
+    {"key": "package", "policies": ["milburn_report_package"]},
     {
         "key": "youth_allowance",
         "policies": ["milburn_report_youth_allowance_independent"],
-        "name": "Higher Youth Allowance",
-        "kind": "separate",
-        "description": (
-            "A separate run: under-25 claims with a housing costs element "
-            "(the review's proxy for living independently) get the "
-            "standard allowance for those aged 25 and over."
-        ),
     },
     {
         "key": "work_allowance",
         "policies": ["milburn_report_youth_allowance_work_allowance"],
-        "name": "Work allowance (illustrative)",
-        "kind": "illustrative",
-        "description": (
-            "A separate, illustrative run: the report proposes a work "
-            "allowance for young people in work but gives no amount; the "
-            "amount here is our assumption, the current Universal Credit "
-            "work allowance."
-        ),
     },
     {
         "key": "employer_ni",
         "policies": ["milburn_report_employer_nics_threshold"],
-        "name": "Employer NI threshold",
-        "kind": "separate",
-        "description": (
-            "A separate run: employers pay National Insurance from £10,000 "
-            "a year, not £5,000, for 21 to 24-year-olds in retail and "
-            "hospitality. The model passes the saving to pay."
-        ),
     },
 )
+
+
+def published_run_ids() -> list[str]:
+    """Every published run, in the registry's order: the runs
+    ``milburn_measures.json`` lists as computable."""
+    from uk_budget_data.reforms import get_milburn_reforms
+
+    return [reform.id for reform in get_milburn_reforms()]
+
+
+def covered_run_ids() -> list[str]:
+    """The published runs the calculator covers."""
+    return [id_ for id_ in published_run_ids() if id_ not in NOT_COVERED]
+
+
+def coverage() -> list[dict]:
+    """Each published run, covered or not, as the presets file lists it:
+    its id, its published name and description, whether the calculator
+    covers it, and the reason when not (or a note when it needs one)."""
+    from uk_budget_data.reforms import get_reform
+
+    runs = []
+    for id_ in published_run_ids():
+        reform = get_reform(id_)
+        entry = {
+            "id": id_,
+            "name": reform.name,
+            "description": reform.description,
+        }
+        if id_ in NOT_COVERED:
+            entry.update(covered=False, reason=NOT_COVERED[id_])
+        else:
+            entry.update(covered=True, policies=[id_])
+            if id_ in NOTES:
+                entry["note"] = NOTES[id_]
+        runs.append(entry)
+    return runs
+
+
+def run_entries(run_ids) -> tuple:
+    """The runs to compute, by id (each run's id as its policies).
+
+    Raises:
+        ValueError: for an id that isn't a published run, or one the
+            calculator does not cover (with the reason).
+    """
+    published = set(published_run_ids())
+    entries = []
+    for id_ in dict.fromkeys(run_ids):
+        if id_ not in published:
+            raise ValueError(f"Not a published run: {id_}")
+        if id_ in NOT_COVERED:
+            raise ValueError(
+                f"The household calculator does not cover {id_}: "
+                f"{NOT_COVERED[id_]}"
+            )
+        entries.append({"key": id_, "policies": [id_]})
+    return tuple(entries)
+
 
 # Every stored example's answers start from these: 2029-30 pay, in the
 # North West, claiming Universal Credit, with no Council Tax (left out, as
@@ -234,9 +305,8 @@ ASSUMPTIONS = (
     "The report's replacement payments (such as its additional cost "
     "allowance) are not modelled, so nothing is paid in place of the health "
     "element or PIP.",
-    "Each run is compared with current law for the same household. The "
-    "Youth Allowance, work allowance and employer National Insurance runs "
-    "are separate: they are not added to the package or to each other.",
+    "Each run is compared with current law for the same household, one "
+    "run at a time: runs are never added to each other.",
     "Losing PIP daily living moves a single renter under 35 onto the "
     "shared accommodation rate of Local Housing Allowance, so the PIP part "
     "of a renter's change can include a fall in the Universal Credit "
@@ -260,7 +330,7 @@ BY_POLICY_METHOD = (
 )
 
 
-def run_requests(household: dict, runs=RUNS) -> list:
+def run_requests(household: dict, runs=LEGACY_RUNS) -> list:
     """Each run's request, as ``/api/household-impact`` validates it: the
     run's key and the validated request."""
     from uk_budget_data.api import HouseholdImpactRequest
@@ -281,7 +351,7 @@ def run_requests(household: dict, runs=RUNS) -> list:
     ]
 
 
-def run_household(household: dict, runs=RUNS, workers: int = 1) -> dict:
+def run_household(household: dict, runs=LEGACY_RUNS, workers: int = 1) -> dict:
     """Each run's answer for one household (the API's household answers),
     by run key: validated and computed as ``/api/household-impact`` does,
     with the split by measure and no earnings sweep.

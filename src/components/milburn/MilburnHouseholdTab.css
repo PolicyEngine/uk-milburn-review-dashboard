@@ -6,31 +6,6 @@
   align-items: flex-start;
 }
 
-/* Under each card's figure: what the figure is, then the separate runs */
-.milburn-card-lines {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-height: 3.6em;
-}
-
-.milburn-card-caption {
-  font-size: var(--fs-caption);
-  color: var(--c-axis-title);
-}
-
-.milburn-card-others {
-  font-size: var(--fs-caption);
-  line-height: 1.3;
-  font-weight: 600;
-  color: var(--c-gain-text);
-}
-
-.milburn-card-others.is-empty {
-  font-weight: 400;
-  color: var(--c-axis-title);
-}
-
 /* A choice switches at once: the shared tiles fade their background but
    not their text, so for a moment the new choice's white label sat on a
    white tile and the old one still looked chosen */
@@ -40,10 +15,6 @@
 
 .milburn-waterfall-note {
   margin: 8px 0 0;
-}
-
-.milburn-runs-note {
-  margin: 12px 0 0;
 }
 
 .milburn-household-about {

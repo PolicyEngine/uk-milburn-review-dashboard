@@ -23,7 +23,7 @@ Public repository. Figures are PolicyEngine UK static microsimulation estimates 
 | Impact: Public finances | Exchequer effect by year |
 | Impact: Moves into work (illustrative) | An assumed move into work (25% of non-working 18 to 24-year-olds with PIP or the health element, an assumption, not an estimate), set apart from the review's own estimate of 440,000 into sustained work by 2036 |
 | Impact: Benchmarks | Published figures (the review, its annex and data tables, the Resolution Foundation, ONS, IFS) beside our estimates on the same basis (ages, area, year and measure), with our savings shown apart |
-| Household impact (`?tab=household`) | One young person's household in 2029-30 under current law and under the report's runs: the package (with its health element and PIP parts) and, separately, the higher Youth Allowance, the work allowance (illustrative) and the employer NI threshold, with a breakdown by programme. Eight stored examples load from `public/data/milburn_household_presets.json` with no API; a custom household needs the household API |
+| Household impact (`?tab=household`) | One young person's household in 2029-30 under current law and under the one run chosen in the header, like the other tabs (runs are never added up): its change, a waterfall by part for a combined run, and a breakdown by programme. Runs the calculator cannot show for one household (the phased runs and the move into work, whose reach is a random draw, and the runs that keep the element for severe cases, which read PIP points the form does not ask for) are marked not covered, with the reason (`NOT_COVERED` in `src/uk_budget_data/milburn_household.py`). Eight stored examples, under every covered run, load from `public/data/milburn_household_presets.json` with no API; a custom household needs the household API |
 | Measures | Each modelled measure, and the report's proposals we cannot compute, with the reason |
 | Methodology | Data, model, what is modelled, limitations |
 
@@ -80,7 +80,7 @@ rsync -a --delete --exclude=income_curve.csv --exclude=household_scatter_binned.
 .venv/bin/uk-budget-data milburn-measures --output public/data/milburn_measures.json
 ```
 
-Household impact tab: the eight stored examples are precomputed through the household API's own code path (`src/uk_budget_data/milburn_household.py`, about five minutes, no Hugging Face token):
+Household impact tab: the eight stored examples are precomputed under every covered run through the household API's own code path (`src/uk_budget_data/milburn_household.py`, no Hugging Face token; pass `--jobs 8` to compute the examples at once):
 
 ```bash
 .venv/bin/python scripts/precompute_milburn_household_presets.py   # writes public/data/milburn_household_presets.json
@@ -88,7 +88,7 @@ HOUSEHOLD_WORKERS=2 PORT=8010 uv run uk-budget-api                  # a local AP
 NEXT_PUBLIC_HOUSEHOLD_API_URL=http://localhost:8010/api/household-impact bun run dev
 ```
 
-Custom households on a deployed page use the Modal app `uk-milburn-household` (at most 10 workers; see the docstring of `src/uk_budget_data/modal_household.py`). It keeps 2 Household workers and 1 Web container warm (about £2–3 a day), and the Milburn image sets `HOUSEHOLD_FAST_RUNS=1` (lazy parameter trees, one shared baseline per household). The tab sends all four runs in one request to `/api/milburn-household`, answered in about 10–20 s. Deploy from a clean checkout of pushed `main` (Modal uploads `src/uk_budget_data` from disk), and redeploy after any change to the household code:
+Custom households on a deployed page use the Modal app `uk-milburn-household` (at most 10 workers; see the docstring of `src/uk_budget_data/modal_household.py`). It keeps 2 Household workers and 1 Web container warm (about £2–3 a day), and the Milburn image sets `HOUSEHOLD_FAST_RUNS=1` (lazy parameter trees, one shared baseline per household). The tab sends the run chosen in the header to `/api/milburn-household` (`{"household": …, "runs": ["<run id>"]}`), and again when another run is chosen; a run it does not cover is refused (422) with the reason. A request with no `runs` gets the four runs the tab showed before, by their old keys. Deploy from a clean checkout of pushed `main` (Modal uploads `src/uk_budget_data` from disk), and redeploy after any change to the household code:
 
 ```bash
 env -u HUGGING_FACE_TOKEN HOUSEHOLD_MODAL_APP=uk-milburn-household HOUSEHOLD_MODAL_MIN_CONTAINERS=2 uv run --with modal modal deploy src/uk_budget_data/modal_household.py

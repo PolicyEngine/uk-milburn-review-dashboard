@@ -10,12 +10,12 @@ import {
   COLD_START_RETRY,
   DEFAULT_ANSWERS,
   PRESETS_FILE,
-  RUNS,
   answersFromHousehold,
   calculateHousehold,
   householdRequest,
   milburnHouseholdUrl,
   parsePresets,
+  runCoverage,
   withUcWithdrawn,
   storedExampleFor,
   summarise,
@@ -26,6 +26,12 @@ const FILE = JSON.parse(readFileSync(resolve(__dirname, "../../../public/data", 
 const PRESETS = parsePresets(FILE);
 const example = (id) => PRESETS.examples.find((item) => item.id === id);
 const API = "http://api.test/api/household-impact";
+// The runs these tests choose in the header
+const PACKAGE = "milburn_report_package";
+const YOUTH = "milburn_report_youth_allowance_independent";
+const EMPLOYER_NI = "milburn_report_employer_nics_threshold";
+const PHASED = "milburn_report_package_phased";
+const COVERED = FILE.runs.filter((run) => run.covered).map((run) => run.id);
 
 beforeEach(() => {
   resetSavedMilburnForm();
@@ -37,17 +43,26 @@ afterEach(() => {
 });
 
 describe("householdCalculator", () => {
-  it("reads all eight stored examples, each with every run", () => {
+  it("reads all eight stored examples, each with every covered run", () => {
     expect(PRESETS.examples).toHaveLength(8);
-    expect(FILE.runs.map((run) => run.key)).toEqual(RUNS.map((run) => run.key));
-    expect(PRESETS.runs.find((run) => run.key === "package").policies).toHaveLength(2);
+    expect(COVERED.length).toBeGreaterThan(10);
+    for (const item of PRESETS.examples) expect(Object.keys(item.results).sort()).toEqual([...COVERED].sort());
+    expect(runCoverage(PRESETS, PACKAGE)).toMatchObject({ covered: true, policies: [PACKAGE] });
+    // A run the calculator does not cover comes with its reason, and no figure
+    expect(runCoverage(PRESETS, PHASED)).toMatchObject({ covered: false, reason: expect.stringMatching(/random draw/) });
+    expect(PRESETS.examples.every((item) => !(PHASED in item.results))).toBe(true);
   });
 
-  it("drops an example missing a run", () => {
+  it("keeps the runs an example has, and says when no single run is chosen", () => {
     const broken = structuredClone(FILE);
-    delete broken.examples[0].results.employer_ni;
-    expect(parsePresets(broken).examples).toHaveLength(7);
+    delete broken.examples[0].results[EMPLOYER_NI];
+    const parsed = parsePresets(broken);
+    expect(parsed.examples).toHaveLength(8);
+    expect(parsed.examples[0].results).not.toHaveProperty(EMPLOYER_NI);
+    expect(parsed.examples[0].results).toHaveProperty(PACKAGE);
     expect(parsePresets({})).toBeNull();
+    expect(runCoverage(PRESETS, null)).toMatchObject({ covered: false, reason: expect.stringMatching(/Choose one policy/) });
+    expect(runCoverage(PRESETS, "not_a_run")).toMatchObject({ covered: false });
   });
 
   it("turns each example's answers into the form's and back unchanged", () => {
@@ -103,18 +118,20 @@ describe("householdCalculator", () => {
     expect(householdRequest({ ...DEFAULT_ANSWERS, tenure: "PARENTS" })).not.toHaveProperty("monthly_rent");
   });
 
-  it("summarises the package with its two parts and the separate runs", () => {
-    const summary = summarise(example("renting_health").results);
-    expect(Math.round(summary.netIncome)).toBe(22398);
-    const byKey = Object.fromEntries(summary.runs.map((run) => [run.key, run]));
-    expect(Math.round(byKey.package.change)).toBe(-13096);
-    expect(byKey.package.parts).toHaveLength(2);
-    expect(byKey.package.parts.every((part) => part.change < 0)).toBe(true);
-    expect(Math.round(byKey.youth_allowance.change)).toBe(1158);
+  it("summarises one run: the package with its two parts, a single run with none", () => {
+    const pkg = summarise(example("renting_health").results[PACKAGE]);
+    expect(Math.round(pkg.netIncome)).toBe(22398);
+    expect(Math.round(pkg.change)).toBe(-13096);
+    expect(pkg.parts).toHaveLength(2);
+    expect(pkg.parts.every((part) => part.change < 0)).toBe(true);
+    const youth = summarise(example("renting_health").results[YOUTH]);
+    expect(Math.round(youth.change)).toBe(1158);
+    expect(youth.parts).toEqual([]);
+    expect(summarise(undefined)).toBeNull();
   });
 
   it("adds Universal Credit's withdrawal so its lines add up to the award", () => {
-    const programmes = withUcWithdrawn(normaliseHouseholdImpact(example("retail_part_time").results.employer_ni).programmes);
+    const programmes = withUcWithdrawn(normaliseHouseholdImpact(example("retail_part_time").results[EMPLOYER_NI]).programmes);
     const uc = programmes.find((row) => row.id === "universal_credit");
     for (const side of ["before", "after"]) {
       expect(uc.children.reduce((total, child) => total + child[side], 0)).toBeCloseTo(uc[side], 1);
@@ -122,19 +139,18 @@ describe("householdCalculator", () => {
     expect(uc.children.at(-1).id).toBe("uc_withdrawn");
   });
 
-  it("posts one request for all four runs to the API's Milburn route", async () => {
+  it("posts one request for the chosen run to the API's Milburn route", async () => {
     vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
     const calls = [];
     const fetchImpl = vi.fn(async (url, init) => {
       calls.push({ url, body: JSON.parse(init.body) });
-      return { ok: true, json: async () => ({ year: 2029, runs: example("lone_parent").results }) };
+      return { ok: true, json: async () => ({ year: 2029, runs: { [YOUTH]: example("lone_parent").results[YOUTH] } }) };
     });
-    const results = await calculateHousehold(answersFromHousehold(example("lone_parent").household), { runs: PRESETS.runs, fetchImpl });
+    const result = await calculateHousehold(answersFromHousehold(example("lone_parent").household), { runId: YOUTH, fetchImpl });
     expect(fetchImpl).toHaveBeenCalledTimes(1);
     expect(calls[0].url).toBe("http://api.test/api/milburn-household");
-    expect(calls[0].body).toEqual({ household: example("lone_parent").household });
-    expect(Object.keys(results)).toEqual(RUNS.map((run) => run.key));
-    expect(results.package).toEqual(example("lone_parent").results.package);
+    expect(calls[0].body).toEqual({ household: example("lone_parent").household, runs: [YOUTH] });
+    expect(result).toEqual(example("lone_parent").results[YOUTH]);
   });
 
   it("names the Milburn route beside the household route", () => {
@@ -146,24 +162,24 @@ describe("householdCalculator", () => {
     expect(milburnHouseholdUrl()).toBeNull();
   });
 
-  it("asks again while the service starts up, for up to four minutes, and refuses an answer missing a run", async () => {
+  it("asks again while the service starts up, for up to four minutes, and refuses an answer missing the run", async () => {
     vi.useFakeTimers();
     try {
       vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
       const starting = { ok: false, status: 503, headers: new Headers({ "retry-after": "1" }), json: async () => ({ detail: "starting up", retry_after_seconds: 1 }) };
-      const answered = { ok: true, json: async () => ({ runs: example("lone_parent").results }) };
+      const answered = { ok: true, json: async () => ({ runs: { [PACKAGE]: example("lone_parent").results[PACKAGE] } }) };
       const fetchImpl = vi.fn().mockResolvedValueOnce(starting).mockResolvedValueOnce(answered);
       const onRetry = vi.fn();
-      const pending = calculateHousehold(answersFromHousehold(example("lone_parent").household), { runs: PRESETS.runs, fetchImpl, onRetry });
+      const pending = calculateHousehold(answersFromHousehold(example("lone_parent").household), { runId: PACKAGE, fetchImpl, onRetry });
       await vi.runAllTimersAsync();
-      const results = await pending;
+      const result = await pending;
       expect(fetchImpl).toHaveBeenCalledTimes(2);
       expect(onRetry).toHaveBeenCalledTimes(1);
-      expect(Object.keys(results)).toEqual(RUNS.map((run) => run.key));
+      expect(result).toEqual(example("lone_parent").results[PACKAGE]);
       expect(COLD_START_RETRY.budgetMs).toBeGreaterThanOrEqual(240_000);
-      const { package: _left, ...partial } = example("lone_parent").results;
-      const missing = vi.fn(async () => ({ ok: true, json: async () => ({ runs: partial }) }));
-      const refused = calculateHousehold(answersFromHousehold(example("lone_parent").household), { runs: PRESETS.runs, fetchImpl: missing }).catch((error) => error);
+      // Another run's answer is not the chosen run's
+      const missing = vi.fn(async () => ({ ok: true, json: async () => ({ runs: { [YOUTH]: example("lone_parent").results[YOUTH] } }) }));
+      const refused = calculateHousehold(answersFromHousehold(example("lone_parent").household), { runId: PACKAGE, fetchImpl: missing }).catch((error) => error);
       await vi.runAllTimersAsync();
       expect((await refused).kind).toBe("server");
     } finally {
@@ -177,46 +193,61 @@ const pick = (group, option) => fireEvent.click(within(screen.getByRole("radiogr
 
 describe("MilburnHouseholdTab", () => {
   it("shows the eight example cards and Your household, with no result until one is chosen", () => {
-    const { container } = render(<MilburnHouseholdTab presets={PRESETS} />);
+    const { container } = render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} />);
     const grid = within(screen.getByRole("group", { name: "Example households" }));
     expect(grid.getAllByRole("button")).toHaveLength(8);
     expect(screen.getByRole("button", { name: /^Your household/ })).toBeTruthy();
-    expect(container.querySelectorAll("[data-others]")).toHaveLength(8);
+    // No other run's figure on the cards: the chosen run's alone
+    expect(container.querySelectorAll("[data-others]")).toHaveLength(0);
     expect(screen.queryByRole("region", { name: "Results" })).toBeNull();
   });
 
-  it("shows a chosen example's stored result at once, with each run separately", () => {
+  it("shows a chosen example's stored result at once, under the chosen run only", () => {
     const fetchImpl = vi.fn();
-    const { container } = render(<MilburnHouseholdTab presets={PRESETS} fetchImpl={fetchImpl} />);
+    const { container } = render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} fetchImpl={fetchImpl} />);
     fireEvent.click(within(screen.getByRole("group", { name: "Example households" })).getByRole("button", { name: "22, renting alone" }));
     const results = example("renting_health").results;
     const tiles = within(screen.getByRole("region", { name: "Your result" }));
-    expect(tiles.getByText(formatSignedPounds(results.package.net_income.change))).toBeTruthy();
+    expect(tiles.getByText(formatSignedPounds(results[PACKAGE].net_income.change))).toBeTruthy();
     expect(tiles.getAllByText("£22,398").length).toBeGreaterThan(0);
-    // The waterfall's two removals
+    // The waterfall's two removals, each on its own
     const steps = [...container.querySelectorAll(".waterfall-row.is-step")].map((row) => row.dataset.row);
     expect(steps.sort()).toEqual(["milburn_report_pip", "milburn_report_uc_health"]);
-    // Each run's bar, named as the report's runs, with its own change
-    for (const run of RUNS) {
-      const bar = container.querySelector(`[data-policy="${run.key}"]`);
-      expect(bar.getAttribute("aria-label")).toContain(run.name);
-      expect(bar.getAttribute("aria-label")).toContain(formatSignedPounds(results[run.key].net_income.change).replace(/^\+?£0$/, "£0"));
-    }
-    expect(screen.getByRole("note").textContent).toMatch(/not\s+added to the health element and PIP removal or to each other/);
+    // No bars for other runs: runs are never shown side by side or added up
+    expect(container.querySelector("[data-policy]")).toBeNull();
+    expect(screen.queryByText(/Change in net income by run/)).toBeNull();
     expect(fetchImpl).not.toHaveBeenCalled();
     expect(new URLSearchParams(window.location.search).get("example")).toBe("renting_health");
   });
 
+  it("follows the run chosen in the header", () => {
+    const { container, rerender } = render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} />);
+    fireEvent.click(within(screen.getByRole("group", { name: "Example households" })).getByRole("button", { name: "22, renting alone" }));
+    rerender(<MilburnHouseholdTab runId={YOUTH} presets={PRESETS} />);
+    const tiles = within(screen.getByRole("region", { name: "Your result" }));
+    expect(tiles.getAllByText(formatSignedPounds(example("renting_health").results[YOUTH].net_income.change)).length).toBeGreaterThan(0);
+    expect(tiles.getByText(/from Higher Youth Allowance for under-25s living independently/)).toBeTruthy();
+    expect(container.querySelectorAll(".waterfall-row.is-step")).toHaveLength(1);
+    expect(screen.queryAllByText(formatSignedPounds(example("renting_health").results[PACKAGE].net_income.change))).toHaveLength(0);
+  });
+
+  it("shows a run it does not cover as not covered, with the reason and no figure", () => {
+    const { container } = render(<MilburnHouseholdTab runId={PHASED} presets={PRESETS} />);
+    const grid = within(screen.getByRole("group", { name: "Example households" }));
+    expect(grid.getAllByText("Not covered")).toHaveLength(8);
+    fireEvent.click(grid.getByRole("button", { name: "22, renting alone" }));
+    expect(screen.getByText("Not covered by the household calculator")).toBeTruthy();
+    expect(container.querySelector(`[data-not-covered="${PHASED}"]`).textContent).toMatch(/random draw/);
+    expect(screen.queryByRole("region", { name: "Your result" })).toBeNull();
+    expect(container.querySelector(".waterfall-row")).toBeNull();
+  });
+
   it("offers every result chart and table as CSV, PNG and SVG", () => {
-    const { container } = render(<MilburnHouseholdTab presets={PRESETS} />);
+    const { container } = render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} />);
     fireEvent.click(within(screen.getByRole("group", { name: "Example households" })).getByRole("button", { name: "22, renting alone" }));
     const menus = downloadMenus(container);
-    // The waterfall, the runs' bars and the breakdown table
-    expect(menus.map((menu) => menu.name)).toEqual([
-      "Download chart: How each removal changes your income",
-      expect.stringMatching(/^Download chart: Change in net income by run, 2029-30/),
-      expect.stringMatching(/^Download table: /),
-    ]);
+    // The waterfall and the breakdown table
+    expect(menus.map((menu) => menu.name)).toEqual(["Download chart: How each part changes your income", expect.stringMatching(/^Download table: /)]);
     for (const menu of menus) expect(menu.formats, menu.name).toEqual(STANDARD_FORMATS);
   });
 
@@ -243,32 +274,31 @@ describe("MilburnHouseholdTab", () => {
 
   it("opens an example from the address, by id or by number", () => {
     window.history.replaceState({}, "", "/?tab=household&example=retail_part_time");
-    const { unmount } = render(<MilburnHouseholdTab presets={PRESETS} />);
-    const change = example("retail_part_time").results.employer_ni.net_income.change;
-    expect(document.querySelector('[data-policy="employer_ni"]').getAttribute("aria-label")).toContain(formatSignedPounds(change));
+    const { unmount } = render(<MilburnHouseholdTab runId={EMPLOYER_NI} presets={PRESETS} />);
+    const change = example("retail_part_time").results[EMPLOYER_NI].net_income.change;
+    expect(within(screen.getByRole("region", { name: "Your result" })).getAllByText(formatSignedPounds(change)).length).toBeGreaterThan(0);
     unmount();
     resetSavedMilburnForm();
     window.history.replaceState({}, "", "/?tab=household&example=2");
-    render(<MilburnHouseholdTab presets={PRESETS} />);
+    render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} />);
     // Chosen, the cards fold into the strip, the chosen chip selected
     expect(screen.getByRole("option", { name: /^22, renting alone/ }).getAttribute("aria-selected")).toBe("true");
   });
 
-  it("switches the breakdown table between the runs", () => {
-    render(<MilburnHouseholdTab presets={PRESETS} />);
+  it("breaks the chosen run down by programme", () => {
+    render(<MilburnHouseholdTab runId={EMPLOYER_NI} presets={PRESETS} />);
     fireEvent.click(within(screen.getByRole("group", { name: "Example households" })).getByRole("button", { name: "24, in hospitality with PIP" }));
-    expect(screen.getByRole("tab", { name: "Health element and PIP removal" }).getAttribute("aria-selected")).toBe("true");
-    fireEvent.click(screen.getByRole("tab", { name: "Employer NI threshold" }));
+    expect(screen.queryByRole("tab")).toBeNull();
     const table = screen.getByRole("table", { name: /Your income, taxes and benefits, 2029-30/ });
     expect(within(table).getByText("Net income")).toBeTruthy();
-    expect(within(table).getByText("Under the run")).toBeTruthy();
+    expect(within(table).getByText("Under the policy")).toBeTruthy();
     // Universal Credit's elements in view at first, with the withdrawal
     expect(within(table).getByText("Less: withdrawn against income")).toBeTruthy();
     expect(within(table).getByText("Health element (LCWRA)")).toBeTruthy();
   });
 
   it("asks the form's questions in numbered steps, the Milburn ones included", () => {
-    render(<MilburnHouseholdTab presets={PRESETS} />);
+    render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} />);
     openForm();
     const form = within(screen.getByRole("form", { name: "Your household" }));
     for (const step of MILBURN_STEPS) expect(form.getByRole("group", { name: new RegExp(step.title) })).toBeTruthy();
@@ -293,7 +323,7 @@ describe("MilburnHouseholdTab", () => {
   });
 
   it("shows one chosen tile in each choice, every tile with its label", () => {
-    render(<MilburnHouseholdTab presets={PRESETS} />);
+    render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} />);
     openForm();
     pick("Health condition limiting work-related activity", "Yes");
     pick("Health element claimed", "From April 2026");
@@ -317,13 +347,13 @@ describe("MilburnHouseholdTab", () => {
   });
 
   it("says when the PIP removal's step includes the housing element", () => {
-    const view = normaliseHouseholdImpact(example("renting_health").results.package);
+    const view = normaliseHouseholdImpact(example("renting_health").results[PACKAGE]);
     expect(pipKnockOn(view)).toBe(
       "PIP removed (−£7,566) includes −£1,061 from Universal Credit's housing element: without PIP daily living, a young single renter is paid the shared accommodation rate.",
     );
     // Living with parents: no housing element, nothing to say
-    expect(pipKnockOn(normaliseHouseholdImpact(example("with_parents_health").results.package))).toBeNull();
-    render(<MilburnHouseholdTab presets={PRESETS} />);
+    expect(pipKnockOn(normaliseHouseholdImpact(example("with_parents_health").results[PACKAGE]))).toBeNull();
+    render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} />);
     fireEvent.click(within(screen.getByRole("group", { name: "Example households" })).getByRole("button", { name: "22, renting alone" }));
     expect(document.querySelector('[data-note="pip-knock-on"]').textContent).toContain("shared accommodation rate");
   });
@@ -335,7 +365,7 @@ describe("MilburnHouseholdTab", () => {
 
   it("says custom households are not available yet when the build has no API", () => {
     vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", "");
-    render(<MilburnHouseholdTab presets={PRESETS} />);
+    render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} />);
     openForm();
     fireEvent.click(screen.getAllByRole("button", { name: /Calculate/ })[0]);
     expect(screen.getByText("Custom households are not available yet")).toBeTruthy();
@@ -345,25 +375,26 @@ describe("MilburnHouseholdTab", () => {
   it("gives an example's own answers its stored result on Calculate, without the API", () => {
     vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
     const fetchImpl = vi.fn();
-    render(<MilburnHouseholdTab presets={PRESETS} fetchImpl={fetchImpl} />);
+    render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} fetchImpl={fetchImpl} />);
     fireEvent.click(within(screen.getByRole("group", { name: "Example households" })).getByRole("button", { name: "19, lone parent" }));
     fireEvent.click(screen.getByRole("button", { name: "Edit these answers" }));
     fireEvent.click(screen.getAllByRole("button", { name: /Calculate/ })[0]);
     expect(fetchImpl).not.toHaveBeenCalled();
-    const before = "£" + Math.round(example("lone_parent").results.package.net_income.baseline).toLocaleString("en-GB");
+    const before = "£" + Math.round(example("lone_parent").results[PACKAGE].net_income.baseline).toLocaleString("en-GB");
     expect(within(screen.getByRole("region", { name: "Your result" })).getAllByText(before).length).toBeGreaterThan(0);
     expect(screen.getByRole("option", { name: /^19, lone parent/ }).getAttribute("aria-selected")).toBe("true");
   });
 
-  it("posts a custom household with its Milburn answers on Calculate, and shows each run", async () => {
+  it("posts a custom household with its Milburn answers on Calculate, and asks again for a run chosen after", async () => {
     vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
     const answer = example("hospitality_health").results;
     const bodies = [];
     const fetchImpl = vi.fn(async (_url, init) => {
-      bodies.push(JSON.parse(init.body));
-      return { ok: true, json: async () => ({ year: 2029, runs: answer }) };
+      const body = JSON.parse(init.body);
+      bodies.push(body);
+      return { ok: true, json: async () => ({ year: 2029, runs: Object.fromEntries(body.runs.map((id) => [id, answer[id]])) }) };
     });
-    const { container } = render(<MilburnHouseholdTab presets={PRESETS} fetchImpl={fetchImpl} />);
+    const { rerender } = render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} fetchImpl={fetchImpl} />);
     openForm();
     const form = within(screen.getByRole("form", { name: "Your household" }));
     fireEvent.change(form.getByLabelText("Age"), { target: { value: "21" } });
@@ -379,6 +410,7 @@ describe("MilburnHouseholdTab", () => {
     });
     await waitFor(() => expect(screen.getByRole("region", { name: "Your result" })).toBeTruthy());
     expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(bodies[0].runs).toEqual([PACKAGE]);
     expect(bodies[0].household).toMatchObject({
       age: 21,
       limited_capability_for_work_related_activity: true,
@@ -389,9 +421,20 @@ describe("MilburnHouseholdTab", () => {
       employment_sector: "HOSPITALITY",
       council_tax: 0,
     });
-    for (const run of RUNS) {
-      expect(container.querySelector(`[data-policy="${run.key}"]`).getAttribute("aria-label")).toContain(formatSignedPounds(answer[run.key].net_income.change));
-    }
+    const tile = () => within(screen.getByRole("region", { name: "Your result" }));
+    expect(tile().getAllByText(formatSignedPounds(answer[PACKAGE].net_income.change)).length).toBeGreaterThan(0);
+    // Another run chosen in the header: asked for, the same answers
+    await act(async () => {
+      rerender(<MilburnHouseholdTab runId={EMPLOYER_NI} presets={PRESETS} fetchImpl={fetchImpl} />);
+    });
+    await waitFor(() => expect(tile().getAllByText(formatSignedPounds(answer[EMPLOYER_NI].net_income.change)).length).toBeGreaterThan(0));
+    expect(bodies[1]).toEqual({ household: bodies[0].household, runs: [EMPLOYER_NI] });
+    // Back to the first: kept, not asked for again
+    await act(async () => {
+      rerender(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} fetchImpl={fetchImpl} />);
+    });
+    expect(tile().getAllByText(formatSignedPounds(answer[PACKAGE].net_income.change)).length).toBeGreaterThan(0);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
     // An edited answer takes the result away until Calculate
     pick("Partner", "Yes");
     expect(screen.getByText("Your answers have changed. Press Calculate to see the new result.")).toBeTruthy();
@@ -401,18 +444,10 @@ describe("MilburnHouseholdTab", () => {
   it("shows the API's refusal", async () => {
     vi.stubEnv("NEXT_PUBLIC_HOUSEHOLD_API_URL", API);
     const fetchImpl = vi.fn(async () => ({ ok: false, status: 400, headers: new Headers(), json: async () => ({ detail: "Not a measure the calculation knows" }) }));
-    render(<MilburnHouseholdTab presets={PRESETS} fetchImpl={fetchImpl} />);
+    render(<MilburnHouseholdTab runId={PACKAGE} presets={PRESETS} fetchImpl={fetchImpl} />);
     openForm();
     pick("Partner", "Yes");
     fireEvent.click(screen.getAllByRole("button", { name: /Calculate/ })[0]);
     expect((await screen.findByRole("alert")).textContent).toContain("Not a measure the calculation knows");
-  });
-
-  it("shows the separate runs' changes on each card", () => {
-    const { container } = render(<MilburnHouseholdTab presets={PRESETS} />);
-    const card = (id) => [...container.querySelectorAll("[data-others]")][PRESETS.examples.findIndex((item) => item.id === id)].textContent;
-    expect(card("lone_parent")).toBe("Separate runs: +£1,158 Youth Allowance");
-    expect(card("renting_health_25")).toBe("No change from the separate runs");
-    expect(card("retail_part_time")).toContain("employer NI");
   });
 });

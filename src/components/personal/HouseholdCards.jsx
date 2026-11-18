@@ -312,6 +312,8 @@ export function YearBars({ series, year }) {
  * @param {(example) => string} [props.figureTip] - The card figure's tip
  * @param {(example) => import("react").ReactNode} [props.cardExtra] - More
  *   about a card's figure, in the row under it
+ * @param {string} [props.noFigureText] - A card's words where it has no
+ *   figure ("Calculated when chosen" unless given)
  */
 export default function HouseholdCards({
   examples,
@@ -333,6 +335,7 @@ export default function HouseholdCards({
   positions = true,
   figureTip = null,
   cardExtra = null,
+  noFigureText = "Calculated when chosen",
 }) {
   const catalogue = useMeasureCatalogue();
   // A page with one year and no income distribution (the Milburn review)
@@ -457,7 +460,7 @@ export default function HouseholdCards({
                   </span>
                 ) : (
                   <span className="household-card-pending" id={`household-card-${example.id}-result`}>
-                    Calculated when chosen
+                    {noFigureText}
                   </span>
                 )}
               </span>

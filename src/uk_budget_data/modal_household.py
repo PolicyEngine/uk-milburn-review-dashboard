@@ -39,11 +39,11 @@ A test app (same code, no warm schedule, scales to zero):
 
 The Milburn review dashboard's calculator (the Household impact tab) is
 its own app, ``uk-milburn-household``: the same code, no warm schedule, at
-most 10 ``Household`` containers, and warm jobs that run the tab's four
-report runs for 2029-30 (``milburn_household.RUNS``). No Hugging Face token:
-each household is built from the answers. The tab sends one request for a
-household's four runs (``/api/milburn-household``); its seven simulations
-go out in ``GROUPS`` batches, one in the Web container
+most 10 ``Household`` containers, and warm jobs that run every run the
+tab covers for 2029-30 (``milburn_household.covered_run_ids``). No Hugging
+Face token: each household is built from the answers. The tab sends one
+request for the run chosen in the header (``/api/milburn-household`` with
+``runs``); its simulations go out in ``GROUPS`` batches, one in the Web container
 (``WEB_BATCH``), with the speed-ups ``FAST_RUNS`` turns on. Keep as many
 ``Household`` containers warm as there are batches beyond the Web's (two),
 or a batch waits on a cold one (approved by Vahid, 18 November 2026: up to
@@ -101,8 +101,8 @@ TIMEOUT_SECONDS = 300
 # price while idle. 40, approved by Vahid for the 26-28 October 2026 Budget
 # window (the live app was raised to 40 at runtime on 26 October; a deploy
 # applies this value, so it must match). Back to 12 after 17 November.
-# The Milburn app's ceiling is 10: four runs of about three simulations
-# each per household.
+# The Milburn app's ceiling is 10: one run of two to six simulations per
+# household request.
 MAX_CONTAINERS = int(
     os.environ.get("HOUSEHOLD_MODAL_MAX_CONTAINERS", "10" if MILBURN else "40")
 )
@@ -231,15 +231,15 @@ app = modal.App(APP_NAME, image=build_image())
 
 
 def mh_runs() -> tuple:
+    """Every run the Milburn tab covers (``milburn_household.run_entries``)."""
     from uk_budget_data import milburn_household as mh
 
-    return mh.RUNS
+    return mh.run_entries(mh.covered_run_ids())
 
 
 def milburn_warm_jobs() -> list:
-    """The current-law side and each of the Milburn tab's four report runs'
-    sides (milburn_household.RUNS), for its first stored example in
-    2029-30."""
+    """The current-law side and each covered Milburn run's sides
+    (``mh_runs``), for the tab's first stored example in 2029-30."""
     from uk_budget_data import household_impact as hi
     from uk_budget_data import milburn_household as mh
     from uk_budget_data.api import HouseholdAnswersRequest
@@ -249,7 +249,7 @@ def milburn_warm_jobs() -> list:
     ).answers()
     job = hi.household_entities(answers, mh.YEAR) + (mh.YEAR,)
     jobs = []
-    for run in mh.RUNS:
+    for run in mh_runs():
         sides = hi.measure_sides(run["policies"])
         if not jobs:
             jobs.append((*job, sides.before))
@@ -259,7 +259,8 @@ def milburn_warm_jobs() -> list:
                 (*job, sides.singles[id_], None, True)
                 for id_ in sides.included
             ]
-    return jobs
+    # A package's parts are often other runs' sides: each side once
+    return list({hi._run_key(job): job for job in jobs}.values())
 
 
 def warm_jobs() -> list:

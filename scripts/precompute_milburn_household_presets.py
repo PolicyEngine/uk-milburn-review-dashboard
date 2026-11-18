@@ -1,13 +1,19 @@
 """The Milburn Household impact tab's eight stored examples, precomputed
-for 2029-30 through the household API's own code path
-(``uk_budget_data.milburn_household.run_household``: the request model's
-checks, then ``household_impact.calculate_household_impact``), so the page
-shows them with no API.
+for 2029-30 under every run the calculator covers, through the household
+API's own code path (``uk_budget_data.milburn_household.run_household``:
+the request model's checks, then
+``household_impact.calculate_household_impact``), so the page shows them
+with no API whichever run the header chooses. The file also lists every
+published run, covered or not (with the reason), which the page reads.
 
 Usage::
 
     .venv/bin/python scripts/precompute_milburn_household_presets.py \\
-        --output public/data/milburn_household_presets.json
+        --output public/data/milburn_household_presets.json --jobs 8
+
+``--jobs`` examples are computed at once, each in its own process (one,
+in turn, by default): every covered run for eight examples is a few
+hundred simulations, about five minutes an example.
 
 Household calculations only: no survey data and no Hugging Face token.
 """
@@ -45,7 +51,10 @@ def pruned(programmes: list) -> list:
 
 
 def example_entry(example: dict) -> dict:
-    results = mh.run_household(example["household"])
+    warnings.simplefilter("ignore")
+    results = mh.run_household(
+        example["household"], runs=mh.run_entries(mh.covered_run_ids())
+    )
     for result in results.values():
         for key in PER_FILE:
             result.pop(key, None)
@@ -60,7 +69,17 @@ def example_entry(example: dict) -> dict:
     }
 
 
-def presets() -> dict:
+def examples(jobs: int = 1) -> list:
+    """Each example's entry, in order, ``jobs`` at once."""
+    if jobs <= 1:
+        return [example_entry(example) for example in mh.EXAMPLES]
+    from concurrent.futures import ProcessPoolExecutor
+
+    with ProcessPoolExecutor(max_workers=jobs) as pool:
+        return list(pool.map(example_entry, mh.EXAMPLES))
+
+
+def presets(jobs: int = 1) -> dict:
     warnings.simplefilter("ignore")
     identity = runtime_identity()
     return {
@@ -69,23 +88,17 @@ def presets() -> dict:
         "label": f"PolicyEngine household calculation, {mh.FISCAL_YEAR}",
         "build": local_build.LABEL,
         "engine": identity["packages"],
-        "runs": [
-            {
-                key: run[key]
-                for key in ("key", "policies", "name", "kind", "description")
-            }
-            for run in mh.RUNS
-        ],
+        "runs": mh.coverage(),
         "assumptions": list(mh.ASSUMPTIONS),
-        "examples": [example_entry(example) for example in mh.EXAMPLES],
+        "examples": examples(jobs),
     }
 
 
-def write(output: Path) -> Path:
+def write(output: Path, jobs: int = 1) -> Path:
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
-        json.dumps(presets(), indent=1, ensure_ascii=False) + "\n"
+        json.dumps(presets(jobs), indent=1, ensure_ascii=False) + "\n"
     )
     return output
 
@@ -93,7 +106,9 @@ def write(output: Path) -> Path:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--output", type=Path, default=OUTPUT)
-    print(write(parser.parse_args().output))
+    parser.add_argument("--jobs", type=int, default=1)
+    args = parser.parse_args()
+    print(write(args.output, args.jobs))
 
 
 if __name__ == "__main__":

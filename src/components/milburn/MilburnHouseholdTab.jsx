@@ -8,14 +8,12 @@ import UnavailableNotice from "../publication/UnavailableNotice";
 import HouseholdCards from "../personal/HouseholdCards";
 import { ChoiceTiles, NumberField, SelectField } from "../personal/FormControls";
 import NetIncomeWaterfall from "../personal/NetIncomeWaterfall";
-import PolicyBars from "../personal/PolicyBars";
 import ProgrammeTable from "../personal/ProgrammeTable";
 import { ProcessingPanel, SingleYearError, headlineTotals, useDelayed, useElapsedSeconds } from "../personal/SingleYearResults";
 import { REGION_OPTIONS, StepGroup, YES_NO, hintPlace, useNarrow } from "../HouseholdCalculator";
 import useCollapse from "../../hooks/useCollapse";
 import { normaliseHouseholdImpact } from "../../utils/householdImpactApi";
 import { MINUS, money, policyRows } from "../../utils/singleYear";
-import { CHART_COLOURS } from "../../utils/chartTheme";
 import { prefersReducedMotion } from "../../utils/chartMotion";
 import { scrollBelowBars } from "../../utils/pageScroll";
 import {
@@ -26,7 +24,6 @@ import {
   OLDEST_CHILD,
   PARENTS,
   PIP_OPTIONS,
-  RUNS,
   SECTOR_OPTIONS,
   YEAR,
   STARTING_UP_TEXT,
@@ -38,13 +35,13 @@ import {
   isRentingTenure,
   loadPresets,
   resolveExampleId,
+  runCoverage,
   sameHousehold,
-  separateRunsLine,
   storedExampleFor,
-  summarise,
   withUcWithdrawn,
   writeExampleToLocation,
 } from "../../utils/milburn/householdCalculator";
+import { milburnDisplayName } from "../../utils/milburn/measureGroups";
 import "../HouseholdCalculator.css";
 import "../personal/SingleYear.css";
 import "./MilburnHouseholdTab.css";
@@ -241,16 +238,18 @@ export function resetSavedMilburnForm() {
   Object.assign(saved, { answers: null, presetId: null, formOpen: false, stepOpen: {}, submitted: null, startFrom: null, custom: null });
 }
 
-const IDLE = { status: "idle", results: null, error: null, startingUp: false };
+// A custom household's answers, by run id: each run the header chose
+// since Calculate, asked for when chosen (`runId`: the one being asked for)
+const IDLE = { status: "idle", results: {}, runId: null, error: null, startingUp: false };
 
 // A part's name, short, for the waterfall's rows: the API's name without
 // whom it is for ("PIP removed for 18 to 24-year-olds" is "PIP removed");
 // the full name is in the row's tip
 const shortPart = (name) => String(name ?? "").replace(/ for (?:under-|\d).*$/, "");
 
-/** Each run's answer, as the Budget calculator's results read one. */
-function runViews(results) {
-  return Object.fromEntries(RUNS.map((run) => [run.key, normaliseHouseholdImpact(results[run.key])]));
+/** The run's name as the header names it, or a plain stand-in. */
+export function runName(run) {
+  return (run?.id && milburnDisplayName(run.id, run.name)) || "the selected policy";
 }
 
 /**
@@ -278,19 +277,18 @@ export function pipKnockOn(view) {
 
 /**
  * The result: the Budget calculator's result card (three tiles, then the
- * waterfall from net income under current law through the package's two
- * removals), with the package's change as "Your change": the one run the
- * report sets out as its package. The separate runs follow, by run.
+ * waterfall from net income under current law through the run), with the
+ * chosen run's change as "Your change". A combined run's waterfall steps
+ * are its parts, each on its own, and the interaction between them.
  */
-function ResultCard({ views }) {
-  const pkg = views.package;
-  const totals = headlineTotals(pkg.net);
-  // Each removal by a short name on the bar (the API's full name in its tip)
-  const steps = pkg.byPolicy
-    ? policyRows(pkg.byPolicy, totals.change, [], YEAR).rows.map((row) => ({ ...row, label: shortPart(row.name) }))
+function ResultCard({ view, name, note }) {
+  const totals = headlineTotals(view.net);
+  // Each part by a short name on the bar (the API's full name in its tip)
+  const steps = view.byPolicy
+    ? policyRows(view.byPolicy, totals.change, [], YEAR).rows.map((row) => ({ ...row, label: shortPart(row.name) }))
     : null;
   const share = totals.before > 0 ? (totals.change / totals.before) * 100 : null;
-  const knockOn = pipKnockOn(pkg);
+  const knockOn = pipKnockOn(view);
   return (
     <section className={`card result-card ${changeClass(totals.change)}`} aria-label="Your result">
       <div className="forecast-tiles position-tiles result-tiles">
@@ -298,9 +296,9 @@ function ResultCard({ views }) {
           icon={Wallet}
           name="Your change"
           value={<span className="result-change-value">{changeWords(totals.change)}</span>}
-          caption="a year, from the health element and PIP removal"
+          caption={`a year, from ${name}`}
           trend={{ rows: [] }}
-          meaning={`In ${FISCAL_YEAR}, with no replacement awards. The separate runs are below.`}
+          meaning={`In ${FISCAL_YEAR}, against current law. Choose another policy in the header to see its effect.`}
           meaningKind="small"
         />
         <HeadlineTile
@@ -327,17 +325,23 @@ function ResultCard({ views }) {
           totals={totals}
           steps={steps}
           yearLabel={FISCAL_YEAR}
-          title="How each removal changes your income"
-          afterName="With the removals"
+          title={steps && steps.length > 1 ? "How each part changes your income" : "How the policy changes your income"}
+          afterName="With the policy"
           download={{
-            name: "household-net-income-by-removal",
+            name: "household-net-income-by-part",
             notes: [
-              `Your change: ${changeWords(totals.change)} a year in ${FISCAL_YEAR}, from the health element and PIP removal, with no replacement awards`,
+              `Your change: ${changeWords(totals.change)} a year in ${FISCAL_YEAR}, from ${name}, against current law`,
               ...(share === null ? [] : [`Share of your income: ${share.toFixed(2)}% of net income under current law (before housing costs, with no Council Tax)`]),
+              ...(note ? [note] : []),
               ...(knockOn ? [knockOn] : []),
             ],
           }}
         />
+        {note && (
+          <p className="single-year-quiet milburn-waterfall-note" data-note="run">
+            {note}
+          </p>
+        )}
         {knockOn && (
           <p className="single-year-quiet milburn-waterfall-note" data-note="pip-knock-on">
             {knockOn}
@@ -348,39 +352,18 @@ function ResultCard({ views }) {
   );
 }
 
-/** Each run's change, as the Budget calculator's change by policy. */
-function RunBars({ views }) {
-  const rows = RUNS.map((run) => {
-    const change = views[run.key].net.change;
-    return { id: run.key, name: run.name, color: CHART_COLOURS.noChange, change, rounded: Math.round(change) };
-  });
-  return (
-    <PolicyBars
-      rows={rows}
-      noEffect={[]}
-      yearLabel={FISCAL_YEAR}
-      title={`Change in net income by run, ${FISCAL_YEAR}`}
-      description="Each run on its own, against current law for the same household."
-      rowWord="Run"
-    >
-      <p className="single-year-quiet milburn-runs-note" role="note">
-        The higher Youth Allowance, the work allowance and the employer NI threshold are separate runs: they are not
-        added to the health element and PIP removal or to each other. The work allowance is illustrative: the report
-        gives no amount, so the amount is our assumption.
-      </p>
-    </PolicyBars>
-  );
-}
-
 /**
  * The Household impact tab: the Autumn Budget calculator's flow and parts
  * (its example cards, numbered steps, Calculate, result card, waterfall
- * and breakdown table) for one household under current law and the
- * report's four runs in 2029-30. The eight stored examples answer at once
+ * and breakdown table) for one household under current law and the one
+ * run chosen in the header (`runId`), in 2029-30, as the other tabs follow
+ * it; runs are never added up. The eight stored examples answer at once
  * (public/data/milburn_household_presets.json); any other answers are sent
- * with Calculate to the household API, one request for all four runs.
+ * with Calculate to the household API, one request for the chosen run, and
+ * again for each run chosen after. A run the calculator does not cover
+ * shows its reason, and no figure.
  */
-export default function MilburnHouseholdTab({ presets: given = undefined, fetchImpl = undefined }) {
+export default function MilburnHouseholdTab({ runId = null, presets: given = undefined, fetchImpl = undefined }) {
   const [loaded, setLoaded] = useState(given === undefined ? undefined : given);
   useEffect(() => {
     if (given !== undefined) return undefined;
@@ -394,6 +377,8 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
   }, [given, fetchImpl]);
   const presets = given ?? loaded;
   const examples = useMemo(() => presets?.examples ?? [], [presets]);
+  const run = useMemo(() => runCoverage(presets, runId), [presets, runId]);
+  const name = runName(run);
 
   const [answers, setAnswers] = useState(() => ({ ...DEFAULT_ANSWERS, ...saved.answers }));
   // The example the form was last filled from, while its answers stand
@@ -410,7 +395,7 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
   const resultsRef = useRef(null);
 
   useEffect(() => {
-    Object.assign(saved, { answers, presetId, formOpen, startFrom, stepOpen, submitted, custom: custom.status === "loading" ? IDLE : custom });
+    Object.assign(saved, { answers, presetId, formOpen, startFrom, stepOpen, submitted, custom: custom.status === "loading" ? { ...custom, status: "idle", runId: null, startingUp: false } : custom });
   }, [answers, presetId, formOpen, startFrom, stepOpen, submitted, custom]);
 
   // One calculation at a time: a new one aborts the one in flight
@@ -477,9 +462,29 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
   // The answers differ from those of the result shown
   const changed = submitted !== null && !sameHousehold(householdRequest(answers), householdRequest(submitted.answers));
   const shownExample = submitted && submitted.household !== "yours" ? examples.find((example) => example.id === submitted.household) : null;
-  const shownResults = shownExample ? shownExample.results : submitted?.household === "yours" && custom.status === "ready" ? custom.results : null;
-  const views = useMemo(() => (shownResults ? runViews(shownResults) : null), [shownResults]);
-  const running = submitted !== null && !changed && submitted.household === "yours" && custom.status === "loading";
+  const yours = submitted?.household === "yours";
+  // The chosen run's answer only: never another run's
+  const shownResult = !run.covered ? null : shownExample ? (shownExample.results[run.id] ?? null) : yours ? (custom.results[run.id] ?? null) : null;
+  const view = useMemo(() => (shownResult ? normaliseHouseholdImpact(shownResult) : null), [shownResult]);
+  const running = submitted !== null && !changed && yours && custom.status === "loading" && custom.runId === run.id;
+
+  // Ask the API for one run of the answers last sent; `fresh` (a new
+  // Calculate) forgets the earlier answers' runs
+  const requestRun = (sent, id, { fresh = false } = {}) => {
+    inFlight.current?.abort();
+    const controller = new AbortController();
+    inFlight.current = controller;
+    const current = () => inFlight.current === controller && !controller.signal.aborted;
+    setCustom((state) => ({ ...IDLE, status: "loading", runId: id, results: fresh ? {} : state.results }));
+    calculateHousehold(sent, {
+      runId: id,
+      fetchImpl,
+      signal: controller.signal,
+      onRetry: () => current() && setCustom((state) => ({ ...state, startingUp: true })),
+    })
+      .then((result) => current() && setCustom((state) => ({ ...IDLE, status: "ready", results: { ...state.results, [id]: result } })))
+      .catch((error) => current() && setCustom((state) => ({ ...IDLE, status: "error", runId: id, error, results: state.results })));
+  };
 
   const calculate = (event) => {
     event?.preventDefault();
@@ -496,23 +501,27 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
     }
     setSubmitted({ answers, household: "yours", at: Date.now() });
     if (!customAvailable() || !presets) {
+      inFlight.current?.abort();
       setCustom({ ...IDLE, status: "unavailable" });
       return;
     }
-    inFlight.current?.abort();
-    const controller = new AbortController();
-    inFlight.current = controller;
-    const current = () => inFlight.current === controller && !controller.signal.aborted;
-    setCustom({ ...IDLE, status: "loading" });
-    calculateHousehold(answers, {
-      runs: presets.runs,
-      fetchImpl,
-      signal: controller.signal,
-      onRetry: () => current() && setCustom((state) => ({ ...state, startingUp: true })),
-    })
-      .then((results) => current() && setCustom({ ...IDLE, status: "ready", results }))
-      .catch((error) => current() && setCustom({ ...IDLE, status: "error", error }));
+    if (!run.covered) {
+      // Nothing to ask for: the result says why; a covered run chosen
+      // later is asked for then
+      inFlight.current?.abort();
+      setCustom({ ...IDLE });
+      return;
+    }
+    requestRun(answers, run.id, { fresh: true });
   };
+
+  // A run chosen in the header after Calculate: ask for it (the answers
+  // last sent), unless already in; the run asked for before is dropped
+  useEffect(() => {
+    if (!yours || changed || !run.covered || !presets || !customAvailable()) return;
+    if (custom.results[run.id] || (custom.status === "loading" && custom.runId === run.id)) return;
+    requestRun(submitted.answers, run.id);
+  }, [run]); // eslint-disable-line react-hooks/exhaustive-deps -- on a change of run only
 
   // Bring the form or the result into view below the sticky bars
   useEffect(() => {
@@ -532,25 +541,23 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
   const showLoading = useDelayed(running);
   const seconds = useElapsedSeconds(running, submitted?.at ?? null);
 
-  // The cards' figures: each example's package change and its two parts
+  // The cards' figures: each example's change under the chosen run; none
+  // for a run the calculator does not cover
   const cardPresets = useMemo(
     () =>
       Object.fromEntries(
-        examples.map((example) => {
-          const summary = summarise(example.results);
-          return [example.id, { [YEAR]: { change: summary?.runs[0].change ?? 0, byPolicy: null } }];
-        }),
+        examples
+          .filter((example) => run.covered && example.results[run.id])
+          .map((example) => [example.id, { [YEAR]: { change: example.results[run.id].net_income.change, byPolicy: null } }]),
       ),
-    [examples],
+    [examples, run],
   );
   const cardExamples = useMemo(
     () => examples.map((example) => ({ ...example, label: example.title, short: example.title, measures: [] })),
     [examples],
   );
   const yoursChange =
-    presetId === null && submitted?.household === "yours" && !changed && custom.status === "ready"
-      ? custom.results.package.net_income.change
-      : null;
+    presetId === null && yours && !changed && run.covered && custom.results[run.id] ? custom.results[run.id].net_income.change : null;
 
   const applies = (id) => !APPLIES[id] || APPLIES[id](answers);
   const childAges = answers.childAges;
@@ -705,21 +712,10 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
           yoursChange={yoursChange}
           yearBars={false}
           positions={false}
-          subtitle={`Young people in ${FISCAL_YEAR} under current law and the report's runs. Enter your own household, or start from an example below.`}
-          yoursLead="See how the report's runs change your income. A calculation usually takes 10–20 seconds; after a quiet spell or when many people use it at once it can take longer, up to a minute or two."
-          figureTip={() => `Change in net income in ${FISCAL_YEAR} from the health element and PIP removal (no replacement awards)`}
-          cardExtra={(example) => {
-            const summary = summarise(example.results);
-            const others = separateRunsLine(summary, formatSignedPounds);
-            return (
-              <span className="milburn-card-lines">
-                <span className="milburn-card-caption">Health element and PIP removal</span>
-                <span className={`milburn-card-others${others ? "" : " is-empty"}`} data-others>
-                  {others ? `Separate runs: ${others}` : "No change from the separate runs"}
-                </span>
-              </span>
-            );
-          }}
+          subtitle={`Young people in ${FISCAL_YEAR} under current law and the policy chosen in the header: ${name}. Enter your own household, or start from an example below.`}
+          yoursLead="See how the policy chosen in the header changes your income. A calculation usually takes 10–20 seconds; after a quiet spell or when many people use it at once it can take longer, up to a minute or two."
+          figureTip={() => `Change in net income in ${FISCAL_YEAR} from ${name}, against current law`}
+          noFigureText={run.covered ? undefined : "Not covered"}
         />
       ) : (
         <p className="milburn-note">The stored examples are not available.</p>
@@ -793,13 +789,24 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
                   {(showLoading || custom.startingUp) && <ProcessingPanel seconds={seconds} startingUp={custom.startingUp} times={CALCULATION_TIMES} startingUpText={STARTING_UP_TEXT} />}
                 </div>
               </div>
+            ) : !run.covered ? (
+              <UnavailableNotice reason="Not covered by the household calculator">
+                <p data-not-covered={run.id ?? ""}>
+                  {run.id ? `${name[0].toUpperCase()}${name.slice(1)}: ` : ""}
+                  {run.reason} Choose another policy in the header to see its effect on this household.
+                </p>
+              </UnavailableNotice>
+            ) : shownExample && !view ? (
+              <UnavailableNotice reason="Not available for this example">
+                <p>This stored example has no result for {name}.</p>
+              </UnavailableNotice>
             ) : submitted.household === "yours" && custom.status === "unavailable" ? (
               <UnavailableNotice reason="Custom households are not available yet">
                 <p>This build has no household calculator. The stored examples above are available.</p>
               </UnavailableNotice>
-            ) : submitted.household === "yours" && custom.status === "error" ? (
-              <SingleYearError error={custom.error} onRetry={() => calculate()} />
-            ) : views ? (
+            ) : yours && custom.status === "error" && custom.runId === run.id ? (
+              <SingleYearError error={custom.error} onRetry={() => requestRun(submitted.answers, run.id)} />
+            ) : view ? (
               <div className="single-year-headline">
                 <div className="single-year-result">
                   <SectionHeading
@@ -809,10 +816,10 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
                     subtitle={
                       shownExample
                         ? `${shownExample.title}: ${shownExample.description}`
-                        : "How the health element and PIP removal changes your net income, removal by removal."
+                        : `How ${name} changes your net income.`
                     }
                   />
-                  <ResultCard views={views} />
+                  <ResultCard view={view} name={name} note={run.note} />
                 </div>
               </div>
             ) : null}
@@ -820,22 +827,15 @@ export default function MilburnHouseholdTab({ presets: given = undefined, fetchI
         )}
       </div>
 
-      {views && submitted !== null && !changed && !running && <ResultDetails views={views} presets={presets} />}
+      {view && submitted !== null && !changed && !running && <ResultDetails view={view} run={run} name={name} presets={presets} />}
     </div>
   );
 }
 
-/** The separate runs, then the breakdown by programme, run by run. */
-function ResultDetails({ views, presets }) {
-  const [run, setRun] = useState(RUNS[0].key);
-  const view = views[run];
-  const chosen = RUNS.find((item) => item.key === run);
+/** The breakdown by programme under the chosen run, and how it is calculated. */
+function ResultDetails({ view, run, name, presets }) {
   return (
     <div className="single-year-details milburn-household-details">
-      <SectionHeading icon="bars" title="Change by run" subtitle="Each of the report's runs on its own, against current law for the same household." />
-      <section className="report-section" id="change-by-run">
-        <RunBars views={views} />
-      </section>
       <section className="report-section" id="household-breakdown">
         <ProgrammeTable
           programmes={withUcWithdrawn(view.programmes)}
@@ -844,15 +844,14 @@ function ResultDetails({ views, presets }) {
           year={YEAR}
           policies={[]}
           parameterTables={null}
-          afterLabel={`Under the ${chosen.kind === "package" ? "removals" : "run"}`}
-          runTabs={{ tabs: RUNS.map((item) => ({ id: item.key, label: item.tab })), value: run, onChange: setRun, label: "Run" }}
+          afterLabel="Under the policy"
           // Universal Credit's elements and PIP's parts in view at first
           openRows={["universal_credit", "pip"]}
           // The Milburn Methodology has no household calculation section
           method={null}
         />
       </section>
-      <Disclosure title="About these figures" preview="How they are calculated · What each run is" className="milburn-household-about">
+      <Disclosure title="About these figures" preview="How they are calculated · What the policy is" className="milburn-household-about">
         <div className="info-sections">
           <p className="info-text">
             {presets.label}
@@ -861,11 +860,9 @@ function ResultDetails({ views, presets }) {
             included.
           </p>
           <ul className="info-list">
-            {RUNS.map((item) => (
-              <li key={item.key}>
-                <strong>{item.name}.</strong> {presets.runDescriptions[item.key]}
-              </li>
-            ))}
+            <li>
+              <strong>{`${name[0].toUpperCase()}${name.slice(1)}.`}</strong> {run.description}
+            </li>
             {presets.assumptions.map((item) => (
               <li key={item}>{item}</li>
             ))}

@@ -114,8 +114,8 @@ export const STATIC_CAVEAT_ANCHOR = "method-model";
 
 export const VIEWS = [
   { value: "dashboard", label: "Impact", year: true, policies: true },
-  // One household under current law and the report's runs, 2029-30
-  { value: "household", label: "Household impact", year: false, policies: false },
+  // One household under current law and the run chosen in the header, 2029-30
+  { value: "household", label: "Household impact", year: false, policies: true },
   { value: "policies", label: "Measures", year: false, policies: false },
   { value: "methodology", label: "Methodology", year: false, policies: false },
 ];
@@ -1236,7 +1236,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
         ) : value === "methodology" ? (
           <MethodologyTab onShowTab={handleTabChange} />
         ) : value === "household" ? (
-          <MilburnHouseholdTab />
+          <MilburnHouseholdTab runId={selectedPolicies.length === 1 ? selectedPolicies[0] : null} />
         ) : (
           // Impact and its sub-tabs (populationPanel)
           // Hidden under the landing page, it leaves the address alone

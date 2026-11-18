@@ -1,5 +1,5 @@
 """The Milburn household calculator's speed-ups: one request for the tab's
-four runs (``/api/milburn-household``, ``milburn_household.run_household``),
+chosen run, or the four it showed before (``/api/milburn-household``, ``milburn_household.run_household``),
 the runs in batches on Modal (``household_runs.job_groups``), lazy parameter
 trees (``lazy_parameters``) and one current-law simulation per household
 batch (``household_impact.shared_baselines``), which give the same answers.
@@ -58,7 +58,7 @@ def test_four_runs_share_their_current_law_side(counted_runs):
     """The four runs' simulations go out once, together: the current-law
     side every run compares with is run once, not once a run."""
     results = mh.run_household(example("renting_health"))
-    assert list(results) == [run["key"] for run in mh.RUNS]
+    assert list(results) == [run["key"] for run in mh.LEGACY_RUNS]
     # Current law, the package and its two parts, and the three other runs
     assert len(counted_runs) == len(set(counted_runs)) == 7
 
@@ -67,7 +67,7 @@ def test_each_run_answers_as_its_own_request(counted_runs):
     """The answers are each run's own request's, as before the runs were
     sent together."""
     together = mh.run_household(example("hospitality_health"))
-    for run in mh.RUNS:
+    for run in mh.LEGACY_RUNS:
         hi.clear_runs()
         request = dict(mh.run_requests(example("hospitality_health")))[
             run["key"]
@@ -93,10 +93,13 @@ def test_milburn_route_answers_every_run(counted_runs):
     body = response.json()
     assert body["year"] == mh.YEAR
     assert body["fiscal_year"] == mh.FISCAL_YEAR
-    assert list(body["runs"]) == [run["key"] for run in mh.RUNS]
+    assert list(body["runs"]) == [run["key"] for run in mh.LEGACY_RUNS]
     package = body["runs"]["package"]
     assert package["by_policy"]["method"] == mh.BY_POLICY_METHOD
-    assert sorted(package["included"]) == sorted(mh.RUNS[0]["policies"])
+    assert sorted(package["included"]) == [
+        "milburn_report_pip",
+        "milburn_report_uc_health",
+    ]
     # The same household again (in another key order) is answered from the
     # runs kept: nothing more is run
     ran = len(counted_runs)
@@ -106,6 +109,62 @@ def test_milburn_route_answers_every_run(counted_runs):
     )
     assert again.json()["runs"] == body["runs"]
     assert len(counted_runs) == ran
+
+
+def test_milburn_route_answers_the_runs_named(counted_runs):
+    from uk_budget_data.api import app
+
+    client = TestClient(app)
+    household = example("renting_health")
+    body = client.post(
+        "/api/milburn-household",
+        json={"household": household, "runs": ["milburn_report_pip"]},
+    ).json()
+    assert list(body["runs"]) == ["milburn_report_pip"]
+    # Another run for the same household is its own answer, not the first
+    # run's kept one
+    other = client.post(
+        "/api/milburn-household",
+        json={
+            "household": household,
+            "runs": ["milburn_report_package_with_youth_allowance"],
+        },
+    ).json()
+    assert list(other["runs"]) == [
+        "milburn_report_package_with_youth_allowance"
+    ]
+    assert (
+        len(
+            other["runs"]["milburn_report_package_with_youth_allowance"][
+                "by_policy"
+            ]["measures"]
+        )
+        == 4
+    )
+
+
+@pytest.mark.parametrize(
+    "runs, words",
+    [
+        (["milburn_report_package_phased"], "does not cover"),
+        (["child_dla_to_18"], "Not a published run"),
+        ([], None),
+        (["a", "b", "c", "d"], None),
+    ],
+)
+def test_milburn_route_refuses_runs_it_does_not_cover(
+    counted_runs, runs, words
+):
+    from uk_budget_data.api import app
+
+    response = TestClient(app).post(
+        "/api/milburn-household",
+        json={"household": example("lone_parent"), "runs": runs},
+    )
+    assert response.status_code == 422
+    if words:
+        assert words in response.text
+    assert counted_runs == []
 
 
 def test_milburn_route_refuses_bad_answers(counted_runs):
@@ -259,20 +318,24 @@ def test_an_eager_node_built_before_install_still_reads():
 
 @pytest.mark.slow
 def test_fast_runs_give_the_same_answers(monkeypatch):
-    """The real engine, the 21-year-old in retail (whose employer NI run
-    reads the current-law simulation's employer cost): the runs with lazy
-    parameters and one shared current-law simulation are exactly the runs
-    without them."""
+    """The real engine, the 21-year-old in retail (whose employer NI runs
+    read the current-law simulation's employer cost), under every covered
+    run and each combined run's parts: the runs with lazy parameters and
+    one shared current-law simulation are exactly the runs without them."""
     answers = mh.run_requests(example("retail_part_time"))[0][1].household
     people, benunit, household = hi.household_entities(
         answers.answers(), mh.YEAR
     )
+    job = (people, benunit, household, mh.YEAR)
     jobs = []
-    for run in (mh.RUNS[0], mh.RUNS[3]):
+    for run in mh.run_entries(mh.covered_run_ids()):
         sides = hi.measure_sides(run["policies"])
         if not jobs:
-            jobs.append((people, benunit, household, mh.YEAR, sides.before))
-        jobs.append((people, benunit, household, mh.YEAR, sides.after))
+            jobs.append((*job, sides.before))
+        jobs.append((*job, sides.after))
+        if len(sides.included) > 1:
+            jobs += [(*job, sides.singles[id_]) for id_ in sides.included]
+    jobs = list({hi._run_key(j): j for j in jobs}.values())
     monkeypatch.delenv(lazy_parameters.ENV, raising=False)
     plain = hi.run_batch(jobs)
     monkeypatch.setenv(lazy_parameters.ENV, "1")

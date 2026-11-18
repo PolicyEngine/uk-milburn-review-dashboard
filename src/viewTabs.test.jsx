@@ -73,7 +73,8 @@ describe("the view tabs", () => {
     const { container } = await renderApp();
     const expected = {
       dashboard: [true, true],
-      household: [false, false],
+      // Household impact follows the header's one policy, not its year
+      household: [false, true],
       outlook: [false, false],
       policies: [false, false],
       methodology: [false, false],

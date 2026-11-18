@@ -51,7 +51,7 @@ const LAYOUTS = {
     { icon: "lifebuoy", title: "How the selected policy changes poverty", subtitle: "With the selected policy.", cards: [["bars"], ["bars"]] },
   ],
   household: [
-    { icon: "users", title: "Household impact", subtitle: "Young people in 2029-30 under current law and under the report's runs, by exact household calculation.", cards: [["text"], ["text"], ["text"]] },
+    { icon: "users", title: "Household impact", subtitle: "Young people in 2029-30 under current law and under the policy chosen in the header, by exact household calculation.", cards: [["text"], ["text"], ["text"]] },
   ],
   policies: [
     { icon: "fileText", title: "Measures we model", subtitle: reportCopy().measuresPlaceholderSubtitle, cards: [["text", "wide"], ["text", "wide"], ["text", "wide"]] },

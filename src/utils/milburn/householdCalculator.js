@@ -1,15 +1,15 @@
 /**
- * The Milburn Household impact tab's data: its four report runs, the form's
- * answers as the household API takes them, the stored examples
+ * The Milburn Household impact tab's data: which published runs it covers,
+ * the form's answers as the household API takes them, the stored examples
  * (public/data/milburn_household_presets.json, written by
  * scripts/precompute_milburn_household_presets.py) and a custom household's
- * request, one POST to the API's Milburn route for all four runs
- * (milburnHouseholdUrl, beside NEXT_PUBLIC_HOUSEHOLD_API_URL).
+ * request, one POST to the API's Milburn route for the run chosen in the
+ * header (milburnHouseholdUrl, beside NEXT_PUBLIC_HOUSEHOLD_API_URL).
  *
- * The runs mirror src/uk_budget_data/milburn_household.py RUNS: the
- * package is its two removals together; the other three are separate runs,
- * never added to it or to each other. Which measures each run sends comes
- * from the presets file (its runs' policies), not from here.
+ * The tab follows the one run the header chooses, as the other tabs do:
+ * runs are never added up. Which runs it covers, and why it does not cover
+ * the others, comes from the presets file (src/uk_budget_data/
+ * milburn_household.py NOT_COVERED), not from here.
  */
 import { MODAL_TIMEOUT_MS, householdApiUrl, postHouseholdImpactRetrying } from "../householdImpactApi";
 
@@ -18,29 +18,6 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 export const PRESETS_FILE = "milburn_household_presets.json";
 export const YEAR = 2029;
 export const FISCAL_YEAR = "2029-30";
-
-// `inSentence`: the name mid-sentence; `short`: on an example's card and
-// in the waterfall; `tab`: the programme table's tab
-export const RUNS = [
-  {
-    key: "package",
-    name: "Health element and PIP removal (no replacement awards)",
-    inSentence: "the health element and PIP removal",
-    short: "health element and PIP removal",
-    tab: "Health element and PIP removal",
-    kind: "package",
-  },
-  { key: "youth_allowance", name: "Higher Youth Allowance", inSentence: "the higher Youth Allowance", short: "Youth Allowance", tab: "Higher Youth Allowance", kind: "separate" },
-  {
-    key: "work_allowance",
-    name: "Work allowance (illustrative; amount is our assumption)",
-    inSentence: "the work allowance (illustrative)",
-    short: "work allowance (illustrative)",
-    tab: "Work allowance (illustrative)",
-    kind: "illustrative",
-  },
-  { key: "employer_ni", name: "Employer NI threshold", inSentence: "the employer NI threshold", short: "employer NI", tab: "Employer NI threshold", kind: "separate" },
-];
 
 /**
  * The example id in the address as a stored example's id: its slug
@@ -195,46 +172,64 @@ export function isRunResult(result) {
   );
 }
 
+const text = (value) => (typeof value === "string" ? value : "");
+
 /**
- * The presets file, checked: null unless it has at least one example with
- * an answer for every run. An example missing one is dropped, never shown
+ * The presets file, checked: null unless it lists the runs and has at least
+ * one example. Each run is covered (with its measures) or not (with the
+ * reason the page gives); an example keeps only the covered runs it has an
+ * answer for, so a run missing from an example shows as not stored, never
  * in part.
  */
 export function parsePresets(json) {
-  if (!json || typeof json !== "object" || !Array.isArray(json.examples)) return null;
-  // Each run's measures, as the file lists them: every run must be there
-  const policies = Object.fromEntries(
-    (Array.isArray(json.runs) ? json.runs : [])
-      .filter((run) => run && typeof run.key === "string" && Array.isArray(run.policies) && run.policies.length > 0)
-      .map((run) => [run.key, run.policies]),
-  );
-  if (!RUNS.every((run) => policies[run.key])) return null;
-  const examples = json.examples.filter(
-    (example) =>
-      example &&
-      typeof example.id === "string" &&
-      typeof example.title === "string" &&
-      example.household &&
-      RUNS.every((run) => isRunResult(example.results?.[run.key])),
-  );
-  if (!examples.length) return null;
-  return {
-    label: typeof json.label === "string" ? json.label : `PolicyEngine household calculation, ${FISCAL_YEAR}`,
-    build: typeof json.build === "string" ? json.build : "",
-    assumptions: Array.isArray(json.assumptions) ? json.assumptions.filter((item) => typeof item === "string") : [],
-    runs: RUNS.map((run) => ({ ...run, policies: policies[run.key] })),
-    runDescriptions: Object.fromEntries(
-      (Array.isArray(json.runs) ? json.runs : []).filter((run) => run && typeof run.key === "string").map((run) => [run.key, run.description ?? ""]),
-    ),
-    examples: examples.map((example) => ({
+  if (!json || typeof json !== "object" || !Array.isArray(json.examples) || !Array.isArray(json.runs)) return null;
+  const runs = json.runs
+    .filter((run) => run && typeof run.id === "string")
+    .map((run) => {
+      const covered = run.covered === true && Array.isArray(run.policies) && run.policies.length > 0;
+      return {
+        id: run.id,
+        name: text(run.name),
+        description: text(run.description),
+        covered,
+        policies: covered ? run.policies : [],
+        reason: covered ? "" : text(run.reason) || "The household calculator does not cover this run.",
+        note: covered ? text(run.note) : "",
+      };
+    });
+  if (!runs.length) return null;
+  const coveredIds = runs.filter((run) => run.covered).map((run) => run.id);
+  const examples = json.examples
+    .filter((example) => example && typeof example.id === "string" && typeof example.title === "string" && example.household)
+    .map((example) => ({
       id: example.id,
       title: example.title,
-      description: typeof example.description === "string" ? example.description : "",
+      description: text(example.description),
       icon: example.icon,
       household: example.household,
-      results: example.results,
-    })),
+      results: Object.fromEntries(coveredIds.filter((id) => isRunResult(example.results?.[id])).map((id) => [id, example.results[id]])),
+    }));
+  if (!examples.length) return null;
+  return {
+    label: text(json.label) || `PolicyEngine household calculation, ${FISCAL_YEAR}`,
+    build: text(json.build),
+    assumptions: Array.isArray(json.assumptions) ? json.assumptions.filter((item) => typeof item === "string") : [],
+    runs,
+    examples,
   };
+}
+
+/**
+ * Whether the calculator covers the run chosen in the header: the run as
+ * the presets file lists it, with `covered` false and the reason when it
+ * does not (a run the file does not list, or no single run chosen,
+ * included).
+ */
+export function runCoverage(presets, runId) {
+  if (!runId) return { id: null, name: "", description: "", covered: false, policies: [], note: "", reason: "Choose one policy in the header to see its effect on a household." };
+  const run = presets?.runs?.find((item) => item.id === runId);
+  if (run) return run;
+  return { id: runId, name: "", description: "", covered: false, policies: [], note: "", reason: "The household calculator has no results for this run." };
 }
 
 export async function loadPresets(fetchImpl = fetch) {
@@ -247,35 +242,19 @@ export async function loadPresets(fetchImpl = fetch) {
 }
 
 /**
- * The tab's summary of one household's four answers: current-law net
- * income, and each run's change, the package with its parts.
+ * One household's answer under one run: current-law net income, the run's
+ * change and net income, and a combined run's parts (each member on its
+ * own); null when the run has no answer.
  */
-export function summarise(results) {
-  const first = results?.[RUNS[0].key];
-  if (!RUNS.every((run) => isRunResult(results?.[run.key]))) return null;
+export function summarise(result) {
+  if (!isRunResult(result)) return null;
+  const measures = result.by_policy?.measures ?? [];
   return {
-    netIncome: first.net_income.baseline,
-    runs: RUNS.map((run) => {
-      const result = results[run.key];
-      const parts =
-        run.kind === "package"
-          ? (result.by_policy?.measures ?? []).map((measure) => ({
-              id: measure.id,
-              name: measure.name,
-              change: measure.change,
-            }))
-          : [];
-      return { ...run, change: result.net_income.change, netIncome: result.net_income.reform, parts };
-    }),
+    netIncome: result.net_income.baseline,
+    change: result.net_income.change,
+    netIncomeAfter: result.net_income.reform,
+    parts: measures.length > 1 ? measures.map((measure) => ({ id: measure.id, name: measure.name, change: measure.change })) : [],
   };
-}
-
-/** "+£1,158 Youth Allowance · +£3,076 work allowance (illustrative)": the separate runs that change a household. */
-export function separateRunsLine(summary, formatSigned) {
-  return (summary?.runs ?? [])
-    .filter((run) => run.kind !== "package" && Math.round(run.change) !== 0)
-    .map((run) => `${formatSigned(run.change)} ${run.short}`)
-    .join(" · ");
 }
 
 /**
@@ -307,11 +286,10 @@ export const COLD_START_RETRY = Object.freeze({ budgetMs: 240_000, maxRetries: 6
 
 /**
  * What the waiting panel says (ProcessingPanel's `times`): a custom
- * household's four runs on the Modal app (uk_budget_data/modal_household.py),
- * measured on 18 November 2026 at 9.5–18 s for one household with the
- * containers warm, 16.6 s after a quiet spell of three minutes and 20–23 s
- * for two households at once; past `stillWorking` seconds new containers
- * may be starting.
+ * household's chosen run on the Modal app (uk_budget_data/modal_household.py).
+ * The four runs the tab sent before took 9.5–18 s for one household with
+ * the containers warm (18 November 2026); one run takes less. Past
+ * `stillWorking` seconds new containers may be starting.
  */
 export const CALCULATION_TIMES = Object.freeze({
   typical: 15,
@@ -338,26 +316,24 @@ export function milburnHouseholdUrl() {
   return `${base === path ? path.replace(/\/$/, "") : base}/milburn-household${query ? `?${query}` : ""}`;
 }
 
-const hasEveryRun = (runs) => (payload) => Boolean(payload?.runs) && runs.every((run) => isRunResult(payload.runs[run.key]));
+const hasRun = (runId) => (payload) => isRunResult(payload?.runs?.[runId]);
 
 /**
- * One custom household's four answers, by run key: one POST to the API's
- * Milburn route (milburnHouseholdUrl), which runs the four report runs
- * together (their current-law side once) and answers each exactly as the
- * household route answers that run; retried while the service starts up
- * (postHouseholdImpactRetrying). `runs` (from parsePresets) are the runs
- * the answer must hold. Rejects with the API client's error
- * (HouseholdApiError: its kind, message and the answers it names), which
- * SingleYearError shows.
+ * One custom household's answer under the run chosen in the header: one
+ * POST to the API's Milburn route (milburnHouseholdUrl) naming that run,
+ * answered exactly as the household route answers it; retried while the
+ * service starts up (postHouseholdImpactRetrying). Rejects with the API
+ * client's error (HouseholdApiError: its kind, message and the answers it
+ * names), which SingleYearError shows.
  */
-export async function calculateHousehold(answers, { runs, fetchImpl, signal, onRetry } = {}) {
+export async function calculateHousehold(answers, { runId, fetchImpl, signal, onRetry } = {}) {
   if (!householdApiUrl()) throw Object.assign(new Error("Custom households need the household API, which this build does not have."), { kind: "unavailable" });
-  if (!runs?.length) throw new Error("The runs to calculate are not available.");
+  if (!runId) throw new Error("Choose one policy in the header to calculate.");
   const payload = await postHouseholdImpactRetrying(
-    { household: householdRequest(answers) },
-    { url: milburnHouseholdUrl(), isAnswer: hasEveryRun(runs), fetchImpl, signal, timeoutMs: MODAL_TIMEOUT_MS, onRetry, retry: COLD_START_RETRY },
+    { household: householdRequest(answers), runs: [runId] },
+    { url: milburnHouseholdUrl(), isAnswer: hasRun(runId), fetchImpl, signal, timeoutMs: MODAL_TIMEOUT_MS, onRetry, retry: COLD_START_RETRY },
   );
-  return Object.fromEntries(runs.map((run) => [run.key, payload.runs[run.key]]));
+  return payload.runs[runId];
 }
 
 /** The example id in the address (?example=), or null. */

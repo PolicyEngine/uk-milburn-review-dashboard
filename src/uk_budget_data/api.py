@@ -686,7 +686,9 @@ class HouseholdImpactRequest(BaseModel):
     def _known_measures(cls, policies: Optional[list[str]]):
         if policies is None:
             return policies
-        unknown = sorted(set(policies) - set(household_impact.measure_ids()))
+        unknown = sorted(
+            set(policies) - household_impact.accepted_measure_ids()
+        )
         if unknown:
             raise ValueError(f"Unknown measures: {', '.join(unknown)}")
         return policies
@@ -782,25 +784,54 @@ async def calculate_household_impact(
         raise HTTPException(status_code=500, detail=f"Calculation error: {e}")
 
 
-# --- The Milburn tab's four runs at once: POST /api/milburn-household -------
+# --- The Milburn tab's chosen run: POST /api/milburn-household -------------
+
+# A request names at most this many runs: the page sends the one chosen in
+# the header
+MILBURN_RUNS_PER_REQUEST = 3
 
 
 class MilburnHouseholdRequest(BaseModel):
     """One household for the Milburn review dashboard's Household impact
-    tab: its four report runs in 2029-30 (``milburn_household.RUNS``)."""
+    tab, in 2029-30: the runs it names (``runs``, published run ids the
+    calculator covers: ``milburn_household.run_entries``), or with none the
+    four runs the tab showed before it followed the header
+    (``milburn_household.LEGACY_RUNS``, by their old keys)."""
 
     household: HouseholdAnswersRequest = Field(
         ..., description="The household's answers, as /api/household-impact"
     )
+    runs: Optional[list[str]] = Field(
+        None,
+        min_length=1,
+        max_length=MILBURN_RUNS_PER_REQUEST,
+        description="Published run ids, answered by id",
+    )
+
+    @field_validator("runs")
+    @classmethod
+    def _covered_runs(cls, runs: Optional[list[str]]):
+        if runs is None:
+            return runs
+        from uk_budget_data import milburn_household
+
+        milburn_household.run_entries(runs)
+        return list(dict.fromkeys(runs))
 
 
 @functools.lru_cache(maxsize=64)
-def _cached_milburn_household(household_json: str) -> dict:
-    """Answers by household, as ``_cached_household_impact``."""
+def _cached_milburn_household(household_json: str, runs: tuple) -> dict:
+    """Answers by household and runs, as ``_cached_household_impact``."""
     from uk_budget_data import milburn_household
 
     return milburn_household.run_household(
-        json.loads(household_json), workers=household_workers()
+        json.loads(household_json),
+        runs=(
+            milburn_household.run_entries(runs)
+            if runs
+            else milburn_household.LEGACY_RUNS
+        ),
+        workers=household_workers(),
     )
 
 
@@ -808,23 +839,26 @@ def _cached_milburn_household(household_json: str) -> dict:
 async def calculate_milburn_household(
     data: MilburnHouseholdRequest, response: Response
 ):
-    """The Milburn tab's four runs for one household: each run's answer,
-    by run key (``runs``), exactly as ``/api/household-impact`` answers that
-    run with ``include: ["by_policy"]``, its split by measure described for
-    these runs. One request: their current-law side is run once, and the
-    runs' simulations go out together (``milburn_household.run_household``).
+    """The Milburn tab's runs for one household: each run's answer, by run
+    id (``runs``), exactly as ``/api/household-impact`` answers that run
+    with ``include: ["by_policy"]``, its split by measure described for
+    these runs. One request: the runs' current-law side is run once, and
+    their simulations go out together (``milburn_household.run_household``).
+    A run the calculator does not cover is refused (422, as any refused
+    answer) with the reason.
     Through the household route's limiter; errors as that route's."""
     from uk_budget_data import milburn_household
 
     # As the API reads them: the answers' defaults filled in, key order aside
     household = data.household.model_dump(mode="json", exclude_unset=True)
     key = json.dumps(household, sort_keys=True)
+    runs = tuple(data.runs or ())
     try:
         received = time.perf_counter()
-        runs, calculating = await anyio.to_thread.run_sync(
+        answers, calculating = await anyio.to_thread.run_sync(
             timed,
             lambda household_json: copy.deepcopy(
-                _cached_milburn_household(household_json)
+                _cached_milburn_household(household_json, runs)
             ),
             key,
             limiter=HOUSEHOLD_REQUESTS,
@@ -837,7 +871,7 @@ async def calculate_milburn_household(
         return {
             "year": milburn_household.YEAR,
             "fiscal_year": milburn_household.FISCAL_YEAR,
-            "runs": runs,
+            "runs": answers,
         }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
