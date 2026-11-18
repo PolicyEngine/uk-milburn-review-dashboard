@@ -580,7 +580,10 @@ export function moreInfo(row, { estimate = null, runLabel = "" } = {}) {
   const test = !verdict
     ? ""
     : verdict.tested
-      ? `${toleranceWords(verdict)}: ours ${Math.round(Math.abs(verdict.gapPct) * 10) / 10}% ${verdict.gapPct < 0 ? "lower" : "higher"}.`
+      ? Number.isFinite(verdict.gapPct) && Number.isFinite(verdict.published)
+        ? // toleranceWords already gives the gap's size and side
+          `${toleranceWords(verdict)}.`
+        : `${toleranceWords(verdict)}: ours ${Math.round(Math.abs(verdict.gapPct) * 10) / 10}% ${verdict.gapPct < 0 ? "lower" : "higher"}.`
       : `Not tested against the ${TOLERANCE_PCT}% tolerance: ${verdict.reason}.`;
   const why = [basis && `Not like for like: ${basis}.`, sentence(row.estimate?.note), test].filter(Boolean).join(" ");
   const unpaired = !row.estimate && Object.hasOwn(UNPAIRED_REASONS, row.id) ? UNPAIRED_REASONS[row.id] : "";

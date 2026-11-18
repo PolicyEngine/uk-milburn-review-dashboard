@@ -488,6 +488,9 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
     .map((policy) => ({ key: policy.seriesKey ?? `measure:${policy.id}`, label: policy.label ?? policy.name, decimals: 2 }));
   const units =
     "£ per person per year; each person counts their household's change in net income (without equivalisation)";
+  // A note line for each exported age whose net is withheld (its cell left empty)
+  const withheldNotes = (points, name = (label) => label) =>
+    points.filter((point) => point.withheld || point.netChange === null || point.netChange === undefined).map((point) => `${name(point.label)}: ${WITHHELD_DETAIL}`);
   const csvText = () =>
     single
       ? buildChartCsv({
@@ -501,6 +504,7 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
           // The real values, not the slivers drawn; the net blank where it
           // is withheld
           rows: published ? singleData.filter((point) => point.netChange !== null || point.parts.length > 0) : [],
+          notes: withheldNotes(published ? singleData.filter((point) => point.netChange !== null || point.parts.length > 0) : [], (label) => `Age ${label}`),
         })
       : buildChartCsv({
           title: `Average change in household net income per person by age, ${yearLabel}`,
@@ -511,6 +515,7 @@ export function MeanChangeCard({ rows, policies, selectedPolicies, selectedYear,
             { key: "netChange", label: "Net change", decimals: 2 },
           ],
           rows: published ? data.filter((point) => !point.suppressed) : [],
+          notes: withheldNotes(published ? data.filter((point) => !point.suppressed) : []),
         });
   const download = {
     chartRef,

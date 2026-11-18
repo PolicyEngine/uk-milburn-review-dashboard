@@ -71,6 +71,7 @@ const bnText = (value) => (missing(value) ? FIGURE_WITHHELD : formatBn(value));
 const ppText = (value) => (missing(value) ? FIGURE_WITHHELD : formatSignedPp(value));
 const pctText = (value) => (missing(value) ? FIGURE_WITHHELD : `${value.toFixed(2)}%`);
 const peopleText = (value) => (missing(value) ? "" : ` (${value < 0 ? "−" : "+"}${formatPeople(Math.abs(value))})`);
+const ariaShare = (value) => (missing(value) ? FIGURE_WITHHELD.toLowerCase() : `${value}%`);
 const signOf = (value) => (value > 0 ? "+" : value < 0 ? "−" : "");
 
 /** The label over the change rows: each path's figure minus its static package's. */
@@ -94,7 +95,8 @@ function changeText(figure, key) {
   const people = figure?.peopleAbs;
   if (missing(people?.static) || missing(people?.scenario)) return points;
   const moved = people.scenario - people.static;
-  return `${points} (${signOf(moved)}${formatPeople(Math.abs(moved))} people)`;
+  // The file's counts are rounded to the nearest thousand, so their difference is too
+  return `${points} (about ${signOf(moved)}${formatPeople(Math.abs(moved))} people)`;
 }
 
 /** The year's table: each figure, for the static package and on each path. */
@@ -259,7 +261,7 @@ export function EntryShares({ data }) {
           </>
         }
       >
-        <div role="img" aria-label={`${title}: ${chartData.map((point) => `${point.year}: phased ${point.central}%, flat ${point.flat}%, rollout ${point.rollout}%`).join("; ")}`}>
+        <div role="img" aria-label={`${title}: ${chartData.map((point) => `${point.year}: phased ${ariaShare(point.central)}, flat ${ariaShare(point.flat)}, rollout ${ariaShare(point.rollout)}`).join("; ")}`}>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={chartData} margin={chartMargin()}>
               <CartesianGrid {...GRID_PROPS} />
@@ -371,7 +373,8 @@ export function EntryYear({ data, year }) {
         </div>
         <p className="milburn-note" data-phased-static="">
           The rollout path is set against the phased package, static: {rows.filter((row) => !row.change).map((row) => `${row.label} ${row.phasedStatic}`).join("; ")}. Each
-          change row is a path&rsquo;s figure minus its own static package&rsquo;s.
+          change row is a path&rsquo;s figure minus its own static package&rsquo;s. The people in a poverty change are a difference of counts rounded to the
+          nearest thousand, so they can differ from the change in points.
         </p>
       </MilburnChartCard>
     </section>

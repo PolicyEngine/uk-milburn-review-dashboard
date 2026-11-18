@@ -21,9 +21,15 @@ vi.mock("../../utils/milburn/packageRun", () => ({
 vi.mock("../../utils/measureCatalogue", () => ({
   useMeasureCatalogue: () => state.catalogue,
 }));
+// jsdom gives ResponsiveContainer no size, so a chart (and its Legend) would
+// never render: the mock hands the chart a fixed width and height instead
 vi.mock("recharts", async () => {
   const actual = await vi.importActual("recharts");
-  return { ...actual, ResponsiveContainer: ({ children }) => <div style={{ width: 800, height: 400 }}>{children}</div> };
+  const { cloneElement } = await vi.importActual("react");
+  return {
+    ...actual,
+    ResponsiveContainer: ({ children }) => <div style={{ width: 800, height: 400 }}>{cloneElement(children, { width: 800, height: 400 })}</div>,
+  };
 });
 
 afterEach(() => {
@@ -53,7 +59,8 @@ const serve = ({ scenarios = fixture, summary = summaryText, review = reviewFigu
 const publishedEntry = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_entry_path.json"), "utf8");
 const publishedScenarios = readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_scenarios.json"), "utf8");
 
-// The published files, not the fixture: a crash on real data (c48f71da) is caught here
+// The published files, not the fixture, with the charts drawn (the mock above):
+// the Legend crash fixed in c48f71da is caught here
 describe("Moves into work on the published files", () => {
   it.each([2027, 2029, 2031])("renders the tab and its entry-path cards in %i", async (year) => {
     vi.stubGlobal("fetch", serve({ entry: publishedEntry, scenarios: publishedScenarios }));
@@ -78,6 +85,8 @@ describe("Moves into work on the published files", () => {
       </>,
     );
     expect(container.querySelector("[data-entry-shares]")).not.toBeNull();
+    // The chart drew its legend, through its label formatter
+    expect(container.querySelector(".recharts-legend-wrapper")?.textContent).toContain("Phased (central)");
     if (year >= 2029) {
       const change = [...container.querySelector('tr[data-row="change_exchequer"]').children].map((cell) => cell.textContent);
       // The flat path's change, in £m: visible where £bn to two places is not
