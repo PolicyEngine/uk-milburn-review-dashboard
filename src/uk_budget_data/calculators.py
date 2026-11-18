@@ -1287,7 +1287,10 @@ class AgeImpactCalculator(BaseCalculator):
             def mean_among(flags):
                 chosen = flags[members]
                 weight_in = float(w[chosen].sum())
-                if chosen.sum() < AGE_CONDITIONAL_MIN_RECORDS or weight_in <= 0:
+                if (
+                    chosen.sum() < AGE_CONDITIONAL_MIN_RECORDS
+                    or weight_in <= 0
+                ):
                     return None
                 return float((w[chosen] * change[members][chosen]).sum()) / (
                     weight_in

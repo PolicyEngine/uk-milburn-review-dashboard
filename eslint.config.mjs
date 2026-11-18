@@ -52,5 +52,7 @@ export default defineConfig([
     'coverage/**',
     'next-env.d.ts',
     'public/**',
+    // The git-ignored static copy scripts/artifact_export.py builds
+    'artifact-export/**',
   ]),
 ]);

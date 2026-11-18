@@ -301,7 +301,9 @@ def test_artifacts_leave_out_the_conditional_means():
         official_basis=[],
     )
     cut = result_tables(result)["age_impact"]
-    assert all(set(row) == set(TABLES["age_impact"].column_names) for row in cut)
+    assert all(
+        set(row) == set(TABLES["age_impact"].column_names) for row in cut
+    )
     canonical_csv("age_impact", cut)
 
 
