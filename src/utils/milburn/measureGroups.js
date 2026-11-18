@@ -108,6 +108,18 @@ export const MILBURN_GROUPS = Object.freeze([
   // it) but are not offered: the central package feeds Key figures' range
   // strip (RANGE_IDS) and the full package Moves into work (illustrative) (the 25% entry run
   // against it)
+  //
+  // Kept, not dropped (issue #5, 18 Nov 2026): of the hidden runs, the page
+  // reads milburn_package_central (RANGE_IDS), milburn_package and
+  // milburn_package_entry_25pct (Moves into work) and the packages' parts
+  // (PACKAGE_PARTS). Five are read by no feature: milburn_package_phased,
+  // uc_health_element_removed_under_22, pip_removed_16_to_24,
+  // youth_allowance_at_25_plus_rate and
+  // uc_health_element_removed_under_25_new_claims. They stay for links
+  // naming them and because milburn_summary.json and
+  // milburn_household_presets.json list them; removing them is one change
+  // that regenerates milburn_measures.json and both of those files and
+  // updates policyDetails.js and the docs together.
   { id: PACKAGES_GROUP, label: "Pre-report packages", hidden: true, ids: ["milburn_package", "milburn_package_central", "milburn_package_phased"] },
   { id: SINGLE_GROUP, label: "Single measures", hidden: true, ids: ["uc_health_element_removed_under_25", "pip_removed_under_25"] },
   {
