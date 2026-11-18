@@ -96,7 +96,13 @@ uv run --with modal modal app stop -y uk-milburn-household          # stop it
 
 Then build the page with `NEXT_PUBLIC_HOUSEHOLD_API_URL=https://policyengine--uk-milburn-household-web.us-east.modal.run/api/household-impact` (confirmed by the deploy). The first request after an idle spell takes one to two minutes while containers start; the page retries. Without the variable the build passes with a warning: the tab shows the stored examples only and says custom households are not available yet.
 
-Tests and lint: `bunx vitest run --pool=forks`, `bunx eslint src`, `.venv/bin/pytest tests/test_milburn_design.py tests/test_milburn_measures.py -n 2`.
+Tests and lint: `bunx vitest run --pool=forks`, `bunx eslint .`, `.venv/bin/pytest -n 4` (without `HUGGING_FACE_TOKEN`; the Milburn design and household checks alone: `.venv/bin/pytest tests/test_milburn_design.py tests/test_milburn_measures.py -n 2`), `.venv/bin/black --check src/ tests/` and `.venv/bin/ruff check src/ tests/`.
+
+### Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request: the Python tests in ten shards (no credentials), Python lint (black, ruff), the public data check (`scripts/check_public_data.py`), the publication gate (`scripts/check-public-files.mjs`), the frontend tests and lint, and a production build that is served and probed on `/uk/milburn-review` by `scripts/smoke-built-site.sh` (every tab address and every data file the page reads, compared byte for byte with the checkout).
+
+The **Certified data** job needs the organisation secret `PE_UK_PRIVATE_HF_READ_TOKEN`, which this repository is not yet given. Without it the job skips every step and passes with a notice that the certified-data tests did not run; nothing else depends on it. Once an organisation admin adds the repository to the secret's selected repositories, the job runs those tests and fails, never skips, if they cannot.
 
 Claude artifact build: `python3 scripts/artifact_export.py` stages a static copy in `artifact-export/publish/`.
 

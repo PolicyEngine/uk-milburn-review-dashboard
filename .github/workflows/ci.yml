@@ -140,67 +140,72 @@ jobs:
     timeout-minutes: 30
     env:
       # Fine-grained, read-only token for the private UK data repository.
+      # This repository is not among the organisation secret's selected
+      # repositories yet, so the token is empty: every step below is then
+      # skipped and the job passes with a notice (README, "Continuous
+      # integration"). A job-level if cannot read secrets, so each step
+      # tests the env value.
       HUGGING_FACE_TOKEN: ${{ secrets.PE_UK_PRIVATE_HF_READ_TOKEN }}
       # Certified-data tests fail, never skip, in this job.
       REQUIRE_CERTIFIED_DATA: "1"
     steps:
+      - name: Say why the job is skipped
+        if: env.HUGGING_FACE_TOKEN == ''
+        run: >-
+          echo "::notice title=Certified data skipped::The
+          PE_UK_PRIVATE_HF_READ_TOKEN secret is not available to this
+          repository, so the certified-data tests did not run."
+
       - uses: actions/checkout@v6
+        if: env.HUGGING_FACE_TOKEN != ''
 
       - name: Install uv
+        if: env.HUGGING_FACE_TOKEN != ''
         uses: astral-sh/setup-uv@v8.1.0
         with:
           save-cache: false
           version: "latest"
 
       - name: Set up Python
+        if: env.HUGGING_FACE_TOKEN != ''
         run: uv python install 3.13
 
       - name: Install dependencies (lockfile must be current)
+        if: env.HUGGING_FACE_TOKEN != ''
         run: uv sync --locked --extra dev
 
       # --also: the certified-data tests also run on policyengine-uk-data's
       # tiny enhanced FRS (tests/publication_support.py's SMALL_DATASET_NAME),
       # a bundle overlay from 6.10.0 that stays in its own repository.
       - name: Check access to the bundle's certified data
+        if: env.HUGGING_FACE_TOKEN != ''
         run: >-
           uv run python -m uk_budget_data.certified_data
           --also enhanced_frs_2024_25_tiny
 
       - name: Run certified-data tests
+        if: env.HUGGING_FACE_TOKEN != ''
         run: uv run pytest tests/ -m certified_data
 
   publication-gate:
     name: Publication gate
+    # The Milburn build publishes flat files under public/data, with no
+    # publication manifest, so the Budget's manifest gate (uk-budget-data
+    # publish check) has nothing to check. This runs the build's own check
+    # of every file under public/ (scripts/check-public-files.mjs: record-
+    # level identifiers, area codes, review rows while sign-off is on) on
+    # its own, so a failure names the gate. scripts/check_public_data.py,
+    # the full check, runs in "Public data check".
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      # Full history: the area code check compares the bound area run's
-      # commit with HEAD, and needs both (and the commits between)
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v8.1.0
-        with:
-          save-cache: false
-          version: "latest"
-
-      - name: Set up Python
-        run: uv python install 3.13
-
-      - name: Install dependencies (lockfile must be current)
-        run: uv sync --locked --extra dev
-
-      # Re-runs every gate over the committed publication manifest: receipts,
-      # file digests, certification, responsiveness, completeness,
-      # reconciliation and combined-run membership. Passes when there is no
-      # manifest yet. --code-root also runs the area code and dataset checks
-      # against the committed area_provenance.json (v2): a change to code
-      # that can change an area figure fails here while a map made with
-      # the old code is bound (#362).
-      - name: Check the publication manifest
-        run: uv run uk-budget-data publish check --code-root .
+      # The check shares the page's digest code, which imports
+      # canonicalize, so it needs the page's packages.
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Check every file under public/
+        run: node scripts/check-public-files.mjs
 
   lint:
     name: Python lint
