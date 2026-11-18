@@ -429,7 +429,7 @@
       "young_people_in_losing_households": 557321,
       "share_of_16_24_in_losing_households_pct": 7.45,
       "average_loss_young_person_in_losing_household": 10497,
-      "average_loss_basis": "netted mean over all 16-24s divided by the share affected (file without the conditional mean; under 0.05% on the other side)",
+      "average_loss_basis": "mean change among 16-24s in losing households",
       "everyone_in_losing_households_pct": 1.96,
       "poverty_change_pp": {
         "rel_bhc": 0.247,
