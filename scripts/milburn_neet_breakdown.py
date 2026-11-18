@@ -132,7 +132,16 @@ def parse_arguments(argv=None):
         "--year",
         type=int,
         default=2029,
-        help="Fiscal year Y for Y-(Y+1) (default: 2029, i.e. 2029-30).",
+        help="Fiscal year Y for Y-(Y+1) (default: 2029, i.e. 2029-30): "
+        "the file's own year.",
+    )
+    parser.add_argument(
+        "--years",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Also these years, under by_year (the simulations are built "
+        "once). --extract then needs {year} in its name.",
     )
     parser.add_argument(
         "--extract",
@@ -219,8 +228,14 @@ def release_lock():
 
 
 def read_people(year):
-    """One row per person aged 16 to 24, from the baseline and the package
-    built as the pipeline builds them (``pipeline.run_flat_unit``)."""
+    """One row per person aged 16 to 24 in ``year``."""
+    return read_years([year])[year]
+
+
+def read_years(years):
+    """By year, one row per person aged 16 to 24, from the baseline and the
+    package built once, as the pipeline builds them
+    (``pipeline.run_flat_unit``)."""
     import numpy as np
     import pandas as pd
     from policyengine_core.periods import period as as_period
@@ -243,56 +258,62 @@ def read_people(year):
     )
     reformed = build_microsimulation(dataset_path, reform.to_scenario())
 
-    def person(sim, variable, dtype=float):
-        return np.asarray(
-            sim.calculate(variable, period=year, map_to="person").values,
-            dtype=dtype,
-        )
+    frames = {}
+    for year in years:
 
-    # The measure's own claimant mask
-    # (budget_measures/uc_health_element_removed_under_25.py), on the baseline
-    population = baseline.populations["person"]
-    period = as_period(year)
-    claimant = (
-        np.asarray(population("is_uc_assessed_claimant", period), dtype=bool)
-        & ~np.asarray(
-            other_member_of_single_claim(population, period), dtype=bool
+        def person(sim, variable, dtype=float):
+            return np.asarray(
+                sim.calculate(variable, period=year, map_to="person").values,
+                dtype=dtype,
+            )
+
+        # The measure's own claimant mask
+        # (budget_measures/uc_health_element_removed_under_25.py), on the baseline
+        population = baseline.populations["person"]
+        period = as_period(year)
+        claimant = (
+            np.asarray(
+                population("is_uc_assessed_claimant", period), dtype=bool
+            )
+            & ~np.asarray(
+                other_member_of_single_claim(population, period), dtype=bool
+            )
+            & np.asarray(
+                population("uc_limited_capability_for_WRA", period), dtype=bool
+            )
         )
-        & np.asarray(
-            population("uc_limited_capability_for_WRA", period), dtype=bool
+        frame = pd.DataFrame(
+            {
+                "age": person(baseline, "age"),
+                "weight": person(baseline, "person_weight"),
+                "decile": person(baseline, "household_income_decile"),
+                "baseline_income": person(baseline, "household_net_income"),
+                "reform_income": person(reformed, "household_net_income"),
+                "employment_income": person(baseline, "employment_income"),
+                "self_employment_income": person(
+                    baseline, "self_employment_income"
+                ),
+                "in_full_time_education": person(
+                    baseline, "is_in_full_time_education", bool
+                ),
+                "baseline_pip": person(baseline, "pip"),
+                "reform_pip": person(reformed, "pip"),
+                "baseline_lcwra_element": person(baseline, "uc_LCWRA_element"),
+                "reform_lcwra_element": person(reformed, "uc_LCWRA_element"),
+                "lcwra_claimant": claimant,
+                "employment_status": np.asarray(
+                    baseline.calculate("employment_status", period=year).values
+                ).astype(str),
+                "in_approved_training": person(
+                    baseline, "is_in_approved_training", bool
+                ),
+                "hours_worked": person(baseline, "hours_worked"),
+            }
         )
-    )
-    frame = pd.DataFrame(
-        {
-            "age": person(baseline, "age"),
-            "weight": person(baseline, "person_weight"),
-            "decile": person(baseline, "household_income_decile"),
-            "baseline_income": person(baseline, "household_net_income"),
-            "reform_income": person(reformed, "household_net_income"),
-            "employment_income": person(baseline, "employment_income"),
-            "self_employment_income": person(
-                baseline, "self_employment_income"
-            ),
-            "in_full_time_education": person(
-                baseline, "is_in_full_time_education", bool
-            ),
-            "baseline_pip": person(baseline, "pip"),
-            "reform_pip": person(reformed, "pip"),
-            "baseline_lcwra_element": person(baseline, "uc_LCWRA_element"),
-            "reform_lcwra_element": person(reformed, "uc_LCWRA_element"),
-            "lcwra_claimant": claimant,
-            "employment_status": np.asarray(
-                baseline.calculate("employment_status", period=year).values
-            ).astype(str),
-            "in_approved_training": person(
-                baseline, "is_in_approved_training", bool
-            ),
-            "hours_worked": person(baseline, "hours_worked"),
-        }
-    )
-    return frame[(frame["age"] >= LOWER_AGE) & (frame["age"] < UPPER_AGE)][
-        list(COLUMNS)
-    ].reset_index(drop=True)
+        frames[year] = frame[
+            (frame["age"] >= LOWER_AGE) & (frame["age"] < UPPER_AGE)
+        ][list(COLUMNS)].reset_index(drop=True)
+    return frames
 
 
 # The summary (light)
@@ -465,31 +486,69 @@ def main(argv=None):
 
     from uk_budget_data import local_build
 
-    extract = arguments.extract.expanduser() if arguments.extract else None
-    if extract and ROOT / "public" in extract.resolve().parents:
-        raise SystemExit("Keep the extract outside public/: it is microdata.")
-    if extract and extract.is_file():
-        print(f"Reading {extract} (no simulation built).")
-        frame = pd.read_csv(extract)
-    else:
+    years = sorted(set(arguments.years or []) | {arguments.year})
+    template = (
+        str(arguments.extract.expanduser()) if arguments.extract else None
+    )
+    if template and len(years) > 1 and "{year}" not in template:
+        raise SystemExit("With --years, --extract needs {year} in its name.")
+    extracts = {
+        year: Path(template.format(year=year)) if template else None
+        for year in years
+    }
+    for extract in extracts.values():
+        if extract and ROOT / "public" in extract.resolve().parents:
+            raise SystemExit(
+                "Keep the extract outside public/: it is microdata."
+            )
+    frames = {}
+    for year, extract in extracts.items():
+        if extract and extract.is_file():
+            print(f"Reading {extract} (no simulation built).")
+            frames[year] = pd.read_csv(extract)
+    missing = [year for year in years if year not in frames]
+    if missing:
         take_lock()
         try:
             print(
                 f"{time.strftime('%H:%M')} lock taken: {LOCK.read_text().strip()}",
                 flush=True,
             )
-            frame = read_people(arguments.year)
+            frames.update(read_years(missing))
         finally:
             release_lock()
             print(f"{time.strftime('%H:%M')} lock released", flush=True)
-        if extract:
-            extract.parent.mkdir(parents=True, exist_ok=True)
-            frame.to_csv(extract, index=False)
-            print(f"Wrote {extract}")
+        for year in missing:
+            if extracts[year]:
+                extracts[year].parent.mkdir(parents=True, exist_ok=True)
+                frames[year].to_csv(extracts[year], index=False)
+                print(f"Wrote {extracts[year]}")
 
-    summary, parts = summarise(frame, arguments.year, local_build.LABEL)
-    reconcile(parts, arguments.year)
-    diagnostics(parts)
+    summaries = {}
+    for year in years:
+        summaries[year], parts = summarise(
+            frames[year], year, local_build.LABEL
+        )
+        reconcile(parts, year)
+        if year == arguments.year:
+            diagnostics(parts)
+    summary = summaries[arguments.year]
+    if len(years) > 1:
+        # Every year, so the table follows the page's year selector
+        summary = {
+            **summary,
+            "by_year": {
+                str(year): {
+                    "year": year,
+                    "groups": item["groups"],
+                    "neet_approx_total": item["neet_approx_total"],
+                    "neet_approx_share_of_16_24_pct": item[
+                        "neet_approx_share_of_16_24_pct"
+                    ],
+                }
+                for year, item in summaries.items()
+            },
+        }
     arguments.output.write_text(
         json.dumps(summary, indent=2, ensure_ascii=False) + "\n"
     )

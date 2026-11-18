@@ -4,7 +4,9 @@ Reads public/data/milburn/<id>/ (budgetary_impact, age_impact, metrics,
 model_build.json) and public/data/milburn_scenarios.json, and writes
 public/data/milburn_summary.json plus a Markdown table on stdout.
 
-Static figures only. The return-to-work break-even is arithmetic on the
+Every year the runs cover goes under "by_year" (the default year's also
+under "runs"); the break-even arithmetic is for YEAR only, the year of the
+household entry cases. Static figures only. The return-to-work break-even is arithmetic on the
 run's Exchequer saving and the household entry-to-work case, labelled as
 illustrative.
 """
@@ -97,7 +99,7 @@ def average_loss(young: dict, gains: bool):
     )
 
 
-def summarise(run_dir: Path, scenarios: dict) -> dict:
+def summarise(run_dir: Path, scenarios: dict, year: int = YEAR) -> dict:
     build = json.loads((run_dir / "model_build.json").read_text())
     rid = run_dir.name
     budget = {
@@ -107,10 +109,10 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     ages = {
         r["age_band"]: r
         for r in rows(run_dir / "age_impact.csv")
-        if int(r["year"]) == YEAR
+        if int(r["year"]) == year
     }
     metrics = next(
-        r for r in rows(run_dir / "metrics.csv") if int(r["year"]) == YEAR
+        r for r in rows(run_dir / "metrics.csv") if int(r["year"]) == year
     )
     young = ages["16-24"]
     people = float(young["people"])
@@ -122,7 +124,7 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     else:
         # A side withheld under the floor: the run's direction is the
         # Exchequer's (a saving is a loss to households)
-        gains = budget.get(YEAR, 0) < 0
+        gains = budget.get(year, 0) < 0
     share = (better if gains else worse)
     share = None if share is None else share / 100
     affected = None if share is None else people * share
@@ -185,7 +187,8 @@ def summarise(run_dir: Path, scenarios: dict) -> dict:
     # estimate.
     # The break-even uses the saving and the count of young people in
     # losing households, not the average loss, so it does not wait on it.
-    if not gains and affected and scenarios:
+    # The household entry cases are for YEAR (2029-30) only
+    if not gains and affected and scenarios and year == YEAR:
         cases = scenarios.get("entry_cases", [])
         saving = budget.get(YEAR, 0) * 1e9
         entrants = {
@@ -226,13 +229,36 @@ def loss_text(value):
 def main():
     sp = ROOT / "public" / "data" / "milburn_scenarios.json"
     scenarios = json.loads(sp.read_text()) if sp.exists() else {}
-    results = [
-        summarise(d, scenarios)
-        for d in sorted(RUNS.iterdir())
-        if (d / "model_build.json").exists()
+    folders = [
+        d for d in sorted(RUNS.iterdir()) if (d / "model_build.json").exists()
     ]
+    results = [summarise(d, scenarios) for d in folders]
+    # Every year the runs cover, under the same floor (the cells each run's
+    # files withhold), so the page's figures follow its year selector;
+    # "year" and "runs" stay the default year's, as before
+    years = sorted(
+        {
+            year
+            for d in folders
+            for year in json.loads((d / "model_build.json").read_text())[
+                "years"
+            ]
+        }
+    )
+    by_year = {
+        str(year): (
+            results
+            if year == YEAR
+            else [summarise(d, scenarios, year) for d in folders]
+        )
+        for year in years
+    }
     (ROOT / "public" / "data" / "milburn_summary.json").write_text(
-        json.dumps({"year": YEAR, "runs": results}, indent=2) + "\n"
+        json.dumps(
+            {"year": YEAR, "runs": results, "years": years, "by_year": by_year},
+            indent=2,
+        )
+        + "\n"
     )
     w = sys.stdout.write
     w(
