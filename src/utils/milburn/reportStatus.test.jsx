@@ -82,6 +82,8 @@ describe("the switch", () => {
     expect(text).not.toMatch(/government will|will adopt|should|must/i);
     expect(REPORT_COPY.after.comparatorsLabel).toBe("Comparators (from April 2027)");
     expect(REPORT_COPY.after.policyLimit).toContain("not government policy unless the government adopts them");
+    // The method line, short: the survey basis and that the figures are static (Vahid, 18 Nov)
+    expect(REPORT_COPY.after.methodSummary).toBe("on a weighted survey of UK households, with and without each measure from the review’s final report. The figures are static.");
   });
 
   it("names the report as published: its title, date and GOV.UK addresses", () => {
@@ -144,7 +146,7 @@ describe("Methodology", () => {
 
   it("after, names the report with its links, lists what it proposes and what we model, and says it is not government policy unless adopted", () => {
     const { container } = renderMethodology(true);
-    expect(container.textContent).toContain("with and without each measure drawn from the final report of the Milburn review of young people and work");
+    expect(container.textContent).toContain("with and without each measure from the review’s final report. The figures are static.");
     const links = (href) => [...topic().querySelectorAll("a")].filter((link) => link.getAttribute("href") === href);
     const [publication] = links(FINAL_REPORT.url);
     expect(publication).toHaveTextContent(FINAL_REPORT.title);

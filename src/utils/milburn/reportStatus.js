@@ -94,7 +94,7 @@ export const REPORT_COPY = Object.freeze({
     metaDescription:
       "PolicyEngine UK estimates of benefit and employer National Insurance measures drawn from From a Welfare State to a Working State, the final report of the independent review of young people and work (the Milburn review, 17 November 2026): the public finances and households by age. The report’s proposals are not government policy unless the government adopts them.",
     methodSummary:
-      "on a survey of UK households with and without each measure drawn from the final report of the Milburn review of young people and work; weights scale the survey to the UK. The figures are static.",
+      "on a weighted survey of UK households, with and without each measure from the review’s final report. The figures are static.",
     reviewTopicPreview: "Final report 17 November 2026 · What it proposes · What we model · Not government policy",
     // The closing paragraphs; the report's link, its proposals and what we model are Methodology's own (MethodologyTab.jsx)
     reviewTopicBody: Object.freeze([
