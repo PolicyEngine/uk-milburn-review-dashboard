@@ -35,6 +35,11 @@
  * cannot be found without netting gains against losses, with
  * average_loss_basis saying why (scripts/milburn_summary.py).
  *
+ * `by_year` repeats the runs for every year they cover (2027-28 to
+ * 2031-32), under the same disclosure floor, so the boxes follow the year
+ * selector (useMilburnSummary's `year`); the break-even figures are for the
+ * default year only.
+ *
  * The file is rewritten as national runs finish, so it is fetched afresh
  * (no cache). A run it does not list is "not yet run"; a figure it does not
  * carry is null, never zero.
@@ -124,15 +129,44 @@ export function parseSummaryRun(run) {
   };
 }
 
-/** The file, checked: null unless it has a year and a list of runs. */
-export function parseSummary(json) {
-  if (!json || typeof json !== "object" || !Number.isInteger(json.year) || !Array.isArray(json.runs)) return null;
+function parseRuns(list) {
   const runs = new Map();
-  for (const raw of json.runs) {
+  for (const raw of list) {
     const run = parseSummaryRun(raw);
     if (run && !runs.has(run.id)) runs.set(run.id, run);
   }
-  return { year: json.year, runs };
+  return runs;
+}
+
+/**
+ * The file, checked: null unless it has a year and a list of runs. Its
+ * `by_year` (every year the runs cover, under the same disclosure floor)
+ * is kept as `byYear`, a Map from year to runs; the default year's runs
+ * are `runs`.
+ */
+export function parseSummary(json) {
+  if (!json || typeof json !== "object" || !Number.isInteger(json.year) || !Array.isArray(json.runs)) return null;
+  const runs = parseRuns(json.runs);
+  const byYear = new Map([[json.year, runs]]);
+  if (json.by_year && typeof json.by_year === "object" && !Array.isArray(json.by_year)) {
+    for (const [key, list] of Object.entries(json.by_year)) {
+      const year = Number(key);
+      if (/^\d{4}$/.test(key) && Array.isArray(list) && year !== json.year) byYear.set(year, parseRuns(list));
+    }
+  }
+  return { year: json.year, runs, byYear };
+}
+
+/**
+ * The summary for one year: the same shape, with that year's runs, or
+ * null when the file has no figures for it. Without a year, the file's
+ * default year.
+ */
+export function summaryForYear(summary, year) {
+  if (!summary) return null;
+  if (year === undefined || year === null || Number(year) === summary.year) return summary;
+  const runs = summary.byYear?.get(Number(year));
+  return runs ? { ...summary, year: Number(year), runs } : null;
 }
 
 /** One run's figures, or null when the file does not list it (not yet run). */
@@ -213,7 +247,7 @@ export function savingShare(run, ofRun, year) {
  * Fetched afresh whenever `refresh` changes (the catalogue's fingerprint,
  * which changes as runs are added), so a run that finishes appears.
  */
-export function useMilburnSummary(refresh, { basePath = process.env.NEXT_PUBLIC_BASE_PATH || "", enabled = true } = {}) {
+export function useMilburnSummary(refresh, { basePath = process.env.NEXT_PUBLIC_BASE_PATH || "", enabled = true, year } = {}) {
   const [state, setState] = useState({ status: "loading", summary: null });
   useEffect(() => {
     if (!enabled) return undefined;
@@ -233,7 +267,13 @@ export function useMilburnSummary(refresh, { basePath = process.env.NEXT_PUBLIC_
       cancelled = true;
     };
   }, [refresh, basePath, enabled]);
-  return enabled ? state : { status: "unavailable", summary: null };
+  if (!enabled) return { status: "unavailable", summary: null };
+  // A year asked for: that year's figures, or unavailable when the file has none
+  if (year !== undefined && state.status === "ready") {
+    const chosen = summaryForYear(state.summary, year);
+    return chosen ? { status: "ready", summary: chosen } : { status: "unavailable", summary: null };
+  }
+  return state;
 }
 
 /** The poverty measure the summary counts directly: absolute, before housing costs, all people. */
@@ -245,15 +285,15 @@ const DIRECT_COUNT_KEYS = new Set([DIRECT_COUNT_METRIC, "poverty_abs_bhc_change_
  * The summary's direct count of people moved into poverty, as
  * count(runId, year, metricKey): the run's people_into_poverty_abs_bhc
  * (negative: out of poverty) for absolute poverty before housing costs in
- * the summary's year, else null. So a poverty card that would otherwise
+ * that year (by_year), else null. So a poverty card that would otherwise
  * multiply the rate's change by the population reads the same count as
  * Key figures. Null without a summary.
  */
 export function summaryPovertyCount(summary) {
   if (!summary?.runs) return null;
   return (runId, year, metricKey) => {
-    if (!DIRECT_COUNT_KEYS.has(metricKey) || Number(year) !== summary.year) return null;
-    return finite(summary.runs.get(runId)?.peopleIntoPovertyAbs);
+    if (!DIRECT_COUNT_KEYS.has(metricKey)) return null;
+    return finite(summaryForYear(summary, year)?.runs.get(runId)?.peopleIntoPovertyAbs);
   };
 }
 

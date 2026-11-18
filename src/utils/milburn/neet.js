@@ -40,20 +40,49 @@ const FIGURES = [
 const finite = (value) => (typeof value === "number" && Number.isFinite(value) ? value : null);
 const text = (value) => (typeof value === "string" ? value.trim() : "");
 
-/** The file, checked: every figure a finite number or null. Null without its run, its year or either group. */
-export function parseNeet(json) {
-  if (!json || typeof json !== "object" || !text(json.reform_id)) return null;
-  const year = Number.isInteger(json.year) ? json.year : null;
-  const source = json.groups && typeof json.groups === "object" ? json.groups : null;
-  if (year === null || !source) return null;
+function parseGroups(source) {
+  if (!source || typeof source !== "object") return null;
   const groups = {};
   for (const { key } of NEET_GROUPS) {
     const group = source[key];
     if (!group || typeof group !== "object") return null;
     groups[key] = Object.fromEntries(FIGURES.map((figure) => [figure, finite(group[figure])]));
   }
+  return groups;
+}
+
+/**
+ * The breakdown for one year: the file's own year's, or a by_year entry's
+ * (its groups, total and share), or the file's own year when it does not
+ * cover the year asked for.
+ */
+export function neetForYear(neet, year) {
+  const chosen = neet?.byYear?.get(Number(year));
+  return chosen ? { ...neet, ...chosen } : neet;
+}
+
+/** The file, checked: every figure a finite number or null. Null without its run, its year or either group. */
+export function parseNeet(json) {
+  if (!json || typeof json !== "object" || !text(json.reform_id)) return null;
+  const year = Number.isInteger(json.year) ? json.year : null;
+  const source = json.groups && typeof json.groups === "object" ? json.groups : null;
+  if (year === null || !source) return null;
+  const groups = parseGroups(source);
+  if (!groups) return null;
+  // Every year the file covers (by_year), each with its own groups and total
+  const byYear = new Map([[year, { year, groups, total: finite(json.neet_approx_total), shareOfYoung: finite(json.neet_approx_share_of_16_24_pct) }]]);
+  if (json.by_year && typeof json.by_year === "object" && !Array.isArray(json.by_year)) {
+    for (const [key, item] of Object.entries(json.by_year)) {
+      const other = Number(key);
+      const otherGroups = item && typeof item === "object" ? parseGroups(item.groups) : null;
+      if (/^\d{4}$/.test(key) && other !== year && otherGroups) {
+        byYear.set(other, { year: other, groups: otherGroups, total: finite(item.neet_approx_total), shareOfYoung: finite(item.neet_approx_share_of_16_24_pct) });
+      }
+    }
+  }
   return {
     reformId: text(json.reform_id),
+    byYear,
     year,
     build: text(json.build),
     definition: text(json.definition),

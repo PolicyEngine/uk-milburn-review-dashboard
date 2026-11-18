@@ -2,7 +2,7 @@ import TitleIcon from "../TitleIcon";
 import { MilburnChartCard } from "./MilburnCharts";
 import { shortSource } from "./SourceChip";
 import { yearLabel } from "../../utils/displayYears";
-import { NEET_GROUPS, useNeetBreakdown } from "../../utils/milburn/neet";
+import { NEET_GROUPS, neetForYear, useNeetBreakdown } from "../../utils/milburn/neet";
 import { buildChartCsv } from "../../utils/chartCsv";
 import "./NeetBreakdown.css";
 
@@ -118,15 +118,18 @@ export function neetCsv(neet) {
 
 /**
  * Impact, Young people: the report package's effect on 16 to 24-year-olds
- * who are approximately NEET, beside the other 16 to 24-year-olds. The
- * figures are for the year the file was made for, whatever year is chosen.
+ * who are approximately NEET, beside the other 16 to 24-year-olds, in the
+ * year chosen when the file covers it (by_year), else the file's own year,
+ * which the title names.
  * Nothing unless one run is selected, its file can be read, and that run is
  * the one the file was made for (the report package).
  */
-export default function NeetBreakdown({ selectedPolicies = [] }) {
+export default function NeetBreakdown({ selectedPolicies = [], selectedYear }) {
   const selected = selectedPolicies.length === 1 ? selectedPolicies[0] : null;
-  const { status, neet, benchmark } = useNeetBreakdown({ enabled: selected !== null });
-  if (selected === null || status !== "ready" || neet.reformId !== selected) return null;
+  const { status, neet: file, benchmark } = useNeetBreakdown({ enabled: selected !== null });
+  if (selected === null || status !== "ready" || file.reformId !== selected) return null;
+  // The chosen year's figures where the file has them (by_year), else its own year's, named in the title
+  const neet = neetForYear(file, selectedYear);
   const year = yearLabel(neet.year);
   const description = `The report package's effect on NEET 16 to 24-year-olds, beside other 16 to 24-year-olds, ${year}.`;
   return (

@@ -33,6 +33,7 @@ import UpdateToast from "./components/publication/UpdateToast";
 import { provisionalNotice } from "./utils/publication/manifest";
 import { reportCopy } from "./utils/milburn/reportStatus";
 import { isLocalBuildRoute, localBuildNotice } from "./utils/milburn/localBuild";
+import { SINGLE_YEAR_RULE } from "./components/milburn/MilburnCharts";
 import LocalBuildLabel from "./components/milburn/LocalBuildLabel";
 import { milburnDefaultMeasure } from "./utils/milburn/measureGroups";
 import { DownloadContext, policiesLabel } from "./utils/downloadContext";
@@ -967,7 +968,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     <p className="milburn-header-hint" data-header-hint="">
       <TitleIcon name="layers" bare size={14} />
       <span>
-        Choose the <strong>policy</strong> and the <strong>year</strong> in the header above; the charts below follow your choice.
+        Choose the <strong>policy</strong> and the <strong>year</strong> in the header above; the charts below follow your choice. {SINGLE_YEAR_RULE}
       </span>
     </p>
   );
@@ -1030,7 +1031,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
             title="How the selected policy changes poverty"
             subtitle="Change in poverty rates with the selected policy."
           />
-          <PovertyHeadline runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} />
+          <PovertyHeadline runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined} selectedYear={distributionalYear} />
           {/* The change by year beside which measures move it */}
           <section id="poverty" className="report-section">
             <PovertyMeasuresRow
@@ -1054,6 +1055,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
             <div className="results-container milburn-key-wrap">
               <KeyFigures
                 runId={selectedPolicies.length === 1 ? selectedPolicies[0] : undefined}
+                selectedYear={distributionalYear}
               />
             </div>
           )}

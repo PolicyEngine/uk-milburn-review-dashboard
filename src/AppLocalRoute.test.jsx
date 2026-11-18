@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import App, { STATIC_CAVEAT_ANCHOR, STATIC_CAVEAT_LINE } from "./App";
+import { SINGLE_YEAR_RULE } from "./components/milburn/MilburnCharts";
 
 vi.mock("./components/MethodologyTab", () => ({ default: () => <div data-testid="methodology-view" />, METHOD_SECTIONS: {} }));
 
@@ -82,7 +83,9 @@ describe("the local build route's page", () => {
       expect(found).not.toBeNull();
       return found;
     });
-    expect(hint.textContent).toBe("Choose the policy and the year in the header above; the charts below follow your choice.");
+    // The one rule for what stays on one year, said once, here
+    expect(hint.textContent).toBe(`Choose the policy and the year in the header above; the charts below follow your choice. ${SINGLE_YEAR_RULE}`);
+    expect(document.querySelectorAll("[data-year-only]").length).toBe(0);
     const line = document.querySelector("[data-static-line]");
     expect(line.textContent).toBe(`${STATIC_CAVEAT_LINE}: see Methodology`);
     expect(line.textContent).toBe("Static estimates with no replacement payments modelled: see Methodology");

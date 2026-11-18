@@ -18,7 +18,7 @@ import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
 import { buildChartCsv } from "../../utils/chartCsv";
 import { POVERTY_FIGURES_SHOWN } from "../../utils/povertyFigures";
-import { BoxDownload, SubTabLink, YearOnlyChip } from "./MilburnCharts";
+import { BoxDownload, SubTabLink } from "./MilburnCharts";
 import "./milburn.css";
 
 /**
@@ -195,7 +195,7 @@ export function keyFiguresCsv(run, year, name, { keys = YOUNG_TILE_KEYS } = {}) 
  * A run the file does not list says it has not yet run. Only on the local
  * build route.
  */
-export default function KeyFigures({ runId }) {
+export default function KeyFigures({ runId, selectedYear }) {
   const catalogue = useMeasureCatalogue();
   const id = runId || HEADLINE_RUN;
   const measure = catalogue.byId?.get(id);
@@ -203,7 +203,8 @@ export default function KeyFigures({ runId }) {
   // The tiles, for the box's image download
   const tilesRef = useRef(null);
   // Read afresh whenever the runs the page read change
-  const { status, summary } = useMilburnSummary(catalogue.manifest?.snapshotSha256 ?? null);
+  // The chosen year's figures (milburn_summary.json's by_year)
+  const { status, summary } = useMilburnSummary(catalogue.manifest?.snapshotSha256 ?? null, { year: selectedYear });
   if (!catalogue.localBuild) return null;
 
   const run = status === "ready" ? summaryRun(summary, id) : null;
@@ -218,7 +219,6 @@ export default function KeyFigures({ runId }) {
       </h3>
       {/* One selected policy: the header's button names it (screen readers only here); otherwise the fallback is named on the card */}
       {runId ? <p className="visually-hidden">{name}</p> : <p data-fallback-run="">{fallbackRunLine(name)}</p>}
-      {status === "ready" && <YearOnlyChip year={summary.year} />}
       {tiles.length > 0 && (
         <BoxDownload title={title} name="key-figures" targetRef={tilesRef} csv={() => keyFiguresCsv(run, summary.year, name)} />
       )}

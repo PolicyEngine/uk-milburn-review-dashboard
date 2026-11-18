@@ -15,7 +15,7 @@ import TitleIcon from "../TitleIcon";
 import BenchmarkCallout from "./BenchmarkCallout";
 import { buildChartCsv } from "../../utils/chartCsv";
 import { CASH_TERMS_NOTE, fallbackRunLine, packageRange, PARTIAL_REMOVAL_NOTE, ROUNDING_NOTE } from "./KeyFigures";
-import { BoxDownload, YearOnlyChip } from "./MilburnCharts";
+import { BoxDownload } from "./MilburnCharts";
 import "./milburn.css";
 
 /** The four poverty lines the summary carries, absolute before housing costs first. */
@@ -49,16 +49,17 @@ function MeterRow({ icon, label, value, width, tone, current }) {
 }
 
 /** The run the headline reads (one chosen policy, or the report's package) and its summary. */
-function useHeadlineRun(runId) {
+function useHeadlineRun(runId, year) {
   const catalogue = useMeasureCatalogue();
   const id = runId || HEADLINE_RUN;
   const measure = catalogue.byId?.get(id);
-  const { status, summary } = useMilburnSummary(catalogue.manifest?.snapshotSha256 ?? null);
+  // The chosen year's figures (milburn_summary.json's by_year)
+  const { status, summary } = useMilburnSummary(catalogue.manifest?.snapshotSha256 ?? null, { year });
   const run = status === "ready" ? summaryRun(summary, id) : null;
   return { local: Boolean(catalogue.localBuild), name: measure ? shortNameOf(measure) : id, fallback: !runId, summary, run };
 }
 
-function Heading({ title, name, fallback, onlyYear, download = null }) {
+function Heading({ title, name, fallback, download = null }) {
   return (
     <div className="milburn-key-heading">
       <h3>
@@ -67,8 +68,6 @@ function Heading({ title, name, fallback, onlyYear, download = null }) {
       </h3>
       {/* One selected policy: the header's button names it (screen readers only here); otherwise the fallback is named on the card */}
       {fallback ? <p data-fallback-run="">{fallbackRunLine(name)}</p> : <p className="visually-hidden">{name}</p>}
-      {/* The box's figures are for this year whatever year is chosen above the page */}
-      {onlyYear !== undefined && <YearOnlyChip year={onlyYear} />}
       {download}
     </div>
   );
@@ -175,11 +174,10 @@ export function financesHeadlineCsv(run, summary, name, shown) {
  * moved across the absolute and relative lines, child poverty, the change
  * on each of the four lines side by side, and the packages' range of
  * people moved into absolute poverty, from milburn_summary.json for the
- * summary's year only (the file has no other year's poverty figures), and
- * labelled so. Nothing while the run or the file is missing.
+ * year chosen above the page. Nothing while the run or the file is missing.
  */
-export function PovertyHeadline({ runId }) {
-  const { local, name, fallback, summary, run } = useHeadlineRun(runId);
+export function PovertyHeadline({ runId, selectedYear }) {
+  const { local, name, fallback, summary, run } = useHeadlineRun(runId, selectedYear);
   const figuresRef = useRef(null);
   if (!local || !run) return null;
   const direction = (count) => (count >= 0 ? "into" : "out of");
@@ -195,7 +193,6 @@ export function PovertyHeadline({ runId }) {
         title="Poverty at a glance"
         name={name}
         fallback={fallback}
-        onlyYear={summary.year}
         download={<BoxDownload title={title} name="poverty-at-a-glance" targetRef={figuresRef} csv={() => povertyHeadlineCsv(run, summary, name)} />}
       />
       <div ref={figuresRef} className="milburn-box-figures">
@@ -289,7 +286,7 @@ export function PovertyHeadline({ runId }) {
  * Nothing while the run or the file is missing.
  */
 export function FinancesHeadline({ runId, selectedYear }) {
-  const { local, name, fallback, summary, run } = useHeadlineRun(runId);
+  const { local, name, fallback, summary, run } = useHeadlineRun(runId, selectedYear);
   const figuresRef = useRef(null);
   if (!local || !run) return null;
   const years = Object.keys(run.savingBn).sort();

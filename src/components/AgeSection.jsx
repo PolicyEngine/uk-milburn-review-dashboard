@@ -102,7 +102,7 @@ export default function AgeSection({ selectedPolicies, selectedYear, policies })
           </div>
         </section>
       </MeasureKeyProvider>
-      <NeetBreakdown selectedPolicies={selectedPolicies} />
+      <NeetBreakdown selectedPolicies={selectedPolicies} selectedYear={selectedYear} />
       {POVERTY_FIGURES_SHOWN ? (
         <>
           <SectionHeading

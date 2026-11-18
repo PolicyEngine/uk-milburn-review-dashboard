@@ -25,6 +25,7 @@ import {
   savingInYear,
   savingShare,
   summaryPovertyCount,
+  summaryForYear,
   summaryRun,
 } from "./summary";
 import { povertyWaterfall } from "../../components/MeasuresPovertyCard";
@@ -277,8 +278,8 @@ describe("KeyFigures", () => {
     expect(region.textContent.match(/upper bound/g)).toHaveLength(1);
     // One policy selected: no fallback line
     expect(region.querySelector("[data-fallback-run]")).toBeNull();
-    // The figures are for the summary's year whatever year is chosen: said
-    expect(region.querySelector("[data-year-only]").textContent).toBe(yearOnlyText(2027));
+    // The figures follow the year selector: no year-only chip
+    expect(region.querySelector("[data-year-only]")).toBeNull();
   });
 
   it("links to the sub-tabs that hold the saving and poverty, and to Benchmarks for published figures", async () => {
@@ -391,9 +392,8 @@ describe("headline tiles", () => {
     expect(ROUNDING_NOTE).toBe("Counts rounded to the nearest thousand.");
     expect(poverty.querySelector(".milburn-key-heading [data-source-kind]")).toBeNull();
     expect(poverty.querySelector(".milburn-key-heading .milburn-status-chip:not([data-year-only])")).toBeNull();
-    // Its figures are for the summary's year whatever year is chosen: said
-    expect(poverty.querySelector("[data-year-only]").textContent).toBe(yearOnlyText(2027));
-    expect(yearOnlyText(2027)).toBe("2027-28 only: the year selector does not change these figures.");
+    // Its figures follow the year selector: no year-only chip
+    expect(poverty.querySelector("[data-year-only]")).toBeNull();
     // Published figures: one line to Benchmarks
     expect(poverty.querySelector(".bm-callout").textContent).toBe("Published figures for comparison: see Benchmarks");
     expect(downloadMenus(poverty).map((menu) => menu.formats)).toEqual([STANDARD_FORMATS]);
@@ -585,11 +585,12 @@ describe("the poverty card's direct count", () => {
   const published = parseSummary(JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8")));
   const count = summaryPovertyCount(published);
 
-  it("reads the summary's count for absolute poverty before housing costs in its year only", () => {
+  it("reads the summary's count for absolute poverty before housing costs in each year it covers", () => {
     expect(published.year).toBe(2029);
     expect(count("milburn_package", 2029, "poverty_abs_bhc_change_pp")).toBe(342299);
-    expect(count("milburn_package", 2028, "poverty_abs_bhc_change_pp")).toBeNull();
-    expect(count("milburn_package", 2027, "poverty_abs_bhc_change_pp")).toBeNull();
+    // Every year the runs cover (by_year), under the same floor
+    expect(Number.isFinite(count("milburn_package", 2028, "poverty_abs_bhc_change_pp"))).toBe(true);
+    expect(count("milburn_package", 2026, "poverty_abs_bhc_change_pp")).toBeNull();
     expect(count("milburn_package", 2029, "poverty_rel_ahc_change_pp")).toBeNull();
     expect(count("not_a_run", 2029, "poverty_abs_bhc_change_pp")).toBeNull();
     expect(summaryPovertyCount(null)).toBeNull();
@@ -674,5 +675,42 @@ describe("measure groups", () => {
     expect(milburnDefaultMeasure(catalogueOrder).id).toBe("milburn_report_package");
     expect(milburnDefaultMeasure([{ id: "milburn_package_entry_25pct" }, { id: "pip_halved_under_25" }]).id).toBe("pip_halved_under_25");
     expect(milburnDefaultMeasure([])).toBeNull();
+  });
+});
+
+describe("the summary by year", () => {
+  it("gives each year's runs, the default year's as runs, and null for a year it does not cover", () => {
+    const summary = parseSummary({
+      year: 2029,
+      runs: [{ id: "a", saving_bn: { 2029: 1 }, young_people_in_losing_households: 10 }],
+      by_year: {
+        2029: [{ id: "a", saving_bn: { 2029: 1 }, young_people_in_losing_households: 10 }],
+        2030: [{ id: "a", saving_bn: { 2030: 2 }, young_people_in_losing_households: null }],
+      },
+    });
+    expect(summaryForYear(summary, 2029)).toBe(summary);
+    const later = summaryForYear(summary, 2030);
+    expect(later.year).toBe(2030);
+    // A withheld figure stays null, never zero
+    expect(summaryRun(later, "a").youngPeopleLosing).toBeNull();
+    expect(summaryForYear(summary, 2031)).toBeNull();
+  });
+});
+
+describe("the NEET breakdown by year", () => {
+  it("reads a year the file covers, and keeps the file's own year otherwise", async () => {
+    const { parseNeet, neetForYear } = await import("./neet");
+    const group = (population) => ({ records: 500, population, share_in_losing_households_pct: null, average_change_in_household_net_income: -10, people_losing_uc_health_or_pip: null, share_losing_uc_health_or_pip_pct: null });
+    const neet = parseNeet({
+      reform_id: "milburn_report_package",
+      year: 2029,
+      groups: { neet_approx: group(1), other_16_24: group(2) },
+      neet_approx_total: 1,
+      by_year: { 2030: { year: 2030, groups: { neet_approx: group(3), other_16_24: group(4) }, neet_approx_total: 3 } },
+    });
+    expect(neetForYear(neet, 2030).year).toBe(2030);
+    expect(neetForYear(neet, 2030).groups.neet_approx.population).toBe(3);
+    expect(neetForYear(neet, 2030).groups.neet_approx.share_in_losing_households_pct).toBeNull();
+    expect(neetForYear(neet, 2027).year).toBe(2029);
   });
 });
