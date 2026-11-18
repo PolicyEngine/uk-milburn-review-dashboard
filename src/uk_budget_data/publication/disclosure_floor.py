@@ -551,12 +551,47 @@ def _count(row, column):
     return int(value)
 
 
+def flat_withheld_age_labels(thin: list[str], labels: list[str]) -> set[str]:
+    """Which of a run-year's age rows to withhold for one statistic, given
+    its thin groups, so that no published row, sum or difference gives one
+    back. Unlike ``withheld_age_labels``, a thin band takes "all" (which the
+    bands add up to) rather than every other band, so the other bands stay:
+
+    - "all" thin: every row;
+    - a band thin: the band, its single ages and "all";
+    - a single age thin, or a band's ages without a row: the band's single
+      ages (the band and "all" stay, as each then gives back only groups
+      that are not thin).
+    """
+    if AGE_BAND_ALL in thin:
+        return set(labels)
+    bands = {label for label, _, _ in AGE_BANDS}
+    withheld = set()
+    thin_bands = bands & set(thin)
+    if thin_bands or NO_BAND in thin:
+        withheld |= {AGE_BAND_ALL} | thin_bands
+    dirty = set(thin_bands)
+    for label in thin:
+        if label.endswith(OTHER_AGES):
+            dirty.add(label[: -len(OTHER_AGES)])
+        elif label not in bands and label not in (AGE_BAND_ALL, NO_BAND):
+            dirty.add(_band_of_single_age(label))
+    withheld |= {
+        label
+        for label in labels
+        if label not in bands
+        and label != AGE_BAND_ALL
+        and _band_of_single_age(label) in dirty
+    }
+    return withheld & set(labels)
+
+
 def flat_age_withholding(rows: list[dict]) -> dict[str, set[str]]:
     """One run-year's age rows: the columns to withhold, by row label.
 
     Each statistic is withheld where its count is thin, with whatever
-    would give it back (``withheld_age_labels``: a single age takes its
-    band's other single ages; a thin band every row but "all"). A withheld
+    would give it back (``flat_withheld_age_labels``: a single age takes its
+    band's other single ages; a thin band its single ages and "all"). A withheld
     share takes ``pct_unchanged`` (100 less the two shares), and a withheld
     side takes the other side's conditional mean, since the row's mean
     change less the other side's share times mean gives back its total."""
@@ -574,8 +609,8 @@ def flat_age_withholding(rows: list[dict]) -> dict[str, set[str]]:
         ]
         if not thin:
             continue
-        dropped = withheld_age_labels(thin, labels)
-        for label in labels if dropped is None else dropped:
+        dropped = flat_withheld_age_labels(thin, labels)
+        for label in dropped:
             withheld.setdefault(label, set()).update(columns)
     for columns in withheld.values():
         for side, other in (("worse", "better"), ("better", "worse")):

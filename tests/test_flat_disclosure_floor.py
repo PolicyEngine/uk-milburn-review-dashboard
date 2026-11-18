@@ -50,8 +50,20 @@ def test_thin_better_share_takes_unchanged_and_other_mean():
         "pct_unchanged",
         "mean_change_worse_off",
     }
-    # A thin band leaves only "all"
-    assert "all" not in plan
+    # A thin band takes "all", which the bands add up to
+    assert "pct_better_off" in plan["all"]
+
+
+def test_thin_band_keeps_the_other_bands():
+    rows = [
+        age_row("16-24"),
+        age_row("35-49", better=1),
+        age_row("all", better=10),
+        age_row("40"),
+        age_row("20"),
+    ]
+    plan = flat_age_withholding(rows)
+    assert set(plan) == {"35-49", "40", "all"}
 
 
 def test_thin_single_age_takes_its_band_single_ages():
