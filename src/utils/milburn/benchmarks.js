@@ -264,6 +264,10 @@ export const TOLERANCE = Object.freeze({
   pip_spend_16_24: { untested: "the review's figure gives no area" },
   uc_health_spend_16_24: { untested: "the review's figure gives no area" },
   employer_nics_under_25: { untested: "another model's estimate, not an official count" },
+  // neet_16_24 has no pair, so no entry: ONS publishes the NEET counts by
+  // quarter only (the LFS NEET dataset), with no 2025 average to link. A
+  // mean of its four 2025 quarters (943,416, not seasonally adjusted) is our
+  // arithmetic, not an ONS figure (issue #5).
 });
 
 /**

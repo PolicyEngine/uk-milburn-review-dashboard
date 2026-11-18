@@ -205,6 +205,8 @@ describe("the benchmark charts", () => {
     const nics = comparisonFor(row("employer_nics_under_25"));
     expect(nics).toMatchObject({ unit: "bn", published: 5.1, estimate: 5.85, publishedText: "£5.1bn", estimateText: "£5.85bn" });
     expect(gap("employer_nics_under_25")).toBe(15);
+    // The RF's £5.1bn is its Take a chance on me (Figure 10, as corrected on 2 September), not the 11 November comment
+    expect(row("employer_nics_under_25")).toMatchObject({ url: "https://www.resolutionfoundation.org/publications/take-a-chance-on-me/", date: "29 June 2026" });
     expect(comparisonFor(row("young_pip_recipients"))).toMatchObject({ unit: "count", published: 450000, estimate: 406919 });
     // Like-for-like pairs print their gap; the PIP caseload still differs in date and area, and says so
     expect(Object.keys(DIFFERENT_BASIS)).toEqual(["young_pip_recipients"]);
