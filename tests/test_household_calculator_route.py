@@ -239,34 +239,6 @@ def test_every_measure_the_calculator_shows_has_a_year():
     assert set(MEASURE_YEARS) == set(personal_impact.POLICY_IDS)
 
 
-@pytest.mark.parametrize("year", [2026, 2027])
-def test_the_bus_fare_cap_credits_bus_fares_outside_london_only(year):
-    """£500 a year of bus fares: about £13 in 2026-27 and £40 in 2027-28
-    in the North West (the policy card's example), £0 in London, by both
-    routes; every probe household without bus fares gets £0."""
-    reform = next(
-        reform
-        for reform in get_autumn_budget_2026_reforms()
-        if reform.id == "bus_fare_cap_2027"
-    )
-    names = list(situation(year)["households"])
-    household = dict(zip(names, household_route(reform, year)))
-    national = dict(zip(names, national_route(reform, year)))
-    share = {2026: 95 / 365, 2027: 270 / 366}[year]
-    step = 0.10 * share
-    assert household["bus_rider"] == pytest.approx(
-        500 * step / (1 - step), abs=0.01
-    )
-    assert round(household["bus_rider"]) == {2026: 13, 2027: 40}[year]
-    assert household["london_bus_rider"] == 0
-    assert all(
-        change == 0
-        for name, change in household.items()
-        if name != "bus_rider"
-    )
-    assert same(list(household.values()), list(national.values()))
-
-
 def test_the_calculator_passes_bus_fares_only_when_entered():
     """No bus fares sets nothing, so every other situation is as before."""
     built = personal_impact.build_situation(

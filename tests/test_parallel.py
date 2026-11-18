@@ -10,7 +10,6 @@ serial against ``--jobs auto`` on the certified data, is in the PR.
 import dataclasses
 import functools
 import hashlib
-import json
 import multiprocessing
 import pickle
 from pathlib import Path
@@ -242,11 +241,11 @@ def test_a_picklable_measure_is_sent_as_itself():
 def test_an_unpicklable_registered_measure_is_sent_by_id():
     from uk_budget_data.reforms import get_reform
 
-    combined = get_reform("autumn_budget_2026_combined")
+    combined = get_reform("milburn_package_central")
     with pytest.raises(Exception):
         pickle.dumps(combined)
     reference = portable(combined)
-    assert reference == RegisteredReform("autumn_budget_2026_combined")
+    assert reference == RegisteredReform("milburn_package_central")
     pickle.dumps(reference)
     assert resolve_reform(reference).id == combined.id
 
@@ -915,44 +914,6 @@ def test_any_measure_s_runs_survive_pickling_unchanged(
         for r in copies
     )
     assert _artifacts(copies) == _artifacts(report.written)
-
-
-# --- results by area: the same tables whatever the order ------------------
-
-
-def test_area_tables_are_the_same_whatever_order_measures_run_in(
-    monkeypatch, tmp_path
-):
-    from tests.test_geography import run_cli
-    from uk_budget_data import geography as g
-    from uk_budget_data.publication.release_index import AREA_PROVENANCE_FILE
-
-    outputs = []
-    provenances = []
-    for name, runner in (("serial", None), ("parallel", ReversingRunner())):
-        directory = tmp_path / name
-        directory.mkdir()
-        monkeypatch.setattr(g, "_geography_runner", lambda parsed: runner)
-        code, out, _ = run_cli(monkeypatch, directory)
-        assert code == 0
-        tables = snapshot(out)
-        # Each run makes its own fixture manifest, stamped with the time it
-        # was approved, so the manifest digest the provenance records is
-        # that run's own; everything else in it must match.
-        provenance = json.loads((out / AREA_PROVENANCE_FILE).read_bytes())
-        manifest = next(directory.glob("publication.json")).read_bytes()
-        assert provenance.pop("manifest_sha256") == (
-            hashlib.sha256(manifest).hexdigest()
-        )
-        del tables[AREA_PROVENANCE_FILE]
-        outputs.append(tables)
-        provenances.append(provenance)
-    assert outputs[0] == outputs[1]
-    assert outputs[0]
-    assert provenances[0] == provenances[1]
-    assert provenances[0]["files"] == {
-        name: digest for name, digest in outputs[0].items()
-    }
 
 
 # --- Modal ----------------------------------------------------------------

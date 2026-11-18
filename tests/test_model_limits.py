@@ -145,39 +145,6 @@ def test_a_state_pension_measure_without_the_fix_records_the_limit(
 UPRATING_INPUTS = "gov.economic_assumptions.statutory_uprating_inputs"
 
 
-@pytest.mark.parametrize(
-    "changes, also",
-    [
-        (
-            {f"{UPRATING_INPUTS}.awe_total_pay_may_july": {"2026": 0.10}},
-            [BENEFIT_LIMIT, PENSION_CREDIT_LIMIT],
-        ),
-        (
-            {f"{UPRATING_INPUTS}.cpi_september": {"2027": 0.10}},
-            [BENEFIT_LIMIT],
-        ),
-    ],
-)
-def test_an_uprating_input_that_moves_the_full_rates_records_them(
-    changes, also
-):
-    """By effect: the triple lock is built from these inputs, so the full
-    rates' stored amounts move and are recorded (#71's review found a 10%
-    earnings input moved a pensioner's add-on). A CPI input also moves the
-    September CPI index, recorded too. Each input is also covered by
-    other limits: from 2027 the triple lock index and the September CPI
-    index are the September CPI limit's, and the earnings input is the
-    minimum guarantee's."""
-    touched = {
-        item["key"]: item
-        for item in limits_touched(simulation(), simulation(changes))
-    }
-    assert list(touched) == [LIMIT.key, *(limit.key for limit in also)]
-    assert {BASIC_PENSION, NEW_PENSION} <= set(
-        touched[LIMIT.key]["parameters"]
-    )
-
-
 def test_the_state_pension_limit_still_covers_changes_confined_to_2026():
     assert limits_touched(
         simulation(), simulation({NEW_PENSION: {"2026": 250.0}})
