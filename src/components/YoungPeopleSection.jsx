@@ -88,7 +88,7 @@ const MEAN_DESCRIPTION =
 const SINGLE_AGE_DESCRIPTION =
   `Average change in household income per person, £ a year, by single year of age (${SINGLE_AGE_FIRST} to ${SINGLE_AGE_LAST}); bars add each policy's own effect.`;
 const SHARES_DESCRIPTION =
-  "Share of people who gain or lose (a change over 0.01%), by age group.";
+  "Share of people who gain or lose (over 0.01%), by age group.";
 /** The single-age view's description, for the chosen group's own ages. */
 const sharesSingleDescription = ([first, last]) =>
   `Share of people who gain or lose (a change over 0.01%), at each age from ${first} to ${last >= SINGLE_AGE_TOP ? "90 and over" : last}.`;

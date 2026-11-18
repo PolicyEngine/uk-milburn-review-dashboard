@@ -305,26 +305,26 @@ export default function KeyFigures({ runId, selectedYear }) {
     <section className="report-section milburn-key card" aria-label="Key figures">
       {heading}
       {body}
-      {/* The saving and the poverty count have their own sub-tabs: linked, not repeated */}
-      {run && (
-        <p className="milburn-see-also" data-see-also="">
-          <TitleIcon name="arrowRight" bare size={14} />
-          <span>
-            {run.direction === "gain" ? "Exchequer cost" : "Exchequer saving"}: <SubTabLink sub="finances">Public finances</SubTabLink>
-            {POVERTY_FIGURES_SHOWN && (
-              <>
-                {" · "}Poverty: <SubTabLink sub="poverty">Poverty</SubTabLink>
-              </>
-            )}
-          </span>
-        </p>
-      )}
       <details className="milburn-details">
         <summary>
           <TitleIcon name="alert" bare size={14} />
           Notes and caveats
         </summary>
         <ul className="milburn-points">
+          {/* The saving and the poverty count have their own sub-tabs: linked, not repeated */}
+          {run && (
+            <li data-see-also="">
+              <TitleIcon name="arrowRight" bare size={14} />
+              <span>
+                {run.direction === "gain" ? "Exchequer cost" : "Exchequer saving"}: <SubTabLink sub="finances">Public finances</SubTabLink>
+                {POVERTY_FIGURES_SHOWN && (
+                  <>
+                    {" · "}Poverty: <SubTabLink sub="poverty">Poverty</SubTabLink>
+                  </>
+                )}
+              </span>
+            </li>
+          )}
           {/* The health element and PIP runs only: the upper bound and the
               replacements left out (none applies to the other runs) */}
           {removesHealthOrPip(id) && (
