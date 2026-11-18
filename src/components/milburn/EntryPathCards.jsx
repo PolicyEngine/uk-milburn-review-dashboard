@@ -216,7 +216,7 @@ export function EntryShares({ data }) {
               <XAxis dataKey="year" tick={TICK_STYLE} axisLine={AXIS_LINE} />
               <YAxis tick={TICK_STYLE} axisLine={AXIS_LINE} width={axisWidth(["10%"])} tickFormatter={(value) => `${value}%`} domain={[0, 10]} />
               <Tooltip {...TOOLTIP_PROPS} contentStyle={TOOLTIP_CONTENT_STYLE} cursor={HOVER_CURSOR} formatter={(value) => (missing(value) ? "" : `${value}%`)} />
-              <Legend wrapperStyle={{ paddingTop: "20px" }} formatter={(value) => <span style={legendLabelStyle}>{value}</span>} />
+              <Legend wrapperStyle={{ paddingTop: "20px" }} formatter={(value) => <span style={legendLabelStyle()}>{value}</span>} />
               {charted.map((path) => (
                 <Bar key={path.id} dataKey={path.id} name={path.label} fill={COLOURS[path.id]} radius={BAR_RADIUS} />
               ))}
