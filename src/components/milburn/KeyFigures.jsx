@@ -34,6 +34,13 @@ import "./milburn.css";
 export const REPLACEMENT_NOT_MODELLED_NOTE =
   "With no replacement payments modelled and every claimant reached in April 2029, not at reassessment, the full package is an upper bound on losses.";
 
+/**
+ * The UC health element and PIP overlap in our data, against the Resolution
+ * Foundation's: why more young people lose both than published counts imply.
+ */
+export const HEALTH_PIP_OVERLAP_NOTE =
+  "In our data 90.6% of 16 to 24-year-olds with the UC health element also get PIP, against 62.5% in the Resolution Foundation's figures, so more young people lose both payments than published counts imply.";
+
 /** A headline card's visible line when it shows the fallback run, not one selected policy. */
 export function fallbackRunLine(name) {
   return `Showing: ${name}. Select a single policy to see its own figures.`;
@@ -336,6 +343,10 @@ export default function KeyFigures({ runId, selectedYear }) {
               <li>
                 <TitleIcon name="lifebuoy" bare size={14} />
                 <span>{REPLACEMENT_PARTS_NOTE}</span>
+              </li>
+              <li data-overlap-note="">
+                <TitleIcon name="usersRound" bare size={14} />
+                <span>{HEALTH_PIP_OVERLAP_NOTE}</span>
               </li>
             </>
           )}
