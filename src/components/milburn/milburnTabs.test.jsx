@@ -284,15 +284,31 @@ describe("Moves into work (illustrative)", () => {
   });
 
   it("says a run with gains as well as losses has no break-even arithmetic", async () => {
-    // The summary writes no break-even for a run where some 16-24s gain
-    const mixed = JSON.parse(summaryText);
-    mixed.runs.push({ ...mixed.runs.find((run) => run.id === "milburn_report_package_entry_25pct") ?? mixed.runs[2], id: "mixed_run" });
-    vi.stubGlobal("fetch", serve({ summary: JSON.stringify(mixed) }));
+    // The summary writes no break-even for a loss run where some 16-24s
+    // gain, as for the Youth Allowance package: its young people in losing
+    // households stay
+    const summary = JSON.parse(summaryText);
+    const packageRun = summary.runs.find((run) => run.id === "milburn_report_package");
+    const {
+      break_even_share_in_work_pct: _share,
+      entrants_to_match_income_loss: _entrants,
+      exchequer_gain_per_entrant: _gain,
+      ...mixed
+    } = packageRun;
+    summary.runs.push({ ...mixed, id: "mixed_run" });
+    // No young people in losing households: not said to have gains
+    summary.runs.push({ ...mixed, id: "no_losers_run", young_people_in_losing_households: 0 });
+    vi.stubGlobal("fetch", serve({ summary: JSON.stringify(summary) }));
     const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");
-    render(<BehaviouralScenarios selectedRun="mixed_run" />);
-    const breakEven = await screen.findByRole("region", { name: "Break-even arithmetic" });
+    const { unmount } = render(<BehaviouralScenarios selectedRun="mixed_run" />);
+    let breakEven = await screen.findByRole("region", { name: "Break-even arithmetic" });
     await waitFor(() => expect(breakEven.textContent).toContain("mixed_run has gains as well as losses, so no break-even arithmetic applies."));
     expect(breakEven.textContent).not.toContain("Entrants needed to match the Exchequer saving");
+    unmount();
+    render(<BehaviouralScenarios selectedRun="no_losers_run" />);
+    breakEven = await screen.findByRole("region", { name: "Break-even arithmetic" });
+    await waitFor(() => expect(breakEven.textContent).toContain("Entrants needed to match the Exchequer saving"));
+    expect(breakEven.textContent).not.toContain("gains as well as losses");
   });
 
   it("shows unavailable states, never zeros, when the files are missing", async () => {
