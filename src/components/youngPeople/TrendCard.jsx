@@ -40,7 +40,8 @@ import { PENSIONERS, groupLabel, groupSeries, groupSubject } from "../../utils/a
 import { legendMembership } from "../../utils/legendMembership";
 import { selectionPackageKey } from "../../utils/geography/selection";
 import { useMeasureCatalogue } from "../../utils/measureCatalogue";
-import { nounOf, shortNameOf } from "../../utils/policyDetails";
+import { bareNoun, nounOf, shortNameOf, theNoun } from "../../utils/policyDetails";
+import { REPORT_START_YEAR } from "../../utils/milburn/summary";
 import TitleIcon from "../TitleIcon";
 import ChartMoreInfo from "../ChartMoreInfo";
 import { BY_YEAR_METHOD } from "../methodology/anchors";
@@ -429,10 +430,10 @@ export function stackColumns(data, partKeys) {
 export function stepSentence(notes, headline, nameIn) {
   // Named already when the headline has both its year and its measure
   const named = (note) =>
-    (headline ?? "").includes(fiscalYearTick(note.year)) && (headline ?? "").includes(`the ${nameIn(note.measureId)}`);
+    (headline ?? "").includes(fiscalYearTick(note.year)) && (headline ?? "").includes(theNoun(nameIn(note.measureId)));
   const missing = notes.filter((note) => !named(note));
   if (!missing.length) return null;
-  const parts = missing.map((note) => `in ${fiscalYearTick(note.year)} from ${note.ends ? "the end of " : ""}the ${nameIn(note.measureId)}`);
+  const parts = missing.map((note) => `in ${fiscalYearTick(note.year)} from ${note.ends ? "the end of " : ""}${theNoun(nameIn(note.measureId))}`);
   const list = parts.length > 1 ? `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}` : parts[0];
   return `The ${missing.length > 1 ? "biggest steps come" : "biggest step comes"} ${list}.`;
 }
@@ -523,7 +524,7 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
         ...note,
         // A step from a measure ending is labelled by its absence ("No energy
         // payment, 2027-28"), never as the measure applying that year
-        text: `${note.ends ? `No ${nounFor(note.measureId)}` : nameOf(note.measureId)}${narrow ? "" : `, ${fiscalYearTick(note.year)}`}`,
+        text: `${note.ends ? `No ${bareNoun(nounFor(note.measureId))}` : nameOf(note.measureId)}${narrow ? "" : `, ${fiscalYearTick(note.year)}`}`,
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [focusSeries, catalogue, narrow],
@@ -580,20 +581,28 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
     }
     if (!selected || selected.net === null) return null;
     const none = (value) => Math.round(Math.abs(value)) === 0;
-    // About £0 is no gain or loss: said as almost no change
-    let text = none(selected.net)
-      ? `${SUBJECT} see almost no change in ${fiscalYearTick(selected.year)}`
-      : `${SUBJECT} ${selected.net >= 0 ? "gain" : "lose"} ${about(selected.net)} a person in ${fiscalYearTick(selected.year)}`;
+    const year = fiscalYearTick(selected.year);
+    // Exactly zero before April 2029: the report's measures have not started
+    const notStarted = selected.year < REPORT_START_YEAR && selected.net === 0;
+    // A change as a verb phrase: none, about £0 (rounds to zero but is not
+    // zero) or a gain or loss
+    const change = (value, unit = " a person") =>
+      value === 0 ? "see no change" : none(value) ? "see almost no change" : `${value >= 0 ? "gain" : "lose"} ${about(value)}${unit}`;
+    let text = notStarted
+      ? `${SUBJECT} see no change in ${year}: the measures start in April ${REPORT_START_YEAR}`
+      : `${SUBJECT} ${change(selected.net)} in ${year}`;
     // The biggest step after the selected year
     const later = notes.filter((note) => note.year > selected.year).sort((x, y) => Math.abs(y.step) - Math.abs(x.step))[0];
     if (later) {
-      const sameWay = !none(selected.net) && !none(later.value) && Math.sign(later.value) === Math.sign(selected.net);
-      const level = none(later.value)
-        ? "see almost no change"
-        : sameWay
-          ? about(later.value)
-          : `${later.value >= 0 ? "gain" : "lose"} ${about(later.value)}`;
-      text += ` and ${level} from ${fiscalYearTick(later.year)}, when the ${nounFor(later.measureId)} ${later.ends ? "has ended" : "applies"}`;
+      const when = `from ${fiscalYearTick(later.year)}, when ${theNoun(nounFor(later.measureId))} ${later.ends ? "has ended" : "applies"}`;
+      if (notStarted) {
+        // After the colon, a sentence of its own
+        text += `. They ${change(later.value)} ${when}`;
+      } else {
+        // The same direction as the selected year: the verb is not repeated
+        const sameWay = !none(selected.net) && !none(later.value) && Math.sign(later.value) === Math.sign(selected.net);
+        text += ` and ${sameWay ? about(later.value) : change(later.value, "")} ${when}`;
+      }
     }
     return `${text}.`;
   })();
@@ -922,7 +931,7 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
             how: [
               "Running total adds up the years from the first one we show.",
               // Averages do not nest (María, #6 item 3)
-              "All ages averages over everyone, most of whom no measure reaches.",
+              "All ages averages over everyone, most of whom the policy does not reach, so its line is smaller than 16 to 24's.",
             ],
             caveats: [
               unpublished.length > 0 &&

@@ -135,6 +135,14 @@ describe("nounOf: a measure as a noun after 'the'", () => {
     const savings = POLICY_DETAILS.find((entry) => entry.id === "savings_income_rates_up");
     expect(nounOf({ id: savings.id, description: savings.writtenFor })).toBe("savings income tax rise");
   });
+  it("puts 'the' before a noun only when it carries no article of its own", async () => {
+    const { theNoun, bareNoun } = await import("./policyDetails");
+    expect(theNoun("fuel duty cut")).toBe("the fuel duty cut");
+    expect(theNoun("the health element and PIP removal")).toBe("the health element and PIP removal");
+    expect(theNoun("a £10,000 employer National Insurance threshold")).toBe("a £10,000 employer National Insurance threshold");
+    expect(bareNoun("the health element and PIP removal")).toBe("health element and PIP removal");
+    expect(bareNoun("fuel duty cut")).toBe("fuel duty cut");
+  });
 });
 
 it("describes each Milburn candidate measure in one neutral line, applied whatever its published description", () => {

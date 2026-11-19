@@ -17,7 +17,7 @@ import { CHART_LOGO } from "../utils/chartLogo";
 import { CHART_COLOURS } from "../utils/chartTheme";
 import { buildChartCsv, fiscalYear } from "../utils/chartCsv";
 import { isCatalogueRowDisplayable, useMeasureCatalogue } from "../utils/measureCatalogue";
-import { nounOf, shortNameOf } from "../utils/policyDetails";
+import { nounOf, shortNameOf, theNoun } from "../utils/policyDetails";
 import { loadPolicyParameters, measureWindows, outOfForceText } from "../utils/policyParameters";
 import { loadOfficialCostings, OfficialCostingsPendingError } from "../utils/publication/officialCostings";
 import { SOURCES } from "../utils/sources";
@@ -205,7 +205,8 @@ export function comparisonSentence(rows, obrKind) {
   if (rows.length > 0 && inForce.length === 0) {
     if (rows.length > 1) return "None of the selected policies is in force this year.";
     const noun = nounOf(rows[0].measure ?? { id: rows[0].id, name: rows[0].name });
-    return `The ${noun} is not in force this year.`;
+    const subject = theNoun(noun);
+    return `${subject.charAt(0).toUpperCase()}${subject.slice(1)} is not in force this year.`;
   }
   const paired = inForce.filter((row) => row.pe !== null && row.obr !== null);
   if (paired.length === 0) return null;

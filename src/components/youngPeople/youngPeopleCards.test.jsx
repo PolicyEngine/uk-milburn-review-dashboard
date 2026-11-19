@@ -272,11 +272,21 @@ describe("young people cards", () => {
     expect(screen.queryByRole("radio", { name: /65 and over|Pensioners|25 to 34/ })).toBeNull();
   });
 
-  it("says a change of about £0 as almost no change, not a gain of £0", () => {
+  it("says no change before April 2029 as the measures not yet started, in sentences", () => {
     render(<TrendCard {...props} selectedPolicies={["salary_sacrifice_cap"]} selectedYear={2028} />);
     const headline = document.querySelector(".trend-headline");
-    expect(headline).toHaveTextContent(/^16 to 24-year-olds see almost no change in 2028-29/);
-    expect(headline).not.toHaveTextContent(/gain about £0/);
+    expect(headline).toHaveTextContent(/^16 to 24-year-olds see no change in 2028-29: the measures start in April 2029\. They lose about £120 a person from 2029-30, when /);
+    expect(headline).not.toHaveTextContent(/almost no change|gain about £0|the the /);
+  });
+
+  it("says a change of about £0 as almost no change, not a gain of £0", () => {
+    const rows = ROWS.map((each) =>
+      each.reform_id === "salary_sacrifice_cap" && each.year === 2028 ? { ...each, mean_change: 0.3 } : each,
+    );
+    render(<TrendCard {...props} rows={rows} selectedPolicies={["salary_sacrifice_cap"]} selectedYear={2028} />);
+    const headline = document.querySelector(".trend-headline");
+    expect(headline).toHaveTextContent(/^16 to 24-year-olds see almost no change in 2028-29 and lose about £120 from 2029-30, when /);
+    expect(headline).not.toHaveTextContent(/gain about £0|measures start/);
   });
 
   it("says the headline as one plain sentence, the units folded in", () => {
@@ -328,7 +338,7 @@ describe("young people cards", () => {
     const card = document.querySelector(".young-people-trend");
     fireEvent.click(within(card).getByRole("button", { name: /About this chart/ }));
     expect(card).toHaveTextContent("Average change in household income per person for 16 to 24-year-olds, each year, with all ages for comparison.");
-    expect(card).toHaveTextContent("All ages averages over everyone, most of whom no measure reaches.");
+    expect(card).toHaveTextContent("All ages averages over everyone, most of whom the policy does not reach, so its line is smaller than 16 to 24's.");
   });
 
   it("keys the lines by its chips alone, with no names at the lines' ends, on a wide screen and a phone", () => {

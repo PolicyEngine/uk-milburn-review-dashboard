@@ -810,6 +810,7 @@ export const MILBURN_POLICY_DETAILS = [
   },
   {
     id: "milburn_package",
+    noun: "the health element and PIP removal",
     summary: "Removes the health element and PIP for under-25s.",
     points: [
       { label: "Combines", icon: "layers", text: "Both removals, run together." },
@@ -1315,6 +1316,21 @@ export function shortNameOf(measure) {
  * The fallback runs whenever an entry's `writtenFor` stops matching the
  * publication, so it must not lower a proper name.
  */
+// A noun that carries its own article ("a £10,000 employer National
+// Insurance threshold…", "the health element and PIP removal")
+const ARTICLE = /^(the|a|an)\s/i;
+
+/** The noun after "the" in a sentence: as it is when it carries its own article. */
+export function theNoun(noun) {
+  const text = String(noun ?? "");
+  return ARTICLE.test(text) ? text : `the ${text}`;
+}
+
+/** The noun without a leading article, after "No" in a label ("No health element and PIP removal"). */
+export function bareNoun(noun) {
+  return String(noun ?? "").replace(ARTICLE, "");
+}
+
 export function nounOf(measure) {
   const noun = policyDetailsFor(measure)?.noun;
   if (noun) return noun;
