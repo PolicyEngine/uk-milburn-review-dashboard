@@ -264,6 +264,8 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
   // Before a report run starts (April 2029): said so, not "unavailable"
   const { status: summaryStatus, summary } = useMilburnSummary(manifest?.snapshotSha256 ?? null, { enabled: Boolean(lead), year: selectedYear });
   const notStarted = Boolean(lead) && summaryStatus === "ready" && notYetStarted(summaryRun(summary, lead), selectedYear);
+  // Until the summary is read, whether the run has started is not known
+  const summaryLoading = Boolean(lead) && summaryStatus === "loading";
   const parts = lead ? PACKAGE_PARTS[lead] ?? [] : [];
   const drawnPolicies = parts.length ? [lead, ...parts] : selectedPolicies;
   const chartRef = useRef(null);
@@ -370,7 +372,13 @@ function MeasuresCard({ rows, policies, selectedPolicies, selectedYear, narrow, 
           />
         ) : (
           <div className="plot-empty" style={{ minHeight: height }} role="status">
-            <p>{notStarted ? `${STARTS_TEXT}: no change in ${yearLabel}.` : emptyMeasuresNote({ noEffect, selectedPolicies, yearLabel })}</p>
+            <p>
+              {summaryLoading
+                ? "Loading…"
+                : notStarted
+                  ? `${STARTS_TEXT}: no change in ${yearLabel}.`
+                  : emptyMeasuresNote({ noEffect, selectedPolicies, yearLabel })}
+            </p>
           </div>
         )}
         {strip && <PolicyStrip rows={rows} id={lead} year={selectedYear} band={band} partsShown={partsShown} />}
