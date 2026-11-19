@@ -576,6 +576,7 @@ function TrendCard({ rows, policies, selectedPolicies, selectedYear, narrow, hei
       if (!shown.length) return null;
       const total = shown.reduce((sum, point) => sum + point.net, 0);
       const span = `${fiscalYearTick(shown[0].year)} to ${fiscalYearTick(shown[shown.length - 1].year)}`;
+      if (total === 0) return `${SUBJECT} see no change in total from ${span}.`;
       if (Math.round(Math.abs(total)) === 0) return `${SUBJECT} see almost no change in total from ${span}.`;
       return `${SUBJECT} ${total >= 0 ? "gain" : "lose"} ${about(total)} a person in total from ${span}.`;
     }

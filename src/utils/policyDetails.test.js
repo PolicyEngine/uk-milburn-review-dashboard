@@ -143,6 +143,11 @@ describe("nounOf: a measure as a noun after 'the'", () => {
     expect(bareNoun("the health element and PIP removal")).toBe("health element and PIP removal");
     expect(bareNoun("fuel duty cut")).toBe("fuel duty cut");
   });
+  it("gives the report's package the health element and PIP removal, inherited from the package", async () => {
+    const { nounOf } = await import("./policyDetails");
+    expect(nounOf({ id: "milburn_package", name: "x" })).toBe("the health element and PIP removal");
+    expect(nounOf({ id: "milburn_report_package", name: "x" })).toBe("the health element and PIP removal");
+  });
 });
 
 it("describes each Milburn candidate measure in one neutral line, applied whatever its published description", () => {
