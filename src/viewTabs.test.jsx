@@ -301,7 +301,8 @@ describe("the view tabs", () => {
     expect(await screen.findByRole("tabpanel", { name: "Young people" })).toBeInTheDocument();
     const params = new URLSearchParams(window.location.search);
     // Young people is the default sub-tab, so ?sub= is left out
-    expect([params.get("sub"), params.get("age")]).toEqual([null, "pensioners"]);
+    // No ?age= is written: nothing reads it
+    expect([params.get("sub"), params.get("age")]).toEqual([null, null]);
   });
 
   it("open By age with 16 to 24 chosen from the old Young people links, keeping the hash", async () => {
@@ -324,7 +325,7 @@ describe("the view tabs", () => {
       expect([params.get("tab"), params.get("sub"), params.get("age"), window.location.hash]).toEqual([
         "dashboard",
         null,
-        "16-24",
+        null,
         hash,
       ]);
       unmount();
@@ -365,7 +366,7 @@ describe("the view tabs", () => {
       "true",
     );
     const params = new URLSearchParams(window.location.search);
-    expect([params.get("sub"), params.get("age")]).toEqual([null, "16-24"]);
+    expect([params.get("sub"), params.get("age")]).toEqual([null, null]);
   });
 
   it("gather the method notes on Methodology, each said once", async () => {

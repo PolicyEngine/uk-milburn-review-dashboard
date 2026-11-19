@@ -54,7 +54,8 @@ describe("Young people has no age group choice (Vahid, 18 Nov)", async () => {
     render(<AgeSection selectedPolicies={[]} selectedYear={2027} policies={[]} />);
     expect(screen.getByRole("heading", { name: "How 16 to 24-year-olds' incomes change" })).toBeInTheDocument();
     for (const pill of screen.queryAllByRole("button", { name: /^Options:/ })) {
-      expect(pill.getAttribute("aria-label")).not.toMatch(/16 to 24|25 to 34|All ages/);
+      // The view "16 to 24 and all ages" names what is shown, not a choice of group
+      expect(pill.getAttribute("aria-label").replace("16 to 24 and all ages", "")).not.toMatch(/16 to 24|25 to 34|All ages/);
       fireEvent.click(pill);
       const dialog = screen.getByRole("dialog");
       expect(within(dialog).queryByRole("radio", { name: /^(16 to 24|25 to 34|50 to 64|All ages|Pensioners|Every age group|Age groups)$/ })).toBeNull();

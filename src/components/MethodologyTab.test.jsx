@@ -147,9 +147,9 @@ describe("MethodologyTab", () => {
     renderTab(onShowTab);
     // Young people, with 16 to 24 chosen
     const young = screen.getAllByRole("link", { name: "Young people", hidden: true }).find((a) => a.getAttribute("href").startsWith("?tab="));
-    expect(young).toHaveAttribute("href", "?tab=dashboard&sub=age&age=16-24#young-people");
+    expect(young).toHaveAttribute("href", "?tab=dashboard&sub=age#young-people");
     fireEvent.click(young);
-    expect(onShowTab).toHaveBeenLastCalledWith("dashboard", "age", { age: "16-24" });
+    expect(onShowTab).toHaveBeenLastCalledWith("dashboard", "age");
   });
 
   it("links every external source in a new tab, saying so, and every shared term to its definition", () => {

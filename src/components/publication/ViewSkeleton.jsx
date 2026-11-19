@@ -40,7 +40,7 @@ const LAYOUTS = {
     { icon: "banknote", title: "Public finances", subtitle: "Net effect on revenue and spending, by year.", cards: [["bars", "wide"], ["bars"], ["bars"]] },
   ],
   "dashboard:age": [
-    { icon: "usersRound", title: "How each age group's income changes", cards: [["lines", "wide"], ["bars"], ["bars"]] },
+    { icon: "usersRound", title: "How 16 to 24-year-olds' incomes change", cards: [["lines", "wide"], ["bars"], ["bars"]] },
   ],
   "dashboard:scenarios": [
     { icon: "sliders", title: "Moves into work (illustrative)", subtitle: SCENARIOS_SUBTITLE, cards: [["text", "wide"]] },

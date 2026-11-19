@@ -6,7 +6,7 @@ import SectionHeading from "./SectionHeading";
 import { METHOD_ANCHORS } from "./methodology/anchors";
 import MethodContents, { revealAnchor } from "./methodology/MethodContents";
 import { unavailableMeasures } from "./methodology/measures";
-import { AGE_BANDS, MIN_SAMPLE_SIZE } from "../utils/ageImpact";
+import { MIN_SAMPLE_SIZE } from "../utils/ageImpact";
 import { useMeasureCatalogue } from "../utils/measureCatalogue";
 import { OPEN_VIEW_EVENT } from "../utils/methodLink";
 import { AnchorLink, ExternalLink, ReasonList, SourceLink, Topic } from "./methodology/MethodUi";
@@ -419,19 +419,16 @@ function MethodologyTab({ onShowTab, published = REPORT_PUBLISHED }) {
           <Topic id={METHOD_SECTIONS.young} title="Results by age" preview="Age bands · Who counts · Young people">
             <p className="method-more">
               The{" "}
-              <ViewLink tab="dashboard" sub="age" age="16-24" hash="young-people" onShowTab={onShowTab}>
+              <ViewLink tab="dashboard" sub="age" hash="young-people" onShowTab={onShowTab}>
                 Young people
               </ViewLink>{" "}
-              sub-tab opens on people aged 16 to 24, the ONS definition of young people.
+              sub-tab shows people aged 16 to 24, the ONS definition of young people, with all ages for comparison.
             </p>
             <FactList
               items={[
                 [
                   "Age bands",
-                  AGE_BANDS.filter((band) => band.label !== "All ages")
-                    .map((band) => band.label)
-                    .join(", ")
-                    .replace(/, ([^,]*)$/, " and $1"),
+                  "16 to 24, by single year of age, and all ages (the published files also hold the other bands)",
                 ],
                 [
                   "Who counts",

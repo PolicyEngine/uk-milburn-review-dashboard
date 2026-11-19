@@ -37,7 +37,7 @@ export default function MeasureSharesChart({ rows, groupLabel, yearLabel, emphas
   const worseDecimals = shareDecimals(rows.map(({ row }) => row.pct_worse_off ?? 0));
   return (
     <div className="msc-wrap">
-    <div ref={ref} className="msc" role="table" aria-label={`Gains and losses, ${[groupLabel, byGroup ? "by age group" : "each policy on its own"].filter(Boolean).join(", ")}, ${yearLabel}`}>
+    <div ref={ref} className="msc" role="table" aria-label={`Gains and losses, ${[groupLabel, byGroup ? "16 to 24 and all ages" : "each policy on its own"].filter(Boolean).join(", ")}, ${yearLabel}`}>
       <div className="msc-row msc-head" role="row">
         <span className="msc-label" />
         <span className="msc-bar-cell" />

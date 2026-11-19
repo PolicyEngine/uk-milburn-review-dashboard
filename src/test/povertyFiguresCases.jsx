@@ -143,7 +143,7 @@ export function describePovertyFigures(shown, { files, catalogueRef, ageRowsRef 
       if (shown && selector === ".young-people-shares") {
         // The fallback itself: the groups, with By single year of age disabled
         fireEvent.click(within(shares).getByRole("button", { name: /^Options:/ }));
-        expect(within(shares).getByRole("radio", { name: "By age group" })).toHaveAttribute("aria-checked", "true");
+        expect(within(shares).getByRole("radio", { name: "16 to 24 and all ages" })).toHaveAttribute("aria-checked", "true");
         expect(within(shares).getByRole("radio", { name: "By single year of age" })).toBeDisabled();
       }
       // Effect of each policy draws its rows either way, with no people-affected figure

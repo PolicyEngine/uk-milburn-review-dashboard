@@ -354,11 +354,9 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
     // An old link to the Young people view opens its sub-tab; the hash
     // stays, so the page scrolls to the section
     const view = viewFromLocation(window.location);
-    // (By age, with 16 to 24 chosen; an old Pensioners sub-tab link opens
-    // By age with pensioners chosen)
-    const oldGroup = oldAgeSubGroup(window.location);
-    if (opensYoungPeople(window.location)) dropSubTab("age", { age: "16-24" });
-    else if (oldGroup) dropSubTab("age", { age: oldGroup });
+    // (Young people; an old Pensioners sub-tab link opens it too). No
+    // ?age= is written: nothing reads it, and an old link's is left alone
+    if (opensYoungPeople(window.location) || oldAgeSubGroup(window.location)) dropSubTab("age");
     setLanding(opensLanding(window.location));
     setActiveTab(view);
     // A shared link's ?year= opens that year; one not offered opens the
@@ -710,7 +708,7 @@ function Dashboard({ published, unavailable = null, updated = false, fromBuild =
   useEffect(() => {
     const onHashChange = () => {
       if (window.location.hash === `#${YOUNG_PEOPLE_ANCHOR}`) {
-        dropSubTab("age", { age: "16-24" });
+        dropSubTab("age");
         setLanding(false);
         setActiveTab(DEFAULT_VIEW);
       }

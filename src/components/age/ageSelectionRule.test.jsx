@@ -457,7 +457,7 @@ describe("Gains and losses when the package withholds every single age", () => {
   function viewRadios(card) {
     fireEvent.click(within(card).getByRole("button", { name: /^Options:/ }));
     return {
-      band: within(card).getByRole("radio", { name: "By age group" }),
+      band: within(card).getByRole("radio", { name: "16 to 24 and all ages" }),
       single: within(card).getByRole("radio", { name: "By single year of age" }),
     };
   }
@@ -477,7 +477,7 @@ describe("Gains and losses when the package withholds every single age", () => {
     expect(single).toBeDisabled();
     expect(single).toHaveAttribute("aria-disabled", "true");
     fireEvent.click(single);
-    expect(within(card).getByRole("radio", { name: "By age group" })).toHaveAttribute("aria-checked", "true");
+    expect(within(card).getByRole("radio", { name: "16 to 24 and all ages" })).toHaveAttribute("aria-checked", "true");
     // The two groups drawn, not the empty panel, and no note or explanation line
     expect(card.textContent).not.toMatch(/No shares are published/);
     expect(card.textContent).not.toMatch(/confidential|not published for this selection|too few survey records/i);

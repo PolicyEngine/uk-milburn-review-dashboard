@@ -129,7 +129,7 @@ export function withheldBand(point, rows, runIds, year, seriesKeys) {
 
 /** The two views of "Average change by age" (and Pensioners' Gains and losses). */
 export const AGE_VIEWS = [
-  { value: "band", label: "By age group" },
+  { value: "band", label: "16 to 24 and all ages" },
   { value: "single", label: "By single year of age" },
 ];
 /** The age views, By single year of age disabled when every single age is withheld. */
