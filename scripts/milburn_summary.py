@@ -191,8 +191,17 @@ def summarise(run_dir: Path, scenarios: dict, year: int = YEAR) -> dict:
     # estimate.
     # The break-even uses the saving and the count of young people in
     # losing households, not the average loss, so it does not wait on it.
-    # The household entry cases are for YEAR (2029-30) only
-    if not gains and affected and scenarios and year == YEAR:
+    # The household entry cases are for YEAR (2029-30) only. Only for runs
+    # where no 16-24 gains: with gains as well as losses the saving is net
+    # of them, so it does not measure the losses. A withheld gain side
+    # (None) counts as none.
+    if (
+        not gains
+        and (better or 0) == 0
+        and affected
+        and scenarios
+        and year == YEAR
+    ):
         cases = scenarios.get("entry_cases", [])
         saving = budget.get(YEAR, 0) * 1e9
         entrants = {

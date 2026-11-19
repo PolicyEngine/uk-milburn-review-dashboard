@@ -558,6 +558,10 @@ function BreakEvenSection({ runId, catalogue, summaryState, review = null, gainY
       body = <p role="status">Not yet run: the arithmetic for {name} appears here once its national run has finished.</p>;
     } else if (run.direction === "gain") {
       body = <p role="status">{name} raises young people&rsquo;s household incomes, so there is no loss for work to make up: no break-even arithmetic applies.</p>;
+    } else if (BREAK_EVEN_HOURS.every(({ id: hoursId }) => run.breakEvenSharePct[hoursId] === null)) {
+      // The summary writes the break-even only for runs where no 16-24 gains
+      // (scripts/milburn_summary.py): with gains the saving is net of them
+      body = <p role="status">{name} has gains as well as losses, so no break-even arithmetic applies.</p>;
     } else {
       const hoursRows = BREAK_EVEN_HOURS.map(({ id: hoursId, hours }) => ({
         hours,

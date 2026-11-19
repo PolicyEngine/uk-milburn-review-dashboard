@@ -283,6 +283,18 @@ describe("Moves into work (illustrative)", () => {
     expect(document.body.textContent).not.toMatch(/Review.s own estimate|About 440,000/);
   });
 
+  it("says a run with gains as well as losses has no break-even arithmetic", async () => {
+    // The summary writes no break-even for a run where some 16-24s gain
+    const mixed = JSON.parse(summaryText);
+    mixed.runs.push({ ...mixed.runs.find((run) => run.id === "milburn_report_package_entry_25pct") ?? mixed.runs[2], id: "mixed_run" });
+    vi.stubGlobal("fetch", serve({ summary: JSON.stringify(mixed) }));
+    const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");
+    render(<BehaviouralScenarios selectedRun="mixed_run" />);
+    const breakEven = await screen.findByRole("region", { name: "Break-even arithmetic" });
+    await waitFor(() => expect(breakEven.textContent).toContain("mixed_run has gains as well as losses, so no break-even arithmetic applies."));
+    expect(breakEven.textContent).not.toContain("Entrants needed to match the Exchequer saving");
+  });
+
   it("shows unavailable states, never zeros, when the files are missing", async () => {
     vi.stubGlobal("fetch", serve({ scenarios: null, summary: null, entry: null }));
     const { default: BehaviouralScenarios } = await import("./BehaviouralScenarios");

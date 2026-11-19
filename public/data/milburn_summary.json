@@ -359,19 +359,7 @@
       "people_into_poverty_abs_bhc": 319944,
       "people_into_poverty_rel_bhc": 246077,
       "child_poverty_change_pp_rel_bhc": 0.516,
-      "people_directly_affected": 0,
-      "break_even_share_in_work_pct": {
-        "h16": 84.2,
-        "h25": 66.2
-      },
-      "entrants_to_match_income_loss": {
-        "h16": 490689,
-        "h25": 386276
-      },
-      "exchequer_gain_per_entrant": {
-        "h16": 4227.0,
-        "h25": 9438.18
-      }
+      "people_directly_affected": 0
     },
     {
       "id": "milburn_report_pip",
@@ -2713,19 +2701,7 @@
         "people_into_poverty_abs_bhc": 319944,
         "people_into_poverty_rel_bhc": 246077,
         "child_poverty_change_pp_rel_bhc": 0.516,
-        "people_directly_affected": 0,
-        "break_even_share_in_work_pct": {
-          "h16": 84.2,
-          "h25": 66.2
-        },
-        "entrants_to_match_income_loss": {
-          "h16": 490689,
-          "h25": 386276
-        },
-        "exchequer_gain_per_entrant": {
-          "h16": 4227.0,
-          "h25": 9438.18
-        }
+        "people_directly_affected": 0
       },
       {
         "id": "milburn_report_pip",

@@ -53,7 +53,19 @@
         "abs_bhc": 0.42
       },
       "people_into_poverty_rel_bhc": 135000,
-      "people_into_poverty_abs_bhc": 290000
+      "people_into_poverty_abs_bhc": 290000,
+      "break_even_share_in_work_pct": {
+        "h16": 102.0,
+        "h25": 80.4
+      },
+      "entrants_to_match_income_loss": {
+        "h16": 520000,
+        "h25": 410000
+      },
+      "exchequer_gain_per_entrant": {
+        "h16": 4000.0,
+        "h25": 9000.0
+      }
     },
     {
       "id": "milburn_package_entry_25pct",
