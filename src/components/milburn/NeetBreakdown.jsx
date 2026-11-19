@@ -1,6 +1,6 @@
 import TitleIcon from "../TitleIcon";
 import { MilburnChartCard } from "./MilburnCharts";
-import { HEALTH_PIP_OVERLAP_NOTE } from "./KeyFigures";
+import { HEALTH_PIP_OVERLAP_NOTE, removesHealthOrPip } from "./KeyFigures";
 import { shortSource } from "./SourceChip";
 import { yearLabel } from "../../utils/displayYears";
 import { NEET_GROUPS, neetForYear, useNeetBreakdown } from "../../utils/milburn/neet";
@@ -168,7 +168,7 @@ export default function NeetBreakdown({ selectedPolicies = [], selectedYear }) {
               {neet.notes.map((note) => (
                 <li key={note}>{note}</li>
               ))}
-              <li>{HEALTH_PIP_OVERLAP_NOTE}</li>
+              {removesHealthOrPip(selected) && <li>{HEALTH_PIP_OVERLAP_NOTE}</li>}
             </ul>
           </details>
         }
