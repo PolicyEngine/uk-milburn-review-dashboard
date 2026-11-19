@@ -16,12 +16,21 @@ spec.loader.exec_module(milburn_summary)
 YEAR = milburn_summary.YEAR
 SCENARIOS = {
     "entry_cases": [
-        {"id": "h16", "net_income_gain_package": 5000.0, "exchequer_gain_package": 4000.0},
-        {"id": "h25", "net_income_gain_package": 8000.0, "exchequer_gain_package": 9000.0},
+        {
+            "id": "h16",
+            "net_income_gain_package": 5000.0,
+            "exchequer_gain_package": 4000.0,
+        },
+        {
+            "id": "h25",
+            "net_income_gain_package": 8000.0,
+            "exchequer_gain_package": 9000.0,
+        },
     ]
 }
 METRIC_COLUMNS = [
-    f"poverty_{k}_change_pp" for k in ("rel_bhc", "rel_ahc", "abs_bhc", "abs_ahc")
+    f"poverty_{k}_change_pp"
+    for k in ("rel_bhc", "rel_ahc", "abs_bhc", "abs_ahc")
 ] + ["child_poverty_rel_ahc_change_pp", "child_poverty_rel_bhc_change_pp"]
 
 
@@ -68,7 +77,10 @@ def test_break_even_for_runs_where_nobody_gains(tmp_path, better):
     out = milburn_summary.summarise(make_run(tmp_path, better), SCENARIOS)
     assert out["direction"] == "loss"
     # £2bn over 100,000 young people in losing households
-    assert out["entrants_to_match_income_loss"] == {"h16": 400000, "h25": 250000}
+    assert out["entrants_to_match_income_loss"] == {
+        "h16": 400000,
+        "h25": 250000,
+    }
     assert out["break_even_share_in_work_pct"] == {"h16": 400.0, "h25": 250.0}
     assert out["exchequer_gain_per_entrant"] == {"h16": 4000.0, "h25": 9000.0}
 
