@@ -244,16 +244,18 @@ export default function BenchmarksTable() {
     const yearLabel = ready.year === null ? "" : fiscalYearTick(ready.year);
     // The estimate's year only: which route built the run is no reader's concern
     const runLabel = yearLabel;
+    // Only the rows the sections show: the file holds figures no section draws
+    const shownRows = groups.flatMap((group) => group.rows);
     const counts = Object.fromEntries([
-      ["all", ready.rows.length],
-      [OURS_TOPIC, ready.rows.filter((row) => row.estimate).length],
+      ["all", shownRows.length],
+      [OURS_TOPIC, shownRows.filter((row) => row.estimate).length],
       ...groups.map((group) => [group.key, group.rows.length]),
     ]);
     const shown = groupsForTopic(groups, topic);
     // The builds our fixed figures come from, once, in the folded notes
     const builds = [
       ...new Set(
-        ready.rows
+        shownRows
           .map((row) => (row.estimate?.fixed ? row.estimate.label : ""))
           .filter(Boolean),
       ),
