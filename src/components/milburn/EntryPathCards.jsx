@@ -379,7 +379,8 @@ export function EntryYear({ data, year }) {
           </>
         }
       >
-        <div className="milburn-table-wrap">
+        {/* Scrolls sideways on a narrow screen: focusable, so a keyboard can scroll it */}
+        <div className="milburn-table-wrap" tabIndex={0} role="region" aria-label={`${title} table`}>
           <table className="milburn-table milburn-entry-table" data-entry-year={year}>
             <thead>
               <tr>
@@ -396,7 +397,7 @@ export function EntryYear({ data, year }) {
               <tbody key={change ? "change" : "level"} data-group={change ? "change" : "level"}>
                 {change && (
                   <tr className="milburn-entry-subhead">
-                    <th scope="colgroup" colSpan={2 + ENTRY_PATHS.length}>
+                    <th scope="rowgroup" colSpan={2 + ENTRY_PATHS.length}>
                       {CHANGE_FROM_STATIC}
                     </th>
                   </tr>

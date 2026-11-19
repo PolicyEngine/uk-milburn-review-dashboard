@@ -312,6 +312,22 @@
   .milburn-entry-table thead th {
     min-width: 88px;
   }
+
+  /* The row labels stay in view while the figures scroll sideways; the
+     subheading spans the row, so it scrolls with it */
+  .milburn-entry-table thead th:first-child,
+  .milburn-entry-table tbody tr:not(.milburn-entry-subhead) th {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--c-surface);
+  }
+
+  /* A banded row's label keeps the band */
+  .milburn-entry-table tbody[data-group="level"] tr:nth-child(even) th,
+  .milburn-entry-table tbody[data-group="change"] tr:nth-child(odd):not(.milburn-entry-subhead) th {
+    background: var(--c-row-band);
+  }
 }
 
 /* A card's More info on Moves into work, as on the Benchmarks cards */
