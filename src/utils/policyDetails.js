@@ -1217,7 +1217,7 @@ MILBURN_POLICY_DETAILS.push(
       { label: "Combines", icon: "layers", text: "The two Youth Allowance runs, simulated as one." },
       { label: "Amount", icon: "coins", text: "Work allowance assumed: the current UC amounts." },
       // Report 6.5, paras 748 and 749
-      { label: "Report", icon: "file", text: "Proposes both; gives no amount for either." },
+      { label: "Report", icon: "file", text: "Annex pays the 25-and-over rate; no work allowance amount." },
     ],
     affects: "Under-25 UC claims",
     starts: "Apr 2029",
