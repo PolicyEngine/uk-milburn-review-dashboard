@@ -244,7 +244,7 @@ describe("Benchmarks cards", () => {
     expect(pip).toContain("£3.27bn a year");
     expect(pip).toContain(",-14,,Yes,Not tested: the review's figure gives no area,");
     // A share's gap in percentage points, in its own column
-    expect(lines.find((line) => line.includes("UC health element and PIP, 16–24s"))).toContain(",,28.1,Yes,");
+    expect(lines.find((line) => line.includes("UC health element 16–24s also on PIP"))).toContain(",,28.1,Yes,");
     expect(lines.find((line) => line.includes("PIP recipients, 16–24s"))).toContain("No: ours is England and Wales in 2025");
   });
 

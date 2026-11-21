@@ -78,7 +78,7 @@ export const BENCHMARK_SHORT = {
     estimateBasis: "Ages 16 to 24, Great Britain, 2025",
   },
   uc_health_pip_overlap: {
-    label: "UC health element and PIP, 16–24s",
+    label: "UC health element 16–24s also on PIP",
     icon: "hbars",
     basis: "Share also receiving PIP; no source, date or area given",
     estimateBasis: "Ages 16 to 24, Great Britain, 2025",
@@ -258,11 +258,11 @@ export function toleranceFor(row) {
 /**
  * A verdict in a few words, for a badge, naming the figure tested against
  * so it is not read as the card's published one: "0.1% below DWP's 2025
- * count (407,505), within 15%"; "No 15% test".
+ * count (407,505), within 15%"; "No matched official count".
  */
 export function toleranceWords(verdict) {
   if (!verdict) return "";
-  if (!verdict.tested) return `No ${TOLERANCE_PCT}% test`;
+  if (!verdict.tested) return "No matched official count";
   const verdictWords = `${verdict.within ? "within" : "outside"} ${TOLERANCE_PCT}%`;
   if (!Number.isFinite(verdict.gapPct) || !Number.isFinite(verdict.published)) {
     return `${verdict.within ? "Within" : "Outside"} ${TOLERANCE_PCT}% of ${verdict.against}`;
