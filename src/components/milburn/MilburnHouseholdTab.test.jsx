@@ -53,6 +53,16 @@ describe("householdCalculator", () => {
     expect(PRESETS.examples.every((item) => !(PHASED in item.results))).toBe(true);
   });
 
+  it("reads each assumption as one short line with an icon, and an older file's strings with the info icon", () => {
+    expect(PRESETS.assumptions.length).toBeGreaterThan(0);
+    for (const item of PRESETS.assumptions) {
+      expect(item.icon).toMatch(/^[a-zA-Z]+$/);
+      expect(item.text.split(/\s+/).length).toBeLessThanOrEqual(25);
+    }
+    const old = parsePresets({ ...FILE, assumptions: ["Council Tax is left out.", { icon: "house" }] });
+    expect(old.assumptions).toEqual([{ icon: "info", text: "Council Tax is left out." }]);
+  });
+
   it("keeps the runs an example has, and says when no single run is chosen", () => {
     const broken = structuredClone(FILE);
     delete broken.examples[0].results[EMPLOYER_NI];

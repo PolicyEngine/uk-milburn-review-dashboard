@@ -21,6 +21,71 @@
   margin-top: 24px;
 }
 
+/* "About these figures": the policy in a tinted box, then one short
+   line per assumption, each with its icon chip, two to a row */
+.milburn-about {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--c-text);
+}
+
+.milburn-about p {
+  margin: 0;
+}
+
+.milburn-about-heading {
+  margin: 0 0 2px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.milburn-about-policy {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--c-row-band);
+  border-left: 3px solid var(--c-gain-text);
+}
+
+.milburn-about-lead {
+  margin-top: -8px;
+  color: var(--c-axis-title);
+}
+
+.milburn-about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.milburn-about-grid li {
+  display: flex;
+  align-items: flex-start;
+}
+
+.milburn-about-grid .title-icon {
+  margin-top: -2px;
+}
+
+.milburn-about-build {
+  font-size: var(--fs-small);
+  color: var(--c-axis-title);
+}
+
+@media (max-width: 640px) {
+  .milburn-about-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .milburn-note,
 .milburn-loading {
   margin: 0;

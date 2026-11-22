@@ -869,22 +869,29 @@ function ResultDetails({ view, run, name, presets }) {
           method={null}
         />
       </section>
-      <Disclosure title="About these figures" preview="How they are calculated · What the policy is" className="milburn-household-about">
-        <div className="info-sections">
-          <p className="info-text">
-            {presets.label}
-            {presets.build ? ` (${presets.build})` : ""}. Household calculations with no survey data. Amounts are pounds a
-            year, before housing costs. Council Tax and Council Tax Reduction are left out for every household, renters
-            included.
-          </p>
-          <ul className="info-list">
-            <li>
-              <strong>{`${name[0].toUpperCase()}${name.slice(1)}.`}</strong> {run.description}
-            </li>
+      <Disclosure title="About these figures" preview="What the policy is · How they are calculated" className="milburn-household-about">
+        <div className="milburn-about">
+          <div className="milburn-about-policy" data-about="policy">
+            <TitleIcon name="fileText" />
+            <div>
+              <h4 className="milburn-about-heading">{`${name[0].toUpperCase()}${name.slice(1)}`}</h4>
+              <p>{run.description}</p>
+            </div>
+          </div>
+          <h4 className="milburn-about-heading">How they are calculated</h4>
+          <p className="milburn-about-lead">Household calculations with no survey data, in pounds a year before housing costs.</p>
+          <ul className="milburn-about-grid">
             {presets.assumptions.map((item) => (
-              <li key={item}>{item}</li>
+              <li key={item.text} data-about="assumption">
+                <TitleIcon name={item.icon} />
+                <span>{item.text}</span>
+              </li>
             ))}
           </ul>
+          <p className="milburn-about-build">
+            {presets.label}
+            {presets.build ? ` · ${presets.build}` : ""}
+          </p>
         </div>
       </Disclosure>
     </div>

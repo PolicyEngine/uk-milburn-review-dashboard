@@ -89,7 +89,9 @@ def presets(jobs: int = 1) -> dict:
         "build": local_build.LABEL,
         "engine": identity["packages"],
         "runs": mh.coverage(),
-        "assumptions": list(mh.ASSUMPTIONS),
+        "assumptions": [
+            {"icon": icon, "text": text} for icon, text in mh.ASSUMPTIONS
+        ],
         "examples": examples(jobs),
     }
 

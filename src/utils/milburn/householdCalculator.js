@@ -213,7 +213,13 @@ export function parsePresets(json) {
   return {
     label: text(json.label) || `PolicyEngine household calculation, ${FISCAL_YEAR}`,
     build: text(json.build),
-    assumptions: Array.isArray(json.assumptions) ? json.assumptions.filter((item) => typeof item === "string") : [],
+    // One short line each, with a TitleIcon name; an older file's plain
+    // strings take the info icon
+    assumptions: Array.isArray(json.assumptions)
+      ? json.assumptions
+          .map((item) => (typeof item === "string" ? { icon: "info", text: item } : { icon: text(item?.icon) || "info", text: text(item?.text) }))
+          .filter((item) => item.text)
+      : [],
     runs,
     examples,
   };

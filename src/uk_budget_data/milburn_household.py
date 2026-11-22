@@ -292,30 +292,38 @@ EXAMPLES = (
     },
 )
 
+# "About these figures" on the Household tab: (icon, one short line),
+# each fact once. Icons are TitleIcon names.
 ASSUMPTIONS = (
-    "Renters pay £500 a month to a private landlord; the stored examples "
-    "are in the North West.",
-    "A young person living with their parents is modelled as their own "
-    "household with no rent: the parents' income and housing costs are not "
-    "part of the calculation.",
-    "Council Tax and Council Tax Reduction are left out.",
-    "Benefit rates, the minimum wage and tax thresholds are the engine's "
-    f"for {FISCAL_YEAR}, on the OBR forecast; every award is claimed in "
-    "full, all year.",
-    "The report's replacement payments (such as its additional cost "
-    "allowance) are not modelled, so nothing is paid in place of the health "
-    "element or PIP.",
-    "Each run is compared with current law for the same household, one "
-    "run at a time: runs are never added to each other.",
-    "Losing PIP daily living moves a single renter under 35 onto the "
-    "shared accommodation rate of Local Housing Allowance, so the PIP part "
-    "of a renter's change can include a fall in the Universal Credit "
-    "housing element as well as the PIP itself.",
-    "A young person living with their parents holds no TV licence: the "
-    "parents' household holds it.",
-    "Hours, wages (other than the employer National Insurance saving, "
-    "which the model passes to pay) and housing costs are held fixed; no "
-    "behavioural response is modelled.",
+    (
+        "house",
+        "The examples rent privately at £500 a month, in the North West.",
+    ),
+    (
+        "users",
+        "Living with parents counts as a household of one with no rent: the parents' income, housing costs and TV licence are left out.",
+    ),
+    ("building", "Council Tax and Council Tax Reduction are left out."),
+    (
+        "calendar",
+        f"{FISCAL_YEAR} benefit rates, minimum wage and tax thresholds, on the OBR forecast; every award is claimed in full, all year.",
+    ),
+    (
+        "ban",
+        "The report's replacement payments are not modelled: nothing is paid in place of the health element or PIP.",
+    ),
+    (
+        "scale",
+        "Each run is compared with current law on its own; runs are never added together.",
+    ),
+    (
+        "key",
+        "Losing PIP daily living can move a single renter under 35 to the shared accommodation rate, so the Universal Credit housing element falls too.",
+    ),
+    (
+        "clock",
+        "Hours, wages and housing costs are held fixed (the employer National Insurance saving is passed to pay); no behavioural response.",
+    ),
 )
 
 
