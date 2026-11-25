@@ -38,7 +38,7 @@ published 16-24 row of the package's ``age_impact.csv``; a mismatch stops
 the script.
 
 Two national simulations (baseline and the package: Microcosm build
-fcfac709 through ``uk_budget_data.local_build``), so the read is a heavy
+b891aa69 through ``uk_budget_data.local_build``), so the read is a heavy
 job. It waits for the shared heavy-run lock (/tmp/pe-heavy.lock, one line:
 "<pid> <project> <job>"), takes it, and never removes a live holder's.
 

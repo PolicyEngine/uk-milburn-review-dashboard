@@ -14,7 +14,7 @@
 # public/data only, so it cannot be pointed at staging).
 #
 # Runs on the installed build (uk_budget_data.local_build: Microcosm build
-# fcfac709 on policyengine-uk 2.177.7, certified in policyengine 6.20.1), with the Hugging Face token unset.
+# b891aa69 on policyengine-uk 2.179.2, certified in policyengine 6.20.3), with the Hugging Face token unset.
 # A run takes about 6.5 to 9.5 minutes and about 23 GB (estimates).
 
 set -u -o pipefail

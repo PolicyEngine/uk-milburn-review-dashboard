@@ -100,8 +100,8 @@ export const signed = (value) => {
   return `${rounded > 0 ? "+" : "−"}£${Math.abs(rounded).toLocaleString("en-GB")}`;
 };
 /**
- * "about £1,005": to the pound, as the other cards give the same average
- * (NEET young people's −£1,005), so one figure never reads two ways.
+ * "about £917": to the pound, as the other cards give the same average
+ * (the 16 to 24 average change, −£917 in 2029-30), so one figure never reads two ways.
  */
 export const about = (value) => `about £${Math.round(Math.abs(value)).toLocaleString("en-GB")}`;
 

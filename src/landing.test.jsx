@@ -385,7 +385,7 @@ describe("the About side tab on the window's edge, and its overview drawer", () 
     // Only the policyengine.py release: its bundle pins the model and the data
     expect(built).not.toHaveTextContent("Microcosm UK build");
     const [model] = within(built).getAllByRole("link");
-    expect(model).toHaveTextContent(/^policyengine 6\.20\.2 \(opens in a new tab\)$/);
+    expect(model).toHaveTextContent(/^policyengine 6\.20\.3 \(opens in a new tab\)$/);
     expect(model).toHaveAttribute("target", "_blank");
   });
 

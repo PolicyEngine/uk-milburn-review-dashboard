@@ -12,8 +12,8 @@ baseline does not change with the report, so on the same build they should
 reproduce exactly; the 2027-28 figures in that note are printed beside the
 results.
 
-One national baseline simulation (Microcosm build fcfac709 on
-policyengine-uk 2.177.7, through ``uk_budget_data.local_build``), so it is a
+One national baseline simulation (Microcosm build b891aa69 on
+policyengine-uk 2.179.2, through ``uk_budget_data.local_build``), so it is a
 heavy job: about 20 GB and a few minutes. It takes the shared heavy-run lock
 (/tmp/pe-heavy.lock, one line: "<pid> <project> <job>") and refuses to start
 while another live process holds it.

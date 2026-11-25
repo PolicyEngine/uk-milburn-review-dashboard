@@ -161,19 +161,19 @@ describe("Benchmarks cards", () => {
       "employer_nics_under_25",
     ]);
     for (const [id, gap] of [
-      ["uc_health_element_16_24", "Ours 33% higher"],
+      ["uc_health_element_16_24", "Ours 16% higher"],
       // A share differs in percentage points, never as a % of a %
-      ["uc_health_pip_overlap", "Ours 28.1pp higher"],
-      ["pip_spend_16_24", "Ours 14% lower"],
-      ["uc_health_spend_16_24", "Ours 28% higher"],
-      ["young_benefits_spend", "Ours 6% lower"],
-      ["employer_nics_under_25", "Ours 15% higher"],
+      ["uc_health_pip_overlap", "Ours 20.9pp higher"],
+      ["pip_spend_16_24", "Ours 17% lower"],
+      ["uc_health_spend_16_24", "Ours 12% higher"],
+      ["young_benefits_spend", "Ours 11% lower"],
+      ["employer_nics_under_25", "Ours 21% higher"],
     ]) {
       expect(card(id).querySelector("[data-gap]").textContent, id).toBe(gap);
       // The long notes are not on the face
       const row = file.rows.find((each) => each.id === id);
       expect(card(id).textContent, id).not.toContain(row.estimate.note.slice(0, 40));
-      expect(card(id).textContent, id).not.toContain("build fcfac709");
+      expect(card(id).textContent, id).not.toContain("build b891aa69");
       expect(card(id).querySelectorAll("[data-source-link]").length, id).toBe(1);
       expect(card(id).querySelectorAll(".bm-bar").length, id).toBe(2);
     }
@@ -195,7 +195,7 @@ describe("Benchmarks cards", () => {
     expect(info.textContent).toContain("Why they differ");
     expect(info.textContent).toContain("Why ours is lower: the caseload matches DWP's 2025 count");
     expect(info.textContent).toContain("Published: £3.8bn a year; £1.3bn in 2019-20, forecast at £8.1bn in 2036-37.");
-    expect(info.textContent).toContain("PolicyEngine, build fcfac709, 2025, cash terms: £3.27bn a year.");
+    expect(info.textContent).toContain("PolicyEngine, build b891aa69, 2025, cash terms: £3.17bn a year.");
     expect(info.textContent).toContain("Our saving from removing PIP at 16 to 24, 2029-30, cash terms: £4.68bn a year.");
     // The source is the foot's chip, not repeated in More info (issue #6, item 8)
     expect(within(info).queryByRole("link", { name: /From a Welfare State to a Working State/ })).toBeNull();
@@ -241,10 +241,10 @@ describe("Benchmarks cards", () => {
     const pip = lines.find((line) => line.includes("PIP spending, 16–24s"));
     expect(pip).toContain("https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation");
     expect(pip).toContain("17 November 2026");
-    expect(pip).toContain("£3.27bn a year");
-    expect(pip).toContain(",-14,,Yes,Not tested: the review's figure gives no area,");
+    expect(pip).toContain("£3.17bn a year");
+    expect(pip).toContain(",-17,,Yes,Not tested: the review's figure gives no area,");
     // A share's gap in percentage points, in its own column
-    expect(lines.find((line) => line.includes("UC health element 16–24s also on PIP"))).toContain(",,28.1,Yes,");
+    expect(lines.find((line) => line.includes("UC health element 16–24s also on PIP"))).toContain(",,20.9,Yes,");
     expect(lines.find((line) => line.includes("PIP recipients, 16–24s"))).toContain("No: ours is England and Wales in 2025");
   });
 

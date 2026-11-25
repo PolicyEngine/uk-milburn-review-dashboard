@@ -517,9 +517,9 @@ describe("the published summary", () => {
   it("gives the packages' range: full removal, the pre-report partial removal and the phased run", () => {
     expect(packageRange(published).map((row) => row.id)).toEqual(["milburn_report_package", "milburn_package_central", "milburn_report_package_phased"]);
     expect(packageRange(published).map(({ name, saving, poverty }) => [name, saving, poverty])).toEqual([
-      ["Full removal", "£4.67bn", "about 342,000"],
-      ["Partial removal", "£2.64bn", "about 99,000"],
-      ["Phased", "£2.77bn", "about 156,000"],
+      ["Full removal", "£4.42bn", "about 291,000"],
+      ["Partial removal", "£2.46bn", "about 78,000"],
+      ["Phased", "£2.57bn", "about 113,000"],
     ]);
   });
 
@@ -540,7 +540,7 @@ describe("the published summary", () => {
     }
     const full = summaryRun(published, "milburn_package");
     // The 2029-30 entry case (milburn_scenarios.json) against the 2029-30 saving
-    expect(full.breakEvenSharePct).toEqual({ h16: 97.4, h25: 76.7 });
+    expect(full.breakEvenSharePct).toEqual({ h16: 88, h25: 69.3 });
     // The pre-report 25% run's files stay, but the summary no longer reads it
     expect(summaryRun(published, "milburn_package_entry_25pct")).toBeNull();
   });
@@ -554,7 +554,11 @@ describe("a run without an average loss", () => {
   const raw = JSON.parse(readFileSync(join(__dirname, "..", "..", "..", "public", "data", "milburn_summary.json"), "utf8"));
   const withNull = {
     ...raw,
-    runs: raw.runs.map((run) => (run.id === "milburn_package" ? { ...run, average_loss_young_person_in_losing_household: null } : run)),
+    runs: raw.runs.map((run) =>
+      run.id === "milburn_package"
+        ? { ...run, average_loss_young_person_in_losing_household: null, average_loss_basis: "not computed for this run" }
+        : run,
+    ),
   };
   const summary = parseSummary(withNull);
 
@@ -577,7 +581,7 @@ describe("the poverty card's direct count", () => {
 
   it("reads the summary's count for absolute poverty before housing costs in each year it covers", () => {
     expect(published.year).toBe(2029);
-    expect(count("milburn_package", 2029, "poverty_abs_bhc_change_pp")).toBe(342299);
+    expect(count("milburn_package", 2029, "poverty_abs_bhc_change_pp")).toBe(290728);
     // Every year the runs cover (by_year), under the same floor
     expect(Number.isFinite(count("milburn_package", 2028, "poverty_abs_bhc_change_pp"))).toBe(true);
     expect(count("milburn_package", 2026, "poverty_abs_bhc_change_pp")).toBeNull();
@@ -587,13 +591,13 @@ describe("the poverty card's direct count", () => {
   });
 
   it("replaces pp × population in the card's bars, so it reads the summary's own count as Key figures do", () => {
-    // +0.490pp of about 70m people would be 343,000; the summary counts 342,299
-    const measures = [{ id: "milburn_package", name: "Package", value: 0.49, colour: "" }];
+    // +0.417pp of about 70m people would be 292,000; the summary counts 290,728
+    const measures = [{ id: "milburn_package", name: "Package", value: 0.417, colour: "" }];
     const scaled = povertyWaterfall(measures, null, 70);
-    expect(Math.round(-scaled.steps[0].x)).toBe(343000);
+    expect(Math.round(-scaled.steps[0].x)).toBe(291900);
     const direct = povertyWaterfall(measures, null, 70, [], (id) => count(id, 2029, "poverty_abs_bhc_change_pp"));
-    expect(direct.steps[0].x).toBe(-342299);
-    expect(formatPeople(-direct.steps[0].x)).toBe("342,000");
+    expect(direct.steps[0].x).toBe(-290728);
+    expect(formatPeople(-direct.steps[0].x)).toBe("291,000");
   });
 });
 

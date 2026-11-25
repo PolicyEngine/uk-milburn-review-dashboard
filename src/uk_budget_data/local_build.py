@@ -1,12 +1,14 @@
 """The data build and engine the Milburn review dashboard runs on.
 
 The dashboard's national figures come from Microcosm build
-``uk-frs-calibration-attempt-20261115T104657Z-fcfac709`` (dataset SHA-256
-301d2fe5...), on policyengine-uk 2.177.7 and policyengine-core 3.34.10.
-policyengine 6.20.1 certifies that pair (its bundle's UK data release,
-policyengine.py PR 759), so model and data are pinned together by the
-bundle; until 16 November 2026 the dashboard ran on the uncertified build
-6f918b81 with the engine overridden.
+``uk-frs-calibration-attempt-20261122T100732Z-b891aa69`` (dataset SHA-256
+ae116bc3...), on policyengine-uk 2.179.2 and policyengine-core 3.34.10.
+policyengine 6.20.3 certifies that pair (its bundle's UK data release,
+policyengine.py PR 766), so model and data are pinned together by the
+bundle. From 16 to 24 November 2026 the dashboard ran on build fcfac709
+(policyengine-uk 2.177.7, certified in policyengine 6.20.1 and 6.20.2);
+before that, on the uncertified build 6f918b81 with the engine
+overridden.
 
 National simulations are built on the build's local file, downloaded from
 the bundle's own location (``policyengine/populace-uk-private`` at the
@@ -36,12 +38,12 @@ from importlib import metadata
 from pathlib import Path
 from typing import Optional
 
-BUILD_ID = "uk-frs-calibration-attempt-20261115T104657Z-fcfac709"
-BUILD_SHORT = "fcfac709"
+BUILD_ID = "uk-frs-calibration-attempt-20261122T100732Z-b891aa69"
+BUILD_SHORT = "b891aa69"
 DATASET_SHA256 = (
-    "301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90"
+    "ae116bc3cff798fe68df253083f0b26d779e02a0a818ee68df7d29fbc557165a"
 )
-ENGINE = {"policyengine-uk": "2.177.7", "policyengine-core": "3.34.10"}
+ENGINE = {"policyengine-uk": "2.179.2", "policyengine-core": "3.34.10"}
 
 
 # The installed policyengine.py release (6.20.1 and later certify this build;
@@ -209,7 +211,7 @@ def drop_hugging_face_token() -> list[str]:
 # as docs/milburn-local-run.md fetches it locally.
 FETCH_ENV = "MILBURN_FETCH_DATASET"
 DATASET_REPO = "policyengine/populace-uk-private"
-DATASET_REVISION = "ad84c0602ed28f694ef52662eb9b063779e4e923"
+DATASET_REVISION = "a80a4bf70ab4ffeac77357fe0633d3cee4ce7401"
 
 
 def fetch_dataset() -> None:

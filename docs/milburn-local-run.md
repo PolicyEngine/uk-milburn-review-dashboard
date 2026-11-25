@@ -7,14 +7,16 @@ data build the review uses.
 
 ## The build
 
-> **Since 16 November 2026 the runs use a certified build.** policyengine
-> 6.20.1 (policyengine.py PR 759) first certified Microcosm build `fcfac709`
-> with policyengine-uk 2.177.7 and core 3.34.10; the project now depends on
-> `policyengine[uk]>=6.20.2`, which certifies the same build, engine and
-> data. Version labels: the pre-report runs were first made on 6.20.1 and
-> the report runs on 6.20.2, on the same engine and data; since the floored
-> reruns of 18 November every run's `model_build.json` records 6.20.2.
-> There is no engine override, and
+> **Since 24 November 2026 the runs use build `b891aa69`.** policyengine
+> 6.20.3 (policyengine.py PR 766) certifies Microcosm build `b891aa69` with
+> policyengine-uk 2.179.2 and core 3.34.10, and every run was rerun on it
+> that day. From 16 to 24 November the runs used build `fcfac709`
+> (policyengine-uk 2.177.7, certified in policyengine 6.20.1 and 6.20.2;
+> the pre-report runs recorded 6.20.1, the report runs 6.20.2, on the same
+> engine and data). Figures from the two builds are not comparable: the new
+> build binds PIP at 16–19 and 20–24, the UC health element at 16 to 24 and
+> RTI employees at 18 to 24, and stores the new-claimant health element
+> draw ordered by claim date. There is no engine override, and
 > `local_build.bundle_certifies()` checks the file against the installed
 > bundle. Sections below that describe the uncertified build `6f918b81`
 > (engine override, "not in a policyengine.py release", refused bundle) are
@@ -22,20 +24,12 @@ data build the review uses.
 
 | | |
 |---|---|
-| Data | Microcosm build `uk-frs-calibration-attempt-20261115T104657Z-fcfac709`, `microcosm_uk_2024_25.h5`, SHA-256 `301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90` |
-| Engine | policyengine-uk 2.177.7, policyengine-core 3.34.10 (pinned by the bundle) |
-| Bundle | policyengine 6.20.2, whose UK data release certifies this build |
-| Label carried into outputs | `build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2` |
+| Data | Microcosm build `uk-frs-calibration-attempt-20261122T100732Z-b891aa69`, `microcosm_uk_2024_25.h5`, SHA-256 `ae116bc3cff798fe68df253083f0b26d779e02a0a818ee68df7d29fbc557165a` |
+| Engine | policyengine-uk 2.179.2, policyengine-core 3.34.10 (pinned by the bundle) |
+| Bundle | policyengine 6.20.3, whose UK data release certifies this build |
+| Label carried into outputs | `build b891aa69, policyengine-uk 2.179.2, certified in policyengine 6.20.3` |
 
-Version labels: runs made before the final report was published
-first recorded `certified in policyengine 6.20.1` in their
-`model_build.json`, and the report runs `6.20.2`. Both bundles pin the same
-engine (policyengine-uk 2.177.7, policyengine-core 3.34.10) and certify the
-same build fcfac709 (same SHA-256), so the figures are comparable; only the
-bundle's release number differs, and the pre-report runs were not rerun to
-change it. The floored reruns of 18 November (the 3-survey-household floor)
-ran every run on 6.20.2, so every published `model_build.json` now records
-6.20.2; the page still merges a 6.20.1 and a 6.20.2 label into one
+The page still merges a 6.20.1 and a 6.20.2 label into one
 (`combinedLabel` in `src/utils/milburn/localBuild.js`) should an older
 output return.
 
@@ -45,8 +39,8 @@ Fetch the file once (it reads the Hugging Face CLI token; nothing is printed):
 .venv/bin/python - <<'PY'
 import shutil; from pathlib import Path
 from huggingface_hub import hf_hub_download
-path = "releases/microcosm-uk-2024-25-national/uk-frs-calibration-attempt-20261115T104657Z-fcfac709/microcosm_uk_2024_25.h5"
-f = hf_hub_download("policyengine/populace-uk-private", path, repo_type="dataset", revision="ad84c0602ed28f694ef52662eb9b063779e4e923")
+path = "releases/microcosm-uk-2024-25-national/uk-frs-calibration-attempt-20261122T100732Z-b891aa69/microcosm_uk_2024_25.h5"
+f = hf_hub_download("policyengine/populace-uk-private", path, repo_type="dataset", revision="a80a4bf70ab4ffeac77357fe0633d3cee4ce7401")
 dest = Path.home() / "data" / "microcosm" / path; dest.parent.mkdir(parents=True, exist_ok=True); shutil.copy2(f, dest)
 PY
 ```
@@ -340,7 +334,7 @@ The two options added on 17 November:
   additions and education and shared accommodation exceptions, benefit cap
   exceptions, non-dependant deductions) therefore stay where any of it is
   still paid and go where none is (Carer's Allowance and the UC carer
-  element are not linked to PIP in policyengine-uk 2.177.7, so they never
+  element are not linked to PIP in policyengine-uk 2.179.2, so they never
   change): all `1.0` is current law, all `0.0` is
   `pip_removed_under_25`, all `0.5` is `pip_halved_under_25`. The
   replacement is not a separate payment, and the local health and
@@ -386,7 +380,7 @@ country list) is new code: see the runbook's section 1.
 ### 6. Household API and page
 
 ```bash
-HOUSEHOLD_WORKERS=2 PORT=8010 .venv/bin/uk-budget-api  # household calculations on 2.177.7
+HOUSEHOLD_WORKERS=2 PORT=8010 .venv/bin/uk-budget-api  # household calculations on 2.179.2
 bun run dev                                            # http://localhost:3000/uk/milburn-review
 ```
 

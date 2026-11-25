@@ -89,7 +89,7 @@ export const REVIEW_FIGURE_CAVEAT =
 
 /** Relative poverty is approximate under the scaling. */
 export const RELATIVE_APPROXIMATE_SENTENCE =
-  "Relative poverty is not shown: its line moves with the median, so it does not scale with the share, and the check (a random 25% and the other 75% of the group, run separately) found the parts missing the whole by up to 9% of the change.";
+  "Relative poverty is not shown: its line moves with the median, so it does not scale with the share, and the check (a random 25% and the other 75% of the group, run separately) found the parts missing the whole by up to 13% of the change.";
 
 /** The replacement awards the review's 9% sits beside. */
 export const REPLACEMENTS_SENTENCE =

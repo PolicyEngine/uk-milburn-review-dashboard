@@ -58,10 +58,10 @@ Definitions are in [`src/uk_budget_data/reforms.py`](src/uk_budget_data/reforms.
 
 ## Data and engine
 
-- **policyengine 6.20.2** (`pyproject.toml`, `uv.lock`), whose bundle certifies **Microcosm UK build `fcfac709`** with policyengine-uk 2.177.7 and policyengine-core 3.34.10. Upgrade the bundle, never policyengine-uk alone.
+- **policyengine 6.20.3** (`pyproject.toml`, `uv.lock`), whose bundle certifies **Microcosm UK build `b891aa69`** with policyengine-uk 2.179.2 and policyengine-core 3.34.10 (policyengine.py PR 766). Upgrade the bundle, never policyengine-uk alone.
 - Runs load the certified file from the location the bundle pins, checked by SHA-256 and `local_build.bundle_certifies()` ([`src/uk_budget_data/local_build.py`](src/uk_budget_data/local_build.py)). Fetch it once with the command in [`docs/milburn-local-run.md`](docs/milburn-local-run.md).
 - Every run writes `model_build.json` (build, dataset SHA-256, engine, `certified`, policyengine version) beside its tables in `public/data/milburn/<id>/`.
-- Version labels: the pre-report runs were first made on policyengine 6.20.1 and the report runs on 6.20.2, which pin the same engine and certify the same data, so the figures are comparable. They were not rerun for the label; since the floored reruns of 18 November every run records 6.20.2 ("Version labels" in [`docs/milburn-local-run.md`](docs/milburn-local-run.md)).
+- Build history: from 16 November 2026 the runs used build `fcfac709` (policyengine-uk 2.177.7, certified in policyengine 6.20.1 and 6.20.2). On 24 November every run was rerun on `b891aa69`, which binds PIP at 16–19 and 20–24, the UC health element at 16 to 24 and RTI employees at 18 to 24 to the published counts, and stores the new-claimant health element draw ordered by claim date. Figures made on the two builds are not comparable.
 
 ## Running
 

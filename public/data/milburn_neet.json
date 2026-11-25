@@ -1,7 +1,7 @@
 {
   "reform_id": "milburn_report_package",
   "year": 2029,
-  "build": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
+  "build": "build b891aa69, policyengine-uk 2.179.2, certified in policyengine 6.20.3",
   "definition": "Aged 16 to 24 with no employment or self-employment income in the year and not recorded as in full-time education, under current law.",
   "definition_notes": [
     "A static estimate: the UC health element and PIP are removed with no replacement benefit modelled and no one moving into work.",
@@ -16,52 +16,52 @@
   "min_records": 100,
   "groups": {
     "neet_approx": {
-      "records": 1997,
-      "population": 1072888,
-      "share_in_losing_households_pct": 19.41,
-      "people_in_losing_households": 208207,
-      "average_change_in_household_net_income": -2555.57,
-      "people_losing_uc_health_or_pip": 179654,
-      "people_losing_pip": 147338,
-      "people_losing_uc_health": 161645,
-      "records_losing_uc_health_or_pip": 340,
-      "share_losing_uc_health_or_pip_pct": 16.74
+      "records": 1873,
+      "population": 986476,
+      "share_in_losing_households_pct": 21.03,
+      "people_in_losing_households": 207407,
+      "average_change_in_household_net_income": -2641.62,
+      "people_losing_uc_health_or_pip": 181373,
+      "people_losing_pip": 148020,
+      "people_losing_uc_health": 151789,
+      "records_losing_uc_health_or_pip": 362,
+      "share_losing_uc_health_or_pip_pct": 18.39
     },
     "other_16_24": {
-      "records": 12775,
-      "population": 6412041,
-      "share_in_losing_households_pct": 5.8,
-      "people_in_losing_households": 372157,
-      "average_change_in_household_net_income": -745.63,
-      "people_losing_uc_health_or_pip": 211833,
-      "people_losing_pip": 201464,
-      "people_losing_uc_health": 112040,
-      "records_losing_uc_health_or_pip": 389,
-      "share_losing_uc_health_or_pip_pct": 3.3
+      "records": 12883,
+      "population": 6508107,
+      "share_in_losing_households_pct": 6.17,
+      "people_in_losing_households": 401657,
+      "average_change_in_household_net_income": -655.21,
+      "people_losing_uc_health_or_pip": 329719,
+      "people_losing_pip": 212453,
+      "people_losing_uc_health": 221321,
+      "records_losing_uc_health_or_pip": 622,
+      "share_losing_uc_health_or_pip_pct": 5.07
     },
     "all_16_24": {
-      "records": 14772,
-      "population": 7484929,
-      "share_in_losing_households_pct": 7.75,
-      "people_in_losing_households": 580365,
-      "average_change_in_household_net_income": -1005.06,
-      "people_losing_uc_health_or_pip": 391487,
-      "people_losing_pip": 348802,
-      "people_losing_uc_health": 273685,
-      "records_losing_uc_health_or_pip": 729,
-      "share_losing_uc_health_or_pip_pct": 5.23
+      "records": 14756,
+      "population": 7494583,
+      "share_in_losing_households_pct": 8.13,
+      "people_in_losing_households": 609063,
+      "average_change_in_household_net_income": -916.67,
+      "people_losing_uc_health_or_pip": 511092,
+      "people_losing_pip": 360473,
+      "people_losing_uc_health": 373110,
+      "records_losing_uc_health_or_pip": 984,
+      "share_losing_uc_health_or_pip_pct": 6.82
     }
   },
-  "neet_approx_total": 1072888,
-  "neet_approx_share_of_16_24_pct": 14.3,
+  "neet_approx_total": 986476,
+  "neet_approx_share_of_16_24_pct": 13.2,
   "ons_benchmark_id": "neet_16_24",
   "by_year": {
     "2027": {
       "year": 2027,
       "groups": {
         "neet_approx": {
-          "records": 1997,
-          "population": 1068822,
+          "records": 1873,
+          "population": 982738,
           "share_in_losing_households_pct": 0.0,
           "people_in_losing_households": null,
           "average_change_in_household_net_income": 0.0,
@@ -72,8 +72,8 @@
           "share_losing_uc_health_or_pip_pct": null
         },
         "other_16_24": {
-          "records": 12775,
-          "population": 6387745,
+          "records": 12883,
+          "population": 6483447,
           "share_in_losing_households_pct": 0.0,
           "people_in_losing_households": null,
           "average_change_in_household_net_income": 0.0,
@@ -84,8 +84,8 @@
           "share_losing_uc_health_or_pip_pct": null
         },
         "all_16_24": {
-          "records": 14772,
-          "population": 7456567,
+          "records": 14756,
+          "population": 7466185,
           "share_in_losing_households_pct": 0.0,
           "people_in_losing_households": null,
           "average_change_in_household_net_income": 0.0,
@@ -96,15 +96,15 @@
           "share_losing_uc_health_or_pip_pct": null
         }
       },
-      "neet_approx_total": 1068822,
-      "neet_approx_share_of_16_24_pct": 14.3
+      "neet_approx_total": 982738,
+      "neet_approx_share_of_16_24_pct": 13.2
     },
     "2028": {
       "year": 2028,
       "groups": {
         "neet_approx": {
-          "records": 1997,
-          "population": 1070639,
+          "records": 1873,
+          "population": 984408,
           "share_in_losing_households_pct": 0.0,
           "people_in_losing_households": null,
           "average_change_in_household_net_income": 0.0,
@@ -115,8 +115,8 @@
           "share_losing_uc_health_or_pip_pct": null
         },
         "other_16_24": {
-          "records": 12775,
-          "population": 6398604,
+          "records": 12883,
+          "population": 6494469,
           "share_in_losing_households_pct": 0.0,
           "people_in_losing_households": null,
           "average_change_in_household_net_income": 0.0,
@@ -127,8 +127,8 @@
           "share_losing_uc_health_or_pip_pct": null
         },
         "all_16_24": {
-          "records": 14772,
-          "population": 7469243,
+          "records": 14756,
+          "population": 7478877,
           "share_in_losing_households_pct": 0.0,
           "people_in_losing_households": null,
           "average_change_in_household_net_income": 0.0,
@@ -139,137 +139,137 @@
           "share_losing_uc_health_or_pip_pct": null
         }
       },
-      "neet_approx_total": 1070639,
-      "neet_approx_share_of_16_24_pct": 14.3
+      "neet_approx_total": 984408,
+      "neet_approx_share_of_16_24_pct": 13.2
     },
     "2029": {
       "year": 2029,
       "groups": {
         "neet_approx": {
-          "records": 1997,
-          "population": 1072888,
-          "share_in_losing_households_pct": 19.41,
-          "people_in_losing_households": 208207,
-          "average_change_in_household_net_income": -2555.57,
-          "people_losing_uc_health_or_pip": 179654,
-          "people_losing_pip": 147338,
-          "people_losing_uc_health": 161645,
-          "records_losing_uc_health_or_pip": 340,
-          "share_losing_uc_health_or_pip_pct": 16.74
+          "records": 1873,
+          "population": 986476,
+          "share_in_losing_households_pct": 21.03,
+          "people_in_losing_households": 207407,
+          "average_change_in_household_net_income": -2641.62,
+          "people_losing_uc_health_or_pip": 181373,
+          "people_losing_pip": 148020,
+          "people_losing_uc_health": 151789,
+          "records_losing_uc_health_or_pip": 362,
+          "share_losing_uc_health_or_pip_pct": 18.39
         },
         "other_16_24": {
-          "records": 12775,
-          "population": 6412041,
-          "share_in_losing_households_pct": 5.8,
-          "people_in_losing_households": 372157,
-          "average_change_in_household_net_income": -745.63,
-          "people_losing_uc_health_or_pip": 211833,
-          "people_losing_pip": 201464,
-          "people_losing_uc_health": 112040,
-          "records_losing_uc_health_or_pip": 389,
-          "share_losing_uc_health_or_pip_pct": 3.3
+          "records": 12883,
+          "population": 6508107,
+          "share_in_losing_households_pct": 6.17,
+          "people_in_losing_households": 401657,
+          "average_change_in_household_net_income": -655.21,
+          "people_losing_uc_health_or_pip": 329719,
+          "people_losing_pip": 212453,
+          "people_losing_uc_health": 221321,
+          "records_losing_uc_health_or_pip": 622,
+          "share_losing_uc_health_or_pip_pct": 5.07
         },
         "all_16_24": {
-          "records": 14772,
-          "population": 7484929,
-          "share_in_losing_households_pct": 7.75,
-          "people_in_losing_households": 580365,
-          "average_change_in_household_net_income": -1005.06,
-          "people_losing_uc_health_or_pip": 391487,
-          "people_losing_pip": 348802,
-          "people_losing_uc_health": 273685,
-          "records_losing_uc_health_or_pip": 729,
-          "share_losing_uc_health_or_pip_pct": 5.23
+          "records": 14756,
+          "population": 7494583,
+          "share_in_losing_households_pct": 8.13,
+          "people_in_losing_households": 609063,
+          "average_change_in_household_net_income": -916.67,
+          "people_losing_uc_health_or_pip": 511092,
+          "people_losing_pip": 360473,
+          "people_losing_uc_health": 373110,
+          "records_losing_uc_health_or_pip": 984,
+          "share_losing_uc_health_or_pip_pct": 6.82
         }
       },
-      "neet_approx_total": 1072888,
-      "neet_approx_share_of_16_24_pct": 14.3
+      "neet_approx_total": 986476,
+      "neet_approx_share_of_16_24_pct": 13.2
     },
     "2030": {
       "year": 2030,
       "groups": {
         "neet_approx": {
-          "records": 1997,
-          "population": 1075570,
-          "share_in_losing_households_pct": 19.41,
-          "people_in_losing_households": 208728,
-          "average_change_in_household_net_income": -2615.29,
-          "people_losing_uc_health_or_pip": 180103,
-          "people_losing_pip": 147707,
-          "people_losing_uc_health": 162049,
-          "records_losing_uc_health_or_pip": 340,
-          "share_losing_uc_health_or_pip_pct": 16.74
+          "records": 1873,
+          "population": 988942,
+          "share_in_losing_households_pct": 21.03,
+          "people_in_losing_households": 207925,
+          "average_change_in_household_net_income": -2704.26,
+          "people_losing_uc_health_or_pip": 181826,
+          "people_losing_pip": 148390,
+          "people_losing_uc_health": 152168,
+          "records_losing_uc_health_or_pip": 362,
+          "share_losing_uc_health_or_pip_pct": 18.39
         },
         "other_16_24": {
-          "records": 12775,
-          "population": 6428071,
-          "share_in_losing_households_pct": 5.8,
-          "people_in_losing_households": 373088,
-          "average_change_in_household_net_income": -762.17,
-          "people_losing_uc_health_or_pip": 212363,
-          "people_losing_pip": 201967,
-          "people_losing_uc_health": 112320,
-          "records_losing_uc_health_or_pip": 389,
-          "share_losing_uc_health_or_pip_pct": 3.3
+          "records": 12883,
+          "population": 6524378,
+          "share_in_losing_households_pct": 6.17,
+          "people_in_losing_households": 402661,
+          "average_change_in_household_net_income": -669.76,
+          "people_losing_uc_health_or_pip": 330543,
+          "people_losing_pip": 212984,
+          "people_losing_uc_health": 221875,
+          "records_losing_uc_health_or_pip": 622,
+          "share_losing_uc_health_or_pip_pct": 5.07
         },
         "all_16_24": {
-          "records": 14772,
-          "population": 7503641,
-          "share_in_losing_households_pct": 7.75,
-          "people_in_losing_households": 581816,
-          "average_change_in_household_net_income": -1027.79,
-          "people_losing_uc_health_or_pip": 392466,
-          "people_losing_pip": 349674,
-          "people_losing_uc_health": 274369,
-          "records_losing_uc_health_or_pip": 729,
-          "share_losing_uc_health_or_pip_pct": 5.23
+          "records": 14756,
+          "population": 7513319,
+          "share_in_losing_households_pct": 8.13,
+          "people_in_losing_households": 610586,
+          "average_change_in_household_net_income": -937.55,
+          "people_losing_uc_health_or_pip": 512370,
+          "people_losing_pip": 361374,
+          "people_losing_uc_health": 374043,
+          "records_losing_uc_health_or_pip": 984,
+          "share_losing_uc_health_or_pip_pct": 6.82
         }
       },
-      "neet_approx_total": 1075570,
-      "neet_approx_share_of_16_24_pct": 14.3
+      "neet_approx_total": 988942,
+      "neet_approx_share_of_16_24_pct": 13.2
     },
     "2031": {
       "year": 2031,
       "groups": {
         "neet_approx": {
-          "records": 1997,
-          "population": 1078151,
-          "share_in_losing_households_pct": 19.41,
-          "people_in_losing_households": 209229,
-          "average_change_in_household_net_income": -2671.01,
-          "people_losing_uc_health_or_pip": 180536,
-          "people_losing_pip": 148061,
-          "people_losing_uc_health": 162438,
-          "records_losing_uc_health_or_pip": 340,
-          "share_losing_uc_health_or_pip_pct": 16.74
+          "records": 1873,
+          "population": 991315,
+          "share_in_losing_households_pct": 21.03,
+          "people_in_losing_households": 208424,
+          "average_change_in_household_net_income": -2762.74,
+          "people_losing_uc_health_or_pip": 182263,
+          "people_losing_pip": 148746,
+          "people_losing_uc_health": 152533,
+          "records_losing_uc_health_or_pip": 362,
+          "share_losing_uc_health_or_pip_pct": 18.39
         },
         "other_16_24": {
-          "records": 12775,
-          "population": 6443498,
-          "share_in_losing_households_pct": 5.8,
-          "people_in_losing_households": 373983,
-          "average_change_in_household_net_income": -775.44,
-          "people_losing_uc_health_or_pip": 212872,
-          "people_losing_pip": 202452,
-          "people_losing_uc_health": 112589,
-          "records_losing_uc_health_or_pip": 389,
-          "share_losing_uc_health_or_pip_pct": 3.3
+          "records": 12883,
+          "population": 6540036,
+          "share_in_losing_households_pct": 6.17,
+          "people_in_losing_households": 403627,
+          "average_change_in_household_net_income": -682.83,
+          "people_losing_uc_health_or_pip": 331336,
+          "people_losing_pip": 213495,
+          "people_losing_uc_health": 222407,
+          "records_losing_uc_health_or_pip": 622,
+          "share_losing_uc_health_or_pip_pct": 5.07
         },
         "all_16_24": {
-          "records": 14772,
-          "population": 7521650,
-          "share_in_losing_households_pct": 7.75,
-          "people_in_losing_households": 583212,
-          "average_change_in_household_net_income": -1047.15,
-          "people_losing_uc_health_or_pip": 393408,
-          "people_losing_pip": 350513,
-          "people_losing_uc_health": 275028,
-          "records_losing_uc_health_or_pip": 729,
-          "share_losing_uc_health_or_pip_pct": 5.23
+          "records": 14756,
+          "population": 7531351,
+          "share_in_losing_households_pct": 8.13,
+          "people_in_losing_households": 612051,
+          "average_change_in_household_net_income": -956.6,
+          "people_losing_uc_health_or_pip": 513599,
+          "people_losing_pip": 362241,
+          "people_losing_uc_health": 374940,
+          "records_losing_uc_health_or_pip": 984,
+          "share_losing_uc_health_or_pip_pct": 6.82
         }
       },
-      "neet_approx_total": 1078151,
-      "neet_approx_share_of_16_24_pct": 14.3
+      "neet_approx_total": 991315,
+      "neet_approx_share_of_16_24_pct": 13.2
     }
   }
 }

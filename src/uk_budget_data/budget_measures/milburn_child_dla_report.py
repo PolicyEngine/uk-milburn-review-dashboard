@@ -15,7 +15,7 @@ replaced by DLA at the equivalent award level:
 
 These are the pairs with the same weekly amounts (2026-27: £76.70 and
 £114.60 for daily living and care, £30.30 and £80.00 for mobility), and
-policyengine-uk 2.177.7 uprates both benefits by the same index, so the
+policyengine-uk 2.179.2 uprates both benefits by the same index, so the
 amounts stay equal in every year: the swap changes the name of the
 payment, not its size. The DLA care lowest rate has no PIP counterpart
 and is not used. The engine can pay DLA at 16 and 17: ``dla_sc`` and

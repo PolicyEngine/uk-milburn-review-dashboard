@@ -135,11 +135,11 @@ describe("MethodologyTab", () => {
 
   it("says young LCWRA claimants mostly also get PIP, and how the caseloads compare with DWP's", () => {
     const { container } = renderTab();
-    expect(container.textContent).toContain("In the data 90.6% of 16 to 24-year-olds with limited capability for work and work-related activity (LCWRA) also get PIP, against 62.5%");
-    expect(container.textContent).toContain("sits 1.5% above DWP's figure");
+    expect(container.textContent).toContain("In the data 83.4% of 16 to 24-year-olds with limited capability for work and work-related activity (LCWRA) also get PIP, against 62.5%");
+    expect(container.textContent).toContain("each fits within 0.2%");
     expect(container.textContent).not.toContain("23% above");
-    expect(container.textContent).toContain("too few aged 20 to 24 (15.9% below). The proposal starts at 18");
-    expect(container.textContent).toContain("the young average award is lower than the published figures");
+    expect(container.textContent).toContain("about 16% above the Resolution Foundation's 176,000");
+    expect(container.textContent).toContain("The young average PIP award is lower than the published figures");
   });
 
   it("switches views from its links, in place", () => {
@@ -162,7 +162,7 @@ describe("MethodologyTab", () => {
       expect(link).toHaveTextContent("(opens in a new tab)");
     }
     expect(external.map((link) => link.getAttribute("href"))).toEqual(
-      expect.arrayContaining(["https://pypi.org/project/policyengine-uk/2.177.7/"]),
+      expect.arrayContaining(["https://pypi.org/project/policyengine-uk/2.179.2/"]),
     );
     // Each term link lands on a term the glossary defines
     const terms = [...container.querySelectorAll('a[href^="#term-"]')];
@@ -253,19 +253,19 @@ describe("MethodologyTab", () => {
 
   it("names the build, the model and that the figures are static", () => {
     const { container } = renderTab();
-    expect(container).toHaveTextContent("Microcosm UK build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2");
+    expect(container).toHaveTextContent("Microcosm UK build b891aa69, policyengine-uk 2.179.2, certified in policyengine 6.20.3");
     expect(container).toHaveTextContent("policyengine-core 3.34.10");
-    expect(container).toHaveTextContent("uk-frs-calibration-attempt-20261115T104657Z-fcfac709");
+    expect(container).toHaveTextContent("uk-frs-calibration-attempt-20261122T100732Z-b891aa69");
     expect(container).toHaveTextContent("no behavioural response in the main figures");
     expect(container.textContent).not.toMatch(/Autumn Budget|October 2026/i);
   });
 
-  it("lists the limits once: static, no NEET variable, ADP held as PIP, the age-blind draw, small samples at 16 and 17", () => {
+  it("lists the limits once: static, no NEET variable, ADP held as PIP, the claim-date ordering, small samples at 16 and 17", () => {
     const { container } = renderTab();
     const limitations = container.querySelector(`section#${METHOD_SECTIONS.limitations}`);
     const terms = [...limitations.querySelectorAll(".method-fact dt")].map((term) => term.textContent);
     expect(terms).toEqual(MILBURN_LIMITATIONS.map(([term]) => term));
-    for (const words of ["No NEET variable", "Adult Disability Payment", "does not depend on age", "16 or 17"]) {
+    for (const words of ["No NEET variable", "Adult Disability Payment", "most recent claims", "16 or 17"]) {
       expect(limitations).toHaveTextContent(words);
     }
   });

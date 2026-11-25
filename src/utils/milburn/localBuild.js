@@ -1,7 +1,7 @@
 /**
  * The local build data route: the Milburn review's figures from the flat
- * results the pipeline writes on Microcosm build fcfac709 with
- * policyengine-uk 2.177.7 (docs/milburn-local-run.md).
+ * results the pipeline writes on Microcosm build b891aa69 with
+ * policyengine-uk 2.179.2 (docs/milburn-local-run.md).
  *
  * The verified publication route (manifest.json and receipted artifacts,
  * utils/publication/) cannot run on this build: its receipts are bound to

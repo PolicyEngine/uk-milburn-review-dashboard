@@ -118,20 +118,20 @@ describe("the benchmarks file", () => {
     ]);
     for (const row of parsed.rows.filter((each) => each.estimate?.fixed)) {
       // Each is for 2025 (2025-26 rules), the published figures' own year; money in cash terms
-      expect(row.estimate.label, row.id).toMatch(/^PolicyEngine, build fcfac709, 2025(-26)?(, cash terms)?$/);
+      expect(row.estimate.label, row.id).toMatch(/^PolicyEngine, build b891aa69, 2025(-26)?(, cash terms)?$/);
       if (/£/.test(row.estimate.fixed)) expect(row.estimate.label, row.id).toMatch(/cash terms$/);
       expect(row.estimate.note, row.id).toBeTruthy();
       expect(estimateFor(row, { ageRows: [], packageRows: [], packageKey: null, year: 2027 })).toBeNull();
     }
-    // The figures from build fcfac709 (issue #1), as given
+    // The figures from build b891aa69 (scripts/milburn_one_off_figures.py)
     const fixed = (id) => parsed.rows.find((row) => row.id === id).estimate.fixed;
     // Our counts to the nearest thousand; the tolerance is tested unrounded (benchmarks.js)
-    expect(fixed("uc_health_element_16_24")).toBe("233,000");
+    expect(fixed("uc_health_element_16_24")).toBe("204,000");
     expect(fixed("young_pip_recipients")).toBe("407,000");
-    expect(fixed("young_benefits_spend")).toBe("£4.44bn a year");
-    expect(fixed("pip_spend_16_24")).toBe("£3.27bn a year");
-    expect(fixed("uc_health_spend_16_24")).toBe("£1.18bn a year");
-    expect(fixed("employer_nics_under_25")).toBe("£5.85bn a year");
+    expect(fixed("young_benefits_spend")).toBe("£4.19bn a year");
+    expect(fixed("pip_spend_16_24")).toBe("£3.17bn a year");
+    expect(fixed("uc_health_spend_16_24")).toBe("£1.03bn a year");
+    expect(fixed("employer_nics_under_25")).toBe("£6.18bn a year");
     // The RF figure with no published basis, and the review's own estimates, have no PolicyEngine pair
     for (const id of ["uc_health_no_work_requirements", "retail_hospitality_jobs_16_24", "relative_poverty_review", "review_welfare_saving_2036"]) expect(parsed.rows.find((row) => row.id === id).estimate, id).toBeNull();
     expect(parsed.rows.find((row) => row.id === "uc_health_no_work_requirements").basis).toMatch(/^Basis not published/);
@@ -193,19 +193,19 @@ describe("the benchmark charts", () => {
       "uc_health_spend_16_24",
       "employer_nics_under_25",
     ]);
-    // The gaps issue #1 gives, like for like: +33% (+32% on our count to the nearest thousand), -6%, -14%, +28%, +15%
+    // The like-for-like gaps on build b891aa69: +16%, -11%, -17%, +12%, +21%
     const gap = (id) => Math.round(comparisonFor(row(id)).gapPct);
-    expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 233000 });
-    expect(gap("uc_health_element_16_24")).toBe(33); // from the unrounded 233,407, so rounding the shown count to 233,000 never moves the gap
+    expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 204000 });
+    expect(gap("uc_health_element_16_24")).toBe(16); // from the unrounded 203,774, so rounding the shown count never moves the gap
     // The PIP overlap: shares, so the gap is in percentage points (Max, 18 Nov; issue #4's table)
-    expect(comparisonFor(row("uc_health_pip_overlap"))).toMatchObject({ unit: "pct", published: 62.5, estimate: 90.6 });
-    expect(comparisonFor(row("uc_health_pip_overlap")).gapPp).toBeCloseTo(28.1, 6);
-    expect(gap("young_benefits_spend")).toBe(-6);
-    expect(gap("pip_spend_16_24")).toBe(-14);
-    expect(gap("uc_health_spend_16_24")).toBe(28);
+    expect(comparisonFor(row("uc_health_pip_overlap"))).toMatchObject({ unit: "pct", published: 62.5, estimate: 83.4 });
+    expect(comparisonFor(row("uc_health_pip_overlap")).gapPp).toBeCloseTo(20.9, 6);
+    expect(gap("young_benefits_spend")).toBe(-11);
+    expect(gap("pip_spend_16_24")).toBe(-17);
+    expect(gap("uc_health_spend_16_24")).toBe(12);
     const nics = comparisonFor(row("employer_nics_under_25"));
-    expect(nics).toMatchObject({ unit: "bn", published: 5.1, estimate: 5.85, publishedText: "£5.1bn", estimateText: "£5.85bn" });
-    expect(gap("employer_nics_under_25")).toBe(15);
+    expect(nics).toMatchObject({ unit: "bn", published: 5.1, estimate: 6.18, publishedText: "£5.1bn", estimateText: "£6.18bn" });
+    expect(gap("employer_nics_under_25")).toBe(21);
     // The RF's £5.1bn is its Take a chance on me (Figure 10, as corrected on 2 September), not the 11 November comment
     expect(row("employer_nics_under_25")).toMatchObject({ url: "https://www.resolutionfoundation.org/publications/take-a-chance-on-me/", date: "29 June 2026" });
     expect(comparisonFor(row("young_pip_recipients"))).toMatchObject({ unit: "count", published: 450000, estimate: 407000 });

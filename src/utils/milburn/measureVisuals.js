@@ -2,7 +2,7 @@
  * The numbers behind the Milburn measures' card visuals (components/
  * policies/MilburnVisual.jsx). The local build route publishes no
  * policy_parameters.json entry for these runs, so the rates are held here,
- * read from the installed policyengine-uk 2.177.7 (the build's engine) for
+ * read from the installed policyengine-uk 2.179.2 (the build's engine) for
  * the 2027-28 fiscal year, the measures' first:
  *
  * - health element, claims from April 2026 (£217.26 a month, legislated
@@ -44,7 +44,7 @@ import { percent, pounds, wholePounds } from "../policyVisuals";
 import { DEFAULT_SUMMARY_RUN, savingShare, summaryRun } from "./summary";
 
 export const MILBURN_RATES = Object.freeze({
-  engine: "policyengine-uk 2.177.7",
+  engine: "policyengine-uk 2.179.2",
   year: "2027-28",
   // A month
   healthElement: { protected: 442.1, protected2026: 429.8, newClaimant: 217.26 },
@@ -60,7 +60,7 @@ export const MILBURN_RATES = Object.freeze({
   // An hour, aged 21 and over
   minimumWage: 13.21,
   // The same in 2029-30, when the report's work allowance would start
-  // (gov/hmrc/minimum_wage/non_apprentice at 21, policyengine-uk 2.177.7):
+  // (gov/hmrc/minimum_wage/non_apprentice at 21, policyengine-uk 2.179.2):
   // the 15-hour card is drawn at it, as the run uses that year's rate
   minimumWage2029: 13.85,
   employerNics: { rate: 0.15, zeroRateBelowAge: 21, apprenticeZeroRateBelowAge: 25, upperSecondaryThreshold: 50270, secondaryThreshold: 5000 },

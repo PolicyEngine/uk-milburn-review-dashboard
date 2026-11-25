@@ -39,7 +39,7 @@ export const REPLACEMENT_NOT_MODELLED_NOTE =
  * Foundation's: why more young people lose both than published counts imply.
  */
 export const HEALTH_PIP_OVERLAP_NOTE =
-  "In our data 90.6% of 16 to 24-year-olds with the UC health element also get PIP, against 62.5% in the Resolution Foundation's figures, so more young people lose both payments than published counts imply.";
+  "In our data 83.4% of 16 to 24-year-olds with the UC health element also get PIP, against 62.5% in the Resolution Foundation's figures, so more young people lose both payments than published counts imply.";
 
 /** A headline card's visible line when it shows the fallback run, not one selected policy. */
 export function fallbackRunLine(name) {

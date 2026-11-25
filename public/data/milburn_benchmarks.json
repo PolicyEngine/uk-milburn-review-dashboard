@@ -46,11 +46,11 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "233,000",
-        "exact": 233407,
-        "basis": "People aged 16 to 24 receiving the Universal Credit health element, Great Britain, 2025 (2025-26 rules), at the build's calibrated weights",
-        "label": "PolicyEngine, build fcfac709, 2025",
-        "note": "Why ours is higher: the data's UC take-up draw adds claimants who carry the element where they receive PIP, so the build counts about a third more young recipients than published"
+        "value": "204,000",
+        "exact": 203774,
+        "basis": "People aged 16 to 24 receiving the Universal Credit health element (an award with the element), Great Britain, 2025 (2025-26 rules), at the build's calibrated weights",
+        "label": "PolicyEngine, build b891aa69, 2025",
+        "note": "Why ours is higher: the build is calibrated to DWP's count for England and Wales from the review's interim annex (176,000), but the simulated count also includes Scotland, and the model's Universal Credit take-up adds some claimants with the element, so it sits about 16% above the published figure"
       }
     },
     {
@@ -63,10 +63,10 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "90.6%",
+        "value": "83.4%",
         "basis": "People aged 16 to 24 receiving the Universal Credit health element who also receive PIP, Great Britain, 2025 (2025-26 rules), at the build's calibrated weights",
-        "label": "PolicyEngine, build fcfac709, 2025",
-        "note": "The overlap affects how many young people would lose both payments under the package. Our data's UC take-up draw adds health element claimants among PIP recipients, which raises the overlap"
+        "label": "PolicyEngine, build b891aa69, 2025",
+        "note": "The overlap affects how many young people would lose both payments under the package. In our data more young recipients of the health element also receive PIP than in the Resolution Foundation's figures, so more of them lose both"
       }
     },
     {
@@ -91,9 +91,9 @@
       "press_report": false,
       "policyengine_estimate": {
         "value": "407,000",
-        "exact": 406919,
+        "exact": 406943,
         "basis": "People aged 16 to 24 receiving PIP, England and Wales, 2025, at the build's calibrated weights. DWP's 2025 count for the same group is 407,505 (England 384,150, Wales 23,355)",
-        "label": "PolicyEngine, build fcfac709, 2025",
+        "label": "PolicyEngine, build b891aa69, 2025",
         "note": "DWP's 2025 count for the same ages and area: 407,505. The published 450,000 is current (November 2026), so it includes the caseload's growth since 2025"
       }
     },
@@ -132,7 +132,7 @@
         "run": "package",
         "metric": "young_people_worse_off",
         "label": "People aged 16 to 24 in households made worse off by the combined package",
-        "note": "Our data put 90.6% of 16 to 24-year-olds receiving the UC health element on PIP too, against 62.5% in the Resolution Foundation's figures, so more of these young people lose both payments in our data than the published counts imply"
+        "note": "Our data put 83.4% of 16 to 24-year-olds receiving the UC health element on PIP too, against 62.5% in the Resolution Foundation's figures, so more of these young people lose both payments in our data than the published counts imply"
       }
     },
     {
@@ -145,10 +145,10 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "£4.44bn a year",
-        "basis": "Spending in 2025 (2025-26 rules), cash terms: PIP at ages 16 to 24 in England and Wales (£3.27bn) and the Universal Credit health element for young claimants in Great Britain (£1.18bn)",
-        "label": "PolicyEngine, build fcfac709, 2025, cash terms",
-        "note": "Close because two gaps offset: PIP is 14% lower than the review's figure and the health element 28% higher"
+        "value": "£4.19bn a year",
+        "basis": "Spending in 2025 (2025-26 rules), cash terms: PIP at ages 16 to 24 in England and Wales (£3.17bn) and the Universal Credit health element for young claimants in Great Britain (£1.03bn)",
+        "label": "PolicyEngine, build b891aa69, 2025, cash terms",
+        "note": "Lower overall because PIP is 17% below the review's figure, partly offset by the health element, 12% above"
       },
       "policyengine_saving": {
         "value": "£4.67bn a year",
@@ -166,10 +166,10 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "£3.27bn a year",
+        "value": "£3.17bn a year",
         "basis": "PIP spending on people aged 16 to 24, England and Wales, 2025 (2025-26 rules), cash terms",
-        "label": "PolicyEngine, build fcfac709, 2025, cash terms",
-        "note": "Why ours is lower: the caseload matches DWP's 2025 count, but the review's figure is for the 2025-26 financial year and the build's average award is lower (about £8,000 a year, against the Resolution Foundation's £8,400)"
+        "label": "PolicyEngine, build b891aa69, 2025, cash terms",
+        "note": "Why ours is lower: the caseload matches DWP's 2025 count, but the review's figure is for the 2025-26 financial year and the build's average award is lower (about £7,800 a year, against the Resolution Foundation's £8,400)"
       },
       "policyengine_saving": {
         "value": "£4.68bn a year",
@@ -187,10 +187,10 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "£1.18bn a year",
+        "value": "£1.03bn a year",
         "basis": "Universal Credit health element spending on young claimants, Great Britain, 2025 (2025-26 rules), cash terms",
-        "label": "PolicyEngine, build fcfac709, 2025, cash terms",
-        "note": "Why ours is higher: the same excess as in the caseload, where the build has about a third more young people receiving the element than published counts"
+        "label": "PolicyEngine, build b891aa69, 2025, cash terms",
+        "note": "Why ours is higher: the same excess as in the caseload, where the simulated count of young people receiving the element is above the published figure"
       },
       "policyengine_saving": {
         "value": "£1.13bn a year",
@@ -263,10 +263,10 @@
       "date": "29 June 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "£5.85bn a year",
+        "value": "£6.18bn a year",
         "basis": "Gross static cost in 2025-26 of a zero employer National Insurance rate for under-25s, on top of the existing zero rate for under-21s, UK, cash terms",
-        "label": "PolicyEngine, build fcfac709, 2025-26, cash terms",
-        "note": "Why ours is higher: the build has about 10% fewer payroll employees aged 18 to 24 than HMRC's count, so the difference points to pay per young employee, which is not a calibration target"
+        "label": "PolicyEngine, build b891aa69, 2025-26, cash terms",
+        "note": "Why ours is higher: the build is calibrated to HMRC's count of payroll employees aged 18 to 24, so the difference points to pay per young employee, which is not a calibration target"
       },
       "policyengine_saving": {
         "value": "£4.65bn a year",

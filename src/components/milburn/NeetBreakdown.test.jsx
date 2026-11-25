@@ -159,7 +159,7 @@ describe("NeetBreakdown", () => {
     expect([...details.querySelectorAll("li")].slice(2).map((item) => item.textContent)).toEqual([
       "The survey data has no NEET flag.",
       "Thin cells are withheld.",
-      "In our data 90.6% of 16 to 24-year-olds with the UC health element also get PIP, against 62.5% in the Resolution Foundation's figures, so more young people lose both payments than published counts imply.",
+      "In our data 83.4% of 16 to 24-year-olds with the UC health element also get PIP, against 62.5% in the Resolution Foundation's figures, so more young people lose both payments than published counts imply.",
     ]);
   });
 

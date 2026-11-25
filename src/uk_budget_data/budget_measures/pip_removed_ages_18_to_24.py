@@ -24,7 +24,7 @@ def pip_removed_ages_18_to_24(
 
     Hand-written: no template withdraws a benefit by age. It wraps
     ``pip_dl`` and ``pip_m``, which the engine computes from each person's
-    category (in policyengine-uk 2.177.7 derived from the stored
+    category (in policyengine-uk 2.179.2 derived from the stored
     ``pip_dl_points`` and ``pip_m_points``); ``pip`` adds the two, so it
     follows. The certified build stores no ``pip`` amounts, so Scottish
     records (Adult Disability Payment, which the survey and the engine
@@ -39,7 +39,7 @@ def pip_removed_ages_18_to_24(
     exception, the benefit cap exceptions, non-dependant deduction
     exemptions), so they go with the payment; the PIP categories and points
     do not change. Carer's Allowance and the Universal Credit carer element
-    do not follow: in policyengine-uk 2.177.7 a carer qualifies through
+    do not follow: in policyengine-uk 2.179.2 a carer qualifies through
     ``cares_for_severely_disabled_person``, an input that defaults to true
     and is not linked to the PIP of the person cared for, so this removal
     changes no carer's award (in reality a carer whose entitlement rests on

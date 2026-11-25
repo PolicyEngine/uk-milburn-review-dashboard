@@ -32,7 +32,7 @@ def uc_health_element_removed_under_25(
     Hand-written because the engine's UC rebalancing
     (policyengine_uk.scenarios.uc_reform.add_universal_credit_reform)
     stores ``uc_LCWRA_element`` as an input in every year it runs (2026-27
-    to 2032-33 in policyengine-uk 2.177.7), so a wrapper of the element's
+    to 2032-33 in policyengine-uk 2.179.2), so a wrapper of the element's
     formula would move no award. This runs after that step (a modifier's
     default phase, after data load) and rewrites the stored element: kept
     where some claimant with LCWRA is 25 or over (joint claimants get one

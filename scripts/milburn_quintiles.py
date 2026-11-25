@@ -24,8 +24,8 @@ run's published winners_losers.csv and distributional_impact.csv for every
 year; a mismatch stops the script.
 
 Runs: the package and its two removals on their own, each against current
-law (Microcosm build fcfac709 on policyengine-uk 2.177.7, certified in
-policyengine 6.20.2, through ``uk_budget_data.local_build``).
+law (Microcosm build b891aa69 on policyengine-uk 2.179.2, certified in
+policyengine 6.20.3, through ``uk_budget_data.local_build``).
 
 Locally it builds the baseline once and each reform in turn, a heavy job:
 it waits for the shared heavy-run lock (/tmp/pe-heavy.lock, "<pid>

@@ -110,12 +110,12 @@ describe("MilburnVisual", () => {
     expect(image()).toHaveAccessibleName(/People who turned 18 since April 2026 are reached at once; existing claimants as they are reassessed, at 25% of the remaining caseload a year\./);
     expect(MILBURN_PHASING.reassessedEachYear).toBe(0.25);
     // Then the run's own saving over full abolition's, a year each
-    await screen.findByRole("img", { name: /Exchequer saving as a share of full abolition's, from the results: 45% in 2027-28, 72% in 2028-29, 81% in 2029-30, 90% in 2030-31, 97% in 2031-32\./ });
+    await screen.findByRole("img", { name: /Exchequer saving as a share of full abolition's, from the results: 43% in 2027-28, 71% in 2028-29, 80% in 2029-30, 90% in 2030-31, 97% in 2031-32\./ });
     expect(container.querySelectorAll(".mviz-column")).toHaveLength(5);
     expect(image()).not.toHaveAccessibleName(/36%/);
     const shares = phasedSavingShares(parseSummary(JSON.parse(PUBLISHED_SUMMARY)), "milburn_package_phased");
     expect(shares).toHaveLength(5);
-    expect(shares[0]).toEqual({ year: 2027, share: 2.009 / 4.486 });
+    expect(shares[0]).toEqual({ year: 2027, share: 1.806 / 4.236 });
   });
 
   it("the report's runs with stated assumptions: each card's visual says its own rule, and shares come from the results", async () => {
@@ -135,9 +135,9 @@ describe("MilburnVisual", () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(PUBLISHED_SUMMARY, { status: 200 })));
     show("milburn_report_package_phased");
     expect(image()).toHaveAccessibleName(/People who turned 18 since April 2028 are reached at once; existing claimants as they are reassessed, at 45% of the remaining caseload a year\./);
-    await screen.findByRole("img", { name: /Exchequer saving as a share of the unphased package's, from the results: 59% in 2029-30, 84% in 2030-31, 93% in 2031-32\.$/ });
+    await screen.findByRole("img", { name: /Exchequer saving as a share of the unphased package's, from the results: 58% in 2029-30, 83% in 2030-31, 92% in 2031-32\.$/ });
     const shares = phasedSavingShares(parseSummary(JSON.parse(PUBLISHED_SUMMARY)), "milburn_report_package_phased", "milburn_report_package");
-    expect(shares[0]).toEqual({ year: 2029, share: 2.766 / 4.666 });
+    expect(shares[0]).toEqual({ year: 2029, share: 2.571 / 4.422 });
   });
 
   it("phased package: the rule alone when the summary is missing, never a typed share", async () => {

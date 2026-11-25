@@ -1,13 +1,13 @@
 {
-  "label": "build fcfac709, policyengine-uk 2.177.7, certified in policyengine 6.20.2",
-  "build": "uk-frs-calibration-attempt-20261115T104657Z-fcfac709",
-  "dataset_sha256": "301d2fe5e7805c5a6242b37843cb118445aefd59a0593833362ab5a6e2f9ba90",
+  "label": "build b891aa69, policyengine-uk 2.179.2, certified in policyengine 6.20.3",
+  "build": "uk-frs-calibration-attempt-20261122T100732Z-b891aa69",
+  "dataset_sha256": "ae116bc3cff798fe68df253083f0b26d779e02a0a818ee68df7d29fbc557165a",
   "engine": {
-    "policyengine-uk": "2.177.7",
+    "policyengine-uk": "2.179.2",
     "policyengine-core": "3.34.10"
   },
   "certified": true,
-  "policyengine": "6.20.2",
+  "policyengine": "6.20.3",
   "measures": [
     "uc_health_element_removed_under_22"
   ],

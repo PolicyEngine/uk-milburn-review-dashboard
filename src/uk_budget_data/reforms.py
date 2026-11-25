@@ -2,7 +2,7 @@
 
 The active registry is the Milburn section at the end of this module: five
 computable measures and their combined package, each compared against
-current law in policyengine-uk 2.177.7 (Microcosm build fcfac709, certified in policyengine 6.20.1; see
+current law in policyengine-uk 2.179.2 (Microcosm build b891aa69, certified in policyengine 6.20.3; see
 ``uk_budget_data.local_build``) from 2027-28, and four measures listed as
 not computable with their reasons (``NOT_COMPUTABLE_MEASURES``).
 
@@ -1261,7 +1261,7 @@ def _create_state_pension_double_lock_2030() -> Reform:
 # Candidate measures for the independent review of young people and work
 # (the Milburn review; final report expected 17 November 2026). None is
 # announced policy. Each is compared against current law in the installed
-# policyengine-uk (2.177.7 on Microcosm build fcfac709: see
+# policyengine-uk (2.179.2 on Microcosm build b891aa69: see
 # ``uk_budget_data.local_build``), from 2027-28 through the last policy year.
 # The Autumn Budget 2026 measures above are retired: their factories stay,
 # unregistered, for the modules and tests that still read them.
@@ -1415,10 +1415,11 @@ def _create_uc_health_element_removed_under_25_new_claims() -> Reform:
             "element at the new-claimant rate (claims from April 2026) no "
             "longer include it where the claimant with limited capability "
             f"for work and work-related activity is under {_UC_AGE}; protected "
-            "claimants keep it. The data hold no claim dates: the model "
-            "assigns the new-claimant rate by a random draw at the expected "
-            "share of claims, regardless of age, so the figure rests on "
-            "that assumption."
+            "claimants keep it. The data store an ordering of claims by "
+            "the survey's Universal Credit start date, then age: the model "
+            "gives the new-claimant rate to the most recent claims at the "
+            "expected share each year, so the figure rests on that "
+            "ordering."
         ),
         simulation_modifier=uc_health_element_removed_under_25_new_claims,
     )

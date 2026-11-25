@@ -27,11 +27,14 @@ def uc_health_element_removed_under_25_new_claims(
     true): protected pre-2026, severe conditions and terminally ill
     claimants keep the element whatever their age.
 
-    The engine has no claim date. On survey data the new-claimant flag is a
-    seeded draw at the expected new-claimant share of LCWRA awards each
-    year (rebalancing.new_claimant_share), blind to age, so the young
-    claimants it reaches are a random share of all young LCWRA claimants,
-    not those who actually claimed after April 2026. A household situation
+    The engine has no claim date. Since policyengine-uk 2.179.0 a dataset
+    can store the draw the engine compares with the expected new-claimant
+    share of LCWRA awards each year (rebalancing.new_claimant_share,
+    ``uc_new_claimant_health_element_draw``). Build b891aa69 stores it
+    ordered by the survey's UC start date (FRS ``UCSTART``), then age, so
+    the most recent claims take the new-claimant rate first; it is still an
+    ordering, not the claims actually made after April 2026. (On build
+    fcfac709 the draw was random, blind to age.) A household situation
     sets the flag itself (false by default: protected).
 
     Like the all-claimant measure it rewrites the stored element, which the
