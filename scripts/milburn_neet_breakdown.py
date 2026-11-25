@@ -98,7 +98,8 @@ DEFINITION_NOTES = [
     "falls by more than 0.01% of its baseline.",
     "A person personally loses a benefit when their own PIP falls, or they "
     "are the claimant with limited capability for work and work-related "
-    "activity in a benefit unit whose UC health element falls. Each person "
+    "activity in a benefit unit on Universal Credit whose health element "
+    "falls. Each person "
     "is counted once.",
     f"Figures resting on fewer than {MIN_RECORDS} survey records are "
     "withheld.",
@@ -116,6 +117,7 @@ COLUMNS = (
     "reform_pip",
     "baseline_lcwra_element",
     "reform_lcwra_element",
+    "baseline_universal_credit",
     "lcwra_claimant",
     "employment_status",
     "in_approved_training",
@@ -301,6 +303,11 @@ def read_years(years):
                 "baseline_lcwra_element": person(baseline, "uc_LCWRA_element"),
                 "reform_lcwra_element": person(reformed, "uc_LCWRA_element"),
                 "lcwra_claimant": claimant,
+                # The element is computed whether or not the unit claims, so
+                # losing it needs a Universal Credit award under current law.
+                "baseline_universal_credit": person(
+                    baseline, "universal_credit"
+                ),
                 "employment_status": np.asarray(
                     baseline.calculate("employment_status", period=year).values
                 ).astype(str),
@@ -340,6 +347,7 @@ def summarise(frame, year, label):
     loses_pip = (frame["reform_pip"] < frame["baseline_pip"]).to_numpy()
     loses_uc_health = (
         frame["lcwra_claimant"].to_numpy(dtype=bool)
+        & (frame["baseline_universal_credit"].to_numpy(dtype=float) > 0)
         & (
             frame["reform_lcwra_element"] < frame["baseline_lcwra_element"]
         ).to_numpy()
