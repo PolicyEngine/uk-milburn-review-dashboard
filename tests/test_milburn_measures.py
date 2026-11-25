@@ -3,7 +3,7 @@
 Each test builds the household as the national run builds its simulations
 (``personal_impact.household_simulations``: current law on the forecast,
 and the measure's scenario) and checks the annual change against hand
-arithmetic on the engine's 2027-28 parameters (policyengine-uk 2.177.7,
+arithmetic on the engine's 2027-28 parameters (policyengine-uk 2.179.2,
 OBR October 2026 forecast), whose values are written out here.
 """
 
@@ -46,7 +46,7 @@ SECONDARY_THRESHOLD = 5_000
 
 pytestmark = pytest.mark.skipif(
     not local_build.engine_matches(),
-    reason="pins policyengine-uk 2.177.7's 2027-28 amounts",
+    reason="pins policyengine-uk 2.179.2's 2027-28 amounts",
 )
 
 

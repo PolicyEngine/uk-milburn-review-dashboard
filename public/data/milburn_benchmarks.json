@@ -46,11 +46,11 @@
       "date": "17 November 2026",
       "press_report": false,
       "policyengine_estimate": {
-        "value": "204,000",
-        "exact": 203774,
-        "basis": "People aged 16 to 24 receiving the Universal Credit health element (an award with the element), Great Britain, 2025 (2025-26 rules), at the build's calibrated weights",
+        "value": "176,000",
+        "exact": 176239,
+        "basis": "People aged 16 to 24 receiving the Universal Credit health element (an award with the element), England and Wales, 2025 (2025-26 rules), at the build's calibrated weights. Great Britain, with Scotland: 204,000",
         "label": "PolicyEngine, build b891aa69, 2025",
-        "note": "Why ours is higher: the build is calibrated to DWP's count for England and Wales from the review's interim annex (176,000), but the simulated count also includes Scotland, and the model's Universal Credit take-up adds some claimants with the element, so it sits about 16% above the published figure"
+        "note": "The build is calibrated to this count: DWP's figure for England and Wales in the review's interim annex (Table 28), which blends 161,000 observed in 2024-25 with 181,000 projected for 2025-26. The Resolution Foundation does not state its area; with Scotland our count is 204,000"
       }
     },
     {
@@ -151,7 +151,7 @@
         "note": "Lower overall because PIP is 17% below the review's figure, partly offset by the health element, 12% above"
       },
       "policyengine_saving": {
-        "value": "£4.67bn a year",
+        "value": "£4.42bn a year",
         "label": "Our saving from removing them, 2029-30, cash terms",
         "basis": "Static Exchequer saving in 2029-30 from removing the UC health element for under-25s and PIP for ages 18 to 24, UK, cash terms, including knock-on effects on other benefits, all within Universal Credit in the model (such as the disabled child element, entitlement while in education and the housing element's shared accommodation rate; Carer's Allowance does not change in the model): a saving, not spending; PIP at 16 and 17 is not removed"
       }
@@ -172,9 +172,9 @@
         "note": "Why ours is lower: the caseload matches DWP's 2025 count, but the review's figure is for the 2025-26 financial year and the build's average award is lower (about £7,800 a year, against the Resolution Foundation's £8,400)"
       },
       "policyengine_saving": {
-        "value": "£4.68bn a year",
+        "value": "£4.44bn a year",
         "label": "Our saving from removing PIP at 16 to 24, 2029-30, cash terms",
-        "basis": "Static Exchequer saving from removing PIP for ages 16 to 24 in 2029-30, UK, cash terms, including knock-on effects on other benefits, all within Universal Credit in the model (such as the disabled child element, entitlement while in education and the housing element's shared accommodation rate; Carer's Allowance does not change in the model), so not the same as PIP spending; £3.64bn for ages 18 to 24"
+        "basis": "Static Exchequer saving from removing PIP for ages 16 to 24 in 2029-30, UK, cash terms, including knock-on effects on other benefits, all within Universal Credit in the model (such as the disabled child element, entitlement while in education and the housing element's shared accommodation rate; Carer's Allowance does not change in the model), so not the same as PIP spending; £3.50bn for ages 18 to 24"
       }
     },
     {
@@ -193,7 +193,7 @@
         "note": "Why ours is higher: the same excess as in the caseload, where the simulated count of young people receiving the element is above the published figure"
       },
       "policyengine_saving": {
-        "value": "£1.13bn a year",
+        "value": "£0.95bn a year",
         "label": "Our saving from removing it for under-25s, 2029-30, cash terms",
         "basis": "Static Exchequer saving from removing the UC health element for under-25s in 2029-30, UK, cash terms"
       }
@@ -269,7 +269,7 @@
         "note": "Why ours is higher: the build is calibrated to HMRC's count of payroll employees aged 18 to 24, so the difference points to pay per young employee, which is not a calibration target"
       },
       "policyengine_saving": {
-        "value": "£4.65bn a year",
+        "value": "£4.83bn a year",
         "label": "Our net cost, 2029-30, cash terms",
         "basis": "Static cost of a zero employer National Insurance rate for under-25s in 2029-30, UK, cash terms, net of the income tax and National Insurance on the higher pay that employers' saving passes into"
       }

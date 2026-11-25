@@ -31,22 +31,22 @@ Every PolicyEngine figure is labelled "PolicyEngine estimate"; published figures
 
 ## The measures
 
-The report's measures, from April 2029, when the report's welfare savings start (analytical annex, section 1). Static estimates for 2029-30, against current law.
+The report's measures, from April 2029, when the report's welfare savings start (analytical annex, section 1). Static estimates for 2029-30, against current law, on build b891aa69. The last column adds gainers and losers; where one side is withheld under the disclosure floor, it counts the other alone.
 
 | Run id | Measure | Exchequer, 2029-30 (cash terms) | 16–24s in households whose income changes |
 |---|---|---|---|
-| `milburn_report_package` | UC health element removed for under-25s and PIP removed for 18 to 24-year-olds, together; no replacement payments modelled, so losses are an upper bound | £4.67bn saving | 580,000 |
-| `milburn_report_uc_health` | UC health element removed for under-25s (para 745) | £1.13bn saving | 404,000 |
-| `milburn_report_pip` | PIP removed for 18 to 24-year-olds (paras 750–757) | £3.64bn saving | 557,000 |
-| `milburn_report_employer_nics_threshold` | Employer NI threshold £5,000 → £10,000 for 21 to 24-year-olds in retail and hospitality (SIC 47, 55, 56), end state from an assumed April 2027, cost net of tax on the higher pay (paras 269–270) | £0.22bn cost | 766,000 |
-| `milburn_report_youth_allowance_independent` | Higher Youth Allowance for under-25s living independently: the 25-and-over rate where the claim has a housing element, the review's own proxy (annex, section 8) | £0.13bn cost | 159,000 |
-| `milburn_report_package_phased` | The package phased in: new 18-year-olds at once, existing claimants at an assumed 45% a year (about 95% within five years, para 773) | £2.77bn saving | 341,000 |
-| `milburn_report_employer_nics_threshold_glide_path` | The NI threshold in assumed equal steps, £6,000 in 2027-28 to £10,000 in 2031-32 | £0.14bn cost | 766,000 |
-| `milburn_report_employer_nics_threshold_all_sectors` | Illustrative: the £10,000 end state for every 21 to 24-year-old employee in every sector, an upper bound: para 270 says the government should consider extending the relief to other sectors, "focusing on those with the biggest potential to create more entry level jobs", and names none, from an assumed April 2027, cost net of tax on the higher pay | £0.91bn cost | 2,857,000 |
-| `milburn_report_youth_allowance_work_allowance` | Illustrative: a work allowance for every under-25 UC claim (para 749 gives no amount), at the current UC work allowance amounts, the lower with a housing element: our assumption | £0.46bn cost | 422,000 |
-| `milburn_report_youth_allowance_work_allowance_15h` | Illustrative sensitivity at the report's hours (para 749: "10 or 15 hours a week"): a work allowance of 15 hours a week at the minimum wage for 21 and over, 52 weeks over 12 months (about £900 a month in 2029-30), the same with or without a housing element; claims with a statutory work allowance today (a child or limited capability for work) get the higher of the two, which the current-amount run leaves alone: our assumptions | £0.88bn cost | 752,000 |
-| `milburn_report_youth_allowance_combined` | Our combination: the higher Youth Allowance and the illustrative work allowance, simulated together (separately −£0.13bn and −£0.46bn) | £0.63bn cost | 548,000 |
-| `milburn_report_package_with_youth_allowance` | Our combination: the health element and PIP removal plus both Youth Allowance changes, simulated together; no replacement payments modelled | £4.05bn saving | 1,043,000 |
+| `milburn_report_package` | UC health element removed for under-25s and PIP removed for 18 to 24-year-olds, together; no replacement payments modelled, so losses are an upper bound | £4.42bn saving | 609,000 |
+| `milburn_report_uc_health` | UC health element removed for under-25s (para 745) | £0.95bn saving | 335,000 |
+| `milburn_report_pip` | PIP removed for 18 to 24-year-olds (paras 750–757) | £3.50bn saving | 568,000 |
+| `milburn_report_employer_nics_threshold` | Employer NI threshold £5,000 → £10,000 for 21 to 24-year-olds in retail and hospitality (SIC 47, 55, 56), end state from an assumed April 2027, cost net of tax on the higher pay (paras 269–270) | £0.24bn cost | 818,000 |
+| `milburn_report_youth_allowance_independent` | Higher Youth Allowance for under-25s living independently: the 25-and-over rate where the claim has a housing element, the review's own proxy (annex, section 8) | £0.15bn cost | 185,000 |
+| `milburn_report_package_phased` | The package phased in: new 18-year-olds at once, existing claimants at an assumed 45% a year (about 95% within five years, para 773) | £2.57bn saving | 364,000 |
+| `milburn_report_employer_nics_threshold_glide_path` | The NI threshold in assumed equal steps, £6,000 in 2027-28 to £10,000 in 2031-32 | £0.15bn cost | 818,000 |
+| `milburn_report_employer_nics_threshold_all_sectors` | Illustrative: the £10,000 end state for every 21 to 24-year-old employee in every sector, an upper bound: para 270 says the government should consider extending the relief to other sectors, "focusing on those with the biggest potential to create more entry level jobs", and names none, from an assumed April 2027, cost net of tax on the higher pay | £0.93bn cost | 2,908,000 |
+| `milburn_report_youth_allowance_work_allowance` | Illustrative: a work allowance for every under-25 UC claim (para 749 gives no amount), at the current UC work allowance amounts, the lower with a housing element: our assumption | £0.51bn cost | 458,000 |
+| `milburn_report_youth_allowance_work_allowance_15h` | Illustrative sensitivity at the report's hours (para 749: "10 or 15 hours a week"): a work allowance of 15 hours a week at the minimum wage for 21 and over, 52 weeks over 12 months (about £900 a month in 2029-30), the same with or without a housing element; claims with a statutory work allowance today (a child or limited capability for work) get the higher of the two, which the current-amount run leaves alone: our assumptions | £0.97bn cost | 808,000 |
+| `milburn_report_youth_allowance_combined` | Our combination: the higher Youth Allowance and the illustrative work allowance, simulated together (separately −£0.15bn and −£0.51bn) | £0.70bn cost | 589,000 |
+| `milburn_report_package_with_youth_allowance` | Our combination: the health element and PIP removal plus both Youth Allowance changes, simulated together; no replacement payments modelled | £3.74bn saving | 1,126,000 |
 
 Child DLA extended to 18 (para 760) is listed as not computable: DLA and PIP pay the same amounts, so the swap changes no payment for those who move; about 77% of child DLA claimants move to PIP by 17 (para 759), so some who would lose an award at 16 would keep DLA longer, and the data cannot identify them (its reserved run, `milburn_report_child_dla_to_18`, is all zeros and is not published).
 

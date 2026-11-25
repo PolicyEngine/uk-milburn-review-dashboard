@@ -25,7 +25,7 @@ from uk_budget_data.reforms import Reform
 
 pytestmark = pytest.mark.skipif(
     not local_build.engine_matches(),
-    reason="pins policyengine-uk 2.177.7's DLA and PIP variables",
+    reason="pins policyengine-uk 2.179.2's DLA and PIP variables",
 )
 
 WEEKS = 52

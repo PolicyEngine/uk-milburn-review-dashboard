@@ -3,7 +3,7 @@
 
 Each test builds the household as the national run builds its simulations
 (``personal_impact.household_simulations``) and checks the annual change
-against hand arithmetic on the engine's amounts (policyengine-uk 2.177.7,
+against hand arithmetic on the engine's amounts (policyengine-uk 2.179.2,
 OBR October 2026 forecast): a 15% employer rate and a £5,000 secondary
 threshold to 2030-31, £5,100 in 2031-32.
 """
@@ -36,7 +36,7 @@ COMPUTING = 62
 
 pytestmark = pytest.mark.skipif(
     not local_build.engine_matches(),
-    reason="pins policyengine-uk 2.177.7's amounts",
+    reason="pins policyengine-uk 2.179.2's amounts",
 )
 
 REPORT = Reform(

@@ -161,7 +161,7 @@ describe("Benchmarks cards", () => {
       "employer_nics_under_25",
     ]);
     for (const [id, gap] of [
-      ["uc_health_element_16_24", "Ours 16% higher"],
+      ["uc_health_element_16_24", "Ours within 1%"],
       // A share differs in percentage points, never as a % of a %
       ["uc_health_pip_overlap", "Ours 20.9pp higher"],
       ["pip_spend_16_24", "Ours 17% lower"],
@@ -196,7 +196,7 @@ describe("Benchmarks cards", () => {
     expect(info.textContent).toContain("Why ours is lower: the caseload matches DWP's 2025 count");
     expect(info.textContent).toContain("Published: £3.8bn a year; £1.3bn in 2019-20, forecast at £8.1bn in 2036-37.");
     expect(info.textContent).toContain("PolicyEngine, build b891aa69, 2025, cash terms: £3.17bn a year.");
-    expect(info.textContent).toContain("Our saving from removing PIP at 16 to 24, 2029-30, cash terms: £4.68bn a year.");
+    expect(info.textContent).toContain("Our saving from removing PIP at 16 to 24, 2029-30, cash terms: £4.44bn a year.");
     // The source is the foot's chip, not repeated in More info (issue #6, item 8)
     expect(within(info).queryByRole("link", { name: /From a Welfare State to a Working State/ })).toBeNull();
     expect(info.textContent).toContain("Not tested against the 15% tolerance: the review's figure gives no area.");
@@ -205,7 +205,7 @@ describe("Benchmarks cards", () => {
     expect(pip.textContent).toContain("Not like for like: ours is England and Wales in 2025; the published figure is current, for November 2026.");
     expect(pip.textContent).toContain("407,505");
     // The employer NI pair's net cost
-    expect(openMoreInfo("employer_nics_under_25").textContent).toContain("Our net cost, 2029-30, cash terms: £4.65bn a year.");
+    expect(openMoreInfo("employer_nics_under_25").textContent).toContain("Our net cost, 2029-30, cash terms: £4.83bn a year.");
   });
 
   it("lists every figure once, with its source, and the package's estimate from its own run", async () => {

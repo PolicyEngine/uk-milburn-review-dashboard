@@ -138,7 +138,7 @@ describe("MethodologyTab", () => {
     expect(container.textContent).toContain("In the data 83.4% of 16 to 24-year-olds with limited capability for work and work-related activity (LCWRA) also get PIP, against 62.5%");
     expect(container.textContent).toContain("each fits within 0.2%");
     expect(container.textContent).not.toContain("23% above");
-    expect(container.textContent).toContain("about 16% above the Resolution Foundation's 176,000");
+    expect(container.textContent).toContain("176,000 in England and Wales, the same as the Resolution Foundation's figure");
     expect(container.textContent).toContain("The young average PIP award is lower than the published figures");
   });
 

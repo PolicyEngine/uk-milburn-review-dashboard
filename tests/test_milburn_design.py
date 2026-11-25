@@ -51,7 +51,7 @@ from uk_budget_data.milburn_measures import milburn_measures
 
 pytestmark = pytest.mark.skipif(
     not local_build.engine_matches(),
-    reason="pins policyengine-uk 2.177.7's 2027-28 amounts",
+    reason="pins policyengine-uk 2.179.2's 2027-28 amounts",
 )
 
 ROOT = Path(__file__).resolve().parents[1]

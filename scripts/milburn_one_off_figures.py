@@ -144,6 +144,9 @@ def baseline_figures(sim):
     count = wsum(young_lcwra, weight)
     with_pip = wsum(young_lcwra & (pip > 0), weight)
     out["uc_health_16_24_gb_2025"] = count
+    out["uc_health_16_24_ew_2025"] = wsum(
+        lcwra & young & (element_person > 0) & receives_uc & ew, weight
+    )
     out["uc_health_16_24_with_pip_pct_2025"] = 100 * with_pip / count
 
     pip_young_ew = (pip > 0) & young & ew

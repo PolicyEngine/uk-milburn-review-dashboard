@@ -18,7 +18,7 @@ COMPLEMENT = reforms.MILBURN_REPORT_ENTRY_CHECK_COMPLEMENT_ID
 
 engine = pytest.mark.skipif(
     not local_build.engine_matches(),
-    reason="household checks pin policyengine-uk 2.177.7",
+    reason="household checks pin policyengine-uk 2.179.2",
 )
 
 

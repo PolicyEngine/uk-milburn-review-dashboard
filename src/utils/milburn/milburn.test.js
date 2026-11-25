@@ -126,7 +126,7 @@ describe("the benchmarks file", () => {
     // The figures from build b891aa69 (scripts/milburn_one_off_figures.py)
     const fixed = (id) => parsed.rows.find((row) => row.id === id).estimate.fixed;
     // Our counts to the nearest thousand; the tolerance is tested unrounded (benchmarks.js)
-    expect(fixed("uc_health_element_16_24")).toBe("204,000");
+    expect(fixed("uc_health_element_16_24")).toBe("176,000");
     expect(fixed("young_pip_recipients")).toBe("407,000");
     expect(fixed("young_benefits_spend")).toBe("£4.19bn a year");
     expect(fixed("pip_spend_16_24")).toBe("£3.17bn a year");
@@ -138,10 +138,10 @@ describe("the benchmarks file", () => {
     // Our savings are kept apart, labelled as savings (or a net cost), never set against spending
     const saving = (id) => parsed.rows.find((row) => row.id === id).saving;
     expect(parsed.rows.filter((row) => row.saving).map((row) => row.id)).toEqual(["young_benefits_spend", "pip_spend_16_24", "uc_health_spend_16_24", "employer_nics_under_25"]);
-    expect(saving("young_benefits_spend")).toMatchObject({ value: "£4.67bn a year", label: "Our saving from removing them, 2029-30, cash terms" });
-    expect(saving("pip_spend_16_24").value).toBe("£4.68bn a year");
-    expect(saving("uc_health_spend_16_24").value).toBe("£1.13bn a year");
-    expect(saving("employer_nics_under_25")).toMatchObject({ value: "£4.65bn a year", label: "Our net cost, 2029-30, cash terms" });
+    expect(saving("young_benefits_spend")).toMatchObject({ value: "£4.42bn a year", label: "Our saving from removing them, 2029-30, cash terms" });
+    expect(saving("pip_spend_16_24").value).toBe("£4.44bn a year");
+    expect(saving("uc_health_spend_16_24").value).toBe("£0.95bn a year");
+    expect(saving("employer_nics_under_25")).toMatchObject({ value: "£4.83bn a year", label: "Our net cost, 2029-30, cash terms" });
     expect(saving("employer_nics_under_25").basis).toMatch(/net of the income tax and National Insurance on the higher pay/);
     for (const id of ["young_benefits_spend", "pip_spend_16_24"]) expect(saving(id).basis, id).toMatch(/Exchequer saving[\s\S]*knock-on effects on other benefits/);
     expect(parsed.year).toBe(2029);
@@ -193,10 +193,10 @@ describe("the benchmark charts", () => {
       "uc_health_spend_16_24",
       "employer_nics_under_25",
     ]);
-    // The like-for-like gaps on build b891aa69: +16%, -11%, -17%, +12%, +21%
+    // The like-for-like gaps on build b891aa69: 0%, -11%, -17%, +12%, +21%
     const gap = (id) => Math.round(comparisonFor(row(id)).gapPct);
-    expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 204000 });
-    expect(gap("uc_health_element_16_24")).toBe(16); // from the unrounded 203,774, so rounding the shown count never moves the gap
+    expect(comparisonFor(row("uc_health_element_16_24"))).toMatchObject({ unit: "count", published: 176000, estimate: 176000 });
+    expect(gap("uc_health_element_16_24")).toBe(0); // from the unrounded 176,239, so rounding the shown count never moves the gap
     // The PIP overlap: shares, so the gap is in percentage points (Max, 18 Nov; issue #4's table)
     expect(comparisonFor(row("uc_health_pip_overlap"))).toMatchObject({ unit: "pct", published: 62.5, estimate: 83.4 });
     expect(comparisonFor(row("uc_health_pip_overlap")).gapPp).toBeCloseTo(20.9, 6);

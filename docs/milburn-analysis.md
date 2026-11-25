@@ -3,9 +3,9 @@
 > **Historical.** This note was written before the final report, on the
 > uncertified Microcosm build 6f918b81, with the pre-report packages, 2027-28
 > start dates and the netted average loss. None of its figures is current.
-> The dashboard now runs on build fcfac709 (pre-report runs first made on
-> policyengine 6.20.1, report runs on 6.20.2, same engine and data; every run
-> now records 6.20.2; see docs/milburn-local-run.md) with the report's
+> The dashboard now runs on build b891aa69 (policyengine 6.20.3,
+> policyengine-uk 2.179.2, since 24 November 2026; before that build fcfac709;
+> see docs/milburn-local-run.md) with the report's
 > measures from April 2029; current figures are in
 > `public/data/milburn_summary.json` and `public/data/milburn/<run>/`, and the
 > design choices in `src/uk_budget_data/budget_measures/milburn_design.py`.
@@ -106,8 +106,9 @@ Negative saving = a cost; for gain measures the loss columns are gains (negative
   the shared accommodation rate exemption). Carer's Allowance and the UC
   carer element do not change: the model does not link a carer's
   entitlement to the PIP of the person cared for (in reality a carer could
-  lose it, a limitation). For the report's 18–24 run in 2029-30: about
-  £3.09bn of PIP and £0.56bn of knock-on effects.
+  lose it, a limitation). For the report's 18–24 run in 2029-30 on build
+  fcfac709: about £3.09bn of PIP and £0.56bn of knock-on effects (on
+  b891aa69: £3.08bn and £0.42bn).
 - **Health element rate.** The engine pays the new-claimant rate (£217.26 a
   month) to a random 13% of awards in 2027-28, regardless of age. Young
   claimants turn over fast, so more of them are likely on the lower rate;

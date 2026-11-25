@@ -34,7 +34,7 @@ from uk_budget_data.reforms import Reform
 
 pytestmark = pytest.mark.skipif(
     not local_build.engine_matches(),
-    reason="pins policyengine-uk 2.177.7's 2027-28 amounts",
+    reason="pins policyengine-uk 2.179.2's 2027-28 amounts",
 )
 
 # 12 x (£443.21 - £353.17) = £1,080.48 a year.
