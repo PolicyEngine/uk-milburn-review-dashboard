@@ -3,6 +3,10 @@
 Read-only review, 16 November 2026, of `main` at `0287c2d7`. Nothing was
 edited, committed, deployed or posted. No result figure is repeated here.
 
+> **Update, 25 November 2026.** The HMRC SPI condition (blocker 1 and section
+> 1.1) is resolved: María confirmed it was met on 17 November 2026. The rest of
+> this review is kept as it stood on 16 November.
+
 ## Verdict
 
 **No-go for a public deploy on 17 November as the repository stands.** Three
@@ -23,7 +27,7 @@ of principle.
 
 ## 1. Licensing and data
 
-### 1.1 HMRC SPI condition (blocker, unconfirmed)
+### 1.1 HMRC SPI condition (resolved 17 November: María confirmed it was met)
 
 - The only source in the repository is `docs/milburn-analysis.md:6-8` ("analyses
   to HMRC ten working days before publication; confirm with María before
